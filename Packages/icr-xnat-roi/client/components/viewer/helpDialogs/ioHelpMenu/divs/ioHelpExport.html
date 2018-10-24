@@ -1,0 +1,22 @@
+<template name="ioHelpExport">
+  <div>
+    {{#if canWrite}}
+      <p>
+        This command will allow you to select a set of new ROIs drawn on this
+        scan to export to XNAT as a new ROI Collection.
+      </p>
+      <ul>
+        <li>Tick which ROIs you wish to export as a collection.</li>
+        <li>Give the ROI Collection an appropriate descriptive name.</li>
+        <li>Click the large XNAT button to export the collection to XNAT</li>
+      </ul>
+    {{else}}
+      <p>
+        This command is disabled as you do not have the required permissions to
+        write to {{projectId}}/{{experimentLabel}}. If you believe that you
+        should, please contact the project owner.
+      </p>
+    {{/if}}
+    <p>{{exportROIsText}}</p>
+  </div>
+</template>

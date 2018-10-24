@@ -1,0 +1,77 @@
+@import "{ohif:design}/app"
+
+.roiImportListDialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 300px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-top: 5px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  h5, label
+    font-weight: 400
+    float: left
+
+  .roiImportListHeader
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    justify-content: space-between
+
+  h3
+    font-weight: 400
+    text-align: left
+
+  .roiImportListCancel
+    text-align: right
+    margin-top: 16px
+
+  svg
+    background-color: transparent
+    width: 32px
+    height: 32px
+    fill: white
+
+  .roiImportListTableButton
+    width: 100%
+
+  .roiImportListBody
+    max-height: calc(80vh - 300px);
+    padding-right: 18px
+    overflow-y: auto
+    overflow-x: hidden
+    display: inline-block
+
+  .roiImportListBody table, tr, th
+    padding: 0px 10px
+
+  .roiImportListBody th
+    white-space: nowrap
+
+  .roiImportListBody td
+    white-space: nowrap
+    padding: 0px 10px
+
+  .roiImportListFooter
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    justify-content: space-around
+    align-items: center
+
+  .roiImportListImport
+    text-align: center
+    margin: 5px
+
+  .leftAlignedCell
+    text-align: left

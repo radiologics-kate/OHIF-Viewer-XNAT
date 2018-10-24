@@ -1,0 +1,23 @@
+<template name="volumeManagementDialogs">
+  <dialog id="volumeManagementDialog"
+      class="volumeManagementDialog noselect"
+      oncontextmenu="return false">
+      <div class="volumeManagementHeader">
+        <h3>Regions of Interest</h3>
+        <a class="volumeManagementCancel js-volume-management-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      {{>roiCollectionList roiCollections=roiCollections}}
+
+      <div class="volumeManagementFooter">
+        <hr/>
+        <a class="volumeManagementNewButton js-volume-management-new btn btn-sm btn-primary">
+          <i class="fa fa-plus-circle"></i> ROI
+        </a>
+        <br/>
+      </div>
+
+  </dialog>
+</template>

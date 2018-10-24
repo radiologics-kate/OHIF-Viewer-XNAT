@@ -1,0 +1,9 @@
+<template name="roiCollectionList">
+  <div class="roiCollectionListBody">
+    <table>
+      {{#each roiCollection in roiCollections}}
+          {{>volumeList roiCollection}}
+      {{/each}}
+    </table>
+  </div>
+</template>

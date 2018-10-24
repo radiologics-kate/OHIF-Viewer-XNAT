@@ -1,0 +1,51 @@
+<template name="roiCollectionBuilderDialogs">
+  <dialog id="roiCollectionBuilderDialog"
+      class="roiCollectionBuilderDialog noselect"
+      oncontextmenu="return false">
+      <div class="roiCollectionBuilderHeader">
+        <h3>Export ROI Collection</h3>
+        <a class="roiCollectionBuilderCancel js-volume-management-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      <hr />
+
+      <div class="roiCollectionBuilderListBody">
+        <table>
+        <tr>
+          <th nowrap>Name</th>
+          <th class="centeredCell">Export <input class="js-select-all-check" type="checkbox" {{selectAllChecked}} name="sync" value=""></th>
+          <th class="centeredCell">Contours</th>
+        </tr>
+        {{#each region in regions}}
+            {{>roiCollectionBuilderListItem region}}
+        {{/each}}
+        </table>
+      </div>
+
+      <hr/>
+
+      <div class="roiCollectionBuilderFooter">
+        <div class="roiCollectionBuilderTextInputOptions">
+            Name <input name="roiCollectionBuilderTextInput"
+                   class="roiCollectionBuilderTextInput"
+                   type="text"
+                   value="{{roiCollectionName}}"
+                   tabindex="-1"
+                   autocomplete="off"
+                   onfocus="this.select()"/>
+        </div>
+
+        <div class="roiCollectionBuilderExport">
+          <a class="roiCollectionBuilderExportButton btn btn-sm btn-primary">
+              <svg stroke='#fff'>
+                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
+              </svg>
+              <h5 class="exportButtonText"></h5>
+          </a>
+      </div>
+    </div>
+
+  </dialog>
+</template>

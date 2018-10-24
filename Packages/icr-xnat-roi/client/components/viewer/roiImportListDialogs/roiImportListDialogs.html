@@ -1,0 +1,44 @@
+<template name="roiImportListDialogs">
+  <dialog id="roiImportListDialog"
+      class="roiImportListDialog noselect"
+      oncontextmenu="return false">
+      <div class="roiImportListHeader">
+        <h3>Import ROI Collections</h3>
+        <a class="roiImportListCancel js-volume-management-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      <hr />
+      <div class="roiImportListBody">
+        {{#if importListReady}}
+          {{#if listHasData}}
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Import <input class="js-select-all-check" type="checkbox" {{selectAllChecked}} name="sync" value=""></th>
+                <th>Type</th>
+              </tr>
+              {{#each roiCollection in roiCollections}}
+                  {{>roiImportListItem roiCollection}}
+              {{/each}}
+            </table>
+          {{else}}
+            <p>No data to import.</p>
+          {{/if}}
+        {{else}}
+          <h1><i class="fa fa-spin fa-circle-o-notch fa-fw"></i></h1>
+        {{/if}}
+      </div>
+
+      <hr/>
+
+      <div class="roiImportListFooter">
+        <a class="roiImportListConfirm btn btn-sm btn-primary">
+          <svg stroke='#fff'>
+            <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import"}}></use>
+          </svg>
+        </a>
+      </div>
+  </dialog>
+</template>

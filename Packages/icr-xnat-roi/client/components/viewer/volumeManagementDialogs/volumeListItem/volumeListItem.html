@@ -1,0 +1,12 @@
+<template name="volumeListItem">
+  <tr>
+    <th><!--Blank Cell to allow indent with strong alignment--></th>
+    <th><i class="fa fa-square" style="color:{{color}}"></i> {{volumeName}}</th>
+    <th class="centeredCell">{{numPolygons}}</th>
+    {{#if isDefault}}
+      <th class="centeredCell ">
+        <input type="radio" class="volumeListItemCheck js-switch-button"  {{checked}} name="sync" value="">
+      </th>
+    {{/if}}
+  </tr>
+</template>

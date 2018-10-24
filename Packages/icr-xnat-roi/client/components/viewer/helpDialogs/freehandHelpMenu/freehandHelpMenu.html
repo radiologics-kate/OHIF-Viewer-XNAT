@@ -1,0 +1,43 @@
+<template name="freehandHelpMenu">
+  <div id="freehandHelp">
+      <div class="subHelpHeader">
+        <div class="subHelpNavBar">
+          <a class="subHelpButton js-help-draw btn btn-sm btn-primary">
+              <svg class={{pressed 'Draw'}}>
+                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-freehand-draw"}}></use>
+              </svg>
+          </a>
+          <a class="subHelpButton js-help-sculpt btn btn-sm btn-primary">
+            <svg class={{pressed 'Sculpt'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-freehand-sculpt"}}></use>
+            </svg>
+          </a>
+          <a class="subHelpButton js-help-volumes btn btn-sm btn-primary">
+            <svg class={{pressed 'Volumes'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-freehand-switch-volume"}}></use>
+            </svg>
+          </a>
+          <a class="subHelpButton js-help-toggle-stats btn btn-sm btn-primary">
+            <i id="fontAwesomeIcon" class="{{pressed 'Toggle Stats'}} fa fa-commenting fa-2x"></i>
+          </a>
+        </div>
+
+        <div class="subHelpTitle">
+          <h3>{{freehandTitle}}</h3>
+        </div>
+      </div>
+
+      <div class="subHelpBody">
+        {{#if showFreehandHelp 'Draw'}}
+          {{>freehandHelpDraw}}
+        {{else if showFreehandHelp 'Sculpt'}}
+          {{>freehandHelpSculpt}}
+        {{else if showFreehandHelp 'Volumes'}}
+          {{>freehandHelpVolumes}}
+        {{else if showFreehandHelp 'Toggle Stats'}}
+          {{>freehandHelpToggleStats}}
+        {{/if}}
+      </div>
+
+  </div>
+</template>

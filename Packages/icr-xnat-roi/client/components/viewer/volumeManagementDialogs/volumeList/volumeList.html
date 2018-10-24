@@ -1,0 +1,46 @@
+<template name="volumeList">
+  {{#if notEmpty}}
+
+    <!-- volumeList Header -->
+    <tr class="volumeListHeader">
+
+      {{#if isDefault}}
+        <th></th>
+        <th colspan="3"> Working ROI Collection</th>
+      {{else}}
+        <th>
+          <i class="{{showHideButton}} btn btn-sm btn-secondary js-show-hide"></i>
+        </th>
+        <th colspan="2">{{this.structureSetName}}</th>
+        <th>
+          <i class="{{displayRoiCollectionButton}} btn btn-sm btn-secondary js-display-roiCollection"></i>
+        </th>
+      {{/if}}
+    </tr>
+
+    <!-- volumeList Body -->
+    {{#if showBody}}
+      {{#if isDefault}}
+        <tr>
+          <th><!--Blank Cell to allow indent with strong alignment--></th>
+          <th>Name</th>
+          <th class="centeredCell">Contours</th>
+          <th class="centeredCell">Edit</th>
+        </tr>
+        {{#each ROIContour in this.ROIContourArray}}
+            {{>volumeListItem ROIContour}}
+        {{/each}}
+      {{else}}
+        <tr>
+          <th><!--Blank Cell to allow indent with strong alignment--></th>
+          <th>Name</th>
+          <th class="centeredCell">Contours</th>
+        </tr>
+        {{#each ROIContour in this.ROIContourArray}}
+            {{>volumeListItem ROIContour}}
+        {{/each}}
+      {{/if}}
+    {{/if}}
+
+  {{/if}}
+</template>

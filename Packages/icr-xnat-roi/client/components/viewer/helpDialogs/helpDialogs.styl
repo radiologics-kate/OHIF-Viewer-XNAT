@@ -1,0 +1,94 @@
+@import "{ohif:design}/app"
+
+.helpDialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  width: 600px
+  max-height: calc(100% - 300px)
+  position: absolute
+  margin: auto
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-top: 5px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  .helpNavBar
+    float: left
+
+  .helpButton
+    float: left
+
+  .pressed
+    stroke: #fff
+    color: #fff
+    fill: #fff
+
+  .depressed
+    theme('color', '$textSecondaryColor')
+    theme('stroke', '$textSecondaryColor')
+    theme('fill', '$textSecondaryColor')
+
+  .helpTitle
+    float: left
+    margin-left: 20px
+
+  h3
+    font-weight: 400
+    top: 50%
+    transform: translateY(-50%)
+
+  .helpDialogCancel
+    float: right
+
+  li
+    clear: both
+    text-align: left
+
+  h5
+    clear: both
+    text-align: left
+    float: left
+
+  .subHelpNavBar
+    float: left
+    clear: both
+
+  .subHelpButton
+    float: left
+
+  .subHelpTitle
+    float: left
+    margin-left: 20px
+
+  h3
+    font-weight: 400
+    top: 50%
+    transform: translateY(-50%)
+
+  li
+    clear: both
+    text-align: left
+
+  .subHelpBody
+    height: 200px
+    width: 100%
+    overflow-y: auto
+    overflow-x: hidden
+    display: inline-block
+    float: left
+
+  .subHelpBody p
+    float:left
+    text-align: left
+
+  svg
+    background-color: transparent
+    width: 21px
+    height: 21px
+    fill: white

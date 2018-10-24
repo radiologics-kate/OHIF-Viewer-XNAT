@@ -1,0 +1,61 @@
+@import "{ohif:design}/app"
+
+.volumeManagementDialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 50px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-top: 10px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  .volumeManagementHeader
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: space-between
+
+  h3
+    font-weight: 400
+    text-align: left
+
+  .volumeManagementCancel
+    text-align: right
+    margin-top: 16px
+
+  .volumeManagementNewButton
+    float: center
+    width: 100%
+
+  .volumeManagementTableButton
+    width: 100%
+
+  .roiCollectionListBody
+    max-height: calc(80vh - 300px);
+    padding-right: 18px
+    overflow-y: auto
+    overflow-x: hidden
+    display:inline-block;
+
+  .roiCollectionListBody tr, th
+    padding: 0px 5px
+    float: center
+    white-space: nowrap
+
+  .volumeListHeader
+    border-width: 1px
+    border-top-style: solid
+    border-bottom-style: solid
+
+  .centeredCell
+    text-align: center
