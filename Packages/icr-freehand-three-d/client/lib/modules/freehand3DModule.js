@@ -89,6 +89,9 @@ function getSeries (seriesInstanceUid) {
 function getStructureSet (seriesInstanceUid, structureSetUid = 'DEFAULT') {
   check(structureSetUid, 'structureSetUid');
 
+  console.log(seriesInstanceUid);
+  console.log(structureSetUid);
+
   const series = getSeries(seriesInstanceUid);
 
   if (!series) {
@@ -184,8 +187,8 @@ function setStructureSet (seriesInstanceUid, name, options = {}) {
   const structureSet = {
     uid: options.uid ? options.uid : generateUID(),
     name,
-    isLocked: options.isLocked === true,
-    visibile: options.visible === true,
+    isLocked: options.isLocked ? options.isLocked : false,
+    visible: options.visible ? options.visible : true,
     activeROIContourIndex: null,
     ROIContourCollection: []
   };
@@ -214,7 +217,7 @@ function setROIContour (seriesInstanceUid, structureSetUid, name, options = {}) 
 
   structureSet.ROIContourCollection.push(ROIContour);
 
-  return uid;
+  return ROIContour.uid;
 }
 
 function setROIContourAndSetIndexActive (seriesInstanceUid, structureSetUid, name, options = {}) {
@@ -372,7 +375,7 @@ const importColors = [
 let currentColorIndex = importColors.length;
 
 /**
- * getNextColor - TODO
+ * getNextColor
  *
  * @return {string} A CSS recognised color with which to render the ROI contour.
  */

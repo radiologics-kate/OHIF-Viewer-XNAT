@@ -2,7 +2,7 @@ import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 /**
  * Opens UI that allows user to chose a name for a new volume, and processes
@@ -20,7 +20,7 @@ export async function createNewVolume () {
     const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
     modules.freehand3D.setters.ROIContourAndSetIndexActive(activeSeriesInstanceUid, 'DEFAULT', name);
 
-    console.log(`making new volume -- name: ${name}, seriesInstanceUid: ${seriesInstanceUid}`);
+    console.log(`making new volume -- name: ${name}, seriesInstanceUid: ${activeSeriesInstanceUid}`);
   }
 }
 

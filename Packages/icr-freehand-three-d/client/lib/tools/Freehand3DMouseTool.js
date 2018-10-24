@@ -5,6 +5,7 @@ import { createNewVolume, setVolumeName } from '../util/freehandNameIO.js';
 
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
+// Cornerstone 3rd party dev kit imports
 const {
   insertOrDelete,
   freehandArea,
@@ -12,9 +13,17 @@ const {
   freehandIntersect,
   FreehandHandleData
 } = cornerstoneTools.import('util/freehandUtils');
-
+const draw = cornerstoneTools.import('drawing/draw');
+const drawJoinedLines = cornerstoneTools.import('drawing/drawJoinedLines');
+const drawHandles = cornerstoneTools.import('drawing/drawHandles');
+const drawLinkedTextBox = cornerstoneTools.import('drawing/drawLinkedTextBox');
+const moveHandleNearImagePoint = cornerstoneTools.import('manipulators/moveHandleNearImagePoint');
+const getNewContext = cornerstoneTools.import('drawing/getNewContext');
 const FreehandMouseTool = cornerstoneTools.FreehandMouseTool;
 const modules = cornerstoneTools.store.modules;
+const toolColors = cornerstoneTools.toolColors;
+const numbersWithCommas = cornerstoneTools.import('util/numbersWithCommas');
+
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
   constructor(name = 'FreehandMouse') {
@@ -33,6 +42,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @returns {object} measurementData
    */
   createNewMeasurement (eventData) {
+    console.log('createNewMeasurement');
     const freehand3DStore = this._freehand3DStore;
     const goodEventData =
       eventData && eventData.currentPoints && eventData.currentPoints.image;
@@ -78,7 +88,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       hasBoundingBox: true
     };
 
-    Freehand3DMouseTool.setters.incrementPolygonCount(
+    freehand3DStore.setters.incrementPolygonCount(
       seriesInstanceUid,
       'DEFAULT',
       referencedROIContour.uid
@@ -126,7 +136,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       this._startDrawing(eventData);
       this._addPoint(eventData);
       preventPropagation(evt);
-    }).catch(() => {
+    }).catch((error) => {
+      console.log(error);
+      console.log('failure');
       preventPropagation(evt);
     });
   }
@@ -216,29 +228,15 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    */
   preMouseDownCallback (evt) {
     const eventData = evt.detail;
-    const nearby = this._pointNearHandleAllTools(eventData);
-
-    console.log(evt.currentTarget);
-    console.log(this.name);
 
     const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
 
     if (!toolData) {
-      console.log('returning');
-      return;
-    }
-
-    const data = toolData.data[nearby.toolIndex];
-
-    // Check if locked and return
-    const structureSet = freehand3DStore.getters.structureSet(
-      data.seriesIsntanceUid,
-      data.structureSetUid
-    );
-
-    if (structureSet.isLocked) {
       return false;
     }
+
+    const nearby = this._pointNearHandleAllTools(eventData);
+    const freehand3DStore = this._freehand3DStore;
 
     if (eventData.event.ctrlKey) {
       if (nearby !== undefined && nearby.handleNearby.hasBoundingBox) {
@@ -252,6 +250,24 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return true;
     }
 
+    if (!nearby) {
+      return;
+    }
+
+    const data = toolData.data[nearby.toolIndex];
+
+    // Check if locked and return
+    const structureSet = freehand3DStore.getters.structureSet(
+      data.seriesInstanceUid,
+      data.structureSetUid
+    );
+
+    if (structureSet.isLocked) {
+      return false;
+    }
+
+
+
     return false;
   }
 
@@ -262,6 +278,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param  {Object} handle The selected handle.
    */
   handleSelectedCallback (evt, handle, data) {
+    console.log(`handleSelectedCallback`);
+
+    const freehand3DStore = this._freehand3DStore;
     const eventData = evt.detail;
     const element = eventData.element;
     const toolState = cornerstoneTools.getToolState(eventData.element, this.name);
@@ -280,7 +299,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     // Check if locked and return
     const structureSet = freehand3DStore.getters.structureSet(
-      data.seriesIsntanceUid,
+      data.seriesInstanceUid,
       data.structureSetUid
     );
 
@@ -307,7 +326,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     this._activateModify(element);
 
     // Interupt eventDispatchers
-    state.isToolLocked = true;
+    cornerstoneTools.store.state.isToolLocked = true;
 
     preventPropagation(evt);
   }
@@ -342,7 +361,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const image = eventData.image;
     const element = eventData.element;
     const config = this.configuration;
-    const seriesModule = external.cornerstone.metaData.get(
+    const seriesModule = cornerstone.metaData.get(
       'generalSeriesModule',
       image.imageId
     );
@@ -355,7 +374,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     // We have tool data for this element - iterate over each one and draw it
     const context = getNewContext(eventData.canvasContext.canvas);
 
-    const lineWidth = toolStyle.getToolWidth();
+    const lineWidth = cornerstoneTools.toolStyle.getToolWidth();
 
     for (let i = 0; i < toolState.data.length; i++) {
       const data = toolState.data[i];
@@ -379,6 +398,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             fillColor = toolColors.getFillColor();
           }
         } else {
+          color = ROIContour.color;
           fillColor = ROIContour.color;
         }
 
@@ -479,7 +499,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
           // Deviation will be calculated for color images.
           if (!image.color) {
             // Retrieve the array of pixels that the ROI bounds cover
-            const pixels = external.cornerstone.getPixels(
+            const pixels = cornerstone.getPixels(
               element,
               polyBoundingBox.left,
               polyBoundingBox.top,

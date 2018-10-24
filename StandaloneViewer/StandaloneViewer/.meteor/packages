@@ -45,3 +45,4 @@ icr:xnat-roi-namespace
 icr:freehand-three-d
 icr:series-info-provider
 icr:xnat-roi-scaling
+icr:xnat-roi

@@ -11,10 +11,7 @@ Package.onUse(function(api) {
         'standard-app-packages',
         'http',
         'jquery',
-        'stylus',
-        'momentjs:moment',
-        'validatejs',
-        'u2622:persistent-session'
+        'stylus'
     ]);
 
     // OHIF dependencies
