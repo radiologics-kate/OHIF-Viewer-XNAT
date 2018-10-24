@@ -361,24 +361,6 @@ const isStackScrollLinkingActive = () => {
     return isActive;
 };
 
-const isStackScrollLinkingActive = () => {
-    let isActive = true;
-
-    // Its called everytime active viewport layout changes
-    Session.get('LayoutManagerUpdated');
-
-    const synchronizer = OHIF.viewer.stackImagePositionOffsetSynchronizer;
-    const syncedElements = _.pluck(synchronizer.syncedViewports, 'element');
-    const $renderedViewports = $('.imageViewerViewport');
-    $renderedViewports.each((index, element) => {
-        if (!_.contains(syncedElements, element)) {
-            isActive = false;
-        }
-    });
-
-    return isActive;
-};
-
 // JamesAPetts
 const showSyncSettings = () => {
   const dialog = $('#stackSyncDialog');

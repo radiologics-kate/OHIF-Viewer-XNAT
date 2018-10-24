@@ -146,7 +146,8 @@ Meteor.startup(function() {
         rotateR: 'Rotate Right',
         rotateL: 'Rotate Left',
         resetViewport: 'Reset',
-        clearTools: 'Clear Tools'
+        clearTools: 'Clear Tools',
+        showSyncSettings: 'Sync Settings'
     });
 
     // Register the preset switching commands

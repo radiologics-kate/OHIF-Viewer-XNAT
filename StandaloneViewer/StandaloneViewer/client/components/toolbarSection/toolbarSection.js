@@ -89,6 +89,13 @@ Template.toolbarSection.helpers({
         });
 
         extraTools.push({
+          id: 'showSyncSettings',
+          title: 'Sync Settings',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-link'
+        });
+
+        extraTools.push({
             id: 'invert',
             title: 'Invert',
             classes: 'imageViewerCommand',
