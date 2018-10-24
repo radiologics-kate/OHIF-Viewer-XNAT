@@ -47,7 +47,8 @@ export const toolManager = {
     			'RectangleRoi',
     			'WwwcRegion',
           'FreehandMouse',
-          'FreehandSculpterMouse'
+          'FreehandSculpterMouse',
+          'Brush'
         ];
 
         initialized = true;

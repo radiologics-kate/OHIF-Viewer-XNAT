@@ -204,6 +204,13 @@ Template.toolbarSection.helpers({
             iconClasses: 'fa fa-undo'
         });
 
+        buttonData.push({
+          id: 'Brush',
+          title: 'Brush',
+          classes: 'imageViewerTool',
+          iconClasses: 'fa fa-paint-brush'
+        });
+
         if (!OHIF.uiSettings.displayEchoUltrasoundWorkflow) {
 
             buttonData.push({

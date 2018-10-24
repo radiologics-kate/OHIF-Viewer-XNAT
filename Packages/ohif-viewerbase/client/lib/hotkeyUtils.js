@@ -122,7 +122,8 @@ Meteor.startup(function() {
         WwwcRegion: 'W/L by Region',
         Crosshairs: 'Crosshairs',
         FreehandMouse: 'FreehandMouse',
-        FreehandSculpterMouse: 'FreehandSculpterMouse'
+        FreehandSculpterMouse: 'FreehandSculpterMouse',
+        Brush: 'Brush'
     });
 
     // Functions to register the viewport commands
