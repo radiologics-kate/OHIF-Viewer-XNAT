@@ -1,6 +1,6 @@
 Package.describe({
-    name: 'icr:xnat-roi-namespace',
-    summary: 'Namespaced Session variables for icr-xnat-roi libraries.',
+    name: 'icr:series-info-provider',
+    summary: 'Helper module to get useful series information.',
     version: '1.0.0'
 });
 
@@ -9,13 +9,11 @@ Package.onUse(function(api) {
 
     api.use(['ecmascript',
         'standard-app-packages',
-        'underscore'
     ]);
 
     // OHIF dependencies
     api.use([
-        'ohif:core',
-        'ohif:cornerstone'
+        'ohif:core'
     ]);
 
     api.mainModule('main.js', 'client');

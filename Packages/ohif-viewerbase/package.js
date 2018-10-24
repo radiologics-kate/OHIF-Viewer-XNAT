@@ -24,7 +24,8 @@ Package.onUse(function(api) {
         'ohif:core',
         'ohif:cornerstone-settings',
         'ohif:hotkeys',
-        'ohif:log'
+        'ohif:log',
+        'icr:freehand-three-d'
     ]);
 
     const assets = [

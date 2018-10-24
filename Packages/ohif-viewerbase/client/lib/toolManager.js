@@ -3,8 +3,13 @@ import { Random } from 'meteor/random';
 import { OHIF } from 'meteor/ohif:core';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 
+import { Freehand3DMouseTool, freehand3DModule } from 'meteor/icr:freehand-three-d';
+
+console.log(Freehand3DMouseTool);
+
 let activeTool;
 let tools = [];
+let pluginTools = [];
 let initialized = false;
 let defaultTool = {
     left: 'Wwwc',
@@ -27,6 +32,8 @@ export const toolManager = {
             toolManager.setDefaultTool(OHIF.viewer.defaultTool);
         }
 
+        cornerstoneTools.register('module', 'freehand3D', freehand3DModule);
+
         cornerstoneTools.init();
 
         tools = [
@@ -46,9 +53,12 @@ export const toolManager = {
     			'EllipticalRoi',
     			'RectangleRoi',
     			'WwwcRegion',
-          'FreehandMouse',
           'FreehandSculpterMouse',
           'Brush'
+        ];
+
+        pluginTools = [
+          Freehand3DMouseTool
         ];
 
         initialized = true;
@@ -126,6 +136,12 @@ export const toolManager = {
                 cornerstoneTools.addTool(apiTool);
             }
         });
+
+        // JamesAPetts
+        pluginTools.forEach(pluginTool => {
+          cornerstoneTools.addTool(pluginTool);
+        });
+
         toolManager.setAllToolsPassive();
     },
 

@@ -1,11 +1,9 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import generateUID from '../generateUID.js';
+import generateUID from '../util/generateUID.js';
 import { OHIF } from 'meteor/ohif:core';
 import { createNewVolume, setVolumeName } from '../util/freehandNameIO.js';
 
-const SeriesInfoProvider = OHIF.RoiStateManagement.SeriesInfoProvider;
-
-// TODO -> This requires cornerstoneTools v3!!!
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 const {
   insertOrDelete,
@@ -16,7 +14,7 @@ const {
 } = cornerstoneTools.import('util/freehandUtils');
 
 const FreehandMouseTool = cornerstoneTools.FreehandMouseTool;
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
   constructor(name = 'FreehandMouse') {
@@ -148,19 +146,22 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       seriesInstanceUid
     );
 
-    return new Promise((resolve, reject) => {
-      if (ROIContour.name) {
+    if (ROIContour.name) {
+      return new Promise((resolve, reject) => {
         resolve();
-      }
+      });
+    }
 
-      const activeROIContour = freehand3DStore.getters.activeROIContour(
-        seriesInstanceUid
-      );
+    const activeROIContour = freehand3DStore.getters.activeROIContour(
+      seriesInstanceUid
+    );
 
-      await setVolumeName(seriesInstanceUid, 'DEFAULT', activeROIContour.uid);
-      // Require another click to start the roi now it is (possibly) named.
+    await setVolumeName(seriesInstanceUid, 'DEFAULT', activeROIContour.uid);
+    // Require another click to start the roi now it is (possibly) named.
+    return new Promise((resolve, reject) => {
       reject();
     });
+
   }
 
 
@@ -175,7 +176,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const element = eventData.element;
     const freehand3DStore = this._freehand3DStore;
 
-    const toolData = getToolState(evt.currentTarget, this.name);
+    const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
 
     const nearby = this.pointNearHandleAllTools(eventData);
     const config = this.configuration;
@@ -217,7 +218,16 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const eventData = evt.detail;
     const nearby = this._pointNearHandleAllTools(eventData);
 
-    const toolData = getToolState(evt.currentTarget, this.name);
+    console.log(evt.currentTarget);
+    console.log(this.name);
+
+    const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
+
+    if (!toolData) {
+      console.log('returning');
+      return;
+    }
+
     const data = toolData.data[nearby.toolIndex];
 
     // Check if locked and return
@@ -254,7 +264,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   handleSelectedCallback (evt, handle, data) {
     const eventData = evt.detail;
     const element = eventData.element;
-    const toolState = getToolState(eventData.element, this.name);
+    const toolState = cornerstoneTools.getToolState(eventData.element, this.name);
 
     if (eventData.event.metaKey) {
       this._switchROIContour(data);
@@ -323,7 +333,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const freehand3DStore = this._freehand3DStore;
 
     // If we have no toolState for this element, return immediately as there is nothing to do
-    const toolState = getToolState(evt.currentTarget, this.name);
+    const toolState = cornerstoneTools.getToolState(evt.currentTarget, this.name);
 
     if (!toolState) {
       return;

@@ -11,21 +11,17 @@ Package.onUse(function(api) {
         'standard-app-packages',
         'http',
         'jquery',
-        'stylus',
-        'momentjs:moment',
-        'validatejs',
-        'u2622:persistent-session'
+        'stylus'
     ]);
 
     // OHIF dependencies
     api.use([
-        'ohif:design',
-        'ohif:cornerstone',
-        'ohif:viewerbase',
-        'ohif:core',
-        'ohif:hotkeys',
-        'ohif:log',
-        'icr:xnat-roi-namespace'
+      'ohif:design',
+      'ohif:cornerstone',
+      'ohif:core',
+      'ohif:hotkeys',
+      'ohif:log',
+      'icr:series-info-provider'
     ]);
 
     api.mainModule('main.js', 'client');

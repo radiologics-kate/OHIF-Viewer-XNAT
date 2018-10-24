@@ -8,13 +8,7 @@ Package.onUse(function(api) {
     api.versionsFrom('1.4');
 
     api.use(['ecmascript',
-        'standard-app-packages',
-        'http',
-        'jquery',
-        'stylus',
-        'momentjs:moment',
-        'validatejs',
-        'u2622:persistent-session'
+        'standard-app-packages'
     ]);
 
     // OHIF dependencies

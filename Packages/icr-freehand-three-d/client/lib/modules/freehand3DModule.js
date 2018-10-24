@@ -1,8 +1,7 @@
 import { cornerstone } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
-import generateUID from '../generateUID.js';
-
-const SeriesInfoProvider = OHIF.RoiStateManagement.SeriesInfoProvider;
+import generateUID from '../util/generateUID.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 /**
  * @typedef {series[]} seriesCollection
@@ -68,7 +67,7 @@ const SeriesInfoProvider = OHIF.RoiStateManagement.SeriesInfoProvider;
 
 
 const state = {
-  seriesCollection: [];
+  seriesCollection: []
 };
 
 function check (object, name) {
@@ -227,7 +226,7 @@ function setROIContourAndSetIndexActive (seriesInstanceUid, structureSetUid, nam
 }
 
 function setStructureSetName (name, seriesInstanceUid, structureSetUid) {
-  check(name 'name');
+  check(name, 'name');
 
   const structureSet = getStructureSet(seriesInstanceUid, structureSetUid);
 
@@ -313,7 +312,7 @@ const setters = {
   ROIContourName: setROIContourName,
   activeStructureSetIndex: setActiveStructureSetIndex,
   activeROIContourIndex: setActiveROIContourIndex,
-  activeRoiContour: setActiveROIContour
+  activeRoiContour: setActiveROIContour,
   incrementPolygonCount,
   decrementPolygonCount
 };
@@ -324,7 +323,15 @@ const setters = {
  * @param  {Object} enabledElement  The element on which the module is
  *                                  being initialised.
  */
-function enabledElementCallback (enabledElement) {
+function enabledElementCallback (element) {
+  console.log(SeriesInfoProvider.getSeriesInstanceUid);
+
+  const enabledElement = cornerstone.getEnabledElement(element);
+
+  if (!enabledElement.image) {
+    return;
+  }
+
   const seriesIsntanceUid = SeriesInfoProvider.getSeriesInstanceUid(enabledElement);
 
   if (!getSeries(seriesInstanceUid)) {
