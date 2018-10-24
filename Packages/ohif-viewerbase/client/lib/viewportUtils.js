@@ -7,6 +7,7 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { updateOrientationMarkers } from './updateOrientationMarkers';
 import { getInstanceClassDefaultViewport } from './instanceClassSpecificViewport';
+import { stackSynchronizer } from './stackSynchronizer.js';
 
 /**
  * Get a cornerstone enabledElement for a DOM Element
@@ -360,6 +361,49 @@ const isStackScrollLinkingActive = () => {
     return isActive;
 };
 
+const isStackScrollLinkingActive = () => {
+    let isActive = true;
+
+    // Its called everytime active viewport layout changes
+    Session.get('LayoutManagerUpdated');
+
+    const synchronizer = OHIF.viewer.stackImagePositionOffsetSynchronizer;
+    const syncedElements = _.pluck(synchronizer.syncedViewports, 'element');
+    const $renderedViewports = $('.imageViewerViewport');
+    $renderedViewports.each((index, element) => {
+        if (!_.contains(syncedElements, element)) {
+            isActive = false;
+        }
+    });
+
+    return isActive;
+};
+
+// JamesAPetts
+const showSyncSettings = () => {
+  const dialog = $('#stackSyncDialog');
+  const cancelButton = dialog.find('.stackSyncDialogCancel');
+
+  function cancelHandler () {
+    console.log('cancelButton');
+    dialog.get(0).close();
+  };
+
+  cancelButton.off('click');
+  cancelButton.on('click', () => {
+    cancelHandler();
+  });
+
+  dialog.off('keydown');
+  dialog.on('keydown', e => {
+    if (e.which = 27) { // If Esc is pressed cancel and close the dialog
+      cancelHandler();
+    }
+  });
+
+  dialog.get(0).showModal();
+};
+
 // Create an event listener to update playing state when a clip stops playing
 window.addEventListener('cornerstonetoolsclipstopped', () => {
     Session.set('UpdateCINE', Math.random());
@@ -393,7 +437,8 @@ const viewportUtils = {
     hasMultipleFrames,
     stopAllClips,
     isStackScrollLinkingDisabled,
-    isStackScrollLinkingActive
+    isStackScrollLinkingActive,
+    showSyncSettings
 };
 
 export { viewportUtils };

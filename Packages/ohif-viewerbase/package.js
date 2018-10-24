@@ -212,6 +212,14 @@ Package.onUse(function(api) {
     api.addFiles('client/components/viewer/windowLevelPresets/form.html', 'client');
     api.addFiles('client/components/viewer/windowLevelPresets/form.js', 'client');
 
+    api.addFiles('client/components/viewer/stackSyncDialog/stackSyncDialog.html', 'client');
+    api.addFiles('client/components/viewer/stackSyncDialog/stackSyncDialog.js', 'client');
+    api.addFiles('client/components/viewer/stackSyncDialog/stackSyncDialog.styl', 'client');
+
+    api.addFiles('client/components/viewer/syncCheckbox/syncCheckbox.html', 'client');
+    api.addFiles('client/components/viewer/syncCheckbox/syncCheckbox.js', 'client');
+    api.addFiles('client/components/viewer/syncCheckbox/syncCheckbox.styl', 'client');
+
     api.export('dialogPolyfill', 'client');
 
     api.mainModule('main.js', 'client');

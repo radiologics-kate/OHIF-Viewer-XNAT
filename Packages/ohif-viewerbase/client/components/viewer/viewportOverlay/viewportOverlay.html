@@ -9,6 +9,7 @@
             <div class="topright dicomTag">
                 <div>{{studyDescription}}</div>
                 <div>{{formatDA studyDate}} {{formatTM studyTime}}</div>
+                <div>Sync {{> syncCheckbox}}</div>
             </div>
             <div class="bottomright dicomTag">
                 <div>{{#if zoom}}Zoom: {{formatNumberPrecision zoom 0}}%{{/if}}</div>
