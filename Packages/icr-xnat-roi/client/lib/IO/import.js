@@ -9,6 +9,7 @@ import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
  */
 export function importROIs () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
   const asyncRoiFetcher = new AsyncRoiFetcher(seriesInstanceUid);
   asyncRoiFetcher.fetchRois();
 }

@@ -4,6 +4,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { $ } from 'meteor/jquery';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
+const modules = cornerstoneTools.store.modules;
 
 /**
  * @class AsyncRoiFetcher
@@ -30,21 +31,26 @@ export class AsyncRoiFetcher {
    * @return {string[]} An array of the labels of roiCollections already imported.
    */
   _getVolumeManagementLabels () {
-    const volumeManagementLabels = [];
-    const seriesRoiCollectionData = cornerstoneTools.freehand.getRoiCollectionData()[this._seriesInstanceUid];
+    const freehand3DStore = modules.freehand3D;
+    const structureSetUids = [];
 
-    // Check if more than just the working directory exists.
-    if (seriesRoiCollectionData) {
-      Object.keys(seriesRoiCollectionData).forEach(function(roiCollectionName) {
-        const label = seriesRoiCollectionData[roiCollectionName].label;
+    const series = freehand3DStore.getters.series(this._seriesInstanceUid);
 
-        if (label !== 'DEFAULT') {
-          volumeManagementLabels.push(label);
-        }
-      });
+    if (!series) {
+      return structureSetUids;
     }
 
-    return volumeManagementLabels;
+    const structureSetCollection = series.structureSetCollection;
+
+    for (let i = 0; i < structureSetCollection.length; i++) {
+      const label = structureSetCollection[i].uid;
+
+      if (label !== 'DEFAULT') {
+        structureSetUids.push(label);
+      }
+    }
+
+    return structureSetUids;
   }
 
 

@@ -6,7 +6,7 @@ import { RTStructReader } from '../classes/RTStructReader.js';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 export class RoiImporter {
 
