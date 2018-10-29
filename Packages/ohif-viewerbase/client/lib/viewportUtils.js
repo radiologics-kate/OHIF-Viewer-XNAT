@@ -162,12 +162,67 @@ const resetViewport = (viewportIndex=null) => {
     }
 };
 
+/* OHIF default clearTools function.
 const clearTools = () => {
     const element = getActiveViewportElement();
     const toolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
     toolStateManager.clear(element);
     cornerstone.updateImage(element);
 };
+*/
+
+/** @author JamesAPetts */
+const clearTools = () => {
+  const element = getActiveViewportElement();
+  const enabledImage = cornerstone.getEnabledElement(element);
+  const imageId = enabledImage.image.imageId;
+
+  const toolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+  const toolState = toolStateManager.saveImageIdToolState(imageId);
+
+  if (!toolState) {
+    return;
+  }
+
+  // Delete all toolData apart from freehand toolData from the element
+  Object.keys(toolState).forEach(function(key) {
+    if (key !== 'FreehandMouse') {
+      delete toolState[key];
+    }
+  });
+
+  let freehandData;
+  if (toolState.FreehandMouse && toolState.FreehandMouse.data) {
+    freehandData = toolState.FreehandMouse.data;
+  }
+
+  const freehand3DStore = cornerstoneTools.store.modules.freehand3D;
+
+  if (freehandData) {
+    // Delete any non-locked polygons (NOTE: Traverse the array in reverse order to reduce the complexity of the algorithm).
+    for (let i = freehandData.length - 1; i >= 0; i--) {
+      const freehandDataI = freehandData[i];
+
+      if (freehandDataI.referencedStructureSet.isLocked === false) {
+        freehand3DStore.setters.decrementPolygonCount(
+          freehandDataI.seriesInstanceUid,
+          freehandDataI.referencedStructureSet.structureSetUid,
+          freehandDataI.ROIContourUid
+        );
+
+        freehandData.splice(i, 1);
+      }
+    }
+  }
+
+  // If freehandData is now empty as a result of the deletion, delete it.
+  if (freehandData.length === 0) {
+    delete toolState.freehand;
+  }
+
+  toolStateManager.restoreImageIdToolState(imageId, toolState);
+  cornerstone.updateImage(element);
+}
 
 const linkStackScroll = () => {
     const synchronizer = OHIF.viewer.stackImagePositionOffsetSynchronizer;

@@ -124,7 +124,8 @@ Meteor.startup(function() {
         FreehandMouse: 'FreehandMouse',
         FreehandSculpterMouse: 'FreehandSculpterMouse',
         Brush: 'Brush',
-        Freehand3DMouse: 'Freehand3DMouse'
+        Freehand3DMouse: 'Freehand3DMouse',
+        Eraser: 'Eraser'
     });
 
     // Functions to register the viewport commands
@@ -150,7 +151,9 @@ Meteor.startup(function() {
         clearTools: 'Clear Tools',
         showSyncSettings: 'Sync Settings',
         volumeManagement: 'Volume Management',
-        toggleFreehandStats: 'Toggle Freehand Stats'
+        toggleFreehandStats: 'Toggle Freehand Stats',
+        exportROIs: 'Export ROIs',
+        importROIs: 'Import ROIs'
     });
 
     // Register the preset switching commands

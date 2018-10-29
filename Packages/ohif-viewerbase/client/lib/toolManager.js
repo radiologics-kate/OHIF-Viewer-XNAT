@@ -52,7 +52,8 @@ export const toolManager = {
     			'RectangleRoi',
     			'WwwcRegion',
           'FreehandSculpterMouse',
-          'Brush'
+          'Brush',
+          'Eraser'
         ];
 
         pluginTools = [

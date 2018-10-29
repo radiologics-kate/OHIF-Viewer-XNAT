@@ -208,6 +208,42 @@ Template.toolbarSection.helpers({
           }
         ];
 
+        const deleteTools = [
+          {
+            id: 'Eraser',
+            title: 'Eraser',
+            classes: 'imageViewerTool',
+            iconClasses: 'fa fa-eraser'
+          },
+          {
+              id: 'clearTools',
+              title: 'Clear',
+              classes: 'imageViewerCommand',
+              iconClasses: 'fa fa-trash'
+          }
+        ];
+
+        const freehandIO = [
+          {
+            id: 'exportROIs',
+            title: 'Export ROIs',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export'
+          },
+          {
+            id: 'importROIs',
+            title: 'Import ROIs',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import'
+          },
+          {
+            id: 'toggleDownloadDialog',
+            title: 'Snapshot',
+            classes: 'imageViewerCommand',
+            iconClasses: 'fa fa-camera'
+          }
+        ];
+
         buttonData.push({
             id: 'Freehand',
             title: 'Freehand',
@@ -269,6 +305,22 @@ Template.toolbarSection.helpers({
             title: 'Layout',
             iconClasses: 'fa fa-th-large',
             buttonTemplateName: 'layoutButton'
+        });
+
+        buttonData.push({
+          id: 'delete',
+          title: 'Delete',
+          classes: 'rp-x-1 rm-l-3',
+          iconClasses: 'fa fa-times',
+          subTools: deleteTools
+        });
+
+        buttonData.push({
+          id: 'freehandIO',
+          title: 'XNAT',
+          classes: 'rp-x-1 rm-l-3',
+          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-logo',
+          subTools: freehandIO
         });
 
         buttonData.push({
