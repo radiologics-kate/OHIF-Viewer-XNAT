@@ -4,8 +4,7 @@ import { Polygon } from '../classes/Polygon.js';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 
-const modules = cornerstoneTools.import('store/modules');
-const getToolState = cornerstoneTools.import('stateManagement/getToolState');
+const modules = cornerstoneTools.store.modules;
 
 export class RoiExtractor {
 
@@ -17,6 +16,11 @@ export class RoiExtractor {
 
   hasVolumesToExtract () {
     const workingStructureSet = this._freehand3DStore.getters.structureSet(this._seriesInstanceUid);
+
+    if (!workingStructureSet) {
+      return false;
+    }
+
     const ROIContourCollection = workingStructureSet.ROIContourCollection;
 
     let hasVolumes = false;
@@ -38,11 +42,12 @@ export class RoiExtractor {
       // Only get polygons from this series
       if ( this._getSeriesInstanceUidFromImageId(elementId) === this._seriesInstanceUid ) {
         // grab the freehand tool for this DICOM instance
-        const freehandToolState = getToolState(elementId, 'FreehandMouse');
+
+        const freehandToolState = toolStateManager[elementId].FreehandMouse;
 
         if (freehandToolState) {
           // Append new ROIs to polygon list
-          this._getNewPolygonsInInstance(freehandToolState, elementId, exportMask);
+          this._getNewPolygonsInInstance(freehandToolState.data, elementId, exportMask);
         }
       }
     });
@@ -50,9 +55,10 @@ export class RoiExtractor {
     return this._volumes;
   }
 
-  _getNewPolygonsInInstance (toolState, elementId, exportMask) {
-    for ( let i = 0; i < tool.length; i++ ) {
-      const data = toolState[i];
+  _getNewPolygonsInInstance (toolData, elementId, exportMask) {
+    for ( let i = 0; i < toolData.length; i++ ) {
+      const data = toolData[i];
+
       const ROIContourIndex = this._freehand3DStore.getters.ROIContourIndex(
         data.seriesInstanceUid,
         data.structureSetUid,
@@ -61,13 +67,14 @@ export class RoiExtractor {
       const referencedStructureSet = data.referencedStructureSet;
 
       // Check to see if the ROIContour referencing this polygon is eligble for export.
-      if (referencedStructureSet === 'DEFAULT' && exportMask[ROIContourIndex]) {
+      if (referencedStructureSet.uid === 'DEFAULT' && exportMask[ROIContourIndex]) {
         this._appendPolygon(data, elementId, ROIContourIndex);
       }
     }
   }
 
   _appendPolygon (data, imageId, ROIContourIndex) {
+    console.log('_appendPolygon');
     const ROIContourName = data.referencedROIContour.name;
     const sopInstanceUid = this._getSOPInstanceUidFromImageId(imageId);
     const frameNumber = this._getFrameNumber(imageId);

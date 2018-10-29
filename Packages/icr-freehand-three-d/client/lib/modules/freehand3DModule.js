@@ -123,7 +123,7 @@ function getROIContourIndex (seriesInstanceUid, structureSetUid, ROIContourUid) 
     return;
   }
 
-  return structureSet.findIndex((ROIContour) => {
+  return structureSet.ROIContourCollection.findIndex((ROIContour) => {
     return ROIContour.uid === ROIContourUid;
   });
 }

@@ -10,7 +10,7 @@ import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import closeIODialog from './closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 const getToolState = cornerstoneTools.import('stateManagement/getToolState');
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 

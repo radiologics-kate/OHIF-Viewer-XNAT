@@ -331,6 +331,14 @@ Template.toolbarSection.helpers({
             subTools: extraTools
         });
 
+
+        buttonData.push({
+          id: 'showHelp',
+          title: 'Help',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-question'
+        });
+
         return buttonData;
     },
 

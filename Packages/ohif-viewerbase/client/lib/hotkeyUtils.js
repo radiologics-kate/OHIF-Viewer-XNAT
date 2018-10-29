@@ -153,7 +153,8 @@ Meteor.startup(function() {
         volumeManagement: 'Volume Management',
         toggleFreehandStats: 'Toggle Freehand Stats',
         exportROIs: 'Export ROIs',
-        importROIs: 'Import ROIs'
+        importROIs: 'Import ROIs',
+        showHelp: 'Show Help'
     });
 
     // Register the preset switching commands

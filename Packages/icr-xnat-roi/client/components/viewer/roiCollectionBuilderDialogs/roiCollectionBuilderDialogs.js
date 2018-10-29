@@ -2,7 +2,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { createNewVolume } from 'meteor/icr:freehand-three-d';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 Template.roiCollectionBuilderDialogs.onRendered(() => {
     const instance = Template.instance();
@@ -21,8 +21,16 @@ Template.roiCollectionBuilderDialogs.onCreated(() => {
     instance.data.exportMask = [];
 
     instance.data.getOrCreateStructureSetCollectionData = (seriesInstanceUid) => {
+      if (!seriesInstanceUid) {
+        return;
+      }
+
+      console.log('roiCollectionBuilderDialog debug... GO!');
+
       const freehand3DStore = modules.freehand3D;
       let series = freehand3DStore.getters.series(seriesInstanceUid);
+
+      console.log(series);
 
       if (!series) {
         freehand3DStore.setters.series(seriesInstanceUid);
@@ -31,7 +39,8 @@ Template.roiCollectionBuilderDialogs.onCreated(() => {
 
       const selectAll = instance.data.selectAll.get();
 
-      const defaultStructureSet = freehaned3DStore.getters.structureSet(seriesInstanceUid);
+      const defaultStructureSet = freehand3DStore.getters.structureSet(seriesInstanceUid);
+
       const ROIContourCollection = defaultStructureSet.ROIContourCollection;
 
       const dataArray = [];

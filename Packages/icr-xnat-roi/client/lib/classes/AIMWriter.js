@@ -1,7 +1,7 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 const XMLWriter = require('xml-writer');
 

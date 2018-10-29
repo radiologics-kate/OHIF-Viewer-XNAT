@@ -66,22 +66,14 @@ function getOrCreateStructureSetCollectionData(seriesInstanceUid) {
     return;
   }
 
-  console.log('Debug.. GO!');
-
   const freehand3DStore = modules.freehand3D;
 
-  console.log(freehand3DStore);
-
   let series = freehand3DStore.getters.series(seriesInstanceUid);
-
-  console.log(series);
 
   if (!series) {
     freehand3DStore.setters.series(seriesInstanceUid);
     series = freehand3DStore.getters.series(seriesInstanceUid);
   }
-
-  console.log(series);
 
   const structureSetCollection = series.structureSetCollection;
   const dataArray = [];
