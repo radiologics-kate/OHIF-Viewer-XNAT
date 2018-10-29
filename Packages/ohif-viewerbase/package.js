@@ -221,6 +221,10 @@ Package.onUse(function(api) {
     api.addFiles('client/components/viewer/syncCheckbox/syncCheckbox.js', 'client');
     api.addFiles('client/components/viewer/syncCheckbox/syncCheckbox.styl', 'client');
 
+    api.addFiles('client/components/viewer/smoothCheckbox/smoothCheckbox.html', 'client');
+    api.addFiles('client/components/viewer/smoothCheckbox/smoothCheckbox.js', 'client');
+    api.addFiles('client/components/viewer/smoothCheckbox/smoothCheckbox.styl', 'client');
+
     api.export('dialogPolyfill', 'client');
 
     api.mainModule('main.js', 'client');
