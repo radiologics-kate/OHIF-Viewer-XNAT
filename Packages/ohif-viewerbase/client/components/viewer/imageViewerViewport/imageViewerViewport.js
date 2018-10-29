@@ -267,13 +267,12 @@ const loadDisplaySetIntoViewport = (data, templateData) => {
             cornerstoneTools.playClip(element);
         }
 
-        // InstantiateTools on the new element.
-        toolManager.instantiateTools(element);
+        // Instantiate the tools
+        toolManager.instantiateTools();
 
         // Use the tool manager to enable the currently active tool for this
         // newly rendered element
-        const activeTool = toolManager.getActiveTool();
-        toolManager.setActiveTool(activeTool);
+        toolManager.setActiveTool();
 
         // Define a function to run whenever the Cornerstone viewport is rendered
         // (e.g. following a change of window or zoom)
@@ -453,6 +452,7 @@ const loadDisplaySetIntoViewport = (data, templateData) => {
             // that is used for its synchronized viewport updating.
             // This is necessary if this new image shares a frame of reference
             // with currently displayed images
+            const activeTool = toolManager.getActiveTool();
             if (activeTool === 'crosshairs') {
                 updateCrosshairsSynchronizer(imagePlane.frameOfReferenceUID);
             }
@@ -646,17 +646,13 @@ Template.imageViewerViewport.onDestroyed(function() {
         return;
     }
 
-    // Disable mouse functions
-    cornerstoneTools.mouseInput.disable(element);
-    cornerstoneTools.touchInput.disable(element);
-    cornerstoneTools.mouseWheelInput.disable(element);
+    // Remove all tools for the destroyed element
+    toolManager.removeToolsForElement(element);
 
     OHIF.viewer.updateImageSynchronizer.remove(element);
 
     // Clear the stack prefetch data
-    let stackPrefetchData = cornerstoneTools.getToolState(element, 'stackPrefetch');
-    stackPrefetchData = [];
-    cornerstoneTools.stackPrefetch.disable(element);
+    cornerstoneTools.clearToolState(element, 'stackPrefetch');
 
     // Try to stop any currently playing clips
     // Otherwise the interval will continuously throw errors

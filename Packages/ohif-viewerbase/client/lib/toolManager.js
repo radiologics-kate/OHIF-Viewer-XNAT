@@ -6,18 +6,18 @@ import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { Freehand3DMouseTool, freehand3DModule } from 'meteor/icr:freehand-three-d';
 
 let activeTool;
-let tools = [];
-let pluginTools = [];
+let tools = {};
+let pluginTools = {};
 let initialized = false;
 let defaultTool = {
-    left: 'Wwwc',
-    right: 'Zoom',
-    middle: 'Pan'
+    left: 'wwwc',
+    right: 'zoom',
+    middle: 'pan'
 };
 const buttonNum = {
     'left': 1,
-    'right': 4,
-    'middle': 2
+    'right': 2,
+    'middle': 4
 };
 
 /**
@@ -27,38 +27,40 @@ export const toolManager = {
     init() {
         // if a default tool is globally defined, make it the default tool...
         if (OHIF.viewer.defaultTool) {
-            toolManager.setDefaultTool(OHIF.viewer.defaultTool);
+            toolManager.setDefaultTool(OHIF.viewer.defaultTool.left);
+            toolManager.setDefaultTool(OHIF.viewer.defaultTool.right, 'right');
+            toolManager.setDefaultTool(OHIF.viewer.defaultTool.middle, 'middle');
         }
 
         cornerstoneTools.register('module', 'freehand3D', freehand3DModule);
 
         cornerstoneTools.init();
 
-        tools = [
-          'Length',
-          'Angle',
-          'ArrowAnnotate',
-    			'Wwwc',
-          'Zoom',
-          'Pan',
-          'DragProbe',
-          'Magnify',
-          'Crosshairs',
-          'StackScroll',
-          'StackScrollMouseWheel',
-    			'ZoomTouchPinch',
-    			'ZoomMouseWheel',
-    			'EllipticalRoi',
-    			'RectangleRoi',
-    			'WwwcRegion',
-          'FreehandSculpterMouse',
-          'Brush',
-          'Eraser'
-        ];
+        tools = {
+            length: 'LengthTool',
+            angle: 'AngleTool',
+            annotate: 'ArrowAnnotateTool',
+            wwwc: 'WwwcTool',
+            zoom: 'ZoomTool',
+            pan: 'PanTool',
+            dragProbe: 'DragProbeTool',
+            magnify: 'MagnifyTool',
+            crosshairs: 'CrosshairsTool',
+            stackScroll: 'StackScrollTool',
+            ellipticalRoi: 'EllipticalRoiTool',
+            rectangleRoi: 'RectangleRoiTool',
+            wwwcRegion: 'WwwcRegionTool',
+            zoomTouchPinch: 'ZoomTouchPinchTool',
+            panMultiTouch: 'PanMultiTouchTool',
+            stackScrollMouseWheel: 'StackScrollMouseWheelTool',
+            freehandSculpterMouse: 'FreehandSculpterMouseTool',
+            brush: 'BrushTool',
+            eraser: 'EraserTool'
+        };
 
-        pluginTools = [
-          Freehand3DMouseTool
-        ];
+        pluginTools = {
+          freehandMouse: Freehand3DMouseTool
+        };
 
         initialized = true;
     },
@@ -100,10 +102,18 @@ export const toolManager = {
     },
 
     getTools() {
-        return tools;
+        return Object.keys(tools);
     },
 
     setActiveTool(toolName, button = 'left') {
+        // Using setActiveTool with no arguments activates the default tools for all buttons
+        if (!toolName) {
+            toolManager.setActiveTool(toolManager.getDefaultTool());
+            toolManager.setActiveTool(toolManager.getDefaultTool('right'), 'right');
+            toolManager.setActiveTool(toolManager.getDefaultTool('middle'), 'middle');
+            return;
+        }
+
         let options = {};
         const mouseButtonMask = toolManager.getMouseButtonMask(button);
         if (mouseButtonMask) {
@@ -112,39 +122,99 @@ export const toolManager = {
             }
         }
 
-        toolManager.setAllToolsPassive();
-        cornerstoneTools.setToolActive(toolName, options);
+        // Set active tools for the other buttons than this one
+        switch(button) {
+            case 'left':
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('right'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('right')
+                });
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('middle'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('middle')
+                });
+                break;
+            case 'right':
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('left'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('left')
+                });
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('middle'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('middle')
+                });
+                break;
+            case 'middle':
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('left'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('left')
+                });
+                cornerstoneTools.setToolActive(toolManager.getActiveTool('right'), {
+                    mouseButtonMask: toolManager.getMouseButtonMask('right')
+                });
+                break;
+        }
 
-        // TODO: add the active tool with the correct button
+        cornerstoneTools.setToolActive(toolName, options);
         activeTool[button] = toolName;
 
         // Enable reactivity
         Session.set('ToolManagerActiveToolUpdated', Random.id());
     },
 
-    setAllToolsPassive() {
-  		cornerstoneTools.store.state.tools.forEach((tool) => {
-  			cornerstoneTools.setToolPassive(tool.name)
-  		});
-    },
-
     instantiateTools() {
-        Array.from(tools).forEach(toolName => {
-            const apiTool = cornerstoneTools[`${toolName}Tool`];
+        // Instantiate all cornerstone tools for all enabled elements
+        Object.keys(tools).forEach(toolName => {
+            const apiTool = cornerstoneTools[tools[toolName]];
             if (apiTool) {
-                cornerstoneTools.addTool(apiTool);
+              console.log(toolName);
+              if (toolName === 'freehandSculpterMouse') {
+                console.log('adding freehandSculpterMouse');
+                cornerstoneTools.addTool(apiTool, {
+                  name: toolName,
+                  referencedToolName: 'freehandMouse'
+                });
+              } else {
+                cornerstoneTools.addTool(apiTool, { name: toolName });
+              }
             }
         });
 
         // JamesAPetts
-        pluginTools.forEach(pluginTool => {
-          cornerstoneTools.addTool(pluginTool);
+        Object.keys(pluginTools).forEach(toolName => {
+          const pluginTool = pluginTools[toolName];
+          console.log(`adding ${toolName}`);
+          cornerstoneTools.addTool(pluginTool, { name: toolName });
         });
 
-        toolManager.setAllToolsPassive();
+        // Activate pinch zoom
+        cornerstoneTools.setToolActive('zoomTouchPinch', {
+            mouseButtonMask: 0,
+            isTouchActive: true
+        });
+
+        // Activate two-finger pan
+        cornerstoneTools.setToolActive('panMultiTouch', {
+            mouseButtonMask: 0,
+            isTouchActive: true
+        });
+
+        // Activate mouse wheel and three (or more) finger stack scroll
+        cornerstoneTools.setToolActive('stackScrollMouseWheel', {
+            mouseButtonMask: 0,
+            isTouchActive: true
+        });
+    },
+
+    removeToolsForElement(element) {
+        Object.keys(tools).forEach(toolName => {
+            cornerstoneTools.removeToolForElement(element, toolName);
+        });
+
+        // JamesAPetts
+        Object.keys(pluginTools).forEach(toolName => {
+          cornerstoneTools.addTool(element, toolName);
+        });
     },
 
     getNearbyToolData() {
+        // TODO: Implement this and let the others (e.g. deleteLesionKeyboardTool) use this function
+        // if it does not exist in cornerstoneTools
         return undefined;
     },
 
@@ -170,11 +240,11 @@ export const toolManager = {
     },
 
     activateCommandButton(button) {
-        //
+        // TODO: Do we need this?
     },
 
     deactivateCommandButton(button) {
-        //
+        // TODO: Do we need this?
     }
 };
 
