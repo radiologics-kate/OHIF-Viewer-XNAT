@@ -20,8 +20,11 @@ Template.volumeListItem.helpers({
   checked: () => {
     const instance = Template.instance();
     const data = instance.data;
+    console.log('in volumeListItem -- checked');
+    console.log(data);
+
     const ROIContour = data.ROIContourReference;
-    const activeROIContourIndex = data.referencedStructureSet.activeROIContourIndex;
+    const activeROIContourIndex = data.structureSetReference.activeROIContourIndex;
 
     const isActive = activeROIContourIndex === data.index;
 
@@ -60,7 +63,7 @@ Template.volumeListItem.events({
     const instance = Template.instance();
     const data = instance.data;
     const ROIContour = data.ROIContourReference;
-    data.referencedStructureSet.activeROIContourIndex = data.index;
+    data.structureSetReference.activeROIContourIndex = data.index;
 
     const dialog = $('#volumeManagementDialog');
     dialog.get(0).close();

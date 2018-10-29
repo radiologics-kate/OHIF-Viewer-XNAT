@@ -5,8 +5,6 @@ import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 import { Freehand3DMouseTool, freehand3DModule } from 'meteor/icr:freehand-three-d';
 
-console.log(Freehand3DMouseTool);
-
 let activeTool;
 let tools = [];
 let pluginTools = [];

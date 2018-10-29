@@ -89,9 +89,6 @@ function getSeries (seriesInstanceUid) {
 function getStructureSet (seriesInstanceUid, structureSetUid = 'DEFAULT') {
   check(structureSetUid, 'structureSetUid');
 
-  console.log(seriesInstanceUid);
-  console.log(structureSetUid);
-
   const series = getSeries(seriesInstanceUid);
 
   if (!series) {
@@ -315,7 +312,7 @@ const setters = {
   ROIContourName: setROIContourName,
   activeStructureSetIndex: setActiveStructureSetIndex,
   activeROIContourIndex: setActiveROIContourIndex,
-  activeRoiContour: setActiveROIContour,
+  activeROIContour: setActiveROIContour,
   incrementPolygonCount,
   decrementPolygonCount
 };
@@ -327,8 +324,6 @@ const setters = {
  *                                  being initialised.
  */
 function enabledElementCallback (element) {
-  console.log(SeriesInfoProvider.getSeriesInstanceUid);
-
   const enabledElement = cornerstone.getEnabledElement(element);
 
   if (!enabledElement.image) {

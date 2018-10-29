@@ -1,5 +1,5 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { SeriesInfoProvider } from '../classes/SeriesInfoProvider.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 /**
  * Opens a dialog which lets the user select a set of one or more ROIs to

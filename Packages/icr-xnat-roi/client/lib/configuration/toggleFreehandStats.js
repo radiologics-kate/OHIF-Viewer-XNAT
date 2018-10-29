@@ -14,9 +14,15 @@ export function toggleFreehandStats () {
       return;
   }
 
-  const freehandMousetool = cornerstoneTools.getToolForElement(enabledElement, 'FreehandMouse');
+  console.log(enabledElement);
+
+  const element = enabledElement.element;
+
+  const freehandMousetool = cornerstoneTools.getToolForElement(element, 'FreehandMouse');
+
+  console.log(freehandMousetool);
 
   freehandMousetool.configuration.alwaysShowTextBox = !freehandMousetool.configuration.alwaysShowTextBox;
 
-  cornerstone.updateImage(enabledElement.element);
+  cornerstone.updateImage(element);
 }

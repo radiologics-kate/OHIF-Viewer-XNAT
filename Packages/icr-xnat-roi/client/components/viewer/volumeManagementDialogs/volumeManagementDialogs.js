@@ -1,8 +1,8 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { createNewVolume } from '../../../lib/IO/freehandNameIO.js';
+import { createNewVolume } from 'meteor/icr:freehand-three-d';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 Template.volumeManagementDialogs.onRendered(() => {
     const instance = Template.instance();
@@ -62,13 +62,26 @@ function closeDialog () {
 }
 
 function getOrCreateStructureSetCollectionData(seriesInstanceUid) {
+  if (!seriesInstanceUid) {
+    return;
+  }
+
+  console.log('Debug.. GO!');
+
   const freehand3DStore = modules.freehand3D;
+
+  console.log(freehand3DStore);
+
   let series = freehand3DStore.getters.series(seriesInstanceUid);
+
+  console.log(series);
 
   if (!series) {
     freehand3DStore.setters.series(seriesInstanceUid);
     series = freehand3DStore.getters.series(seriesInstanceUid);
   }
+
+  console.log(series);
 
   const structureSetCollection = series.structureSetCollection;
   const dataArray = [];
@@ -79,10 +92,10 @@ function getOrCreateStructureSetCollectionData(seriesInstanceUid) {
     const ROIContourCollection = structureSet.ROIContourCollection;
 
     for (let j = 0; j < ROIContourCollection.length; j++) {
-      if (ROIContourCollection[i]) {
+      if (ROIContourCollection[j]) {
         ROIContourArray.push({
-          index: i,
-          ROIContourReference: ROIContourCollection[i],
+          index: j,
+          ROIContourReference: ROIContourCollection[j],
           structureSetReference: structureSet,
           structureSetName: structureSet.name
         });

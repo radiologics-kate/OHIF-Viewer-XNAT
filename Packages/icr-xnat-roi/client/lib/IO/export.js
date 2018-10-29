@@ -6,7 +6,7 @@ import { Polygon } from '../classes/Polygon.js';
 import { RoiExtractor } from '../classes/RoiExtractor.js';
 import { AIMExporter } from '../classes/AIMExporter.js';
 import { roiCollectionBuilder } from './roiCollectionBuilder.js';
-import { SeriesInfoProvider } from '../classes/SeriesInfoProvider.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import closeIODialog from './closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 

@@ -1,5 +1,5 @@
 import { AsyncRoiFetcher } from '../classes/AsyncRoiFetcher.js';
-import { SeriesInfoProvider } from '../classes/SeriesInfoProvider.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 /**
  * Initiates the fetching of all ROIs in the XNAT Session that can map to the

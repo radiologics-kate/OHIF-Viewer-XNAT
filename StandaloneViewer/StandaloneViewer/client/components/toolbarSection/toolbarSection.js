@@ -193,6 +193,18 @@ Template.toolbarSection.helpers({
               title: 'Sculpt',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-sculpt'
+          },
+          {
+            id: 'volumeManagement',
+            title: 'Volume Management',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-freehand-switch-volume'
+          },
+          {
+            id: 'toggleFreehandStats',
+            title: 'Toggle Stats',
+            classes: 'imageViewerCommand',
+            iconClasses: 'fa fa-commenting'
           }
         ];
 

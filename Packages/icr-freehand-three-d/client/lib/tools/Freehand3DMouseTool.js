@@ -1,4 +1,4 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstoneTools, cornerstoneMath } from 'meteor/ohif:cornerstone';
 import generateUID from '../util/generateUID.js';
 import { OHIF } from 'meteor/ohif:core';
 import { createNewVolume, setVolumeName } from '../util/freehandNameIO.js';
@@ -23,6 +23,7 @@ const FreehandMouseTool = cornerstoneTools.FreehandMouseTool;
 const modules = cornerstoneTools.store.modules;
 const toolColors = cornerstoneTools.toolColors;
 const numbersWithCommas = cornerstoneTools.import('util/numbersWithCommas');
+const pointInsideBoundingBox = cornerstoneTools.import('util/pointInsideBoundingBox');
 
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
@@ -190,7 +191,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
 
-    const nearby = this.pointNearHandleAllTools(eventData);
+    const nearby = this._pointNearHandleAllTools(eventData);
     const config = this.configuration;
     const currentTool = config.currentTool;
 
@@ -205,7 +206,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     // Check if locked and return
     const structureSet = freehand3DStore.getters.structureSet(
-      data.seriesIsntanceUid,
+      data.seriesInstanceUid,
       data.structureSetUid
     );
 
@@ -287,12 +288,17 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     if (eventData.event.metaKey) {
       this._switchROIContour(data);
+      preventPropagation(evt);
+
       return;
     }
 
     if (handle.hasBoundingBox) {
-      // Use default move handler - Can move textbox of locked ROIContours.
-      moveHandleNearImagePoint(evt, handle, data, this.name);
+      if (this.configuration.alwaysShowTextBox) {
+        // Use default move handler - Can move textbox of locked ROIContours.
+        moveHandleNearImagePoint(evt, handle, data, this.name);
+        preventPropagation(evt);
+      }
 
       return;
     }
@@ -561,7 +567,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
         // Only render text if polygon ROI has been completed, and is active,
         // Or config is set to show the textBox all the time
-        if (data.polyBoundingBox && (this.configuration.alwaysShowHandles || data.active)) {
+        if (data.polyBoundingBox && (this.configuration.alwaysShowTextBox || data.active)) {
           // If the textbox has not been moved by the user, it should be displayed on the right-most
           // Side of the tool.
           if (!data.handles.textBox.hasMoved) {
@@ -665,6 +671,47 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     function textBoxAnchorPoints (handles) {
       return handles;
+    }
+  }
+
+  /**
+   * Returns a handle of a particular tool if it is close to the mouse cursor
+   *
+   * @private
+   * @param {Object} eventData - data object associated with an event.
+   * @param {Number} toolIndex - the ID of the tool
+   * @return {Number|Object|Boolean}
+   */
+  _pointNearHandle (element, data, coords) {
+    const config = this.configuration;
+
+    if (data.handles === undefined) {
+      return;
+    }
+
+    if (data.visible === false) {
+      return;
+    }
+
+    for (let i = 0; i < data.handles.length; i++) {
+      const handleCanvas = cornerstone.pixelToCanvas(
+        element,
+        data.handles[i]
+      );
+
+      if (
+        cornerstoneMath.point.distance(handleCanvas, coords) <
+        config.spacing
+      ) {
+        return i;
+      }
+    }
+
+    // Check to see if mouse in bounding box of textbox
+    if (config.alwaysShowTextBox && data.handles.textBox) {
+      if (pointInsideBoundingBox(data.handles.textBox, coords)) {
+        return data.handles.textBox;
+      }
     }
   }
 

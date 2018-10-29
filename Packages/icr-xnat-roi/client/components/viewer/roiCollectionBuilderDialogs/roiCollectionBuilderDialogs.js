@@ -1,5 +1,5 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { createNewVolume } from '../../../lib/IO/freehandNameIO.js';
+import { createNewVolume } from 'meteor/icr:freehand-three-d';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 const modules = cornerstoneTools.import('store/modules');

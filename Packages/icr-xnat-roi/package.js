@@ -22,7 +22,9 @@ Package.onUse(function(api) {
         'ohif:core',
         'ohif:hotkeys',
         'ohif:log',
-        'icr:xnat-roi-namespace'
+        'icr:xnat-roi-namespace',
+        'icr:freehand-three-d',
+        'icr:series-info-provider'
     ]);
 
     // ===== Assets =====

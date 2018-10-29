@@ -1,6 +1,6 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { SeriesInfoProvider } from './classes/SeriesInfoProvider.js';
-import { createNewVolume } from './IO/freehandNameIO.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { createNewVolume } from 'meteor/icr:freehand-three-d';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
 /**
