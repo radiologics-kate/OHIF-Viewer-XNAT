@@ -1,6 +1,10 @@
 import { cornerstoneMath } from 'meteor/ohif:cornerstone';
 import { parsingUtils } from '../parsingUtils';
 
+// JamesAPetts
+import { RoiScaler } from 'meteor/icr:xnat-roi-scaling';
+// JamesAPetts
+
 const FUNCTION = 'function';
 
 export class MetadataProvider {
@@ -219,6 +223,10 @@ export class MetadataProvider {
         }
 
         imageMetadata.imagePlane = imageMetadata.imagePlane || this.getImagePlane(imageMetadata.instance);
+
+        // JamesAPetts -- This is done here as it needs to happen before the ROIs are rendered.
+        RoiScaler.rescaleImportedPolygons(image.imageId, imageMetadata.imagePlane);
+        // JamesAPetts
     }
 
     /**

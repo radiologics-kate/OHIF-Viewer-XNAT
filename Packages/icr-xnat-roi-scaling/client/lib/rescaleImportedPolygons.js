@@ -12,13 +12,15 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  * @param imagePlane
  */
 export function rescaleImportedPolygons (imageId, imagePlane) {
-  const imageIdToolState = globalToolStateManager.saveImageIdToolState (imageId);
+  const imageIdToolState = globalToolStateManager.saveImageIdToolState(imageId);
 
-  if ( imageIdToolState === undefined || imageIdToolState.freehand === undefined ) {
+  console.log(imageIdToolState);
+
+  if ( imageIdToolState === undefined || imageIdToolState.FreehandMouse === undefined ) {
     return;
   }
 
-  const toolData = imageIdToolState.freehand.data;
+  const toolData = imageIdToolState.FreehandMouse.data;
   let rescaledPolygons = false;
 
   for ( let i = 0; i < toolData.length; i++ ) {
