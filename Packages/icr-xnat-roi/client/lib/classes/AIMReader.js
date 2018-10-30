@@ -2,7 +2,7 @@ import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { Polygon } from './Polygon.js';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 //Parses aim files and extracts individual ROIs
 export class AIMReader {
@@ -150,6 +150,7 @@ export class AIMReader {
   }
 
   _createNewVolumeAndGetUid(element) {
+    const freehand3DStore = this._freehand3DStore;
     let name;
     let uid;
     let comment;
@@ -176,7 +177,24 @@ export class AIMReader {
       }
     }
 
-    const ROIContourUid = this._freehand3DStore.setters.setROIContour(
+    const structureSet = freehand3DStore.getters.structureSet(
+      this._seriesInstanceUidToImport,
+      this._roiCollectionLabel
+    );
+
+    if (!structureSet) {
+      freehand3DStore.setters.structureSet(
+        this._seriesInstanceUidToImport,
+        this._roiCollectionName,
+        {
+          isLocked: true,
+          visible: true,
+          uid: this._roiCollectionLabel
+        }
+      );
+    }
+
+    const ROIContourUid = freehand3DStore.setters.ROIContour(
       this._seriesInstanceUidToImport,
       this._roiCollectionLabel,
       name,

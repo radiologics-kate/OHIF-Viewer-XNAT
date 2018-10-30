@@ -18,7 +18,7 @@ export function toggleFreehandStats () {
 
   const element = enabledElement.element;
 
-  const freehandMousetool = cornerstoneTools.getToolForElement(element, 'FreehandMouse');
+  const freehandMousetool = cornerstoneTools.getToolForElement(element, 'freehandMouse');
 
   console.log(freehandMousetool);
 

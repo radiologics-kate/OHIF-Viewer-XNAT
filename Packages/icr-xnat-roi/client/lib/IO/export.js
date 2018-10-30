@@ -62,7 +62,6 @@ async function beginExport() {
 
   try {
     const result = await roiCollectionBuilder(roiCollectionBuilderDialog);
-
     roiCollectionName = result.roiCollectionName;
     exportMask = result.exportMask;
     closeIODialog(roiCollectionBuilderDialog);
@@ -94,6 +93,7 @@ async function beginExport() {
       closeIODialog(exportInProgressDialog);
     })
     .catch(error => {
+      console.log(error.message);
       closeIODialog(exportInProgressDialog);
       displayExportFailedDialog();
   });
@@ -160,7 +160,7 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
   }
 
   // Cycle through slices and update ROIs references to the new volumes.
-  const newStructureSet = freehand3D.getters.structureSet(
+  const newStructureSet = freehand3DStore.getters.structureSet(
     seriesInstanceUid,
     structureSetUid
   );
@@ -171,10 +171,11 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
     // TODO => There must be a better way to do this with the stack tool now.
     if ( getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid ) {
       // grab the freehand tool for this DICOM instance
-      const toolState = getToolState(elementId, 'FreehandMouse');
+      const toolState = toolStateManager[elementId].freehandMouse;
+      const toolData = toolState.data;
       // Append new ROIs to polygon list
       const exportData = {
-        toolState,
+        toolData,
         elementId,
         exportMask,
         newIndicies,
@@ -215,8 +216,11 @@ function getSeriesInstanceUidFromImageId (imageId) {
  *                              to execute the move opperation.
  */
 function moveExportedPolygonsInInstance (exportData) {
+  const freehand3DStore = modules.freehand3D;
+
+  console.log('====moving exported polygons in instance..');
   const {
-    toolState,
+    toolData,
     elementId,
     exportMask,
     newIndicies,
@@ -225,17 +229,25 @@ function moveExportedPolygonsInInstance (exportData) {
     seriesInstanceUid
   } = exportData;
 
-  for ( let i = 0; i < toolState.length; i++ ) {
-    const data = toolState[i];
-    const ROIContourIndex = freehand3D.getters.ROICollectionIndex(
+  console.log(toolData);
+
+  for ( let i = 0; i < toolData.length; i++ ) {
+    const data = toolData[i];
+    const ROIContourIndex = freehand3DStore.getters.ROIContourIndex(
       data.seriesInstanceUid,
       data.structureSetUid,
       data.ROIContourUid
     );
     const structureSetUid = data.structureSetUid;
 
+    console.log(structureSetName);
+    console.log(exportMask[ROIContourIndex]);
+
+    // TODO -> Its already not default at this point apparently! Work out what to do from here.
+    // e.g. AIM_20181030_173647
+
     // Check to see if the volume referencing this contour is eligable for export.
-    if (referencedRoiCollection === 'DEFAULT' && exportMask[ROIContourIndex]) {
+    if (structureSetName === 'DEFAULT' && exportMask[ROIContourIndex]) {
       const newROIContourIndex = newIndicies[ROIContourIndex];
 
       console.log(data);

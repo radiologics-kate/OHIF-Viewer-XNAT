@@ -11,7 +11,7 @@ export class AIMExporter {
     this._experimentID = icrXnatRoiSession.get('experimentId');
     this._seriesInstanceUID = aimWriter.seriesInfo.seriesInstanceUid;
     this._label = aimWriter.label;
-    this._UID = aimWriter.imageAnnotationUUID;
+    this._UID = aimWriter.imageAnnotationCollectionUUID;
     this._ID = this._generateCollectionId();
     this._date = aimWriter.date;
     this._time = aimWriter.time;

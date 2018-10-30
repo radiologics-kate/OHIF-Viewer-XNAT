@@ -8,6 +8,8 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
 
 const modules = cornerstoneTools.store.modules;
 
+const freehandToolDataType = 'freehandMouse';
+
 export class RoiImporter {
 
   constructor (seriesInstanceUid) {
@@ -71,10 +73,9 @@ export class RoiImporter {
     // Point to correct imageId if multiframe Image
     correspondingImageId = this._modifyImageIdIfMultiframe(correspondingImageId, polygon);
 
-
     this._addImageToolIfNotPresent(toolStateManager, correspondingImageId);
 
-    const freehandToolData = toolStateManager[correspondingImageId].FreehandMouse.data;
+    const freehandToolData = toolStateManager[correspondingImageId][freehandToolDataType].data;
     if (this._polygonNotAlreadyPresent(freehandToolData, polygon.uid)) {
       const data = polygon.getFreehandToolData(importType);
 
@@ -91,11 +92,11 @@ export class RoiImporter {
     // Add freehand tools to toolStateManager if no toolState for imageId
     if (!toolStateManager[imageId]) {
       toolStateManager[imageId] = {};
-      toolStateManager[imageId].freehand = {};
-      toolStateManager[imageId].freehand.data = [];
-    } else if (!toolStateManager[imageId].freehand) {
-      toolStateManager[imageId].freehand = {};
-      toolStateManager[imageId].freehand.data = [];
+      toolStateManager[imageId][freehandToolDataType] = {};
+      toolStateManager[imageId][freehandToolDataType].data = [];
+    } else if (!toolStateManager[imageId][freehandToolDataType]) {
+      toolStateManager[imageId][freehandToolDataType] = {};
+      toolStateManager[imageId][freehandToolDataType].data = [];
     }
   }
 

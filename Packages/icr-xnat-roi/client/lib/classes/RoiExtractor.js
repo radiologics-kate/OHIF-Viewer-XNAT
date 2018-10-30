@@ -36,14 +36,22 @@ export class RoiExtractor {
   }
 
   extractVolumes (exportMask) {
+    console.log('==== extracting Volumes ====')
+    console.log('== export mask ==');
+    console.log(exportMask);
+    console.log('== seriesInstanceUid ==');
+    console.log(this._seriesInstanceUid);
+
     const toolStateManager = globalToolStateManager.saveToolState();
 
     Object.keys(toolStateManager).forEach( elementId => {
       // Only get polygons from this series
       if ( this._getSeriesInstanceUidFromImageId(elementId) === this._seriesInstanceUid ) {
         // grab the freehand tool for this DICOM instance
+        console.log('== elementId ==');
+        console.log(elementId);
 
-        const freehandToolState = toolStateManager[elementId].FreehandMouse;
+        const freehandToolState = toolStateManager[elementId].freehandMouse;
 
         if (freehandToolState) {
           // Append new ROIs to polygon list
@@ -56,6 +64,8 @@ export class RoiExtractor {
   }
 
   _getNewPolygonsInInstance (toolData, elementId, exportMask) {
+    console.log('_getNewPolygonsInInstance');
+
     for ( let i = 0; i < toolData.length; i++ ) {
       const data = toolData[i];
 
@@ -74,7 +84,7 @@ export class RoiExtractor {
   }
 
   _appendPolygon (data, imageId, ROIContourIndex) {
-    console.log('_appendPolygon');
+    console.log(`_appendPolygon ${ROIContourIndex}`);
     const ROIContourName = data.referencedROIContour.name;
     const sopInstanceUid = this._getSOPInstanceUidFromImageId(imageId);
     const frameNumber = this._getFrameNumber(imageId);

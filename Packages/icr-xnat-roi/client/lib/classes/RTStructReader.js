@@ -3,7 +3,7 @@ import { Polygon } from '../classes/Polygon.js';
 import { dicomParser } from 'meteor/ohif:cornerstone';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 export class RTStructReader {
 
@@ -117,10 +117,11 @@ export class RTStructReader {
 
 
   _createNewVolumeAndGetUid (ROINumber) {
+    const freehand3DStore = this._freehand3DStore;
     let name;
     let uid;
 
-    uid = `${this._sopInstanceUid}.${ROINumber}`;
+    uid = `${this._sopInstanceUid}.${this._structureSetLabel}.${ROINumber}`;
 
     if (this._structureSetName) { // StructureSetName is Type 3: Optional
       name = `${this._structureSetName} Lesion ${ROINumber}`;
@@ -128,7 +129,9 @@ export class RTStructReader {
       name =` ${this._structureSetLabel} Lesion ${ROINumber}`;
     }
 
-    const ROIContourUid = this._freehand3DStore.setters.setROIContour(
+    this._addStructureSetIfNotPresent();
+
+    const ROIContourUid = freehand3DStore.setters.ROIContour(
       this._seriesInstanceUidToImport,
       this._roiCollectionLabel,
       name,
@@ -138,6 +141,27 @@ export class RTStructReader {
     );
 
     return ROIContourUid;
+  }
+
+  _addStructureSetIfNotPresent () {
+    const freehand3DStore = this._freehand3DStore;
+
+    const structureSet = freehand3DStore.getters.structureSet(
+      this._seriesInstanceUidToImport,
+      this._roiCollectionLabel
+    );
+
+    if (!structureSet) {
+      freehand3DStore.setters.structureSet(
+        this._seriesInstanceUidToImport,
+        this._roiCollectionName,
+        {
+          isLocked: true,
+          visible: true,
+          uid: this._roiCollectionLabel
+        }
+      );
+    }
   }
 
 

@@ -199,6 +199,10 @@ export const toolManager = {
             mouseButtonMask: 0,
             isTouchActive: true
         });
+
+        cornerstoneTools.setToolPassive('freehandMouse', {
+          mouseButtonMask: 1
+        });
     },
 
     removeToolsForElement(element) {

@@ -1,6 +1,6 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-const modules = cornerstoneTools.import('store/modules');
+const modules = cornerstoneTools.store.modules;
 
 export class Polygon {
   constructor (

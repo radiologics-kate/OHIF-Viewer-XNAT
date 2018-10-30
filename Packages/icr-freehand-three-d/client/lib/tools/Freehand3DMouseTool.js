@@ -43,7 +43,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @returns {object} measurementData
    */
   createNewMeasurement (eventData) {
-    console.log('createNewMeasurement');
     const freehand3DStore = this._freehand3DStore;
     const goodEventData =
       eventData && eventData.currentPoints && eventData.currentPoints.image;
@@ -279,8 +278,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param  {Object} handle The selected handle.
    */
   handleSelectedCallback (evt, handle, data) {
-    console.log(`handleSelectedCallback`);
-
     const freehand3DStore = this._freehand3DStore;
     const eventData = evt.detail;
     const element = eventData.element;
@@ -371,6 +368,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       'generalSeriesModule',
       image.imageId
     );
+
     let modality;
 
     if (seriesModule) {

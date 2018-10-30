@@ -16,7 +16,7 @@ export class AIMWriter extends XMLWriter {
     this._label = label;
     this._shapeIdentifier = 0;
     this._imageAnnotationNumber = 0;
-    this._imageAnnotationUUID = '';
+    this._imageAnnotationCollectionUUID = this._generateUUID();
     this._dateTime = dateTime;
     this._freehand3DStore = modules.freehand3D;
   }
@@ -24,6 +24,10 @@ export class AIMWriter extends XMLWriter {
   writeImageAnnotationCollection (volumes, seriesInfo) {
     console.log(`volumes`);
     console.log(volumes);
+
+    console.log('seriesInfo');
+    console.log(seriesInfo);
+
     this._seriesInfo = seriesInfo;
     this._referencedSopInstanceUids = [];
     this._startImageAnnotationCollection();
@@ -39,7 +43,7 @@ export class AIMWriter extends XMLWriter {
       .writeAttribute('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
       .writeAttribute('aimVersion','AIMv4_0')
       .writeAttribute('xsi:schemaLocation', 'gme://caCORE.caCORE/4.4/edu.northwestern.radiology.AIM AIM_v4_rv44_XML.xsd');
-    this._addProperty('uniqueIdentifier', 'root', this._generateUUID());
+    this._addProperty('uniqueIdentifier', 'root', this._imageAnnotationCollectionUUID);
     this._addDateTime();
     this._addProperty('description', 'value', this._name);
     this._addUser();
@@ -208,8 +212,7 @@ export class AIMWriter extends XMLWriter {
     const ROIContourUid = structureSet.ROIContourCollection[ROIContourIndex].uid;
 
     console.log(`uuidString: ${ROIContourUid}`);
-    this._imageAnnotationUUID = ROIContourUid;
-    this._addProperty('uniqueIdentifier', 'root', this._imageAnnotationUUID);
+    this._addProperty('uniqueIdentifier', 'root', ROIContourUid);
   };
 
   _imageAnnotationName (ROIContourIndex) {
@@ -297,12 +300,12 @@ export class AIMWriter extends XMLWriter {
     return `AIM_${dateTime.slice(0,8)}_${dateTime.slice(8,14)}`;
   }
 
-  get imageAnnotationUUID() {
-    return this._imageAnnotationUUID;
-  }
-
   get seriesInfo () {
     return this._seriesInfo;
+  }
+
+  get imageAnnotationCollectionUUID () {
+    return this._imageAnnotationCollectionUUID;
   }
 
   get date () {
