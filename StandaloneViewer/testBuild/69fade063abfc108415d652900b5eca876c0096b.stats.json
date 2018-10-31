@@ -3,8 +3,8 @@
     "name": "standard-minifier-js",
     "version": "2.3.4"
   },
-  "totalMinifiedBytes": 4145900,
-  "totalMinifiedGzipBytes": 943940,
+  "totalMinifiedBytes": 4147778,
+  "totalMinifiedGzipBytes": 944351,
   "minifiedBytesByPackage": {
     "packages/meteor.js": 9433,
     "packages/meteor-base.js": 31,
@@ -1233,19 +1233,20 @@
       }
     ],
     "packages/icr_freehand-three-d.js": [
-      14514,
+      16405,
       {
         "node_modules": {
           "meteor": {
             "icr:freehand-three-d": {
-              "main.js": 334,
+              "main.js": 446,
               "client": {
                 "lib": {
                   "modules": {
-                    "freehand3DModule.js": 3897
+                    "freehand3DModule.js": 3865
                   },
                   "tools": {
-                    "Freehand3DMouseTool.js": 7481
+                    "Freehand3DMouseTool.js": 7967,
+                    "Freehand3DSculpterMouseTool.js": 1291
                   },
                   "util": {
                     "freehandNameIO.js": 1122,
@@ -1259,7 +1260,7 @@
       }
     ],
     "packages/ohif_viewerbase.js": [
-      338765,
+      338851,
       {
         "node_modules": {
           "meteor": {
@@ -1440,7 +1441,7 @@
                   "switchToImageRelative.js": 181,
                   "textMarkerUtils.js": 1089,
                   "thumbnailDragHandlers.js": 2904,
-                  "toolManager.js": 3918,
+                  "toolManager.js": 4004,
                   "unloadHandlers.js": 243,
                   "updateAllViewports.js": 198,
                   "updateCrosshairsSynchronizer.js": 498,
@@ -2409,7 +2410,7 @@
       }
     ],
     "packages/icr_xnat-roi.js": [
-      82713,
+      82614,
       {
         "node_modules": {
           "meteor": {
@@ -2486,7 +2487,7 @@
                   "IO": {
                     "checkAndSetPermissions.js": 731,
                     "closeIODialog.js": 138,
-                    "export.js": 3983,
+                    "export.js": 3884,
                     "import.js": 279,
                     "roiCollectionBuilder.js": 976
                   },

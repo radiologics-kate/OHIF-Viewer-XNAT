@@ -3,7 +3,11 @@ import { Random } from 'meteor/random';
 import { OHIF } from 'meteor/ohif:core';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-import { Freehand3DMouseTool, freehand3DModule } from 'meteor/icr:freehand-three-d';
+import {
+  Freehand3DMouseTool,
+  Freehand3DSculpterMouseTool,
+  freehand3DModule
+} from 'meteor/icr:freehand-three-d';
 
 let activeTool;
 let tools = {};
@@ -53,13 +57,13 @@ export const toolManager = {
             zoomTouchPinch: 'ZoomTouchPinchTool',
             panMultiTouch: 'PanMultiTouchTool',
             stackScrollMouseWheel: 'StackScrollMouseWheelTool',
-            freehandSculpterMouse: 'FreehandSculpterMouseTool',
             brush: 'BrushTool',
             eraser: 'EraserTool'
         };
 
         pluginTools = {
-          freehandMouse: Freehand3DMouseTool
+          freehandMouse: Freehand3DMouseTool,
+          freehandSculpterMouse: Freehand3DSculpterMouseTool
         };
 
         initialized = true;
@@ -175,11 +179,14 @@ export const toolManager = {
             }
         });
 
-        // JamesAPetts
-        Object.keys(pluginTools).forEach(toolName => {
-          const pluginTool = pluginTools[toolName];
-          console.log(`adding ${toolName}`);
-          cornerstoneTools.addTool(pluginTool, { name: toolName });
+        // JamesAPetts - Plugin tools
+        const freehandTool = pluginTools['freehandMouse'];
+        cornerstoneTools.addTool(freehandTool, { name: 'freehandMouse' });
+
+        const freehandSculpterMouseTool = pluginTools['freehandSculpterMouse'];
+        cornerstoneTools.addTool(freehandSculpterMouseTool, {
+          name: 'freehandSculpterMouse',
+          referencedToolName: 'freehandMouse'
         });
 
         // Activate pinch zoom

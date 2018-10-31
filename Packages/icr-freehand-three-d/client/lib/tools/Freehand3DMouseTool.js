@@ -27,8 +27,15 @@ const pointInsideBoundingBox = cornerstoneTools.import('util/pointInsideBounding
 
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
-  constructor(name = 'FreehandMouse') {
-    super(name);
+  constructor(configuration = {}) {
+    const defaultConfig = {
+      name: 'FreehandMouse',
+      supportedInteractionTypes: ['Mouse'],
+      configuration: defaultFreehandConfiguration()
+    };
+    const initialConfiguration = Object.assign(defaultConfig, configuration);
+
+    super(initialConfiguration);
 
     this.configuration.alwaysShowHandles = false;
 
@@ -713,7 +720,26 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
   }
 
+}
 
+function defaultFreehandConfiguration () {
+  return {
+    mouseLocation: {
+      handles: {
+        start: {
+          highlight: true,
+          active: true
+        }
+      }
+    },
+    spacing: 5,
+    activeHandleRadius: 3,
+    completeHandleRadius: 6,
+    alwaysShowHandles: false,
+    invalidColor: 'crimson',
+    currentHandle: 0,
+    currentTool: -1
+  };
 }
 
 
