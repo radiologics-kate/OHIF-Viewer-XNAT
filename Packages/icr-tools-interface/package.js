@@ -14,8 +14,10 @@ Package.onUse(function(api) {
     // OHIF dependencies
     api.use([
         'ohif:core',
-        'ohif:cornerstone'
+        'ohif:cornerstone',
+        'icr:freehand-three-d'
     ]);
 
-    api.addFiles('client/lib/keyInterface.js', 'client');
+    api.addFiles('client/lib/brushToolKeyInterface.js', 'client');
+    api.addFiles('client/lib/freehandToolKeyInterface.js', 'client');
 });
