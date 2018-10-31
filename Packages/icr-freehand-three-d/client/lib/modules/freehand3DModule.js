@@ -330,7 +330,7 @@ function enabledElementCallback (element) {
     return;
   }
 
-  const seriesIsntanceUid = SeriesInfoProvider.getSeriesInstanceUid(enabledElement);
+  const seriesInstanceUid = SeriesInfoProvider.getSeriesInstanceUid(enabledElement);
 
   if (!getSeries(seriesInstanceUid)) {
     // Generate series store.

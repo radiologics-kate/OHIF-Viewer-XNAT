@@ -126,7 +126,7 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
   if (exportMask[activeROIContourIndex]) {
     structureSet.activeROIContourIndex = null;
   }
-  // Create copies of imageAnnotationData inside the new roiCollection
+  // Create copies of ROIContours inside the new structureSet
   const newIndicies = [];
 
   freehand3DStore.setters.structureSet(
@@ -150,7 +150,8 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
         structureSetName,
         {
           uid: oldROIContour.uid,
-          polygonCount: oldROIContour.polygonCount
+          polygonCount: oldROIContour.polygonCount,
+          color: oldROIContour.color
         }
       );
 
@@ -164,6 +165,9 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
     seriesInstanceUid,
     structureSetUid
   );
+
+  console.log(newStructureSet);
+
   const toolStateManager = globalToolStateManager.saveToolState();
 
   Object.keys(toolStateManager).forEach( elementId => {
@@ -229,10 +233,9 @@ function moveExportedPolygonsInInstance (exportData) {
     seriesInstanceUid
   } = exportData;
 
-  console.log(toolData);
-
   for ( let i = 0; i < toolData.length; i++ ) {
     const data = toolData[i];
+
     const ROIContourIndex = freehand3DStore.getters.ROIContourIndex(
       data.seriesInstanceUid,
       data.structureSetUid,
@@ -240,20 +243,12 @@ function moveExportedPolygonsInInstance (exportData) {
     );
     const structureSetUid = data.structureSetUid;
 
-    console.log(structureSetName);
-    console.log(exportMask[ROIContourIndex]);
-
-    // TODO -> Its already not default at this point apparently! Work out what to do from here.
-    // e.g. AIM_20181030_173647
 
     // Check to see if the volume referencing this contour is eligable for export.
-    if (structureSetName === 'DEFAULT' && exportMask[ROIContourIndex]) {
+    if (structureSetUid === 'DEFAULT' && exportMask[ROIContourIndex]) {
       const newROIContourIndex = newIndicies[ROIContourIndex];
 
-      console.log(data);
-      console.log(newStructureSet);
-
-      data.structureSetUid = newStructureSet.structureSetUid,
+      data.structureSetUid = newStructureSet.uid,
       data.referencedStructureSet = newStructureSet;
       data.referencedROIContour = newStructureSet.ROIContourCollection[newROIContourIndex];
     }

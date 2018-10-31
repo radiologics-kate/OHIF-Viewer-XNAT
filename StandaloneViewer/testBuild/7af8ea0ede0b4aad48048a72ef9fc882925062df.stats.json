@@ -3,8 +3,8 @@
     "name": "standard-minifier-js",
     "version": "2.3.4"
   },
-  "totalMinifiedBytes": 4145856,
-  "totalMinifiedGzipBytes": 943918,
+  "totalMinifiedBytes": 4145900,
+  "totalMinifiedGzipBytes": 943940,
   "minifiedBytesByPackage": {
     "packages/meteor.js": 9433,
     "packages/meteor-base.js": 31,
@@ -2409,7 +2409,7 @@
       }
     ],
     "packages/icr_xnat-roi.js": [
-      82669,
+      82713,
       {
         "node_modules": {
           "meteor": {
@@ -2486,7 +2486,7 @@
                   "IO": {
                     "checkAndSetPermissions.js": 731,
                     "closeIODialog.js": 138,
-                    "export.js": 3939,
+                    "export.js": 3983,
                     "import.js": 279,
                     "roiCollectionBuilder.js": 976
                   },
