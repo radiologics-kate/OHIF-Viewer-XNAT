@@ -124,8 +124,7 @@ Package.onUse(function(api) {
     api.addFiles('client/components/viewer/helpDialogs/helpDialogs.js', 'client');
     api.addFiles('client/components/viewer/helpDialogs/helpDialogs.styl', 'client');
 
-    // -- freehand
-
+    // -- Freehand
     api.addFiles(
       'client/components/viewer/helpDialogs/freehandHelpMenu/freehandHelpMenu.html',
       'client'
@@ -152,7 +151,22 @@ Package.onUse(function(api) {
       'client'
     );
 
-    // -- io
+    // -- Brush
+    api.addFiles(
+      'client/components/viewer/helpDialogs/brushHelpMenu/brushHelpMenu.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/helpDialogs/brushHelpMenu/brushHelpMenu.js',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpBrush.html',
+      'client'
+    );
+
+    // -- IO
     api.addFiles(
       'client/components/viewer/helpDialogs/ioHelpMenu/ioHelpMenu.html',
       'client'

@@ -1,0 +1,21 @@
+<template name="brushHelpMenu">
+  <div id="brushHelp">
+      <div class="subHelpHeader">
+        <div class="subHelpNavBar">
+          <a class="subHelpButton js-help-brush btn btn-sm btn-primary">
+            <i id="fontAwesomeIcon" class="{{pressed 'Brush'}} fa fa fa-paint-brush fa-2x"></i>
+          </a>
+        </div>
+
+        <div class="subHelpTitle">
+          <h3>{{ioTitle}}</h3>
+        </div>
+      </div>
+
+      <div class="subHelpBody">
+        {{#if showBrushHelp 'Brush'}}
+          {{>brushHelpBrush}}
+        {{/if}}
+      </div>
+  </div>
+</template>
