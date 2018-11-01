@@ -22,10 +22,6 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  */
 export async function exportROIs () {
 
-  // TEMP
-  icrXnatRoiSession.set('writePermissions', true);
-  // TEMP
-
   if (icrXnatRoiSession.get('writePermissions') === true) {
     beginExport();
     return;

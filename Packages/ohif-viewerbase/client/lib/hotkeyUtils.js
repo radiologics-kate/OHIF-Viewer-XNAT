@@ -159,7 +159,8 @@ Meteor.startup(function() {
         toggleFreehandStats: 'Toggle Freehand Stats',
         exportROIs: 'Export ROIs',
         importROIs: 'Import ROIs',
-        showHelp: 'Show Help'
+        showHelp: 'Show Help',
+        testButton: 'Test Button'
     });
 
     // Register the preset switching commands

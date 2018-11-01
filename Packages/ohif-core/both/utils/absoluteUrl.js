@@ -4,7 +4,7 @@ import { OHIF } from 'meteor/ohif:core';
 // to let multiple domains directed to the same server work
 //
 
-const routingMode = 'LOCALHOST';
+const routingMode = 'XNAT';
 
 if (routingMode === 'XNAT') {
   OHIF.utils.absoluteUrl = function(path) {

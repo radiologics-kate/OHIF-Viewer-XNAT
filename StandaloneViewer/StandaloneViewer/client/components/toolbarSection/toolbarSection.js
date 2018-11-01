@@ -339,6 +339,13 @@ Template.toolbarSection.helpers({
           iconClasses: 'fa fa-question'
         });
 
+        buttonData.push({
+          id: 'testButton',
+          title: 'Dev Test',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-question'
+        });
+
         return buttonData;
     },
 

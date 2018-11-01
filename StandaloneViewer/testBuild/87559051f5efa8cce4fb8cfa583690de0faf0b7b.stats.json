@@ -3,22 +3,22 @@
     "name": "standard-minifier-js",
     "version": "2.3.4"
   },
-  "totalMinifiedBytes": 4147778,
-  "totalMinifiedGzipBytes": 944351,
+  "totalMinifiedBytes": 4164445,
+  "totalMinifiedGzipBytes": 948497,
   "minifiedBytesByPackage": {
     "packages/meteor.js": 9433,
     "packages/meteor-base.js": 31,
     "packages/mobile-experience.js": 37,
     "packages/modules-runtime.js": 4087,
     "packages/modules.js": [
-      35037,
+      40187,
       {
         "node_modules": {
           "meteor": {
             "modules": {
               "client.js": 124,
               "css.js": 261,
-              "install-packages.js": 3716,
+              "install-packages.js": 3741,
               "process.js": 347,
               "reify.js": 71,
               "stubs.js": 97,
@@ -43,7 +43,7 @@
           },
           "@babel": {
             "runtime": {
-              "package.json": 1273,
+              "package.json": 1259,
               "helpers": {
                 "builtin": {
                   "interopRequireDefault.js": 79,
@@ -124,6 +124,10 @@
             "lib": {
               "xml-writer.js": 6596
             }
+          },
+          "mousetrap": {
+            "package.json": 73,
+            "mousetrap.js": 5022
           }
         }
       }
@@ -1260,7 +1264,7 @@
       }
     ],
     "packages/ohif_viewerbase.js": [
-      338851,
+      338876,
       {
         "node_modules": {
           "meteor": {
@@ -1424,7 +1428,7 @@
                   "getStudyMetadata.js": 243,
                   "getWADORSImageId.js": 286,
                   "getWADORSImageUrl.js": 159,
-                  "hotkeyUtils.js": 4693,
+                  "hotkeyUtils.js": 4718,
                   "imageViewerViewportData.js": 96,
                   "instanceClassSpecificViewport.js": 201,
                   "isImage.js": 2162,
@@ -2410,14 +2414,14 @@
       }
     ],
     "packages/icr_xnat-roi.js": [
-      82614,
+      88422,
       {
         "node_modules": {
           "meteor": {
             "icr:xnat-roi": {
               "client": {
                 "viewportFunctions.js": 701,
-                "test.js": 189,
+                "test.js": 268,
                 "components": {
                   "viewer": {
                     "ioDialogs": {
@@ -2456,8 +2460,8 @@
                       }
                     },
                     "helpDialogs": {
-                      "template.helpDialogs.js": 1772,
-                      "helpDialogs.js": 911,
+                      "template.helpDialogs.js": 2187,
+                      "helpDialogs.js": 995,
                       "freehandHelpMenu": {
                         "template.freehandHelpMenu.js": 2630,
                         "freehandHelpMenu.js": 822,
@@ -2466,6 +2470,13 @@
                           "template.freehandHelpSculpt.js": 1103,
                           "template.freehandHelpToggleStats.js": 811,
                           "template.freehandHelpVolumes.js": 1137
+                        }
+                      },
+                      "brushHelpMenu": {
+                        "template.brushHelpMenu.js": 888,
+                        "brushHelpMenu.js": 601,
+                        "divs": {
+                          "template.brushHelpBrush.js": 1073
                         }
                       },
                       "ioHelpMenu": {
@@ -2487,8 +2498,9 @@
                   "IO": {
                     "checkAndSetPermissions.js": 731,
                     "closeIODialog.js": 138,
-                    "export.js": 3884,
+                    "export.js": 3855,
                     "import.js": 279,
+                    "maskExport.js": 638,
                     "roiCollectionBuilder.js": 976
                   },
                   "classes": {
@@ -2496,6 +2508,7 @@
                     "AIMReader.js": 3750,
                     "AIMWriter.js": 8058,
                     "AsyncRoiFetcher.js": 5777,
+                    "MaskExtractor.js": 1573,
                     "Polygon.js": 1595,
                     "RTStructReader.js": 4526,
                     "RoiExtractor.js": 2237,
@@ -2513,10 +2526,27 @@
         }
       }
     ],
+    "packages/icr_tools-interface.js": [
+      3008,
+      {
+        "node_modules": {
+          "meteor": {
+            "icr:tools-interface": {
+              "client": {
+                "lib": {
+                  "brushToolKeyInterface.js": 731,
+                  "freehandToolKeyInterface.js": 930
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
     "packages/hot-code-push.js": 33,
     "app/global-imports.js": 1726,
     "app/app.js": [
-      20295,
+      22969,
       {
         "client": {
           "components": {
@@ -2533,7 +2563,7 @@
             },
             "toolbarSection": {
               "template.toolbarSection.js": 989,
-              "toolbarSection.js": 6161
+              "toolbarSection.js": 6262
             },
             "viewer": {
               "template.viewer.js": 1548,
@@ -2541,6 +2571,13 @@
             }
           },
           "template.body.js": 186,
+          "staticSiteSupport": {
+            "startup": {
+              "startup_MultiplanarReformatting.js": 1232,
+              "startup_VTK.js": 380,
+              "startup_VolumeRendering.js": 633
+            }
+          },
           "config.js": 772,
           "headerItems.js": 373
         },
