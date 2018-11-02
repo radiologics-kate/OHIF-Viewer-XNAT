@@ -5,9 +5,7 @@ const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 const XMLWriter = require('xml-writer');
 
-// Class which extends the XMLWriter with some abstracted AIM specific functionality
-// Currently assumes entire series of ROIs is one VOI. This will change in the future to add multiple VOIs
-// To a single file, however this requires significant UI work to allow a user to choose seperate colour-keyed tools (for example).
+// Class which extends the XMLWriter with some abstracted AIM specific functionality.
 export class AIMWriter extends XMLWriter {
 
   constructor (name, label, dateTime) {

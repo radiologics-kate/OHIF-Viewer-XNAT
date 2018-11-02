@@ -2,6 +2,7 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { MaskExtractor } from '../classes/MaskExtractor.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { DICOMSEGWriter } from '../classes/DICOMSEGWriter.js';
 import closeIODialog from './closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
@@ -17,8 +18,14 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  */
 export function maskExport () {
 
-  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+  const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
+  const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
 
-  maskExtractor.extractMasks();
+  const masks = maskExtractor.extractMasks();
+
+  // TODO DICOM or NIFTI will have different export channels here!
+
+  const dicomSegWriter = new DICOMSEGWriter(seriesInfo);
+  dicomSegWriter.writeDICOMSeg(masks);
 }

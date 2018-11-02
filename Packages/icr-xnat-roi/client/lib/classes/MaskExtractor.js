@@ -2,9 +2,7 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-
 const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
-
 const modules = cornerstoneTools.store.modules;
 
 export class MaskExtractor {
@@ -35,10 +33,7 @@ export class MaskExtractor {
   };
 
   extractMasks() {
-
-
     const stackToolState = cornerstoneTools.getToolState(this._element, 'stack');
-
     const imageIds = stackToolState.data[0].imageIds;
 
     this._numberOfSlices = imageIds.length;
@@ -49,14 +44,11 @@ export class MaskExtractor {
       if (brushState) {
         this._appendBrushState(brushState.data, i);
       }
-
     }
-
-    console.log(this._masks);
 
     this._constructDataCubes();
 
-    console.log(this._3DMasks);
+    return this._3DMasks;
   }
 
   _getImageBrushState (imageId) {
@@ -85,7 +77,6 @@ export class MaskExtractor {
 
     for (let i = 0; i < masks.length; i++) {
       const mask = masks[i];
-      console.log(mask);
 
       const hasData = mask.some((element) => element !== undefined);
 
@@ -96,7 +87,6 @@ export class MaskExtractor {
   }
 
   _constructOneDataCube (mask, maskIndex) {
-    console.log('_constructOneDataCube');
     const sliceLength = this._dimensions.rows * this._dimensions.columns;
 
     const dataCube = new Uint8ClampedArray(
