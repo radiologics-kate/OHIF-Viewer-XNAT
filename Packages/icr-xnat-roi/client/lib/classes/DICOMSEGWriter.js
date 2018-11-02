@@ -5,7 +5,6 @@ const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 const dcmjs = require('dcmjs');
 
-console.log(dcmjs);
 
 export class DICOMSEGWriter {
 
@@ -14,21 +13,15 @@ export class DICOMSEGWriter {
     console.log(seriesInfo);
   }
 
-
   // TODO Check if multiframe!
   // TODO Then grab only one dataset and call dcmjs.normalizers.Normalizer.normalizeToDataset([dataset]);
   writeDICOMSeg (masks) {
-    const bitArrays = [];
-
     // Grab the base image DICOM.
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
 
     const stackToolState = cornerstoneTools.getToolState(element, 'stack');
     const imageIds = stackToolState.data[0].imageIds;
-
-
-    console.log(imageIds);
 
     let imagePromises = [];
     for (let i = 0; i < imageIds.length; i++) {
@@ -53,25 +46,38 @@ export class DICOMSEGWriter {
         datasets.push(dataset);
       }
 
-      console.log(datasets);
-
       const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(datasets);
 
-      console.log(multiframe);
+      const seg = new dcmjs.derivations.Segmentation([multiframe]);
+
+      const pixels = new Uint8Array(seg.dataset.PixelData);
+
+      // TODO -> Include all masks when possible.
+      if (masks[0]) {
+        const bitArray = dcmjs.data.BitArray.pack(masks[0]);
+        console.log(bitArray);
+
+        for (let i = 0; i < pixels.length; i++) {
+          pixels[i] = bitArray[i];
+        }
+      }
+
+      const segBlob = dcmjs.data.datasetToBlob(seg.dataset);
+
+      saveAs(segBlob, "segmentation.dcm", true);
+
+      console.log(JSON.stringify(seg));
+
+      /*
+      for (let i = 0; i < masks.length; i++) {
+        if (masks[i]) {
+          bitArrays[i] = dcmjs.data.BitArray.pack(masks[i]);
+        }
+      }
+      */
+
 
     });
-
-    return;
-
-    console.log(dcmjs.data.BitArray);
-
-    for (let i = 0; i < masks.length; i++) {
-      if (masks[i]) {
-        bitArrays[i] = dcmjs.data.BitArray.pack(masks[i]);
-      }
-    }
-
-    console.log(bitArrays);
 
   }
 
