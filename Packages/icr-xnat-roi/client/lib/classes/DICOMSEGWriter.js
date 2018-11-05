@@ -15,7 +15,7 @@ export class DICOMSEGWriter {
 
   // TODO Check if multiframe!
   // TODO Then grab only one dataset and call dcmjs.normalizers.Normalizer.normalizeToDataset([dataset]);
-  writeDICOMSeg (masks) {
+  write (masks) {
     // Grab the base image DICOM.
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
@@ -49,10 +49,20 @@ export class DICOMSEGWriter {
       const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(datasets);
 
       const seg = new dcmjs.derivations.Segmentation([multiframe]);
+      const dataSet = seg.dataset;
+
+      const SegmentSequence = dataSet.SegmentSequence;
+
+      console.log(SegmentSequence);
+
 
       const pixels = new Uint8Array(seg.dataset.PixelData);
 
-      // TODO -> Include all masks when possible.
+      // TODO -> Include all masks
+      // Itterate through 3D stacks of data and give each a segment in the
+      // Segment Sequence.
+      // TODO -> Naming input for these, auto name them for now.
+
       if (masks[0]) {
         const bitArray = dcmjs.data.BitArray.pack(masks[0]);
         console.log(bitArray);
@@ -64,9 +74,7 @@ export class DICOMSEGWriter {
 
       const segBlob = dcmjs.data.datasetToBlob(seg.dataset);
 
-      saveAs(segBlob, "segmentation.dcm", true);
-
-      console.log(JSON.stringify(seg));
+      //saveAs(segBlob, "segmentation.dcm", true);
 
       /*
       for (let i = 0; i < masks.length; i++) {

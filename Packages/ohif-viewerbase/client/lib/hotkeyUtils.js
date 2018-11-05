@@ -157,9 +157,11 @@ Meteor.startup(function() {
         showSyncSettings: 'Sync Settings',
         volumeManagement: 'Volume Management',
         toggleFreehandStats: 'Toggle Freehand Stats',
+        showHelp: 'Show Help',
         exportROIs: 'Export ROIs',
         importROIs: 'Import ROIs',
-        showHelp: 'Show Help',
+        exportMask: 'Export Mask',
+        importMask: 'Import Mask',
         testButton: 'Test Button'
     });
 

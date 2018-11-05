@@ -1,6 +1,8 @@
 import { OHIF } from 'meteor/ohif:core';
 import { exportROIs } from './lib/IO/export.js';
 import { importROIs } from './lib/IO/import.js';
+import exportMask from './lib/IO/exportMask.js';
+import importMask from './lib/IO/importMask.js';
 import { toggleFreehandStats } from './lib/configuration/toggleFreehandStats.js';
 import { volumeManagement } from './lib/volumeManagement.js';
 
@@ -22,4 +24,14 @@ OHIF.viewerbase.viewportUtils.showHelp = () => {
 }
 OHIF.viewerbase.viewportUtils.volumeManagement = () => {
   volumeManagement();
+}
+
+OHIF.viewerbase.viewportUtils.exportMask = function() {
+  console.log('exportMask');
+  exportMask();
+}
+
+OHIF.viewerbase.viewportUtils.importMask = function() {
+  console.log('importMask');
+  importMask();
 }

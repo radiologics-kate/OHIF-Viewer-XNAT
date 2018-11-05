@@ -252,18 +252,40 @@ Template.toolbarSection.helpers({
             subTools: freehandTools
         });
 
+        const brushTools = [
+          {
+            id: 'brush',
+            title: 'Brush',
+            classes: 'imageViewerTool',
+            iconClasses: 'fa fa-paint-brush'
+          },
+          {
+            id: 'exportMask',
+            title: 'Dev Export',
+            classes: 'imageViewerCommand',
+            iconClasses: 'fa fa-question'
+          },
+          {
+            id: 'importMask',
+            title: 'Dev Import',
+            classes: 'imageViewerCommand',
+            iconClasses: 'fa fa-question'
+          }
+        ];
+
+        buttonData.push({
+            id: 'Brush',
+            title: 'Mask',
+            classes: 'rp-x-1 rm-l-3',
+            iconClasses: 'fa fa-paint-brush', // TEMP - Need a better icon for this.
+            subTools: brushTools
+        });
+
         buttonData.push({
             id: 'resetViewport',
             title: 'Reset',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-undo'
-        });
-
-        buttonData.push({
-          id: 'brush',
-          title: 'Brush',
-          classes: 'imageViewerTool',
-          iconClasses: 'fa fa-paint-brush'
         });
 
         if (!OHIF.uiSettings.displayEchoUltrasoundWorkflow) {
@@ -335,13 +357,6 @@ Template.toolbarSection.helpers({
         buttonData.push({
           id: 'showHelp',
           title: 'Help',
-          classes: 'imageViewerCommand',
-          iconClasses: 'fa fa-question'
-        });
-
-        buttonData.push({
-          id: 'testButton',
-          title: 'Dev Test',
           classes: 'imageViewerCommand',
           iconClasses: 'fa fa-question'
         });
