@@ -26,7 +26,8 @@ export default async function () {
 
   console.log(`...found DICOMSEG file in ${endFetch - startFetch} ms!`);
 
-  // Get stackToolState
+  // Get stackToolState // TODO -> Make this into a function somewhere else as
+  // Both import and export use it.
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
   const stackToolState = cornerstoneTools.getToolState(element, 'stack');
@@ -38,6 +39,9 @@ export default async function () {
     columns: image.columns,
     slices: imageIds.length
   };
+
+  dimensions.sliceLength = dimensions.rows * dimensions.columns;
+  dimensions.cube = dimensions.sliceLength * dimensions.slices;
 
   const dicomSegReader = new DICOMSEGReader(seriesInfo);
 

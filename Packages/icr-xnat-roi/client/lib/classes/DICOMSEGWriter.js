@@ -10,12 +10,11 @@ export class DICOMSEGWriter {
 
   constructor (seriesInfo) {
     this._seriesInfo = seriesInfo;
-    console.log(seriesInfo);
   }
 
   // TODO Check if multiframe!
   // TODO Then grab only one dataset and call dcmjs.normalizers.Normalizer.normalizeToDataset([dataset]);
-  write (masks) {
+  write (masks, dimensions) {
     // Grab the base image DICOM.
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
@@ -31,8 +30,6 @@ export class DICOMSEGWriter {
     }
 
     Promise.all(imagePromises).then((images) => {
-      console.log(images);
-
       const datasets = [];
 
       for (let i = 0; i < images.length; i++) {
@@ -53,37 +50,63 @@ export class DICOMSEGWriter {
 
       const SegmentSequence = dataSet.SegmentSequence;
 
-      console.log(SegmentSequence);
+      let numSegments = 0;
 
+      for (let i = 0; i < masks.length; i++) {
+        if (masks[i]) {
+          numSegments++;
+          // TODO -> Naming input for these, auto name them for now.
+          seg.addSegment({
+            SegmentedPropertyCategoryCodeSequence: {
+              CodeValue: "T-D0050",
+              CodingSchemeDesignator: "SRT",
+              CodeMeaning: "Tissue"
+            },
+            SegmentLabel: `TEST-${i}`,
+            SegmentAlgorithmType: "MANUAL",
+            RecommendedDisplayCIELabValue: [ 43802, 26566, 37721 ],
+            SegmentedPropertyTypeCodeSequence: {
+              CodeValue: "T-D0050",
+              CodingSchemeDesignator: "SRT",
+              CodeMeaning: "Tissue"
+            }
+          });
+        }
+      }
+
+      // Re-define the PixelData ArrayBuffer to be the correct length
+      // => segments * rows * columns * slices / 8 (As 8 bits/byte)
+      seg.dataset.PixelData = new ArrayBuffer(
+        numSegments * dimensions.cube / 8
+      );
 
       const pixels = new Uint8Array(seg.dataset.PixelData);
 
-      // TODO -> Include all masks
-      // Itterate through 3D stacks of data and give each a segment in the
-      // Segment Sequence.
-      // TODO -> Naming input for these, auto name them for now.
+      console.log(dimensions.cube);
+      console.log(pixels.length);
 
-      if (masks[0]) {
-        const bitArray = dcmjs.data.BitArray.pack(masks[0]);
-        console.log(bitArray);
+      const lengthOfCubeInBytes = dimensions.cube / 8;
 
-        for (let i = 0; i < pixels.length; i++) {
-          pixels[i] = bitArray[i];
+      // Fill up the PixelData array with bitpacked segment information.
+      for (let i = 0; i < masks.length; i++) {
+        if (masks[i]) {
+          const bitArray = dcmjs.data.BitArray.pack(masks[i]);
+
+          console.log(bitArray);
+
+          console.log(lengthOfCubeInBytes);
+
+          for (let j = 0; j < lengthOfCubeInBytes; j++) {
+            pixels[(i * lengthOfCubeInBytes) + j] = bitArray[j];
+          }
+
+          console.log(pixels[i * lengthOfCubeInBytes]);
         }
       }
 
       const segBlob = dcmjs.data.datasetToBlob(seg.dataset);
 
-      //saveAs(segBlob, "segmentation.dcm", true);
-
-      /*
-      for (let i = 0; i < masks.length; i++) {
-        if (masks[i]) {
-          bitArrays[i] = dcmjs.data.BitArray.pack(masks[i]);
-        }
-      }
-      */
-
+      saveAs(segBlob, "segmentation.dcm", true);
 
     });
 

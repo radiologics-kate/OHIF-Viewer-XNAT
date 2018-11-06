@@ -11,6 +11,7 @@ export class MaskExtractor {
     this._seriesInstanceUid = seriesInstanceUid;
     this._masks = [];
     this._3DMasks = [];
+    this._hasData = false;
 
     const numberOfColors = BaseBrushTool.getNumberOfColors();
 
@@ -19,6 +20,8 @@ export class MaskExtractor {
     }
 
     this._toolStateManager = globalToolStateManager.saveToolState();
+
+    console.log(this._toolStateManager);
 
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
@@ -48,7 +51,10 @@ export class MaskExtractor {
 
     this._constructDataCubes();
 
-    return this._3DMasks;
+    if (this._hasData) {
+      return this._3DMasks;
+    }
+
   }
 
   _getImageBrushState (imageId) {
@@ -78,7 +84,12 @@ export class MaskExtractor {
     for (let i = 0; i < masks.length; i++) {
       const mask = masks[i];
 
-      const hasData = mask.some((element) => element !== undefined);
+      console.log(this);
+      console.log(this._hasData);
+
+      const hasData = this._doesMaskHaveData(mask);
+
+
 
       if (hasData) {
         this._constructOneDataCube(mask, i);
@@ -104,6 +115,24 @@ export class MaskExtractor {
     }
 
     this._3DMasks[maskIndex] = dataCube;
+  }
+
+
+  /**
+   * Checks if the mask has data, and that it isn't all zero.
+   *
+   * @param  {int[][]} mask An array of arrays of binary mask slices.
+   * @return {boolean}      Whether the object hasData.
+   */
+  _doesMaskHaveData (mask) {
+    const hasData = mask.some((element) =>
+      element !== undefined &&
+      element.some(pixel => pixel)
+    );
+
+    this._hasData = this._hasData || hasData;
+
+    return hasData;
   }
 
 }
