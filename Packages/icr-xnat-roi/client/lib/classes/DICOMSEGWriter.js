@@ -56,21 +56,16 @@ export class DICOMSEGWriter {
         if (masks[i]) {
           numSegments++;
           // TODO -> Naming input for these, auto name them for now.
-          seg.addSegment({
-            SegmentedPropertyCategoryCodeSequence: {
-              CodeValue: "T-D0050",
-              CodingSchemeDesignator: "SRT",
-              CodeMeaning: "Tissue"
-            },
-            SegmentLabel: `TEST-${i}`,
-            SegmentAlgorithmType: "MANUAL",
-            RecommendedDisplayCIELabValue: [ 43802, 26566, 37721 ],
-            SegmentedPropertyTypeCodeSequence: {
-              CodeValue: "T-D0050",
-              CodingSchemeDesignator: "SRT",
-              CodeMeaning: "Tissue"
-            }
-          });
+
+          let segMetadata = modules.brush.getters.metadata(
+            this._seriesInfo.seriesInstanceUid,
+            i
+          );
+          if (!segMetadata) {
+            segMetadata = this._getDefaultSegmentationData(i);
+          }
+
+          seg.addSegment(segMetadata);
         }
       }
 
@@ -110,6 +105,24 @@ export class DICOMSEGWriter {
 
     });
 
+  }
+
+  _getDefaultSegmentationData (i) {
+    return {
+      SegmentedPropertyCategoryCodeSequence: {
+        CodeValue: "T-D0050",
+        CodingSchemeDesignator: "SRT",
+        CodeMeaning: "Tissue"
+      },
+      SegmentLabel: `DEFAULT-MASK-${i}`,
+      SegmentAlgorithmType: "MANUAL",
+      RecommendedDisplayCIELabValue: [ 43802, 26566, 37721 ],
+      SegmentedPropertyTypeCodeSequence: {
+        CodeValue: "T-D0050",
+        CodingSchemeDesignator: "SRT",
+        CodeMeaning: "Tissue"
+      }
+    }
   }
 
 }

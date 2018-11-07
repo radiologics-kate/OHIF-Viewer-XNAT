@@ -24,16 +24,12 @@ export class DICOMSEGReader {
     const pixelData = dcmjs.data.BitArray.unpack(multiframe.PixelData);
     const segmentSequence = multiframe.SegmentSequence;
 
-
-
-
     if (Array.isArray(segmentSequence)) {
       for (let i = 0; i < segmentSequence.length; i++) {
         const segment = segmentSequence[i];
         const mask = [];
 
-        console.log(segment);
-        // TODO -> Store the segment info in some metadata somewhere.
+        this._setSegMetadata(i, segment);
 
         for (let j = 0; j < dimensions.cube; j++) {
           mask[j] = pixelData[(i * dimensions.cube) + j];
@@ -45,8 +41,7 @@ export class DICOMSEGReader {
       const segment = segmentSequence;
       const mask = [];
 
-      console.log(segment);
-      // TODO -> Store the segment info in some metadata somewhere.
+      this._setSegMetadata(i, segment);
 
       for (let j = 0; j < dimensions.cube; j++) {
         mask[j] = pixelData[j];
@@ -55,23 +50,21 @@ export class DICOMSEGReader {
       this._masks.push(mask);
     }
 
-
-
-
-
-
     console.log(pixelData);
 
     console.log(segmentSequence);
-
-
-
-
 
     const maskImporter = new MaskImporter(stackToolState, dimensions);
 
     maskImporter.import(this._masks);
   }
 
+  _setSegMetadata (segIndex, metadata) {
+    modules.brush.setters.metadata(
+      this._seriesInfo.seriesInstanceUid,
+      segIndex,
+      metadata
+    );
+  }
 
 }
