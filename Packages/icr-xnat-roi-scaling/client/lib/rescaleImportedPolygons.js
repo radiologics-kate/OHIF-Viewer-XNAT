@@ -71,9 +71,28 @@ function scaleRtStructContourData (toolData, imagePlane) {
   // Based on the largest component of each direction cosine.
   // This avoids NaNs or floating point errors caused by dividing by very small numbers and ensures a safe mapping.
 
+  let ix = 0;
+  let iy = 0;
+  let largestDirectionCosineMagnitude = {
+    x: 0,
+    y: 0
+  };
+
+  // Find the element with the largest magnitude in each direction cosine vector.
+  for (let i = 0; i < X.length; i++) {
+    if (Math.abs(X[i]) > largestDirectionCosineMagnitude.x) {
+      ix = i;
+      largestDirectionCosineMagnitude.x = Math.abs(X[i]);
+    }
+    if (Math.abs(Y[i]) > largestDirectionCosineMagnitude.y) {
+      iy = i;
+      largestDirectionCosineMagnitude.y = Math.abs(Y[i]);
+    }
+  }
+
   const ci = { // Index of max elements in X and Y
-    ix: X.indexOf(Math.max(...X)),
-    iy: Y.indexOf(Math.max(...Y))
+    ix,
+    iy
   };
 
   // Sanity Check
