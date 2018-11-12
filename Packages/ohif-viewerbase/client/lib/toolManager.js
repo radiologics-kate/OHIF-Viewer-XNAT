@@ -58,7 +58,8 @@ export const toolManager = {
             panMultiTouch: 'PanMultiTouchTool',
             stackScrollMouseWheel: 'StackScrollMouseWheelTool',
             brush: 'BrushTool',
-            eraser: 'EraserTool'
+            eraser: 'EraserTool',
+            referenceLines: 'ReferenceLinesTool'
         };
 
         pluginTools = {

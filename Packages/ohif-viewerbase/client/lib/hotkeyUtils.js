@@ -126,10 +126,10 @@ Meteor.startup(function() {
         length: 'Length Measurement',
         wwwcRegion: 'W/L by Region',
         crosshairs: 'Crosshairs',
+        referenceLines: 'Reference Lines',
         freehandMouse: 'Freehand Mouse',
         freehandSculpterMouse: 'Freehand Sculpter Mouse',
         brush: 'Brush',
-        freehand3DMouse: 'Freehand 3D Mouse',
         eraser: 'Eraser'
     });
 
