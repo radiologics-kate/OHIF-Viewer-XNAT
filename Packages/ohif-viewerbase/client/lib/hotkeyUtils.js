@@ -125,7 +125,8 @@ Meteor.startup(function() {
         pan: 'Pan',
         length: 'Length Measurement',
         wwwcRegion: 'W/L by Region',
-        crosshairs: 'Crosshairs'
+        crosshairs: 'Crosshairs',
+        referenceLines: 'Reference Lines'
     });
 
     // Functions to register the viewport commands

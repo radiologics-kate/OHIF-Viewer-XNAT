@@ -455,7 +455,10 @@ const loadDisplaySetIntoViewport = (data, templateData) => {
 
             if (OHIF.viewer.refLinesEnabled) {
                 // ... and if reference lines are globally enabled, let cornerstoneTools know.
-                cornerstoneTools.referenceLines.tool.enable(element, OHIF.viewer.updateImageSynchronizer);
+                const referenceLinesTool = cornerstoneTools.getToolForElement(element, 'referenceLines');
+
+                referenceLinesTool.configuration.renderer = OHIF.viewer.updateImageSynchronizer;
+                cornerstoneTools.setToolEnabledForElement(element, 'referenceLines');
             }
 
             // If the crosshairs tool is active, update the synchronizer
