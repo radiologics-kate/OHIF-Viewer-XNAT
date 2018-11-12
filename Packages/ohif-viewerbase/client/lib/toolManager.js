@@ -223,7 +223,7 @@ export const toolManager = {
 
         // JamesAPetts
         Object.keys(pluginTools).forEach(toolName => {
-          cornerstoneTools.addTool(element, toolName);
+          cornerstoneTools.removeToolForElement(element, toolName);
         });
     },
 
