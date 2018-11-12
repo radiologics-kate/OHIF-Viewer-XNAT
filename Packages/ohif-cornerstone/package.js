@@ -7,15 +7,15 @@ Package.describe({
 Npm.depends({
     hammerjs: '2.0.8',
     'cornerstone-core': '2.2.7',
-    'cornerstone-tools': '3.0.0-b.1020',
+    'cornerstone-tools': '3.0.0-b.1125',
     'cornerstone-math': '0.1.6',
     'dicom-parser': '1.8.0',
     'cornerstone-wado-image-loader': '2.1.4',
-    'dcmjs': '0.2.1'
+    'dcmjs': '0.1.5'
 });
 
 Package.onUse(function(api) {
-    api.versionsFrom('1.7');
+    api.versionsFrom('1.5');
 
     api.use('ecmascript');
 

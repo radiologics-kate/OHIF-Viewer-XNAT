@@ -166,16 +166,7 @@ export const toolManager = {
         Object.keys(tools).forEach(toolName => {
             const apiTool = cornerstoneTools[tools[toolName]];
             if (apiTool) {
-              console.log(toolName);
-              if (toolName === 'freehandSculpterMouse') {
-                console.log('adding freehandSculpterMouse');
-                cornerstoneTools.addTool(apiTool, {
-                  name: toolName,
-                  referencedToolName: 'freehandMouse'
-                });
-              } else {
-                cornerstoneTools.addTool(apiTool, { name: toolName });
-              }
+              cornerstoneTools.addTool(apiTool, { name: toolName });
             }
         });
 
