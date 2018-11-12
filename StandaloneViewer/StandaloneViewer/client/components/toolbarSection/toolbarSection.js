@@ -196,7 +196,7 @@ Template.toolbarSection.helpers({
           },
           {
             id: 'volumeManagement',
-            title: 'Volume Management',
+            title: 'ROI Management',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-freehand-switch-volume'
           },
@@ -235,18 +235,18 @@ Template.toolbarSection.helpers({
             title: 'Import ROIs',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import'
-          },
+          }/*,
           {
             id: 'toggleDownloadDialog',
             title: 'Snapshot',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-camera'
-          }
+          }*/
         ];
 
         buttonData.push({
             id: 'Freehand',
-            title: 'Freehand',
+            title: 'ROI',
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu',
             subTools: freehandTools
@@ -258,7 +258,7 @@ Template.toolbarSection.helpers({
             title: 'Brush',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
-          },
+          }/*,
           {
             id: 'exportMask',
             title: 'Dev Export',
@@ -270,7 +270,7 @@ Template.toolbarSection.helpers({
             title: 'Dev Import',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-question'
-          }
+          }*/
         ];
 
         buttonData.push({
