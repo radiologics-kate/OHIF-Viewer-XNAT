@@ -1,0 +1,40 @@
+<template name="brushMetadataDialogs">
+  <dialog id="brushMetadataDialog"
+      class="brushMetadataDialog noselect"
+      oncontextmenu="return false">
+      <div class="brushMetadataHeader">
+        <h3>Segmentation Properties</h3>
+        <a class="brushMetadataCancel js-brush-metadata-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      <div class="brush-metadata-vert-box">
+        <div class="brushMetadataTextInputOptions">
+            <label for="brushMetadataTextInput">Label</label>
+            <input name="brushMetadataTextInput"
+                   class="brushMetadataTextInput"
+                   type="text"
+                   tabindex="-1"
+                   autocomplete="off"
+                   placeholder="Enter Segmentation Label.."
+                   onfocus="this.select()"/>
+        </div>
+
+        <div>
+          TEST
+        </div>
+      </div>
+
+
+
+      <div class="brushMetadataFooter">
+        <hr/>
+        <a class="brushMetadataNewButton js-brush-metadata-ok btn btn-sm btn-primary">
+          OK
+        </a>
+        <br/>
+      </div>
+
+  </dialog>
+</template>

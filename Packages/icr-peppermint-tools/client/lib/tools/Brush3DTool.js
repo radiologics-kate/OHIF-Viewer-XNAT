@@ -1,7 +1,8 @@
 import { cornerstoneTools, cornerstoneMath } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
-
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+
+import brushMetadataIO from '../util/brushMetadataIO.js';
 
 const BrushTool = cornerstoneTools.BrushTool;
 const brushStore = cornerstoneTools.store.modules.brush;
@@ -48,6 +49,7 @@ export default class Brush3DTool extends BrushTool {
     } else {
       // Open the UI and let the user input data!
       console.log('No metadata!');
+      brushMetadataIO();
     }
 
 

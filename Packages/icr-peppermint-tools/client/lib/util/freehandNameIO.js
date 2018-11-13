@@ -12,8 +12,7 @@ const modules = cornerstoneTools.store.modules;
  *
  */
 export async function createNewVolume () {
-  const oldName = 'Unnamed Lesion';
-  const name = await imageAnnotationNameInput(oldName);
+  const name = await imageAnnotationNameInput();
 
   if (name) {
     // Create and activate new ROIContour
@@ -41,8 +40,6 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
   let oldName;
   if (ROIContour.name) {
     oldName = ROIContour.name;
-  } else {
-    oldName = 'Unnamed Lesion';
   }
 
   // Await new name input.

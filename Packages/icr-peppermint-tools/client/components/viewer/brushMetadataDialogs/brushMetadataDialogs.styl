@@ -1,0 +1,58 @@
+@import "{ohif:design}/app"
+
+.brushMetadataDialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 50px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-top: 10px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  .brushMetadataHeader
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex;
+    flex-wrap: nowrap
+    justify-content: space-between
+
+  h3
+    font-weight: 400
+    text-align: left
+
+  .brushMetadataCancel
+    text-align: right
+    margin-top: 16px
+
+  .brushMetadataNewButton
+    float: center
+    width: 100%
+
+  .brushMetadataTableButton
+    width: 100%
+
+  .brushMetadataTextInputOptions
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-wrap: nowrap
+    align-content: space-between
+    align-items: flex-end
+
+  .brush-metadata-vert-box
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex;
+
+    flex-direction: column
+    align-items: space-between
