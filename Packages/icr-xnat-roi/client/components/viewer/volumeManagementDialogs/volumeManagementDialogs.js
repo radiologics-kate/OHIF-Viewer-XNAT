@@ -1,5 +1,5 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { createNewVolume } from 'meteor/icr:freehand-three-d';
+import { createNewVolume } from 'meteor/icr:peppermint-tools';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 const modules = cornerstoneTools.store.modules;

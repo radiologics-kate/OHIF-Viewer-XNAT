@@ -1,6 +1,11 @@
+// Tools
 export { default as Freehand3DMouseTool } from './client/lib/tools/Freehand3DMouseTool.js';
 export { default as Freehand3DSculpterMouseTool } from './client/lib/tools/Freehand3DSculpterMouseTool.js';
+export { default as Brush3DTool } from './client/lib/tools/Brush3DTool.js';
+
+// Modules
 export { default as freehand3DModule } from './client/lib/modules/freehand3DModule.js';
+
 export {
   createNewVolume,
   setVolumeName

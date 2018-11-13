@@ -23,7 +23,7 @@ Package.onUse(function(api) {
         'ohif:hotkeys',
         'ohif:log',
         'icr:xnat-roi-namespace',
-        'icr:freehand-three-d',
+        'icr:peppermint-tools',
         'icr:series-info-provider'
     ]);
 

@@ -1,6 +1,6 @@
 Package.describe({
-    name: 'icr:freehand-three-d',
-    summary: '3D freehand roi plugin for OHIF',
+    name: 'icr:peppermint-tools',
+    summary: 'cornerstoneTools plugin for 3D tools.',
     version: '0.1.0'
 });
 
@@ -23,6 +23,9 @@ Package.onUse(function(api) {
       'ohif:log',
       'icr:series-info-provider'
     ]);
+
+    api.addFiles('client/lib/keyInterface/brushToolKeyInterface.js', 'client');
+    api.addFiles('client/lib/keyInterface/freehandToolKeyInterface.js', 'client');
 
     api.mainModule('main.js', 'client');
 });

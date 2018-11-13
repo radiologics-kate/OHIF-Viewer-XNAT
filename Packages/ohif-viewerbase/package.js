@@ -24,7 +24,7 @@ Package.onUse(function(api) {
         'ohif:cornerstone-settings',
         'ohif:hotkeys',
         'ohif:log',
-        'icr:freehand-three-d'
+        'icr:peppermint-tools'
     ]);
 
     const assets = [

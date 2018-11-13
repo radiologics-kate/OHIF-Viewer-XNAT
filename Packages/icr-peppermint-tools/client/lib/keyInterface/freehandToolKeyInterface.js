@@ -1,5 +1,5 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { createNewVolume } from 'meteor/icr:freehand-three-d';
+import { createNewVolume } from '../util/freehandNameIO.js';
 import { OHIF } from 'meteor/ohif:core';
 
 const getKeyFromKeyCode = cornerstoneTools.import('util/getKeyFromKeyCode');

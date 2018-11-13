@@ -6,8 +6,9 @@ import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import {
   Freehand3DMouseTool,
   Freehand3DSculpterMouseTool,
+  Brush3DTool,
   freehand3DModule
-} from 'meteor/icr:freehand-three-d';
+} from 'meteor/icr:peppermint-tools';
 
 let activeTool;
 let tools = {};
@@ -57,14 +58,15 @@ export const toolManager = {
             zoomTouchPinch: 'ZoomTouchPinchTool',
             panMultiTouch: 'PanMultiTouchTool',
             stackScrollMouseWheel: 'StackScrollMouseWheelTool',
-            brush: 'BrushTool',
+            //brush: 'BrushTool',
             eraser: 'EraserTool',
             referenceLines: 'ReferenceLinesTool'
         };
 
         pluginTools = {
           freehandMouse: Freehand3DMouseTool,
-          freehandSculpterMouse: Freehand3DSculpterMouseTool
+          freehandSculpterMouse: Freehand3DSculpterMouseTool,
+          brush: Brush3DTool
         };
 
         initialized = true;
@@ -171,9 +173,12 @@ export const toolManager = {
             }
         });
 
-        // JamesAPetts - Plugin tools
+        // JamesAPetts - Peppermint tools
         const freehandTool = pluginTools['freehandMouse'];
         cornerstoneTools.addTool(freehandTool, { name: 'freehandMouse' });
+
+        const brushTool = pluginTools['brush'];
+        cornerstoneTools.addTool(brushTool, { name: 'brush' });
 
         const freehandSculpterMouseTool = pluginTools['freehandSculpterMouse'];
         cornerstoneTools.addTool(freehandSculpterMouseTool, {
