@@ -7,7 +7,7 @@ import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
  *
  * @author JamesAPetts
  */
-export function toggleFreehandStats () {
+export default function () {
   const enabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
 
   if (!enabledElement) {

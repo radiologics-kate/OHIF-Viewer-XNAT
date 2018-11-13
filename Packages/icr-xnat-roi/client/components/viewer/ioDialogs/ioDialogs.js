@@ -2,7 +2,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
 Template.ioDialogs.onRendered(() => {
     const instance = Template.instance();
-    const dialogIds = ['exportVolumes', 'importVolumes', 'ioSetName', 'ioMessage'];
+    const dialogIds = ['exportVolumes', 'importVolumes', 'ioMessage'];
 
     console.log('ioDialogs onRendered');
 

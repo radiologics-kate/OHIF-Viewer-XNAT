@@ -40,42 +40,6 @@ Package.onUse(function(api) {
     api.addFiles('client/components/viewer/ioDialogs/ioDialogs.styl', 'client');
 
     api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.html',
-      'client'
-    );
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.js',
-      'client'
-    );
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.styl',
-      'client'
-    );
-
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/roiCollectionList/roiCollectionList.html',
-      'client'
-    );
-
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeList/volumeList.html',
-      'client'
-    );
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeList/volumeList.js',
-      'client'
-    );
-
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeListItem/volumeListItem.html',
-      'client'
-    );
-    api.addFiles(
-      'client/components/viewer/volumeManagementDialogs/volumeListItem/volumeListItem.js',
-      'client'
-    );
-
-    api.addFiles(
       'client/components/viewer/roiImportListDialogs/roiImportListDialogs.html',
       'client'
     );
@@ -140,10 +104,6 @@ Package.onUse(function(api) {
     );
     api.addFiles(
       'client/components/viewer/helpDialogs/freehandHelpMenu/divs/freehandHelpSculpt.html',
-      'client'
-    );
-    api.addFiles(
-      'client/components/viewer/helpDialogs/freehandHelpMenu/divs/freehandHelpToggleStats.html',
       'client'
     );
     api.addFiles(

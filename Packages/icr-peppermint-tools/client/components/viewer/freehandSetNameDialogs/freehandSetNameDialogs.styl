@@ -1,0 +1,44 @@
+@import "{ohif:design}/app"
+
+.freehandTextInputDialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 100px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+  margin: auto
+  overflow: hidden
+  padding: 10px
+  border-radius: 8px
+  text-align: center
+
+  .freehandDialogCancel
+    float: right
+
+  .freehandDescription
+    float: left
+
+  h3
+    font-weight: 400
+
+  .freehandTextInputOptions
+    padding: 10px 0
+
+  .freehandTextInputOptions  label
+    clear: both
+    float: left
+
+  .freehandTextInput
+    margin-left: 5px
+
+  .freehandBody
+    float: left
+    text-align: left
+
+  .freehandDialogConfirm
+    float: center

@@ -10,3 +10,7 @@ export {
   createNewVolume,
   setVolumeName
 } from './client/lib/util/freehandNameIO.js';
+
+// Utils to be called by UI buttons:
+export { default as toggleFreehandStats } from './client/lib/util/toggleFreehandStats.js';
+export { default as volumeManagement } from './client/lib/util/volumeManagement.js';

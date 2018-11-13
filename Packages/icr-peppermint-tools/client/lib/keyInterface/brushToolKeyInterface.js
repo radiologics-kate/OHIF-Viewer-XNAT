@@ -5,6 +5,8 @@ const getKeyFromKeyCode = cornerstoneTools.import('util/getKeyFromKeyCode');
 const Mousetrap = require('mousetrap');
 const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
 
+console.log('mousetrap');
+
 
 Mousetrap.bind(['[', ']', '-', '=', '+'], function(evt) {
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();

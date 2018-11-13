@@ -8,7 +8,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
  *
  * @author JamesAPetts
  */
-export async function volumeManagement () {
+export default async function () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
   icrXnatRoiSession.set('volumeManagementActiveSeries', '');
   icrXnatRoiSession.set('volumeManagementActiveSeries', seriesInstanceUid);

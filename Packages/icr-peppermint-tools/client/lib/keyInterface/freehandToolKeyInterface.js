@@ -25,9 +25,9 @@ Mousetrap.bind(['n', 'ctrl'], function(evt) {
       createNewVolume();
       break;
     case 'Control':
-      freehandTool.configuration.alwaysShowHandles = true;
-      console.log(freehandTool.configuration);
+      freehandTool.configuration.alwaysShowHandles = false;
       imageNeedsUpdate = true;
+
       break;
   }
 
@@ -37,18 +37,14 @@ Mousetrap.bind(['n', 'ctrl'], function(evt) {
     cornerstone.updateImage(element);
   }
 
-}, 'keydown');
+}, 'keyup');
 
 Mousetrap.bind(['ctrl'], function(evt) {
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
   const freehandTool = cornerstoneTools.getToolForElement(element, 'freehandMouse');
 
-  if (!freehandTool || freehandTool.mode !== 'active') {
-    return;
-  }
-
-  freehandTool.configuration.alwaysShowHandles = false;
+  freehandTool.configuration.alwaysShowHandles = true;
   cornerstone.updateImage(element);
 
-}, 'keyup');
+}, 'keydown');
