@@ -19,11 +19,14 @@ Package.onUse(function(api) {
         'reactive-var',
         'session',
         'clinical:router',
-        'cultofcoders:persistent-session'
+        'cultofcoders:persistent-session',
     ]);
 
     // OHIF dependencies
-    api.use('ohif:commands');
+    api.use([
+      'ohif:commands',
+      'icr:xnat-roi-namespace'
+    ]);
 
     // Main module definition
     api.mainModule('main.js', 'client');

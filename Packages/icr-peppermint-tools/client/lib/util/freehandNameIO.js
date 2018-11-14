@@ -1,6 +1,7 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
 const modules = cornerstoneTools.store.modules;
 
@@ -12,7 +13,7 @@ const modules = cornerstoneTools.store.modules;
  *
  */
 export async function createNewVolume () {
-  const name = await imageAnnotationNameInput();
+  const name = await imageAnnotationNameInput('Unnamed Lesion');
 
   if (name) {
     // Create and activate new ROIContour
@@ -40,6 +41,8 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
   let oldName;
   if (ROIContour.name) {
     oldName = ROIContour.name;
+  } else {
+    oldName = 'Unnamed Lesion';
   }
 
   // Await new name input.
@@ -103,7 +106,6 @@ function imageAnnotationNameInput (defaultName) {
     cancel.on('click', () => {
       cancelHandler();
     });
-
 
     dialog.get(0).showModal();
   });

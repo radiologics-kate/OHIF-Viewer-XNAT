@@ -13,16 +13,26 @@
         <div class="brushMetadataTextInputOptions">
             <label for="brushMetadataTextInput">Label</label>
             <input name="brushMetadataTextInput"
-                   class="brushMetadataTextInput"
+                   class="brushMetadataTextInput brush-segmentation-label-js"
                    type="text"
-                   tabindex="-1"
                    autocomplete="off"
                    placeholder="Enter Segmentation Label.."
                    onfocus="this.select()"/>
         </div>
 
+        <div class="choose-segmentation-type-header">
+          Choose Segmentation Type
+        </div>
+
+        <input name="brushMetadataTextInput"
+               class="brushMetadataTextInput brush-segmentation-search-js"
+               type="text"
+               autocomplete="off"
+               placeholder="Search.."
+               onfocus="this.select()"/>
+
         <div>
-          TEST
+          {{searchTest}}
         </div>
       </div>
 

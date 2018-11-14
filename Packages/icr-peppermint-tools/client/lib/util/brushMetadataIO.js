@@ -22,7 +22,7 @@ export default async function () {
     element.focus();
   }
 
-  function closeDialogAndCreateNewVolume() {
+  function closeDialogAndAccept() {
     closeDialog();
     // TODO -> key interface here. -> Refactor to do this in Blaze?
   }
@@ -35,6 +35,6 @@ export default async function () {
       closeDialog();
     }
   });
-
+  
   dialog.get(0).showModal();
 }

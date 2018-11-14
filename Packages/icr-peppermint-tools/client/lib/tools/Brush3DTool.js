@@ -1,6 +1,7 @@
 import { cornerstoneTools, cornerstoneMath } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { icrXnatRoiSession, isModalOpen } from 'meteor/icr:xnat-roi-namespace';
 
 import brushMetadataIO from '../util/brushMetadataIO.js';
 
@@ -24,7 +25,7 @@ export default class Brush3DTool extends BrushTool {
   /**
    * Initialise painting with baseBrushTool
    *
-   * @protected
+   * @override @protected
    * @event
    * @param {Object} evt - The event.
    */
@@ -48,8 +49,10 @@ export default class Brush3DTool extends BrushTool {
       this._lastImageCoords = eventData.currentPoints.image;
     } else {
       // Open the UI and let the user input data!
-      console.log('No metadata!');
-      brushMetadataIO();
+
+      if (!isModalOpen()) {
+        brushMetadataIO();
+      }
     }
 
 

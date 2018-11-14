@@ -52,6 +52,7 @@ Template.volumeManagementDialogs.events({
 
 
 function closeDialog () {
+  icrXnatRoiSession.set('modalOpen', false);
   const dialog = $('#volumeManagementDialog');
   dialog.get(0).close();
 

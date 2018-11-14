@@ -1,11 +1,16 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
+import { icrXnatRoiSession, isModalOpen } from 'meteor/icr:xnat-roi-namespace';
 
 const getKeyFromKeyCode = cornerstoneTools.import('util/getKeyFromKeyCode');
 const Mousetrap = require('mousetrap');
 const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
 
 Mousetrap.bind(['[', ']', '-', '=', '+'], function(evt) {
+  if (isModalOpen()) {
+    return;
+  }
+
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
   const activeBrushTools = getActiveBrushToolsForElement(element);

@@ -1,4 +1,5 @@
 import { OHIF } from 'meteor/ohif:core';
+import { isModalOpen } from 'meteor/icr:xnat-roi-namespace';
 
 export class HotkeysContext {
     constructor(name, definitions, enabled) {
@@ -33,6 +34,11 @@ export class HotkeysContext {
         const bindingKey = `keydown.hotkey.${this.name}.${command}`;
         const bind = hotkey => $(document).bind(bindingKey, hotkey, event => {
             if (!this.enabled.get()) return;
+
+            // JamesAPetts --> Modal open? Don't allow hotkeys!
+            if (isModalOpen()) {
+              return;
+            }
             OHIF.commands.run(command);
             event.preventDefault();
         });
