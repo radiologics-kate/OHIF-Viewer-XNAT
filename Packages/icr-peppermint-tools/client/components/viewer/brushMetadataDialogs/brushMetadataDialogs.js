@@ -22,6 +22,7 @@ Template.brushMetadataDialogs.onCreated(() => {
   const instance = Template.instance();
   instance.data.searchQuery = new ReactiveVar('');
   instance.data.label = new ReactiveVar('');
+  instance.data.hasModifiers = false;
 
   instance.data.setSegmentationTypeCallback = (text) => {
     const segmentationInput = document.getElementsByClassName('brushMetadataSegmentationTypeInput');
@@ -194,6 +195,42 @@ Template.brushMetadataDialogs.helpers({
     }
 
     return true;
+  },
+  modifiers: () => {
+    const instance = Template.instance();
+    const searchQuery = instance.data.searchQuery.get();
+
+    const categories = GeneralAnatomyList.SegmentationCodes.Category;
+
+
+
+    if (!isValidSegmentation(categories, searchQuery.toUpperCase())) {
+      return false;
+    }
+
+    let Type;
+
+    for (let i = 0; i < categories.length; i++) {
+      const category = categories[i];
+
+      for (let j = 0; j < category.Type.length; j++) {
+
+        if (category.Type[j].CodeMeaning.toUpperCase() === searchQuery.toUpperCase()) {
+          Type = category.Type[j];
+        }
+      }
+    }
+
+    console.log(Type.Modifier);
+
+    if (Type.Modifier) {
+      instance.data.hasModifiers = true;
+      return Type.Modifier;
+    }
+
+    instance.data.hasModifiers = false;
+
+    return;
   }
 });
 
@@ -223,9 +260,19 @@ Template.brushMetadataDialogs.events({
     const segIndex = icrXnatRoiSession.get('EditBrushMetadataIndex');
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
+    let modifier;
+    if (instance.data.hasModifiers) {
+      const select = document.getElementById('brush-metadata-modifier-select');
+      const option = select.options.find(option => option.selected);
+
+      console.log(option);
+      modifier = option.value;
+    }
+
     const metadata = generateMetadata(
       instance.data.label.get(),
-      instance.data.searchQuery.get()
+      instance.data.searchQuery.get(),
+      modifier
     );
 
     brushModule.setters.metadata(seriesInstanceUid, segIndex, metadata);
@@ -281,7 +328,7 @@ function autoComplete (searchQuery) {
   return autoCompletedType;
 }
 
-function generateMetadata (label, segmentationType) {
+function generateMetadata (label, segmentationType, modifier = null) {
   const categories = GeneralAnatomyList.SegmentationCodes.Category;
   let Type;
   let categoryOfType;
@@ -308,13 +355,27 @@ function generateMetadata (label, segmentationType) {
     },
     SegmentLabel: label,
     SegmentAlgorithmType: "MANUAL",
-    RecommendedDisplayCIELabValue: Type.recommendedDisplayRGBValue,
+
     SegmentedPropertyTypeCodeSequence: {
       CodeValue: Type.CodeValue,
       CodingSchemeDesignator: Type.CodingSchemeDesignator,
       CodeMeaning: Type.CodeMeaning
     }
   };
+
+  if (modifier) {
+    const modifier = Type.Modifier.find(mod => mod.CodeMeaning === modifier);
+
+    metadata.SegmentedPropertyTypeCodeSequence.SegmentedPropertyTypeModifierCodeSequence = {
+      CodeValue: modifier.CodeValue,
+      CodingSchemeDesignator: modifier.CodingSchemeDesignator,
+      CodeMeaning: modifier.CodeMeaning
+    };
+
+    metadata.RecommendedDisplayCIELabValue = modifier.recommendedDisplayRGBValue;
+  } else {
+    metadata.RecommendedDisplayCIELabValue = Type.recommendedDisplayRGBValue;
+  }
 
   return metadata;
 }
