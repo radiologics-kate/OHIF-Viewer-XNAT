@@ -2,6 +2,8 @@ import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
+const brushModule = cornerstoneTools.store.modules.brush;
+
 /**
  * Opens the brushMetadata dialog.
  *
@@ -9,6 +11,8 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
  */
 export default async function () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+  icrXnatRoiSession.set('EditBrushMetadataIndex', brushModule.state.drawColorId);
 
   // Find components
   const dialog = $('#brushMetadataDialog');
@@ -35,6 +39,9 @@ export default async function () {
       closeDialog();
     }
   });
-  
+
   dialog.get(0).showModal();
+
+  const firstInputField = dialog.find('.brush-segmentation-label-js');
+  firstInputField.focus();
 }

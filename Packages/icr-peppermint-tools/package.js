@@ -59,6 +59,21 @@ Package.onUse(function(api) {
       'client'
     );
 
+    api.addFiles(
+      'client/components/viewer/brushMetadataDialogs/brushMetadataSearchList/brushMetadataSearchList.html',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/brushMetadataDialogs/brushMetadataSearchListItem/brushMetadataSearchListItem.html',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/brushMetadataDialogs/brushMetadataSearchListItem/brushMetadataSearchListItem.js',
+      'client'
+    );
+
 
     api.addFiles(
       'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.html',

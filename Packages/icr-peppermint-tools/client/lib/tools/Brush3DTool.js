@@ -41,6 +41,8 @@ export default class Brush3DTool extends BrushTool {
       segIndex
     );
 
+    console.log(metaData);
+
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
       this._paint(eventData);

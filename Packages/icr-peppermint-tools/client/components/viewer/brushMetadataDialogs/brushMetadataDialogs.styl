@@ -7,6 +7,7 @@
   z-index: 1000
 
   max-height: calc(100% - 50px)
+  min-width: 260px
   max-width: calc(100% - 100px)
   position: absolute
   margin: auto
@@ -14,7 +15,6 @@
 
   padding-right: 10px
   padding-left: 10px
-  padding-top: 10px
   padding-bottom: 10px
   border-radius: 8px
   text-align: center
@@ -29,6 +29,8 @@
   h3
     font-weight: 400
     text-align: left
+    border-radius: 8px
+    padding: 2px
 
   .brushMetadataCancel
     text-align: right
@@ -41,19 +43,31 @@
   .brushMetadataTableButton
     width: 100%
 
-  .brushMetadataTextInputOptions
-    display: -webkit-flex
-    display: -ms-flexbox
-    display: flex
-    flex-wrap: nowrap
-    justify-content: space-between
-    align-items: baseline
-
   .brush-metadata-vert-box
     display: -webkit-flex
     display: -ms-flexbox
     display: flex
     flex-direction: column
+    justify-context: flex-start
 
-  .choose-segmentation-type-header
+  .brush-metadata-vert-box label
     margin-top: 20px
+    text-align: left
+
+  .brush-metadata-horizontal-box
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    align-items: baseline
+    justify-context: space-between
+
+  .brushMetadataSearchList
+    text-align: left
+    max-height: calc(50vh - 300px);
+    padding-right: 18px
+    overflow-y: auto
+    overflow-x: hidden
+
+  .brush-metadata-validity-indicator
+    margin-left: 10px

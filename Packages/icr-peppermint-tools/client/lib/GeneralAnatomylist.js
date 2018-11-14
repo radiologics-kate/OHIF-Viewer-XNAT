@@ -1,4 +1,4 @@
-export default {
+const json = `{
   "SegmentationCategoryTypeContextName": "Segmentation category and type - 3D Slicer General Anatomy list",
   "@schema": "https://raw.githubusercontent.com/qiicr/dcmqi/master/doc/schemas/segment-context-schema.json#",
   "SegmentationCodes": {
@@ -4209,4 +4209,9 @@ export default {
       }
     ]
   }
-}
+}`
+
+
+const parsedJson = JSON.parse(json);
+
+export default parsedJson;

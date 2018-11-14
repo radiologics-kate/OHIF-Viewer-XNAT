@@ -1,0 +1,9 @@
+<template name="brushMetadataSearchList">
+  <div class="brushMetadataSearchList">
+    <table>
+      {{#each searchResult in searchResults}}
+        {{>brushMetadataSearchListItem searchResult}}
+      {{/each}}
+    </table>
+  </div>
+</template>

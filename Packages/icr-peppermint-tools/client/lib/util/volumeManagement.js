@@ -19,7 +19,6 @@ export default async function () {
   const cancel = dialog.find('.volumeManagementCancel');
 
   function closeDialog () {
-    icrXnatRoiSession.set('modalOpen', false);
     dialog.get(0).close();
 
     // Reset the focus to the active viewport element
@@ -42,6 +41,5 @@ export default async function () {
     }
   });
 
-  icrXnatRoiSession.set('modalOpen', true);
   dialog.get(0).showModal();
 }

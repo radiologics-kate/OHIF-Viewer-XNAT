@@ -3,48 +3,56 @@
       class="brushMetadataDialog noselect"
       oncontextmenu="return false">
       <div class="brushMetadataHeader">
-        <h3>Segmentation Properties</h3>
+        <h3 style="border:2px solid {{segmentationColor}}">Seg {{segmentationIndex}}</h3>
         <a class="brushMetadataCancel js-brush-metadata-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
       </div>
 
       <div class="brush-metadata-vert-box">
-        <div class="brushMetadataTextInputOptions">
-            <label for="brushMetadataTextInput">Label</label>
-            <input name="brushMetadataTextInput"
-                   class="brushMetadataTextInput brush-segmentation-label-js"
-                   type="text"
-                   autocomplete="off"
-                   placeholder="Enter Segmentation Label.."
-                   onfocus="this.select()"/>
+        <label for="brushMetadataTextInput">Label</label>
+        <div class="brush-metadata-horizontal-box">
+          <input name="brushMetadataTextInput"
+                 class="brushMetadataTextInput brush-segmentation-label-js"
+                 type="text"
+                 autocomplete="off"
+                 placeholder="Enter Segmentation Label.."
+                 onfocus="this.select()"/>
+          <i class="{{validLabelIcon}} brush-metadata-validity-indicator"
+             style="color:{{validLabelColor}}">
+          </i>
         </div>
 
-        <div class="choose-segmentation-type-header">
-          Choose Segmentation Type
-        </div>
+        <label for="brushMetadataSegmentationTypeInput">Segmentation Type</label>
 
-        <input name="brushMetadataTextInput"
-               class="brushMetadataTextInput brush-segmentation-search-js"
-               type="text"
-               autocomplete="off"
-               placeholder="Search.."
-               onfocus="this.select()"/>
+        <div class="brush-metadata-horizontal-box">
+          <input name="brushMetadataSegmentationTypeInput"
+                 class="brushMetadataSegmentationTypeInput brush-segmentation-search-js"
+                 type="text"
+                 autocomplete="off"
+                 placeholder="Search.."
+                 onfocus="this.select()"/>
+          <i class="{{validSegmentationTypeIcon}} brush-metadata-validity-indicator"
+             style="color:{{validSegmentationTypeColor}}">
+          </i>
+        </div>
 
         <div>
-          {{searchTest}}
+          {{>brushMetadataSearchList searchResults=searchResults}}
         </div>
       </div>
 
 
+      {{#if validInput}}
+        <div class="brushMetadataFooter">
+          <hr/>
+          <a class="brushMetadataNewButton js-brush-metadata-confirm btn btn-sm btn-primary">
+            <i class="fa fa fa-check-circle fa-2x"></i>
+          </a>
+          <br/>
+        </div>
+      {{/if}}
 
-      <div class="brushMetadataFooter">
-        <hr/>
-        <a class="brushMetadataNewButton js-brush-metadata-ok btn btn-sm btn-primary">
-          OK
-        </a>
-        <br/>
-      </div>
 
   </dialog>
 </template>
