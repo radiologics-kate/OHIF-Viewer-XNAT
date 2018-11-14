@@ -38,16 +38,9 @@ export default async function () {
     element.focus();
   }
 
-  function closeDialogAndAccept() {
-    closeDialog();
-    // TODO -> key interface here. -> Refactor to do this in Blaze?
-  }
-
   dialog.off('keydown');
   dialog.on('keydown', e => {
-    if (e.which === 13) { // If Enter is pressed accept and close the dialog
-      closeDialogAndAccept();
-    } else if (e.which === 27) { // If Esc is pressed cancel and close the dialog
+    if (e.which === 27) { // If Esc is pressed cancel and close the dialog
       closeDialog();
     }
   });

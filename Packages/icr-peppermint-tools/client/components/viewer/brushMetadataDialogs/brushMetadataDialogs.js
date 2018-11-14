@@ -58,7 +58,7 @@ Template.brushMetadataDialogs.helpers({
           const Type = category.Type[j];
 
           // Check if the CodeMeaning contains the string
-          if (Type.CodeMeaning.toUpperCase().indexOf(searchQuery) > -1) {
+          if (Type.CodeMeaning.toUpperCase() === searchQuery) {
             CodeMeaning = Type.CodeMeaning;
           }
         }
@@ -200,6 +200,11 @@ Template.brushMetadataDialogs.helpers({
 Template.brushMetadataDialogs.events({
   'keyup .brush-segmentation-search-js'(event) {
 
+    // Autocomplete?
+    if (event.key === 'Enter') {
+      event.currentTarget.value = autoComplete(event.currentTarget.value);
+    }
+
     const instance = Template.instance();
     instance.data.searchQuery.set(event.currentTarget.value);
   },
@@ -249,6 +254,31 @@ function isValidSegmentation (categories, searchQuery) {
       Type.CodeMeaning.toUpperCase() === searchQuery
     );
   });
+}
+
+function autoComplete (searchQuery) {
+  const categories = GeneralAnatomyList.SegmentationCodes.Category;
+
+  let autoCompletedType;
+
+  let done = false;
+
+  for (let i = 0; i < categories.length; i++) {
+    const category = categories[i];
+
+    for (let j = 0; j < category.Type.length; j++) {
+      const Type = category.Type[j];
+
+      // Check if the CodeMeaning contains the string
+      if (!done && Type.CodeMeaning.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1) {
+        autoCompletedType = Type.CodeMeaning;
+        console.log('Autocomplete');
+        done = true;
+      }
+    }
+  }
+
+  return autoCompletedType;
 }
 
 function generateMetadata (label, segmentationType) {

@@ -3,7 +3,7 @@
       class="brushMetadataDialog noselect"
       oncontextmenu="return false">
       <div class="brushMetadataHeader">
-        <h3 style="border:2px solid {{segmentationColor}}">Seg {{segmentationIndex}}</h3>
+        <h3 style="border:2px solid {{segmentationColor}}; background-color:#263340;">Segmentation {{segmentationIndex}}</h3>
         <a class="brushMetadataCancel js-brush-metadata-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
@@ -19,7 +19,7 @@
                  placeholder="Enter Segmentation Label.."
                  onfocus="this.select()"/>
           <i class="{{validLabelIcon}} brush-metadata-validity-indicator"
-             style="color:{{validLabelColor}}">
+             style="color:{{validLabelColor}};">
           </i>
         </div>
 
