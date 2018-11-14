@@ -43,15 +43,21 @@
       </div>
 
 
-      {{#if validInput}}
+
         <div class="brushMetadataFooter">
           <hr/>
+          {{#if validInput}}
           <a class="brushMetadataNewButton js-brush-metadata-confirm btn btn-sm btn-primary">
             <i class="fa fa fa-check-circle fa-2x"></i>
           </a>
+          {{else}}
+          <a class="brushMetadataNewButton brush-metadata-invalid-confirm btn btn-sm btn-primary" style="background-color:#263340">
+            <i class="fa fa fa-check-circle fa-2x"></i>
+          </a>
+          {{/if}}
           <br/>
         </div>
-      {{/if}}
+
 
 
   </dialog>

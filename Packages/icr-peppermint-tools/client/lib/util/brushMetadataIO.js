@@ -17,6 +17,18 @@ export default async function () {
   // Find components
   const dialog = $('#brushMetadataDialog');
 
+  // Reset the form.
+  const brushMetadataTextInput = dialog.find('.brushMetadataTextInput');
+  const brushMetadataSegmentationTypeInput = dialog.find('.brushMetadataSegmentationTypeInput');
+
+  const dialogData = Blaze.getData(document.querySelector('#brushMetadataDialog'));
+
+  dialogData.searchQuery.set('');
+  dialogData.label.set('');
+
+  brushMetadataTextInput[0].value = '';
+  brushMetadataSegmentationTypeInput[0].value = '';
+
   function closeDialog () {
     dialog.get(0).close();
 
