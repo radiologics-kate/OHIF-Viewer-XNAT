@@ -1,6 +1,7 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import brushMetadataIO from '../../../lib/util/brushMetadataIO.js';
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -58,6 +59,34 @@ Template.segManagementDialogs.events({
   'click .js-seg-management-cancel'(event) {
 
     closeDialog();
+  },
+  'click .js-seg-management-new'(event) {
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+    closeDialog();
+
+    let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
+
+    if (!segMetadata) {
+      brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
+      segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid]
+    }
+
+    const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
+    const numberOfColors = colormap.getNumberOfColors();
+
+    console.log(numberOfColors);
+    console.log(segMetadata);
+
+    for (let i = 0; i < numberOfColors; i++) {
+      if (!segMetadata[i]) {
+        brushModule.state.drawColorId = i;
+        console.log(`new seg: ${i}`)
+
+        brushMetadataIO(i);
+        break;
+      }
+    }
   }
 });
 
