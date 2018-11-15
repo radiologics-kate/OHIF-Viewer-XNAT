@@ -79,6 +79,33 @@ Package.onUse(function(api) {
       'client'
     );
 
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementDialogs.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementDialogs.js',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementDialogs.styl',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementList/segManagementList.html',
+      'client'
+    );
+    
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementListItem/segManagementListItem.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementListItem/segManagementListItem.js',
+      'client'
+    );
+
 
     api.addFiles(
       'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.html',

@@ -51,7 +51,7 @@ export default class Brush3DTool extends BrushTool {
       // Open the UI and let the user input data!
 
       if (!isModalOpen()) {
-        brushMetadataIO();
+        brushMetadataIO(brushStore.state.drawColorId);
       }
     }
 

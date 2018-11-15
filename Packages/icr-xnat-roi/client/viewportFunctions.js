@@ -6,6 +6,7 @@ import importMask from './lib/IO/importMask.js';
 
 import { toggleFreehandStats } from 'meteor/icr:peppermint-tools';
 import { volumeManagement } from 'meteor/icr:peppermint-tools';
+import { segManagement } from 'meteor/icr:peppermint-tools';
 
 import { $ } from 'meteor/jquery';
 
@@ -37,4 +38,8 @@ OHIF.viewerbase.viewportUtils.toggleFreehandStats = () => {
 
 OHIF.viewerbase.viewportUtils.volumeManagement = () => {
   volumeManagement();
+}
+
+OHIF.viewerbase.viewportUtils.segManagement = () => {
+  segManagement();
 }

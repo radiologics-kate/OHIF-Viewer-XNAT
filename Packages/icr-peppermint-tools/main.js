@@ -6,11 +6,12 @@ export { default as Brush3DTool } from './client/lib/tools/Brush3DTool.js';
 // Modules
 export { default as freehand3DModule } from './client/lib/modules/freehand3DModule.js';
 
+// Utils to be called by UI buttons:
 export {
   createNewVolume,
   setVolumeName
 } from './client/lib/util/freehandNameIO.js';
 
-// Utils to be called by UI buttons:
 export { default as toggleFreehandStats } from './client/lib/util/toggleFreehandStats.js';
 export { default as volumeManagement } from './client/lib/util/volumeManagement.js';
+export { default as segManagement } from './client/lib/util/segManagement.js';

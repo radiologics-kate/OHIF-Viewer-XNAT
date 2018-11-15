@@ -1,0 +1,17 @@
+<template name="segManagementList">
+  <div class="segManagementList">
+    <table class="segManagementListBody">
+
+      <tr>
+        <th>Label</th>
+        <th>Category</th>
+        <th>Type</th>
+        <th>Edit</th>
+      </tr>
+
+      {{#each segmentation in segmentations}}
+        {{>segManagementListItem segmentation}}
+      {{/each}}
+    </table>
+  </div>
+</template>

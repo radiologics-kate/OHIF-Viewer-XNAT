@@ -55,15 +55,12 @@ export class DICOMSEGWriter {
       for (let i = 0; i < masks.length; i++) {
         if (masks[i]) {
           numSegments++;
-          // TODO -> Naming input for these, auto name them for now.
-
-          let segMetadata = modules.brush.getters.metadata(
+          const segMetadata = modules.brush.getters.metadata(
             this._seriesInfo.seriesInstanceUid,
             i
           );
-          if (!segMetadata) {
-            segMetadata = this._getDefaultSegmentationData(i);
-          }
+
+          console.log(segMetadata);
 
           seg.addSegment(segMetadata);
         }
@@ -77,9 +74,6 @@ export class DICOMSEGWriter {
 
       const pixels = new Uint8Array(seg.dataset.PixelData);
 
-      console.log(dimensions.cube);
-      console.log(pixels.length);
-
       const lengthOfCubeInBytes = dimensions.cube / 8;
 
       // Fill up the PixelData array with bitpacked segment information.
@@ -87,15 +81,9 @@ export class DICOMSEGWriter {
         if (masks[i]) {
           const bitArray = dcmjs.data.BitArray.pack(masks[i]);
 
-          console.log(bitArray);
-
-          console.log(lengthOfCubeInBytes);
-
           for (let j = 0; j < lengthOfCubeInBytes; j++) {
             pixels[(i * lengthOfCubeInBytes) + j] = bitArray[j];
           }
-
-          console.log(pixels[i * lengthOfCubeInBytes]);
         }
       }
 
@@ -105,24 +93,6 @@ export class DICOMSEGWriter {
 
     });
 
-  }
-
-  _getDefaultSegmentationData (i) {
-    return {
-      SegmentedPropertyCategoryCodeSequence: {
-        CodeValue: "T-D0050",
-        CodingSchemeDesignator: "SRT",
-        CodeMeaning: "Tissue"
-      },
-      SegmentLabel: `DEFAULT-MASK-${i}`,
-      SegmentAlgorithmType: "MANUAL",
-      RecommendedDisplayCIELabValue: [ 43802, 26566, 37721 ],
-      SegmentedPropertyTypeCodeSequence: {
-        CodeValue: "T-D0050",
-        CodingSchemeDesignator: "SRT",
-        CodeMeaning: "Tissue"
-      }
-    }
   }
 
 }

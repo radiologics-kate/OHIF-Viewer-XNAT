@@ -2,6 +2,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import GeneralAnatomyList from '../../../lib/GeneralAnatomylist.js';
+import segManagement from '../../../lib/util/segManagement.js';
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -23,6 +24,7 @@ Template.brushMetadataDialogs.onCreated(() => {
   instance.data.searchQuery = new ReactiveVar('');
   instance.data.label = new ReactiveVar('');
   instance.data.hasModifiers = false;
+  instance.data.returnToSegManagement = false;
 
   instance.data.setSegmentationTypeCallback = (text) => {
     const segmentationInput = document.getElementsByClassName('brushMetadataSegmentationTypeInput');
@@ -251,17 +253,25 @@ Template.brushMetadataDialogs.events({
     instance.data.label.set(event.currentTarget.value);
   },
   'click .js-brush-metadata-cancel'(event) {
+    const instance = Template.instance();
+    const data = instance.data;
 
     closeDialog();
+
+    if (data.returnToSegManagement) {
+      data.returnToSegManagement = false;
+      segManagement();
+    }
   },
   'click .js-brush-metadata-confirm'(event) {
     const instance = Template.instance();
+    const data = instance.data;
 
     const segIndex = icrXnatRoiSession.get('EditBrushMetadataIndex');
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     let modifier;
-    if (instance.data.hasModifiers) {
+    if (data.hasModifiers) {
       const select = document.getElementById('brush-metadata-modifier-select');
       const options = select.options;
 
@@ -275,14 +285,19 @@ Template.brushMetadataDialogs.events({
 
 
     const metadata = generateMetadata(
-      instance.data.label.get(),
-      instance.data.searchQuery.get(),
+      data.label.get(),
+      data.searchQuery.get(),
       modifier
     );
 
     brushModule.setters.metadata(seriesInstanceUid, segIndex, metadata);
 
     closeDialog();
+
+    if (data.returnToSegManagement) {
+      data.returnToSegManagement = false;
+      segManagement();
+    }
   }
 });
 

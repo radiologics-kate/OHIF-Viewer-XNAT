@@ -258,7 +258,13 @@ Template.toolbarSection.helpers({
             title: 'Brush',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
-          }/*,
+          },
+          {
+            id: 'segManagement',
+            title: 'Seg Management',
+            classes: 'imageViewerCommand',
+            iconClasses: 'fa fa-paint-brush'
+          },
           {
             id: 'exportMask',
             title: 'Dev Export',
@@ -270,7 +276,7 @@ Template.toolbarSection.helpers({
             title: 'Dev Import',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-question'
-          }*/
+          }
         ];
 
         buttonData.push({

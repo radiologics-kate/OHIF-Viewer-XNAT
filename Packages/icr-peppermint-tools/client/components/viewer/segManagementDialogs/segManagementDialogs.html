@@ -1,0 +1,18 @@
+<template name="segManagementDialogs">
+  <dialog id="segManagementDialog"
+      class="segManagementDialog noselect"
+      oncontextmenu="return false">
+      <div class="segManagementHeader">
+        <h3>Segmentations</h3>
+        <a class="segManagementCancel js-seg-management-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+      <hr/>
+
+      <div class="segManagementList">
+        {{>segManagementList segmentations=segmentations}}
+      </div>
+
+  </dialog>
+</template>

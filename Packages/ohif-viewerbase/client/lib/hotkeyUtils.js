@@ -156,6 +156,7 @@ Meteor.startup(function() {
         clearTools: 'Clear Tools',
         showSyncSettings: 'Sync Settings',
         volumeManagement: 'Volume Management',
+        segManagement: 'Seg Management',
         toggleFreehandStats: 'Toggle Freehand Stats',
         showHelp: 'Show Help',
         exportROIs: 'Export ROIs',

@@ -1,6 +1,7 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import segManagement from './segManagement.js';
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -9,10 +10,10 @@ const brushModule = cornerstoneTools.store.modules.brush;
  *
  * @author JamesAPetts
  */
-export default async function () {
+export default async function (segIndex, label = '', type = '', modifier) {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-  icrXnatRoiSession.set('EditBrushMetadataIndex', brushModule.state.drawColorId);
+  icrXnatRoiSession.set('EditBrushMetadataIndex', segIndex);
 
   // Find components
   const dialog = $('#brushMetadataDialog');
@@ -23,11 +24,19 @@ export default async function () {
 
   const dialogData = Blaze.getData(document.querySelector('#brushMetadataDialog'));
 
-  dialogData.searchQuery.set('');
-  dialogData.label.set('');
+  dialogData.searchQuery.set(type);
+  dialogData.label.set(label);
 
-  brushMetadataTextInput[0].value = '';
-  brushMetadataSegmentationTypeInput[0].value = '';
+  // If editing an already existing segmentation, return to the segManagement
+  // window after.
+  if (label) {
+    dialogData.returnToSegManagement = true;
+  }
+
+  brushMetadataTextInput[0].value = label;
+  brushMetadataSegmentationTypeInput[0].value = type;
+
+  setOptionIfModifier(modifier);
 
   function closeDialog () {
     dialog.get(0).close();
@@ -42,6 +51,10 @@ export default async function () {
   dialog.on('keydown', e => {
     if (e.which === 27) { // If Esc is pressed cancel and close the dialog
       closeDialog();
+      if (dialogData.returnToSegManagement) {
+        dialogData.returnToSegManagement = false;
+        segManagement();
+      }
     }
   });
 
@@ -49,4 +62,19 @@ export default async function () {
 
   const firstInputField = dialog.find('.brush-segmentation-label-js');
   firstInputField.focus();
+}
+
+function setOptionIfModifier (modifier) {
+  if (modifier) {
+    const select = document.getElementById('brush-metadata-modifier-select');
+    const options = select.options;
+
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].value === modifier) {
+        options[i].selected = true;
+      } else {
+        options[i].selected = false;
+      }
+    }
+  }
 }
