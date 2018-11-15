@@ -53,6 +53,16 @@ Template.segManagementListItem.helpers({
     }
 
     return type;
+  },
+  checked: () => {
+    const instance = Template.instance();
+    const drawColorId = brushModule.state.drawColorId;
+
+    if (drawColorId === instance.data.index) {
+      return 'checked';
+    }
+
+    return;
   }
 
 });
@@ -86,7 +96,14 @@ Template.segManagementListItem.events({
       type,
       modifier
     );
+  },
+  'click .js-switch-seg'(event) {
+    console.log('.js-switch-seg');
 
+    const instance = Template.instance();
+
+    brushModule.state.drawColorId = instance.data.index;
+    closeDialog();
   }
 });
 
