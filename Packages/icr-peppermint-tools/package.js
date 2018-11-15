@@ -74,6 +74,11 @@ Package.onUse(function(api) {
       'client'
     );
 
+    api.addFiles(
+      'client/components/viewer/brushMetadataDialogs/brushMetadataModifiers/brushMetadataModifiers.html',
+      'client'
+    );
+
 
     api.addFiles(
       'client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.html',

@@ -1,0 +1,8 @@
+<template name="brushMetadataModifiers">
+    <label for="brushMetadataModifiers">Modifier</label>
+    <select id="brush-metadata-modifier-select" class="brushMetadataModifiers">
+      {{#each modifier in modifiers}}
+        <option value="{{modifier.CodeMeaning}}">{{modifier.CodeMeaning}}</option>
+      {{/each}}
+    </select>
+</template>

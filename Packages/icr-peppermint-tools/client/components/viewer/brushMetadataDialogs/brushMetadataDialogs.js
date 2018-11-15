@@ -263,11 +263,16 @@ Template.brushMetadataDialogs.events({
     let modifier;
     if (instance.data.hasModifiers) {
       const select = document.getElementById('brush-metadata-modifier-select');
-      const option = select.options.find(option => option.selected);
+      const options = select.options;
 
-      console.log(option);
-      modifier = option.value;
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].selected) {
+          modifier = options[i].value;
+          break;
+        }
+      }
     }
+
 
     const metadata = generateMetadata(
       instance.data.label.get(),
@@ -276,9 +281,6 @@ Template.brushMetadataDialogs.events({
     );
 
     brushModule.setters.metadata(seriesInstanceUid, segIndex, metadata);
-
-    console.log(seriesInstanceUid);
-    console.log(segIndex);
 
     closeDialog();
   }
@@ -328,7 +330,7 @@ function autoComplete (searchQuery) {
   return autoCompletedType;
 }
 
-function generateMetadata (label, segmentationType, modifier = null) {
+function generateMetadata (label, segmentationType, modifier) {
   const categories = GeneralAnatomyList.SegmentationCodes.Category;
   let Type;
   let categoryOfType;
@@ -343,9 +345,6 @@ function generateMetadata (label, segmentationType, modifier = null) {
       }
     }
   }
-
-  console.log(Type);
-  console.log(categoryOfType);
 
   const metadata = {
     SegmentedPropertyCategoryCodeSequence: {
@@ -364,18 +363,21 @@ function generateMetadata (label, segmentationType, modifier = null) {
   };
 
   if (modifier) {
-    const modifier = Type.Modifier.find(mod => mod.CodeMeaning === modifier);
+    const Modifier = Type.Modifier.find(mod => mod.CodeMeaning === modifier);
 
     metadata.SegmentedPropertyTypeCodeSequence.SegmentedPropertyTypeModifierCodeSequence = {
-      CodeValue: modifier.CodeValue,
-      CodingSchemeDesignator: modifier.CodingSchemeDesignator,
-      CodeMeaning: modifier.CodeMeaning
+      CodeValue: Modifier.CodeValue,
+      CodingSchemeDesignator: Modifier.CodingSchemeDesignator,
+      CodeMeaning: Modifier.CodeMeaning
     };
 
-    metadata.RecommendedDisplayCIELabValue = modifier.recommendedDisplayRGBValue;
+    metadata.RecommendedDisplayCIELabValue = Modifier.recommendedDisplayRGBValue;
   } else {
     metadata.RecommendedDisplayCIELabValue = Type.recommendedDisplayRGBValue;
   }
+
+  console.log('Metadata:');
+  console.log(metadata);
 
   return metadata;
 }

@@ -41,9 +41,7 @@
           {{>brushMetadataSearchList searchResults=searchResults}}
         </div>
         {{#if modifiers}}
-          HAS MODIFIERS!
-          TODO -> Add a select here with the ID "brush-metadata-modifier-select"
-          Use { { modifiers } } to generate the options, make the first one default.
+          {{>brushMetadataModifiers modifiers=modifiers}}
         {{/if}}
       </div>
 
