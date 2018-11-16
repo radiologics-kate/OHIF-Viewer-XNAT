@@ -1,28 +1,28 @@
 <template name="ioHelpMenu">
-  <div id="ioHelp">
-      <div class="subHelpHeader">
-        <div class="subHelpNavBar">
-          <a class="ioHelpButton js-help-export btn btn-sm btn-primary">
+  <div>
+      <div>
+        <div class="sub-help-nav-bar">
+          <a class="sub-help-button js-help-export btn btn-sm btn-primary">
               <svg class={{pressed 'Export ROIs'}}>
                 <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
               </svg>
           </a>
-          <a class="subHelpButton js-help-import btn btn-sm btn-primary">
+          <a class="sub-help-button js-help-import btn btn-sm btn-primary">
             <svg class={{pressed 'Import ROIs'}}>
               <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import"}}></use>
             </svg>
           </a>
-          <a class="subHelpButton js-help-snapshot btn btn-sm btn-primary">
+          <a class="sub-help-button js-help-snapshot btn btn-sm btn-primary">
             <i id="fontAwesomeIcon" class="{{pressed 'Export Snapshot'}} fa fa fa-camera fa-2x"></i>
           </a>
         </div>
 
-        <div class="subHelpTitle">
+        <div class="sub-help-title">
           <h3>{{ioTitle}}</h3>
         </div>
       </div>
 
-      <div class="subHelpBody">
+      <div class="sub-help-body">
         {{#if showIoHelp 'Export ROIs'}}
           {{>ioHelpExport}}
         {{else if showIoHelp 'Import ROIs'}}

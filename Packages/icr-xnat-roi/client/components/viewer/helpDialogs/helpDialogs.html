@@ -1,45 +1,43 @@
 <template name="helpDialogs">
   <dialog id="showHelpDialog"
-      class="helpDialog noselect"
+      class="help-dialog noselect"
       oncontextmenu="return false">
 
-      <div class="helpHeader">
-        <div class="helpNavBar">
-          <a class="helpButton js-help-roi btn btn-sm btn-primary">
+      <div>
+        <div class="help-nav-bar">
+          <a class="help-button js-help-roi btn btn-sm btn-primary">
               <svg class={{pressed 'ROI'}}>
                 <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu"}}></use>
               </svg>
           </a>
-          <a class="helpButton js-help-brush btn btn-sm btn-primary">
+          <a class="help-button js-help-brush btn btn-sm btn-primary">
               <i id="fontAwesomeIcon" class="{{pressed 'Brush'}} fa fa-paint-brush fa-2x"></i>
           </a>
-          <a class="helpButton js-help-file btn btn-sm btn-primary">
+          <a class="help-button js-help-file btn btn-sm btn-primary">
               <svg class={{pressed 'File'}}>
                 <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-logo"}}></use>
               </svg>
           </a>
         </div>
 
-        <div class="helpTitle">
+        <div class="help-title">
           <h3>{{title}}</h3>
         </div>
 
-        <a class="helpDialogCancel js-help-cancel btn btn-sm btn-secondary">
+        <a class="help-dialog-cancel js-help-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
       </div>
 
       <br/>
 
-      <div class="helpBody">
-        {{#if showHelp 'ROI'}}
-          {{>freehandHelpMenu}}
-        {{else if showHelp 'Brush'}}
-          {{>brushHelpMenu}}
-        {{else if showHelp 'File'}}
-          {{>ioHelpMenu}}
-        {{/if}}
-      </div>
+      {{#if showHelp 'ROI'}}
+        {{>freehandHelpMenu}}
+      {{else if showHelp 'Brush'}}
+        {{>brushHelpMenu}}
+      {{else if showHelp 'File'}}
+        {{>ioHelpMenu}}
+      {{/if}}
 
   </dialog>
 </template>
