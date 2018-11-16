@@ -1,26 +1,23 @@
 <template name="freehandSetNameDialogs">
 
   <dialog id="freehandSetName"
-      class="freehandTextInputDialog noselect"
+      class="freehand-text-input-dialog noselect"
       oncontextmenu="return false">
-      <div>
-        <h5 class="freehandDescription">Enter New ROI Name</h5>
-        <a class="freehandDialogCancel btn btn-sm btn-secondary">
+      <div class="freehand-set-name-horizontal-box">
+        <h5>Enter New ROI Name</h5>
+        <a class="freehand-dialog-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
       </div>
-      <div class="freehandTextInputOptions">
-          <label for="freehandTextInput">Name</label>
-          <input name="freehandTextInput"
-                 class="freehandTextInput"
-                 type="text"
-                 tabindex="-1"
-                 autocomplete="off"
-                 placeholder="Enter name.."
-                 onfocus="this.select()"/>
-      </div>
+      <input name="freehandTextInput"
+             class="freehand-text-input"
+             type="text"
+             tabindex="-1"
+             autocomplete="off"
+             placeholder="Enter name.."
+             onfocus="this.select()"/>
       <div>
-          <a class="freehandDialogConfirm btn btn-sm btn-primary">
+          <a class="freehand-dialog-confirm btn btn-sm btn-primary">
             <i class="fa fa fa-check-circle fa-2x"></i>
           </a>
       </div>

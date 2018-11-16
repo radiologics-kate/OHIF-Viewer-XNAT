@@ -80,9 +80,9 @@ function imageAnnotationNameInput (defaultName) {
     };
 
     const dialog = $('#freehandSetName');
-    const textInput = dialog.find('.freehandTextInput');
-    const confirm = dialog.find('.freehandDialogConfirm');
-    const cancel = dialog.find('.freehandDialogCancel');
+    const textInput = dialog.find('.freehand-text-input');
+    const confirm = dialog.find('.freehand-dialog-confirm');
+    const cancel = dialog.find('.freehand-dialog-cancel');
 
     textInput.val(defaultName);
     textInput.focus();
