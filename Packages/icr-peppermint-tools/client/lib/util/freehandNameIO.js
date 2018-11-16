@@ -80,9 +80,9 @@ function imageAnnotationNameInput (defaultName) {
     };
 
     const dialog = $('#freehandSetName');
-    const textInput = dialog.find('.freehand-text-input');
-    const confirm = dialog.find('.freehand-dialog-confirm');
-    const cancel = dialog.find('.freehand-dialog-cancel');
+    const textInput = dialog.find('.freehand-set-name-input');
+    const confirm = dialog.find('.freehand-set-name-confirm');
+    const cancel = dialog.find('.freehand-set-name-cancel');
 
     textInput.val(defaultName);
     textInput.focus();
@@ -92,6 +92,7 @@ function imageAnnotationNameInput (defaultName) {
       if (e.which === 13) { // If Enter is pressed accept and close the dialog
         confirmHandler();
       } else if (e.which === 27) { // If Esc is pressed cancel and close the dialog
+        console.log('OFF');
         cancelHandler();
       }
     });
