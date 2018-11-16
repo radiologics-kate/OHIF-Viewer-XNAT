@@ -1,4 +1,5 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import closeIODialog from '../../../lib/IO/closeIODialog.js';
 
 Template.ioDialogs.onRendered(() => {
     const instance = Template.instance();
@@ -24,5 +25,13 @@ Template.ioDialogs.helpers({
       return `This command is disabled as you do not have the required permissions to write to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}.`
       + ' If you believe that you should, please contact the project owner.';
     }
+  }
+});
+
+Template.ioDialogs.events({
+  'click .io-dialog-cancel-js'(event) {
+    const dialog = $('#ioMessage');
+
+    closeIODialog(dialog);
   }
 });

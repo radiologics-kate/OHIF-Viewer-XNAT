@@ -301,21 +301,8 @@ function displayNoROIsToExportDialog () {
 function messageDialog (title, body) {
   // Find components
   const dialog = $('#ioMessage');
-  const cancelButton = dialog.find('.ioDialogCancel');
-  const descriptionText = dialog.find('.ioDescription');
-  const bodyText = dialog.find('.ioBody');
-
-  cancelButton.off('click');
-  cancelButton.on('click', () => {
-    closeIODialog(dialog);
-  });
-
-  dialog.off('keydown');
-  dialog.on('keydown', e => {
-    if (e.which = 27) { // If Esc is pressed cancel and close the dialog
-      closeIODialog(dialog);
-    }
-  });
+  const descriptionText = dialog.find('.io-description');
+  const bodyText = dialog.find('.io-body');
 
   descriptionText.text(title);
   bodyText.text(body);
