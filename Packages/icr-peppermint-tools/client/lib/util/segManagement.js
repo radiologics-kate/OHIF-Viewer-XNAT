@@ -20,8 +20,6 @@ export default async function () {
   // Trigger recalc of segData.
   dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
 
-  console.log(dialog);
-
   function closeDialog () {
     dialog.get(0).close();
 

@@ -24,10 +24,6 @@ Template.segManagementDialogs.helpers({
 
     instance.data.recalcSegmentations.get();
 
-    console.log('RECOMPUTE');
-
-    // TODO -> Need some way of retriggering this call. Some session variable or something.
-    //
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     if (!seriesInstanceUid) {
@@ -75,14 +71,9 @@ Template.segManagementDialogs.events({
     const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
     const numberOfColors = colormap.getNumberOfColors();
 
-    console.log(numberOfColors);
-    console.log(segMetadata);
-
     for (let i = 0; i < numberOfColors; i++) {
       if (!segMetadata[i]) {
         brushModule.state.drawColorId = i;
-        console.log(`new seg: ${i}`)
-
         brushMetadataIO(i);
         break;
       }

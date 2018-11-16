@@ -19,8 +19,6 @@ export async function createNewVolume () {
     // Create and activate new ROIContour
     const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
     modules.freehand3D.setters.ROIContourAndSetIndexActive(activeSeriesInstanceUid, 'DEFAULT', name);
-
-    console.log(`making new volume -- name: ${name}, seriesInstanceUid: ${activeSeriesInstanceUid}`);
   }
 }
 
@@ -92,7 +90,6 @@ function imageAnnotationNameInput (defaultName) {
       if (e.which === 13) { // If Enter is pressed accept and close the dialog
         confirmHandler();
       } else if (e.which === 27) { // If Esc is pressed cancel and close the dialog
-        console.log('OFF');
         cancelHandler();
       }
     });

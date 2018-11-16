@@ -20,8 +20,6 @@ Template.volumeListItem.helpers({
   checked: () => {
     const instance = Template.instance();
     const data = instance.data;
-    console.log('in volumeListItem -- checked');
-    console.log(data);
 
     const ROIContour = data.ROIContourReference;
     const activeROIContourIndex = data.structureSetReference.activeROIContourIndex;
@@ -59,7 +57,6 @@ Template.volumeListItem.helpers({
 
 Template.volumeListItem.events({
   'click .js-switch-button'(event) {
-    console.log('.js-switch-button');
     const instance = Template.instance();
     const data = instance.data;
     const ROIContour = data.ROIContourReference;

@@ -40,7 +40,6 @@ Template.volumeManagementDialogs.helpers({
 
 Template.volumeManagementDialogs.events({
     'click .js-volume-management-cancel'(event) {
-      console.log('.js-volume-management-cancel');
 
       closeDialog();
     },

@@ -223,8 +223,6 @@ Template.brushMetadataDialogs.helpers({
       }
     }
 
-    console.log(Type.Modifier);
-
     if (Type.Modifier) {
       instance.data.hasModifiers = true;
       return Type.Modifier;
@@ -336,7 +334,6 @@ function autoComplete (searchQuery) {
       // Check if the CodeMeaning contains the string
       if (!done && Type.CodeMeaning.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1) {
         autoCompletedType = Type.CodeMeaning;
-        console.log('Autocomplete');
         done = true;
       }
     }
@@ -390,9 +387,6 @@ function generateMetadata (label, segmentationType, modifier) {
   } else {
     metadata.RecommendedDisplayCIELabValue = Type.recommendedDisplayRGBValue;
   }
-
-  console.log('Metadata:');
-  console.log(metadata);
 
   return metadata;
 }

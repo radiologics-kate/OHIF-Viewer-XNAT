@@ -50,8 +50,6 @@ Template.roiImportListDialogs.helpers({
 
     const selectAll = instance.data.selectAll.get();
 
-    console.log(`importList: ${importList}`);
-
     if (!importList) {
       return []; // Blank array, i.e. no list items.
     }
@@ -68,9 +66,6 @@ Template.roiImportListDialogs.helpers({
 
       instance.data.importMask[i] = selectAll ? true : false;
     }
-
-    console.log('inside roiCollections helper');
-    console.log(roiCollections);
 
     return roiCollections;
   }

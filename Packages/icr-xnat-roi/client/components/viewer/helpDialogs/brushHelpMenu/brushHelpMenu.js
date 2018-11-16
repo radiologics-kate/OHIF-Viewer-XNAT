@@ -35,8 +35,6 @@ Template.brushHelpMenu.helpers({
     const instance = Template.instance();
     const title = instance.data.showBrushHelp.get();
 
-    console.log(title);
-
     if (!title) {
       return 'title';
     }

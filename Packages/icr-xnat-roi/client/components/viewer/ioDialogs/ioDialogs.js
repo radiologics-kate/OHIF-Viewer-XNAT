@@ -5,8 +5,6 @@ Template.ioDialogs.onRendered(() => {
     const instance = Template.instance();
     const dialogIds = ['exportVolumes', 'importVolumes', 'ioMessage'];
 
-    console.log('ioDialogs onRendered');
-
     dialogIds.forEach(id => {
         const dialog = instance.$('#' + id);
         dialogPolyfill.registerDialog(dialog.get(0));
@@ -16,7 +14,6 @@ Template.ioDialogs.onRendered(() => {
 
 Template.ioDialogs.helpers({
   exportROIsText: () => {
-    console.log('in exportROIsText')
     const canWrite = icrXnatRoiSession.get('writePermissions');
 
     if (canWrite) {

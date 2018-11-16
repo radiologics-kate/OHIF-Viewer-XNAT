@@ -19,8 +19,6 @@ Mousetrap.bind(['n', 'ctrl'], function(evt) {
   const key = evt.key;
   let imageNeedsUpdate = false;
 
-  console.log(key);
-
   switch (key) {
     case 'n':
       if (freehandTool || freehandTool.mode === 'active') {
@@ -33,8 +31,6 @@ Mousetrap.bind(['n', 'ctrl'], function(evt) {
 
       break;
   }
-
-  console.log(freehandTool);
 
   if (imageNeedsUpdate) {
     cornerstone.updateImage(element);

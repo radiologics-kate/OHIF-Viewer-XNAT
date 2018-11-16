@@ -52,13 +52,11 @@ Template.volumeList.helpers({
 
 Template.volumeList.events({
     'click .js-show-hide'(event) {
-      console.log('.js-show-hide');
       const instance = Template.instance();
       const showList = instance.data.showList;
       showList.set(!showList.get());
     },
     'click .js-display-roiCollection'(event) {
-      console.log('.js-display-roiCollection');
       const instance = Template.instance();
       const display = instance.data.display.get();
       const structureSet = instance.data.structureSetReference;

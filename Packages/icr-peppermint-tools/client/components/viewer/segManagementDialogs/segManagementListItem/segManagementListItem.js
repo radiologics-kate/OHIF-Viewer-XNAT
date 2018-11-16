@@ -9,8 +9,6 @@ Template.segManagementListItem.helpers({
     const data = instance.data;
     const segIndex = data.index;
 
-    console.log(`segIndex: ${segIndex}`);
-
     const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
 
     if (!colormap) {
@@ -86,10 +84,7 @@ Template.segManagementListItem.events({
         .CodeMeaning;
     }
 
-    console.log(segIndex);
-
     closeDialog();
-
     brushMetadataIO(
       segIndex,
       label,
@@ -98,8 +93,6 @@ Template.segManagementListItem.events({
     );
   },
   'click .js-switch-seg'(event) {
-    console.log('.js-switch-seg');
-
     const instance = Template.instance();
 
     brushModule.state.drawColorId = instance.data.index;

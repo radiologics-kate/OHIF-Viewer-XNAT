@@ -14,13 +14,9 @@ export default function () {
       return;
   }
 
-  console.log(enabledElement);
-
   const element = enabledElement.element;
 
   const freehandMousetool = cornerstoneTools.getToolForElement(element, 'freehandMouse');
-
-  console.log(freehandMousetool);
 
   freehandMousetool.configuration.alwaysShowTextBox = !freehandMousetool.configuration.alwaysShowTextBox;
 
