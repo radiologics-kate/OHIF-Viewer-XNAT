@@ -178,8 +178,8 @@ export class AsyncRoiFetcher {
     const dialog = this._roiImportListDialog;
 
     return new Promise((resolve,reject) => {
-      const confirm = dialog.find('.roiImportListConfirm');
-      const cancel = dialog.find('.roiImportListCancel');
+      const confirm = dialog.find('.roi-import-list-confirm');
+      const cancel = dialog.find('.roi-import-list-cancel');
 
       function confirmHandler () {
         const dialogData = Blaze.getData(document.querySelector('#roiImportListDialog'));

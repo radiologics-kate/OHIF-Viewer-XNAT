@@ -1,30 +1,30 @@
 <template name="ioDialogs">
   <dialog id="exportVolumes"
-      class="ioDialog noselect"
+      class="io-dialog noselect"
       oncontextmenu="return false">
       <h5>Exporting ROI Collection to archive...</h5>
       <h1><i class="fa fa-spin fa-circle-o-notch fa-fw"></i></h1>
   </dialog>
 
   <dialog id="importVolumes"
-      class="ioDialog noselect"
+      class="io-dialog noselect"
       oncontextmenu="return false">
       <h5 id="ioNotificationText">Importing ROI Collections from archive...</h5>
       <h1 id="ioProgressText"><i class="fa fa-spin fa-circle-o-notch fa-fw"></i></h1>
   </dialog>
 
   <dialog id="ioMessage"
-    class="ioMessageDialog noselect"
+    class="io-message-dialog noselect"
     oncontextmenu="return false">
     <div>
-      <h5 class="ioDescription">Title</h5>
-      <a class="ioDialogCancel btn btn-sm btn-secondary">
+      <h5 class="io-description">Title</h5>
+      <a class="io-dialog-cancel btn btn-sm btn-secondary">
         <i class="fa fa-times-circle fa-2x"></i>
       </a>
     </div>
 
     <div>
-      <p class="ioBody">Text</p>
+      <p class="io-body">Text</p>
     </div>
   </dialog>
 </template>

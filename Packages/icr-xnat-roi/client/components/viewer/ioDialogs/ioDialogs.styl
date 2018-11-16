@@ -1,6 +1,6 @@
 @import "{ohif:design}/app"
 
-.ioDialog
+.io-dialog
   theme('border', '1px solid $uiBorderColor', 0.95)
   theme('background', '$uiGrayDarkest', 0.95)
   theme('color', '$textSecondaryColor')
@@ -21,7 +21,7 @@
   h5, label
     font-weight: 400
 
-.ioMessageDialog
+.io-message-dialog
   theme('border', '1px solid $uiBorderColor', 0.95)
   theme('background', '$uiGrayDarkest', 0.95)
   theme('color', '$textSecondaryColor')
@@ -37,88 +37,16 @@
   border-radius: 8px
   text-align: center
 
-  .ioDialogCancel
+  .io-dialog-cancel
     float: right
 
-  .ioDescription
+  .io-description
     float: left
 
   h3
     font-weight: 400
 
-  .ioBody
+  .io-body
     clear: both
     float: left
     text-align: left
-
-.ioHelpDialog
-  theme('border', '1px solid $uiBorderColor', 0.95)
-  theme('background', '$uiGrayDarkest', 0.95)
-  theme('color', '$textSecondaryColor')
-  z-index: 1000
-
-  max-height: calc(100% - 100px)
-  max-width: 400px
-  position: absolute
-  margin: auto
-
-  overflow: hidden
-  padding: 10px
-  border-radius: 8px
-  text-align: center
-
-  h3, label
-    font-weight: 400
-
-  .ioDialogCancel
-    float: right
-
-  .ioDescription
-    float: left
-
-  .ioBody
-    float: left
-    text-align: left
-
-.ioTextInputDialog
-  theme('border', '1px solid $uiBorderColor', 0.95)
-  theme('background', '$uiGrayDarkest', 0.95)
-  theme('color', '$textSecondaryColor')
-  z-index: 1000
-
-  max-height: calc(100% - 100px)
-  max-width: calc(100% - 100px)
-  position: absolute
-  margin: auto
-
-  margin: auto
-  overflow: hidden
-  padding: 10px
-  border-radius: 8px
-  text-align: center
-
-  .ioDialogCancel
-    float: right
-
-  .ioDescription
-    float: left
-
-  h3
-    font-weight: 400
-
-  .ioTextInputOptions
-    padding: 10px 0
-
-  .ioTextInputOptions  label
-    clear: both
-    float: left
-
-  .ioTextInput
-    margin-left: 5px
-
-  .ioBody
-    float: left
-    text-align: left
-
-  .ioDialogConfirm
-    float: center
