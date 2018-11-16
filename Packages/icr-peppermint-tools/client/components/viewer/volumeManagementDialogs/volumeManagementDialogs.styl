@@ -1,6 +1,7 @@
 @import "{ohif:design}/app"
+@import "../peppermint-table.styl"
 
-.volumeManagementDialog
+.volume-management-dialog
   theme('border', '1px solid $uiBorderColor', 0.95)
   theme('background', '$uiGrayDarkest', 0.95)
   theme('color', '$textSecondaryColor')
@@ -19,7 +20,7 @@
   border-radius: 8px
   text-align: center
 
-  .volumeManagementHeader
+  .volume-management-header
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -29,33 +30,18 @@
     font-weight: 400
     text-align: left
 
-  .volumeManagementCancel
+  .volume-management-cancel
     text-align: right
     margin-top: 16px
 
-  .volumeManagementNewButton
+  .volume-management-new-button
     float: center
     width: 100%
 
   .volumeManagementTableButton
     width: 100%
 
-  .roiCollectionListBody
-    max-height: calc(80vh - 300px);
-    padding-right: 18px
-    overflow-y: auto
-    overflow-x: hidden
-    display:inline-block;
-
-  .roiCollectionListBody tr, th
-    padding: 0px 5px
-    float: center
-    white-space: nowrap
-
-  .volumeListHeader
+  .volume-list-header
     border-width: 1px
     border-top-style: solid
     border-bottom-style: solid
-
-  .centeredCell
-    text-align: center

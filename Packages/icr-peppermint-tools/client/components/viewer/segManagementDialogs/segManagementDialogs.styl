@@ -1,6 +1,7 @@
 @import "{ohif:design}/app"
+@import "../peppermint-table.styl"
 
-.segManagementDialog
+.seg-management-dialog
   theme('border', '1px solid $uiBorderColor', 0.95)
   theme('background', '$uiGrayDarkest', 0.95)
   theme('color', '$textSecondaryColor')
@@ -18,7 +19,7 @@
   border-radius: 8px
   text-align: center
 
-  .segManagementHeader
+  .seg-management-header
     display: -webkit-flex
     display: -ms-flexbox
     display: flex
@@ -31,7 +32,7 @@
     border-radius: 8px
     padding: 2px
 
-  .segManagementCancel
+  .seg-management-cancel
     text-align: right
     margin-top: 16px
 
@@ -57,22 +58,6 @@
     align-items: baseline
     justify-context: space-between
 
-  .segManagementList
-    text-align: left
-    max-height: calc(50vh - 300px);
-    padding-right: 18px
-    overflow-y: auto
-    overflow-x: hidden
-
-  .segManagementListBody tr, th, td
-    padding: 0px 5px
-    float: center
-    white-space: nowrap
-
-  .centeredCell
-    text-align: center
-
-
-  .segManagementNewButton
+  .seg-management-new-button
     float: center
     width: 100%

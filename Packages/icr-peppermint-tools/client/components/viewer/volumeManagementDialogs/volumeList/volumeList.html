@@ -2,7 +2,7 @@
   {{#if notEmpty}}
 
     <!-- volumeList Header -->
-    <tr class="volumeListHeader">
+    <tr class="volume-list-header">
 
       {{#if isDefault}}
         <th></th>
@@ -24,8 +24,8 @@
         <tr>
           <th><!--Blank Cell to allow indent with strong alignment--></th>
           <th>Name</th>
-          <th class="centeredCell">Contours</th>
-          <th class="centeredCell">Edit</th>
+          <th class="centered-cell">Contours</th>
+          <th class="centered-cell">Edit</th>
         </tr>
         {{#each ROIContour in this.ROIContourArray}}
             {{>volumeListItem ROIContour}}
@@ -34,7 +34,7 @@
         <tr>
           <th><!--Blank Cell to allow indent with strong alignment--></th>
           <th>Name</th>
-          <th class="centeredCell">Contours</th>
+          <th class="centered-cell">Contours</th>
         </tr>
         {{#each ROIContour in this.ROIContourArray}}
             {{>volumeListItem ROIContour}}

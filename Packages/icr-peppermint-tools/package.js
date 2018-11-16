@@ -33,6 +33,11 @@ Package.onUse(function(api) {
     // Components
 
     api.addFiles(
+      'client/components/viewer/peppermint-table.styl',
+      'client'
+    );
+
+    api.addFiles(
       'client/components/viewer/freehandSetNameDialogs/freehandSetNameDialogs.html',
       'client'
     );
@@ -96,7 +101,12 @@ Package.onUse(function(api) {
       'client/components/viewer/segManagementDialogs/segManagementList/segManagementList.html',
       'client'
     );
-    
+
+    api.addFiles(
+      'client/components/viewer/segManagementDialogs/segManagementList/segManagementList.styl',
+      'client'
+    );
+
     api.addFiles(
       'client/components/viewer/segManagementDialogs/segManagementListItem/segManagementListItem.html',
       'client'
@@ -122,6 +132,11 @@ Package.onUse(function(api) {
 
     api.addFiles(
       'client/components/viewer/volumeManagementDialogs/roiCollectionList/roiCollectionList.html',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/volumeManagementDialogs/roiCollectionList/roiCollectionList.styl',
       'client'
     );
 
