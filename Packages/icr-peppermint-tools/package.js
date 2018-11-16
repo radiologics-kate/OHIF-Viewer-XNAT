@@ -26,6 +26,10 @@ Package.onUse(function(api) {
     ]);
 
 
+    // ===== Assets =====
+    api.addAssets('assets/icons.svg', 'client');
+
+
     // keyInterface
     api.addFiles('client/lib/keyInterface/brushToolKeyInterface.js', 'client');
     api.addFiles('client/lib/keyInterface/freehandToolKeyInterface.js', 'client');
@@ -66,6 +70,11 @@ Package.onUse(function(api) {
 
     api.addFiles(
       'client/components/viewer/brushMetadataDialogs/brushMetadataSearchList/brushMetadataSearchList.html',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/brushMetadataDialogs/brushMetadataSearchList/brushMetadataSearchList.styl',
       'client'
     );
 

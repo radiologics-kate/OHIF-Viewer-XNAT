@@ -1,19 +1,20 @@
 <template name="brushMetadataDialogs">
   <dialog id="brushMetadataDialog"
-      class="brushMetadataDialog noselect"
+      class="brush-metadata-dialog noselect"
       oncontextmenu="return false">
-      <div class="brushMetadataHeader">
+      <div class="brush-metadata-horizontal-box">
         <h3 style="border:2px solid {{segmentationColor}}; background-color:#263340;">Segmentation {{segmentationIndex}}</h3>
-        <a class="brushMetadataCancel js-brush-metadata-cancel btn btn-sm btn-secondary">
+        <a class="js-brush-metadata-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
       </div>
 
       <div class="brush-metadata-vert-box">
-        <label for="brushMetadataTextInput">Label</label>
+        <label for="brushMetadataLabelInput">Label</label>
+
         <div class="brush-metadata-horizontal-box">
-          <input name="brushMetadataTextInput"
-                 class="brushMetadataTextInput brush-segmentation-label-js"
+          <input name="brushMetadataLabelInput"
+                 class="brush-metadata-input brush-metadata-label-input brush-segmentation-label-js"
                  type="text"
                  autocomplete="off"
                  placeholder="Enter Segmentation Label.."
@@ -23,11 +24,11 @@
           </i>
         </div>
 
-        <label for="brushMetadataSegmentationTypeInput">Segmentation Type</label>
+        <label for="brushMetadataTypeInput">Segmentation Type</label>
 
         <div class="brush-metadata-horizontal-box">
-          <input name="brushMetadataSegmentationTypeInput"
-                 class="brushMetadataSegmentationTypeInput brush-segmentation-search-js"
+          <input name="brushMetadataTypeInput"
+                 class="brush-metadata-input brush-metadata-type-input brush-segmentation-search-js"
                  type="text"
                  autocomplete="off"
                  placeholder="Search.."
@@ -37,31 +38,22 @@
           </i>
         </div>
 
-        <div>
-          {{>brushMetadataSearchList searchResults=searchResults}}
-        </div>
+        {{>brushMetadataSearchList searchResults=searchResults}}
+
         {{#if modifiers}}
           {{>brushMetadataModifiers modifiers=modifiers}}
         {{/if}}
       </div>
 
-
-
-        <div class="brushMetadataFooter">
-          <hr/>
-          {{#if validInput}}
-          <a class="brushMetadataNewButton js-brush-metadata-confirm btn btn-sm btn-primary">
-            <i class="fa fa fa-check-circle fa-2x"></i>
-          </a>
-          {{else}}
-          <a class="brushMetadataNewButton brush-metadata-invalid-confirm btn btn-sm btn-primary" style="background-color:#263340">
-            <i class="fa fa fa-check-circle fa-2x"></i>
-          </a>
-          {{/if}}
-          <br/>
-        </div>
-
-
-
+      <hr/>
+      {{#if validInput}}
+        <a class="brush-metadata-new-button js-brush-metadata-confirm btn btn-sm btn-primary">
+          <i class="fa fa fa-check-circle fa-2x"></i>
+        </a>
+      {{else}}
+        <a class="brush-metadata-new-button brush-metadata-invalid-confirm btn btn-sm btn-primary" style="background-color:#263340">
+          <i class="fa fa fa-check-circle fa-2x"></i>
+        </a>
+      {{/if}}
   </dialog>
 </template>

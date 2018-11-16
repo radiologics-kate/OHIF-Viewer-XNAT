@@ -198,7 +198,7 @@ Template.toolbarSection.helpers({
             id: 'volumeManagement',
             title: 'ROI Management',
             classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-freehand-switch-volume'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-switch-volume'
           },
           {
             id: 'toggleFreehandStats',
@@ -263,7 +263,7 @@ Template.toolbarSection.helpers({
             id: 'segManagement',
             title: 'Seg Management',
             classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-paint-brush'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-seg-management-menu'
           },
           {
             id: 'exportMask',
@@ -283,7 +283,7 @@ Template.toolbarSection.helpers({
             id: 'Brush',
             title: 'Mask',
             classes: 'rp-x-1 rm-l-3',
-            iconClasses: 'fa fa-paint-brush', // TEMP - Need a better icon for this.
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu',
             subTools: brushTools
         });
 

@@ -19,8 +19,8 @@ export default async function (segIndex, label = '', type = '', modifier) {
   const dialog = $('#brushMetadataDialog');
 
   // Reset the form.
-  const brushMetadataTextInput = dialog.find('.brushMetadataTextInput');
-  const brushMetadataSegmentationTypeInput = dialog.find('.brushMetadataSegmentationTypeInput');
+  const brushMetadataLabelInput = dialog.find('.brush-metadata-label-input');
+  const brushMetadataTypeInput = dialog.find('.brush-metadata-type-input');
 
   const dialogData = Blaze.getData(document.querySelector('#brushMetadataDialog'));
 
@@ -33,8 +33,8 @@ export default async function (segIndex, label = '', type = '', modifier) {
     dialogData.returnToSegManagement = true;
   }
 
-  brushMetadataTextInput[0].value = label;
-  brushMetadataSegmentationTypeInput[0].value = type;
+  brushMetadataLabelInput[0].value = label;
+  brushMetadataTypeInput[0].value = type;
 
   setOptionIfModifier(modifier);
 

@@ -27,7 +27,7 @@ Template.brushMetadataDialogs.onCreated(() => {
   instance.data.returnToSegManagement = false;
 
   instance.data.setSegmentationTypeCallback = (text) => {
-    const segmentationInput = document.getElementsByClassName('brushMetadataSegmentationTypeInput');
+    const segmentationInput = document.getElementsByClassName('brush-metadata-type-input');
 
     segmentationInput[0].value = text;
 

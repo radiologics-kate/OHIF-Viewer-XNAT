@@ -110,6 +110,10 @@ Package.onUse(function(api) {
       'client/components/viewer/helpDialogs/freehandHelpMenu/divs/freehandHelpVolumes.html',
       'client'
     );
+    api.addFiles(
+      'client/components/viewer/helpDialogs/freehandHelpMenu/divs/freehandHelpToggleStats.html',
+      'client'
+    );
 
     // -- Brush
     api.addFiles(
