@@ -16,9 +16,9 @@ export function roiCollectionBuilder (dialog) {
   icrXnatRoiSession.set('roiCollectionBuilderActiveSeries', seriesInstanceUid);
 
   return new Promise ((resolve, reject) => {
-    const confirm = dialog.find('.roiCollectionBuilderExportButton');
-    const cancel = dialog.find('.roiCollectionBuilderCancel');
-    const textInput = dialog.find('.roiCollectionBuilderTextInput');
+    const confirm = dialog.find('.roi-collection-builder-export-button');
+    const cancel = dialog.find('.roi-collection-builder-cancel');
+    const textInput = dialog.find('.roi-collection-builder-text-input');
 
     function confirmHandler () {
       const dialogData = Blaze.getData(document.querySelector('#roiCollectionBuilderDialog'));

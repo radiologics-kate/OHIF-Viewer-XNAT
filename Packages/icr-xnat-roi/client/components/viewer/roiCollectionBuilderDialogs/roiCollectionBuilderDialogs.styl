@@ -1,6 +1,6 @@
 @import "{ohif:design}/app"
 
-.roiCollectionBuilderDialog
+.roi-collection-builder-dialog
   theme('border', '1px solid $uiBorderColor', 0.95)
   theme('background', '$uiGrayDarkest', 0.95)
   theme('color', '$textSecondaryColor')
@@ -24,7 +24,7 @@
     float: left
 
 
-  .roiCollectionBuilderHeader
+  .roi-collection-builder-header
     display: -webkit-flex
     display: -ms-flexbox
     display: flex
@@ -34,7 +34,7 @@
     font-weight: 400
     text-align: left
 
-  .roiCollectionBuilderCancel
+  .roi-collection-builder-cancel
     text-align: right
     margin-top: 16px
 
@@ -47,32 +47,32 @@
   .roiCollectionBuilderTableButton
     width: 100%
 
-  .roiCollectionBuilderListBody
+  .roi-collection-builder-list-body
     max-height: calc(80vh - 300px);
     overflow-y: auto
     overflow-x: hidden
     display: inline-block
 
-  .roiCollectionBuilderListBody table, tr, th
+    .left-aligned-cell
+      text-align: left
+
+  .roi-collection-builder-list-body table, tr, th, td
     padding: 0px 10px
 
-  .roiCollectionBuilderListBody th
+  .roi-collection-builder-list-body th
     white-space: nowrap
 
-  .roiCollectionBuilderFooter
+  .roi-collection-builder-footer
     display: -webkit-flex
     display: -ms-flexbox
     display: flex
     justify-content: space-around
     align-items: center
 
-  .roiCollectionBuilderTextInputOptions
+  .roi-collection-builder-text-input-options
     margin: 5px
     text-align: left
 
-  .roiCollectionBuilderExport
+  .roi-collection-builder-export
     text-align: right
     margin: 5px
-
-  .centeredCell
-    text-align: center

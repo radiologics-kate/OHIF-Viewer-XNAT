@@ -1,9 +1,9 @@
 <template name="roiCollectionBuilderListItem">
   <tr>
-    <th>
+    <td class="left-aligned-cell">
       <i class="fa fa-square" style="color:{{color}}"></i> {{volumeName}}
-    </th>
-    <th class="centeredCell"><input class="roiCollectionBuilderListItemCheck js-roi-check" type="checkbox" {{checked}} name="sync" value=""></th>
-    <th class="centeredCell">{{polygonCount}}</th>
+    </td>
+    <td><input class="js-roi-check" type="checkbox" {{checked}} name="sync" value=""></td>
+    <td>{{polygonCount}}</td>
   </tr>
 </template>

@@ -1,16 +1,16 @@
 <template name="roiImportListDialogs">
   <dialog id="roiImportListDialog"
-      class="roiImportListDialog noselect"
+      class="roi-import-list-dialog noselect"
       oncontextmenu="return false">
-      <div class="roiImportListHeader">
+      <div class="roi-import-list-header">
         <h3>Import ROI Collections</h3>
-        <a class="roiImportListCancel js-volume-management-cancel btn btn-sm btn-secondary">
+        <a class="roi-import-list-cancel js-volume-management-cancel btn btn-sm btn-secondary">
           <i class="fa fa-times-circle fa-2x"></i>
         </a>
       </div>
 
       <hr />
-      <div class="roiImportListBody">
+      <div class="roi-import-list-body">
         {{#if importListReady}}
           {{#if listHasData}}
             <table>
@@ -33,8 +33,8 @@
 
       <hr/>
 
-      <div class="roiImportListFooter">
-        <a class="roiImportListConfirm btn btn-sm btn-primary">
+      <div class="roi-import-list-footer">
+        <a class="roi-import-list-confirm btn btn-sm btn-primary">
           <svg stroke='#fff'>
             <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import"}}></use>
           </svg>

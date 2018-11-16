@@ -25,12 +25,8 @@ Template.roiCollectionBuilderDialogs.onCreated(() => {
         return;
       }
 
-      console.log('roiCollectionBuilderDialog debug... GO!');
-
       const freehand3DStore = modules.freehand3D;
       let series = freehand3DStore.getters.series(seriesInstanceUid);
-
-      console.log(series);
 
       if (!series) {
         freehand3DStore.setters.series(seriesInstanceUid);

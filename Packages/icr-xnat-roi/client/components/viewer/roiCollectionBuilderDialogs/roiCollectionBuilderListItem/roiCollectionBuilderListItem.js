@@ -38,7 +38,6 @@ Template.roiCollectionBuilderListItem.helpers({
 
 Template.roiCollectionBuilderListItem.events({
   'click .js-roi-check'(event) {
-    console.log('.js-roi-check');
     const instance = Template.instance();
     const data = instance.data;
     const checked = data.checked;
