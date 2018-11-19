@@ -69,9 +69,13 @@ export class MaskExtractor {
   }
 
   _appendBrushState (brushData, frameNumber) {
+    const brushModule = modules.brush;
+
     for (let i = 0; i < brushData.length; i++) {
+
       const pixelData = brushData[i].pixelData;
 
+      // Only append if segIndex i has seg metadata.
       if (pixelData) {
         this._masks[i][frameNumber] = pixelData;
       }
@@ -84,12 +88,7 @@ export class MaskExtractor {
     for (let i = 0; i < masks.length; i++) {
       const mask = masks[i];
 
-      console.log(this);
-      console.log(this._hasData);
-
       const hasData = this._doesMaskHaveData(mask);
-
-
 
       if (hasData) {
         this._constructOneDataCube(mask, i);

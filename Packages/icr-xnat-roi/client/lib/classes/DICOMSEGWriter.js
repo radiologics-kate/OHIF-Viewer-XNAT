@@ -41,7 +41,6 @@ export class DICOMSEGWriter {
         const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
 
         dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
-
         datasets.push(dataset);
       } else {
         for (let i = 0; i < images.length; i++) {
@@ -51,7 +50,6 @@ export class DICOMSEGWriter {
           const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
 
           dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
-
           datasets.push(dataset);
         }
       }
@@ -102,7 +100,7 @@ export class DICOMSEGWriter {
 
       const segBlob = dcmjs.data.datasetToBlob(seg.dataset);
 
-      saveAs(segBlob, "segmentation.dcm", true);
+      //saveAs(segBlob, "segmentation.dcm", true);
 
     });
 
