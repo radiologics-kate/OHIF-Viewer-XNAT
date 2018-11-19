@@ -31,9 +31,11 @@ export class DICOMSEGWriter {
 
     Promise.all(imagePromises).then((images) => {
       const datasets = [];
+      const metadataProvider = OHIF.viewer.metadataProvider;
 
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
+      // Check if multiframe
+      if (metadataProvider.getMultiframeModuleMetadata(images[0]).isMultiframeImage) {
+        const image = images[0];
         const arrayBuffer = image.data.byteArray.buffer;
         const dicomData = dcmjs.data.DicomMessage.readFile(arrayBuffer);
         const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
@@ -41,6 +43,17 @@ export class DICOMSEGWriter {
         dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
 
         datasets.push(dataset);
+      } else {
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          const arrayBuffer = image.data.byteArray.buffer;
+          const dicomData = dcmjs.data.DicomMessage.readFile(arrayBuffer);
+          const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
+
+          dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
+
+          datasets.push(dataset);
+        }
       }
 
       const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(datasets);
