@@ -9,6 +9,11 @@ import { roiCollectionBuilder } from './roiCollectionBuilder.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import closeIODialog from './closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import messageDialog from '../util/messageDialog.js';
+import {
+  displayExportFailedDialog,
+  displayInsufficientPermissionsDialog
+} from '../util/displayExportDialogs.js';
 
 const modules = cornerstoneTools.store.modules;
 const getToolState = cornerstoneTools.import('stateManagement/getToolState');
@@ -37,7 +42,7 @@ export async function exportROIs () {
  *
  * @author JamesAPetts
  */
-async function beginExport() {
+async function beginExport () {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
   const roiExtractor = new RoiExtractor(seriesInfo.seriesInstanceUid);
   const dateTime = AIMWriter.generateDateTime();
@@ -252,34 +257,6 @@ function moveExportedPolygonsInInstance (exportData) {
 }
 
 /**
- * Opens dialog to notify the user when an export was unsuccessful.
- *
- * @author JamesAPetts
- */
-function displayExportFailedDialog () {
-  const title = 'Export Failed';
-  const body = `Export of ROIs to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}`
-    + 'failed. This may be due a bad internet connection. The ROIs have not been locked, if you want'
-    + 'to try again. If you have a good connection to XNAT and this problem persists, please contact'
-    + 'your XNAT administrator.';
-  messageDialog(title, body);
-}
-
-/**
- * Opens dialog to notify the user that they do not have the
- * required permissions.
- *
- * @author JamesAPetts
- */
-function displayInsufficientPermissionsDialog () {
-  const title = 'Insufficient Permissions';
-  const body = `You do not have the required permissions to write to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}.`
-  + ' If you believe that you should, please contact the project owner.'
-
-  messageDialog(title, body);
-}
-
-/**
  * Opens dialog to notify the user there are no ROIs eligable for export.
  *
  * @author JamesAPetts
@@ -289,23 +266,4 @@ function displayNoROIsToExportDialog () {
   const body = 'There are no unlocked ROIs to export. Please refer to the ROI/Help menu for more information.';
 
   messageDialog(title, body);
-}
-
-/**
- * Opens a simple alert-style dialog.
- *
- * @author JamesAPetts
- * @param {String} title The title/header of the dialog.
- * @param {String} body The text to be displayed in the body of the dialog.
- */
-function messageDialog (title, body) {
-  // Find components
-  const dialog = $('#ioMessage');
-  const descriptionText = dialog.find('.io-description');
-  const bodyText = dialog.find('.io-body');
-
-  descriptionText.text(title);
-  bodyText.text(body);
-
-  dialog.get(0).showModal();
 }

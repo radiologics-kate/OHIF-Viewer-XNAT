@@ -1,0 +1,50 @@
+<template name="segBuilderDialogs">
+  <dialog id="segBuilderDialog"
+      class="seg-builder-dialog noselect"
+      oncontextmenu="return false">
+      <div class="seg-builder-header">
+        <h3>Export Segmentations</h3>
+        <a class="seg-builder-cancel js-seg-builder-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      <hr />
+
+      <div class="seg-builder-list-body">
+        <table class="peppermint-table">
+          <tr>
+            <th>Label</th>
+            <th class="centered-cell">Category</th>
+            <th class="centered-cell">Type</th>
+          </tr>
+          {{#each segmentation in segmentations}}
+              {{>segBuilderListItem segmentation}}
+          {{/each}}
+        </table>
+      </div>
+
+      <hr/>
+
+      <div class="seg-builder-footer">
+        <div class="seg-builder-text-input-options">
+            Name <input name="segBuilderTextInput"
+                   class="seg-builder-text-input"
+                   type="text"
+                   value="{{roiCollectionName}}"
+                   tabindex="-1"
+                   autocomplete="off"
+                   onfocus="this.select()"/>
+        </div>
+
+        <div class="seg-builder-export">
+          <a class="seg-builder-export-button btn btn-sm btn-primary">
+              <svg stroke='#fff'>
+                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
+              </svg>
+          </a>
+      </div>
+    </div>
+
+  </dialog>
+</template>

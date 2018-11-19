@@ -100,7 +100,7 @@ export class DICOMSEGWriter {
 
       const segBlob = dcmjs.data.datasetToBlob(seg.dataset);
 
-      //saveAs(segBlob, "segmentation.dcm", true);
+      saveAs(segBlob, "segmentation.dcm", true);
 
     });
 

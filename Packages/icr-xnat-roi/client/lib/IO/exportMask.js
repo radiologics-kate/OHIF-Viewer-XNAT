@@ -3,17 +3,51 @@ import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { MaskExtractor } from '../classes/MaskExtractor.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { DICOMSEGWriter } from '../classes/DICOMSEGWriter.js';
+import { segBuilder } from './segBuilder.js';
+import closeIODialog from './closeIODialog.js';
+import getDateAndLabel from '../util/getDateAndLabel.js';
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import messageDialog from '../util/messageDialog.js';
+import {
+  displayExportFailedDialog,
+  displayInsufficientPermissionsDialog
+} from '../util/displayExportDialogs.js';
 
 /**
- * TODO: If the user has write permissions, begin export event. Otherwise notify the
+ * If the user has write permissions, begin export event. Otherwise notify the
  * user that they don't have sufficient permissions to do this.
  *
  * @author JamesAPetts
  */
-export default function () {
+export default async function () {
+
+    icrXnatRoiSession.set('writePermissions', true);
+
+    if (icrXnatRoiSession.get('writePermissions') === true) {
+      beginExport();
+      return;
+    }
+
+    // User does not have write access
+    displayInsufficientPermissionsDialog();
+}
+
+async function beginExport () {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
   const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
+  const { dateTime, label } = getDateAndLabel();
+
+  const segBuilderDialog = $('#segBuilderDialog');
+  let roiCollectionName;
+
+  try {
+    roiCollectionName = await segBuilder(segBuilderDialog, label);
+    closeIODialog(segBuilderDialog);
+  } catch (cancel) {
+    closeIODialog(segBuilderDialog);
+    return;
+  }
 
   const masks = maskExtractor.extractMasks();
 

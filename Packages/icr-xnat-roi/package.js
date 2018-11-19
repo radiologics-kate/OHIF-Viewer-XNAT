@@ -83,6 +83,28 @@ Package.onUse(function(api) {
       'client'
     );
 
+    api.addFiles(
+      'client/components/viewer/segBuilderDialogs/segBuilderDialogs.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segBuilderDialogs/segBuilderDialogs.js',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segBuilderDialogs/segBuilderDialogs.styl',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/segBuilderDialogs/segBuilderListItem/segBuilderListItem.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/segBuilderDialogs/segBuilderListItem/segBuilderListItem.js',
+      'client'
+    );
+
     // Help Menu
     api.addFiles('client/components/viewer/helpDialogs/helpDialogs.html', 'client');
     api.addFiles('client/components/viewer/helpDialogs/helpDialogs.js', 'client');
