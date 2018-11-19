@@ -22,7 +22,9 @@ export function segBuilder (dialog, label) {
     const dialogData = Blaze.getData(document.querySelector('#segBuilderDialog'));
 
     // Trigger recalc of segData.
-    dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
+    dialogData.recalcSegBuilderSegmentations.set(!dialogData.recalcSegBuilderSegmentations.get());
+
+    console.log(dialogData);
 
     function confirmHandler () {
       const roiCollectionName = textInput.val();

@@ -135,6 +135,8 @@ Template.segManagementDialogs.events({
     const toolStateManager = globalToolStateManager.saveToolState();
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
+    console.log(`segIndex: ${segIndex}`);
+
     // Delete metadata
     brushModule.setters.metadata(seriesInstanceUid, segIndex, undefined);
 
@@ -148,7 +150,11 @@ Template.segManagementDialogs.events({
     for (let i = 0; i < imageIds.length; i++) {
       const imageToolState = toolStateManager[imageIds[i]];
 
-      if (imageToolState && imageToolState.brush && imageToolState.brush.data[segIndex]) {
+      if (imageToolState &&
+        imageToolState.brush &&
+        imageToolState.brush.data[segIndex] &&
+        imageToolState.brush.data[segIndex].pixelData
+       ) {
         const brushData = imageToolState.brush.data[segIndex];
 
         const length = brushData.pixelData.length;

@@ -15,7 +15,9 @@ export default async function () {
   // Find components
   const dialog = $('#segManagementDialog');
 
-  const dialogData = Blaze.getData(document.querySelector('#brushMetadataDialog'));
+  const dialogData = Blaze.getData(document.querySelector('#segManagementDialog'));
+
+  console.log(dialogData);
 
   // Trigger recalc of segData.
   dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());

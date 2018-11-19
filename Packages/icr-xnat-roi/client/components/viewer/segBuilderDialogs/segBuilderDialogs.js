@@ -19,14 +19,17 @@ Template.segBuilderDialogs.onRendered(() => {
 Template.segBuilderDialogs.onCreated(() => {
   const instance = Template.instance();
 
-  instance.data.recalcSegmentations = new ReactiveVar('false');
+  instance.data.recalcSegBuilderSegmentations = new ReactiveVar(false);
 });
 
 Template.segBuilderDialogs.helpers({
   segmentations: () => {
+    console.log('segBuilderDialogs.helpers.segmentations');
+
+
     const instance = Template.instance();
 
-    instance.data.recalcSegmentations.get();
+    instance.data.recalcSegBuilderSegmentations.get();
 
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
