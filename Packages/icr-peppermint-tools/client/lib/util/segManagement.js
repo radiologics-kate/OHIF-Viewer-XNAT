@@ -17,8 +17,6 @@ export default async function () {
 
   const dialogData = Blaze.getData(document.querySelector('#segManagementDialog'));
 
-  console.log(dialogData);
-
   // Trigger recalc of segData.
   dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
 

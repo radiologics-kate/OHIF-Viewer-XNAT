@@ -3,9 +3,10 @@ import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { MaskExtractor } from '../classes/MaskExtractor.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { DICOMSEGWriter } from '../classes/DICOMSEGWriter.js';
+import { DICOMSEGExporter } from '../classes/DICOMSEGExporter.js';
 import { segBuilder } from './segBuilder.js';
 import closeIODialog from './closeIODialog.js';
-import getDateAndLabel from '../util/getDateAndLabel.js';
+import getDateTimeAndLabel from '../util/getDateTimeAndLabel.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import messageDialog from '../util/messageDialog.js';
 import {
@@ -21,7 +22,8 @@ import {
  */
 export default async function () {
 
-    icrXnatRoiSession.set('writePermissions', true);
+    // TEMP
+    //icrXnatRoiSession.set('writePermissions', true);
 
     if (icrXnatRoiSession.get('writePermissions') === true) {
       beginExport();
@@ -36,7 +38,7 @@ async function beginExport () {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
   const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
-  const { dateTime, label } = getDateAndLabel();
+  const { dateTime, label } = getDateTimeAndLabel('SEG');
 
   const segBuilderDialog = $('#segBuilderDialog');
   let roiCollectionName;
@@ -72,9 +74,26 @@ async function beginExport () {
   dimensions.cube = dimensions.rows * dimensions.columns * dimensions.slices;
 
   // TODO DICOM or NIFTI will have different export channels here!
-  // In practice we will check the metadata to check if the image is either NIFTI or DICOM.
+  // In the future we will check the metadata to check if the image is either NIFTI or DICOM.
 
   // DICOM-SEG
   const dicomSegWriter = new DICOMSEGWriter(seriesInfo);
-  dicomSegWriter.write(masks, dimensions);
+  const DICOMSegPromise = dicomSegWriter.write(masks, dimensions);
+
+  console.log(DICOMSegPromise);
+
+  DICOMSegPromise.then(segBlob => {
+    console.log('test');
+    console.log(segBlob);
+    const dicomSegExporter = new DICOMSEGExporter(
+      segBlob,
+      seriesInstanceUid,
+      label,
+      roiCollectionName
+    );
+
+    console.log('seg exporter... ready!');
+
+    dicomSegExporter.exportToXNAT();
+  });
 }

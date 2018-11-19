@@ -135,12 +135,9 @@ Template.segManagementDialogs.events({
     const toolStateManager = globalToolStateManager.saveToolState();
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-    console.log(`segIndex: ${segIndex}`);
-
     // Delete metadata
     brushModule.setters.metadata(seriesInstanceUid, segIndex, undefined);
-
-
+    
     // Delete pixeldata
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
