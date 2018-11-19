@@ -76,7 +76,8 @@ export class MaskExtractor {
       const pixelData = brushData[i].pixelData;
 
       // Only append if segIndex i has seg metadata.
-      if (pixelData) {
+      if (pixelData &&
+        brushModule.getters.metadata(this._seriesInstanceUid, i)) {
         this._masks[i][frameNumber] = pixelData;
       }
     }

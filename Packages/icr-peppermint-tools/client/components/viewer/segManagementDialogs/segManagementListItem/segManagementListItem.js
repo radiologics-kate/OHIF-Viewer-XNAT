@@ -123,6 +123,24 @@ Template.segManagementListItem.events({
 
 
     cornerstone.updateImage(activeEnabledElement.element);
+  },
+  'click .js-seg-delete'(event) {
+    const instance = Template.instance();
+    const segIndex = instance.data.index;
+
+    // TODO -> open delete dialog with the index said to be deleted.
+    // TODO -> Have a wanring and yes/no options.
+    // TODO -> Delete and open up segmentation window.
+    const segManagementDialog = $('#segManagementDialog');
+    const deleteDialog = $('#segDeleteDialog');
+
+    const deleteDialogData = Blaze.getData(document.querySelector('#segDeleteDialog'));
+
+    deleteDialogData.segToBeDeleted.set(segIndex);
+
+    //segManagementDialog.get(0).close();
+    deleteDialog.get(0).showModal();
+
   }
 });
 
