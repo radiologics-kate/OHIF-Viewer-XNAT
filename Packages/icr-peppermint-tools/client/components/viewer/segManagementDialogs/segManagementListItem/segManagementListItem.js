@@ -1,4 +1,5 @@
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { OHIF } from 'meteor/ohif:core';
 import brushMetadataIO from '../../../../lib/util/brushMetadataIO.js';
 
 const brushModule = cornerstoneTools.store.modules.brush;
@@ -61,6 +62,16 @@ Template.segManagementListItem.helpers({
     }
 
     return;
+  },
+  showHideIcon: () => {
+    const instance = Template.instance();
+    const visible = instance.data.visible.get();
+
+    if (visible) {
+      return 'fa fa-eye';
+    }
+
+    return 'fa fa-eye-slash';
   }
 
 });
@@ -97,6 +108,21 @@ Template.segManagementListItem.events({
 
     brushModule.state.drawColorId = instance.data.index;
     closeDialog();
+  },
+  'click .js-seg-showHide'(event) {
+    const instance = Template.instance();
+    const segIndex = instance.data.index;
+
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const enabledElementUID = activeEnabledElement.uuid;
+
+    const visible = !instance.data.visible.get();
+
+    brushModule.setters.brushVisibilityForElement(enabledElementUID, segIndex, visible);
+    instance.data.visible.set(visible);
+
+
+    cornerstone.updateImage(activeEnabledElement.element);
   }
 });
 

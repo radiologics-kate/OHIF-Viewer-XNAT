@@ -1,5 +1,6 @@
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { OHIF } from 'meteor/ohif:core';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import brushMetadataIO from '../../../lib/util/brushMetadataIO.js';
 
@@ -20,6 +21,8 @@ Template.segManagementDialogs.onCreated(() => {
 
 Template.segManagementDialogs.helpers({
   segmentations: () => {
+    console.log('segmentations helper');
+
     const instance = Template.instance();
 
     instance.data.recalcSegmentations.get();
@@ -32,6 +35,15 @@ Template.segManagementDialogs.helpers({
 
     const segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
 
+    console.log(segMetadata);
+
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const enabledElementUID = activeEnabledElement.uuid;
+
+    const visibleSegmentationsForElement = brushModule.getters.visibleSegmentationsForElement(enabledElementUID);
+
+    console.log(enabledElementUID);
+
     if (!segMetadata) {
       return;
     }
@@ -40,9 +52,15 @@ Template.segManagementDialogs.helpers({
 
     for (let i = 0; i < segMetadata.length; i++) {
       if (segMetadata[i]) {
+        console.log(i);
+
+
         segmentationData.push({
           index: i,
-          metadata: segMetadata[i]
+          metadata: segMetadata[i],
+          visible: new ReactiveVar(
+            visibleSegmentationsForElement[i]
+          )
         });
       }
     }
