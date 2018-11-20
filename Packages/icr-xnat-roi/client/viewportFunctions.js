@@ -1,6 +1,6 @@
 import { OHIF } from 'meteor/ohif:core';
-import { exportROIs } from './lib/IO/export.js';
-import { importROIs } from './lib/IO/import.js';
+import exportROIs from './lib/IO/exportROIs.js';
+import importROIs from './lib/IO/importROIs.js';
 import exportMask from './lib/IO/exportMask.js';
 import importMask from './lib/IO/importMask.js';
 

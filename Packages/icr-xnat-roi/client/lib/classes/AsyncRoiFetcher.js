@@ -228,6 +228,13 @@ export class AsyncRoiFetcher {
     const item = collectionInfoJSON.items[0];
     const children = item.children;
 
+    const collectionType = item.data_fields.collectionType;
+
+    if (!this._isValidCollectionType(collectionType)) {
+      return false;
+    }
+
+
     // Check collection isn't already imported.
     const roiCollectionLabel = item.data_fields.label;
 
@@ -255,6 +262,24 @@ export class AsyncRoiFetcher {
     }
 
     return false;
+  }
+
+
+  /**
+   * _isValidCollectionType - Returns true if the collection is a contour type.
+   *
+   * @param  {type} collectionType description
+   * @return {type}                description
+   */
+  _isValidCollectionType (collectionType) {
+    const validTypes = [
+      'RTSTRUCT',
+      'AIM'
+    ];
+
+    return validTypes.some(type =>
+      type === collectionType
+    );
   }
 
 
