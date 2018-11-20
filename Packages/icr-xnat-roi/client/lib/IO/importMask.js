@@ -2,6 +2,7 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { DICOMSEGReader } from '../classes/DICOMSEGReader.js';
+import { AsyncMaskFetcher } from '../classes/AsyncMaskFetcher.js';
 
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
@@ -12,13 +13,15 @@ import { DICOMSEGReader } from '../classes/DICOMSEGReader.js';
 export default async function () {
   console.log('importMask');
 
-  const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
-  const seriesInstanceUid = seriesInfo.seriesInstanceUid;
+  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+  const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
+  asyncMaskFetcher.fetchMasks();
 
   // TODO -> Call XNAT to get masks!
   // TODO -> Different paths for NIFTI/DICOM.
   // TEMP -> Grab a local file.
-
+  /*
   console.log('fetching DICOM-SEG...');
   const startFetch = performance.now();
   let dicomSegArrayBuffer = await getTestFileFromLocalStorage();
@@ -50,6 +53,7 @@ export default async function () {
     stackToolState,
     dimensions
   );
+  */
 }
 
 

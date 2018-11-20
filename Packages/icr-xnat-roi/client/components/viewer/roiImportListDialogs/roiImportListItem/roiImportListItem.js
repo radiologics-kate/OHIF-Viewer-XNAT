@@ -9,18 +9,13 @@ Template.roiImportListItem.helpers({
 
     return data.collectionInfo.name;
   },
+  /*
   label: () => {
     const instance = Template.instance();
     const data = instance.data;
 
     return data.collectionInfo.label;
-  },
-  label: () => {
-    const instance = Template.instance();
-    const data = instance.data;
-
-    return data.collectionInfo.label;
-  },
+  },*/
   collectionType: () => {
     const instance = Template.instance();
     const data = instance.data;

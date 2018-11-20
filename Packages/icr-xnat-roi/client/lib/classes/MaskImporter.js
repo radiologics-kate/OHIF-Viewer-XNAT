@@ -1,21 +1,67 @@
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
+import { DICOMSEGReader } from './DICOMSEGReader.js';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+
+const brushModule = cornerstoneTools.store.modules.brush;
 
 
 export class MaskImporter {
 
-  constructor (stackToolState, dimensions) {
+  constructor () {
+    // Get stackToolState // TODO -> Make this into a function somewhere else as
+    // Both import and export use it.
+    //
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const element = activeEnabledElement.element;
+    const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+    const imageIds = stackToolState.data[0].imageIds;
+    const image = cornerstone.getImage(element);
+
+    const dimensions = {
+      rows: image.rows,
+      columns: image.columns,
+      slices: imageIds.length
+    };
+
+    dimensions.sliceLength = dimensions.rows * dimensions.columns;
+    dimensions.cube = dimensions.sliceLength * dimensions.slices;
+
     this._stackToolState = stackToolState;
     this._dimensions = dimensions;
+    this._seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
 
     const colorMapId = cornerstoneTools.store.modules.brush.state.colorMapId;
     const colormap = cornerstone.colors.getColormap(colorMapId);
+
     this._numberOfColors = colormap.getNumberOfColors();
+
   }
 
-  import (masks) {
+  importDICOMSEG (dicomSegArrayBuffer, collectionName, collectionLabel) {
+    // Clear previous Mask metadata.
+    for (let i = 0; i < this._numberOfColors; i++) {
+      brushModule.setters.metadata(
+        this._seriesInfo.seriesInstanceUid,
+        i,
+        undefined
+      );
+    }
+
+    const dicomSegReader = new DICOMSEGReader(this._seriesInfo);
+
+    const masks = dicomSegReader.read(
+      dicomSegArrayBuffer,
+      this._stackToolState,
+      this._dimensions
+    );
+
+    this._import(masks)
+  }
+
+  _import (masks) {
     const stackToolState = this._stackToolState;
     const dimensions = this._dimensions;
     const sliceLength = dimensions.sliceLength;

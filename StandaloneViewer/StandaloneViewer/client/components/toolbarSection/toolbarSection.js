@@ -96,6 +96,13 @@ Template.toolbarSection.helpers({
         });
 
         extraTools.push({
+          id: 'showHelp',
+          title: 'Help',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-question'
+        });
+
+        extraTools.push({
             id: 'invert',
             title: 'Invert',
             classes: 'imageViewerCommand',
@@ -223,18 +230,18 @@ Template.toolbarSection.helpers({
           }
         ];
 
-        const freehandIO = [
+        const exportMenu = [
           {
             id: 'exportROIs',
-            title: 'Export ROIs',
+            title: 'ROIs',
             classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export'
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
           },
           {
-            id: 'importROIs',
-            title: 'Import ROIs',
+            id: 'exportMask',
+            title: 'Masks',
             classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
           }/*,
           {
             id: 'toggleDownloadDialog',
@@ -242,6 +249,21 @@ Template.toolbarSection.helpers({
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-camera'
           }*/
+        ];
+
+        const importMenu = [
+          {
+            id: 'importROIs',
+            title: 'ROIs',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
+          },
+          {
+            id: 'importMask',
+            title: 'Masks',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
+          }
         ];
 
         buttonData.push({
@@ -264,18 +286,6 @@ Template.toolbarSection.helpers({
             title: 'Seg Management',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-seg-management-menu'
-          },
-          {
-            id: 'exportMask',
-            title: 'Dev Export',
-            classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-question'
-          },
-          {
-            id: 'importMask',
-            title: 'Dev Import',
-            classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-question'
           }
         ];
 
@@ -344,11 +354,19 @@ Template.toolbarSection.helpers({
         });
 
         buttonData.push({
-          id: 'freehandIO',
-          title: 'XNAT',
+          id: 'importMenu',
+          title: 'Import',
           classes: 'rp-x-1 rm-l-3',
-          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-logo',
-          subTools: freehandIO
+          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import',
+          subTools: importMenu
+        });
+
+        buttonData.push({
+          id: 'exportMenu',
+          title: 'Export',
+          classes: 'rp-x-1 rm-l-3',
+          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export',
+          subTools: exportMenu
         });
 
         buttonData.push({
@@ -357,14 +375,6 @@ Template.toolbarSection.helpers({
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-more',
             subTools: extraTools
-        });
-
-
-        buttonData.push({
-          id: 'showHelp',
-          title: 'Help',
-          classes: 'imageViewerCommand',
-          iconClasses: 'fa fa-question'
         });
 
         return buttonData;

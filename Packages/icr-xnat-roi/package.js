@@ -62,6 +62,28 @@ Package.onUse(function(api) {
     );
 
     api.addFiles(
+      'client/components/viewer/maskImportListDialogs/maskImportListDialogs.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/maskImportListDialogs/maskImportListDialogs.js',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/maskImportListDialogs/maskImportListDialogs.styl',
+      'client'
+    );
+
+    api.addFiles(
+      'client/components/viewer/maskImportListDialogs/maskImportListItem/maskImportListItem.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/maskImportListDialogs/maskImportListItem/maskImportListItem.js',
+      'client'
+    );
+
+    api.addFiles(
       'client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderDialogs.html',
       'client'
     );

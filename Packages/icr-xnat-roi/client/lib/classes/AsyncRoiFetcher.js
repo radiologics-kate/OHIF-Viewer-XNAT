@@ -22,6 +22,10 @@ export class AsyncRoiFetcher {
     this._roiCollectionLabel = '';
     this._dialog = $('#importVolumes');
     this._volumeManagementLabels = this._getVolumeManagementLabels();
+    this._validTypes = [
+      'AIM',
+      'RTSTRUCT'
+    ];
   }
 
   /** @private
@@ -272,12 +276,8 @@ export class AsyncRoiFetcher {
    * @return {type}                description
    */
   _isValidCollectionType (collectionType) {
-    const validTypes = [
-      'RTSTRUCT',
-      'AIM'
-    ];
 
-    return validTypes.some(type =>
+    return this._validTypes.some(type =>
       type === collectionType
     );
   }

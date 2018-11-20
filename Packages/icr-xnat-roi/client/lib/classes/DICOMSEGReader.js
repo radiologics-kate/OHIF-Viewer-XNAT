@@ -1,6 +1,6 @@
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
-import { MaskImporter } from './MaskImporter.js';
+//import { MaskImporter } from './MaskImporter.js';
 
 const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
@@ -41,7 +41,7 @@ export class DICOMSEGReader {
       const segment = segmentSequence;
       const mask = [];
 
-      this._setSegMetadata(i, segment);
+      this._setSegMetadata(segment);
 
       for (let j = 0; j < dimensions.cube; j++) {
         mask[j] = pixelData[j];
@@ -50,13 +50,18 @@ export class DICOMSEGReader {
       this._masks.push(mask);
     }
 
+    return this._masks;
+    /*
     console.log(pixelData);
 
     console.log(segmentSequence);
 
     const maskImporter = new MaskImporter(stackToolState, dimensions);
 
+    return
+
     maskImporter.import(this._masks);
+    */
   }
 
   _setSegMetadata (segIndex, metadata) {

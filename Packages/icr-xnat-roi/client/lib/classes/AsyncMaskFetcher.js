@@ -1,4 +1,4 @@
-import { RoiImporter } from './RoiImporter.js';
+import { MaskImporter } from './MaskImporter.js';
 import closeIODialog from '../IO/closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { $ } from 'meteor/jquery';
@@ -14,54 +14,27 @@ const modules = cornerstoneTools.store.modules;
  * import, and parses them using an instance of MaskImporter.
  *
  */
-export class AsyncRoiFetcher {
+export class AsyncMaskFetcher {
   constructor (seriesInstanceUid) {
     this._seriesInstanceUid = seriesInstanceUid;
-    this._roiImporter = new RoiImporter(seriesInstanceUid);
+    this._maskImporter = new MaskImporter();
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = '';
     this._dialog = $('#importVolumes');
-    this._volumeManagementLabels = this._getVolumeManagementLabels();
-  }
-
-  /** @private
-   * _getVolumeManagementLabels - Construct a list of roiCollections
-   *                               already imported.
-   *
-   * @return {string[]} An array of the labels of roiCollections already imported.
-   */
-  _getVolumeManagementLabels () {
-    const freehand3DStore = modules.freehand3D;
-    const structureSetUids = [];
-
-    const series = freehand3DStore.getters.series(this._seriesInstanceUid);
-
-    if (!series) {
-      return structureSetUids;
-    }
-
-    const structureSetCollection = series.structureSetCollection;
-
-    for (let i = 0; i < structureSetCollection.length; i++) {
-      const label = structureSetCollection[i].uid;
-
-      if (label !== 'DEFAULT') {
-        structureSetUids.push(label);
-      }
-    }
-
-    return structureSetUids;
+    this._validTypes = [
+      'SEG'
+    ];
   }
 
 
   /** @public @async
-   * fetchRois - Asynchronusly fetch and process all ROIs.
+   * fetchMasks - Asynchronusly fetch and process masks.
    */
-  async fetchRois () {
+  async fetchMasks () {
     // Open the dialog and display a loading icon whilst data is fetched.
     icrXnatRoiSession.set('importListReady', false);
-    this._roiImportListDialog = $('#roiImportListDialog');
-    this._roiImportListDialog.get(0).showModal();
+    this._maskImportListDialog = $('#maskImportListDialog');
+    this._maskImportListDialog.get(0).showModal();
 
     // Fetch list of assessors for the session.
     const sessionAssessorsUrl = `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors?format=json`;
@@ -119,38 +92,28 @@ export class AsyncRoiFetcher {
    * await user input, and download the selected roiCollections.
    */
   async _selectAndImportRois() {
-    let importMask;
+    let importMaskID;
 
     // Await user input
     try {
-      importMask = await this._awaitInputFromListUI(this._collectionInfoArray);
-      closeIODialog(this._roiImportListDialog);
+      importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
+      closeIODialog(this._maskImportListDialog);
     } catch (cancel) {
-      closeIODialog(this._roiImportListDialog);
+      closeIODialog(this._maskImportListDialog);
       return;
     }
 
-    // Grab number to parse for UI loading dialog.
-    this._numCollectionsToParse = 0;
-    for (let i = 0; i < importMask.length; i++) {
-      if (importMask[i]) {
-        this._numCollectionsToParse++;
-      }
-    }
-
-    // Exit if zero collections selected.
-    if (this._numCollectionsToParse === 0) {
+    // Only 1 to parse for masks.
+    if (importMaskID === undefined) {
       console.log('numCollectionToParse = 0');
       return;
+    } else {
+      this._numCollectionsToParse = 1;
     }
 
     this._openProgressDialog();
 
-    for (let i = 0; i < this._collectionInfoArray.length; i++) {
-      if (importMask[i]) {
-        this._getFilesFromList(this._collectionInfoArray[i]);
-      }
-    }
+    this._getFilesFromList(this._collectionInfoArray[importMaskID]);
   }
 
 
@@ -165,7 +128,7 @@ export class AsyncRoiFetcher {
 
 
   /** @private @async
-   * _awaitInputFromListUI - Awaits user input from the roiImportList UI.
+   * _awaitInputFromListUI - Awaits user input from the maskImportList UI.
    *
    * @param  {Array} importList The list of roiCollections eligible for import.
    * @return {Promise}          A promise that resolves to give a true/false
@@ -175,16 +138,36 @@ export class AsyncRoiFetcher {
     icrXnatRoiSession.set('importList', importList);
     icrXnatRoiSession.set('importListReady', true);
 
-    const dialog = this._roiImportListDialog;
+    const dialog = this._maskImportListDialog;
 
     return new Promise((resolve,reject) => {
-      const confirm = dialog.find('.roi-import-list-confirm');
-      const cancel = dialog.find('.roi-import-list-cancel');
+      const confirm = dialog.find('.mask-import-list-confirm');
+      const cancel = dialog.find('.mask-import-list-cancel');
 
       function confirmHandler () {
-        const dialogData = Blaze.getData(document.querySelector('#roiImportListDialog'));
+        const selection = document.querySelector(".mask-import-list-item-check:checked");
+        console.log(selection);
 
-        resolve(dialogData.importMask);
+        const importMaskID = selection.value;
+
+        console.log(importMaskID);
+        /*
+        let importMaskID = 0;
+
+        console.log(selections);
+
+        for (let i = 0; i < selections.length; i++) {
+          if (selections[i].checked) {
+            importMaskID = i;
+            break;
+          }
+        }
+
+        console.log(importMaskID);
+        */
+
+
+        resolve(importMaskID);
       }
 
       function cancelHandler () {
@@ -234,17 +217,8 @@ export class AsyncRoiFetcher {
       return false;
     }
 
-
     // Check collection isn't already imported.
     const roiCollectionLabel = item.data_fields.label;
-
-    const collectionAlreadyImported = this._volumeManagementLabels.some(
-      label => label === roiCollectionLabel
-    );
-
-    if (collectionAlreadyImported) {
-      return false;
-    }
 
     // Check the collection references this seriesInstanceUid.
     for (let i = 0; i < children.length; i++) {
@@ -272,12 +246,8 @@ export class AsyncRoiFetcher {
    * @return {type}                description
    */
   _isValidCollectionType (collectionType) {
-    const validTypes = [
-      'RTSTRUCT',
-      'AIM'
-    ];
 
-    return validTypes.some(type =>
+    return this._validTypes.some(type =>
       type === collectionType
     );
   }
@@ -341,18 +311,16 @@ export class AsyncRoiFetcher {
    */
   async _getAndImportFile (url, collectionInfo) {
     switch (collectionInfo.collectionType) {
-      case 'AIM':
+      case 'SEG':
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
-        const aimFile = await this._getXml(url).catch(error => console.log(error));
-        this._roiImporter.importAIMfile(aimFile, collectionInfo.name, collectionInfo.label);
-        break;
-      case 'RTSTRUCT':
-        const rtStructFile = await this._getArraybuffer(url).catch(error => console.log(error));
-        this._roiImporter.importRTStruct(rtStructFile, collectionInfo.name, collectionInfo.label);
+
+        console.log(`_getAndImportFile: Importing SEG, url: ${url}`);
+        const arrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
+        this._maskImporter.importDICOMSEG(arrayBuffer, collectionInfo.name, collectionInfo.label);
         break;
       default:
-        console.error(`asyncRoiFetcher._getAndImportFile not configured for filetype: ${fileType}.`);
+        console.error(`asyncMaskFetcher._getAndImportFile not configured for filetype: ${fileType}.`);
     }
 
     this._incrementNumCollectionsParsed();
