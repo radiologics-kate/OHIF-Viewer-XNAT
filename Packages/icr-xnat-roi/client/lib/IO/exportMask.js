@@ -58,6 +58,9 @@ async function beginExport () {
     return;
   }
 
+  const exportInProgressDialog = $('#exportVolumes');
+  exportInProgressDialog.get(0).showModal();
+
   // Get stackToolState // TODO -> Refactor this to a helper.
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
@@ -94,6 +97,14 @@ async function beginExport () {
 
     console.log('seg exporter... ready!');
 
-    dicomSegExporter.exportToXNAT();
+    dicomSegExporter.exportToXNAT().then(success => {
+      console.log('PUT successful.');
+      closeIODialog(exportInProgressDialog);
+    })
+    .catch(error => {
+      console.log(error.message);
+      closeIODialog(exportInProgressDialog);
+      displayExportFailedDialog();
+    });;
   });
 }

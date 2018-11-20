@@ -10,7 +10,7 @@ const modules = cornerstoneTools.store.modules;
  * @class AsyncRoiFetcher
  * @author JamesAPetts
  *
- * Asynchronusly fetches roiCollections, allows the user to select which to
+ * Asynchronusly fetches roiCollections that contain contours, allows the user to select which to
  * import, and parses them using an instance of RoiImporter.
  *
  */
