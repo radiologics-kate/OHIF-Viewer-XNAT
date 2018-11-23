@@ -7,12 +7,12 @@
  */
 export default function (title, body) {
   // Find components
-  const dialog = $('#ioMessage');
-  const descriptionText = dialog.find('.io-description');
-  const bodyText = dialog.find('.io-body');
+  const dialog = document.getElementById('ioMessage');
+  const descriptionText = dialog.getElementsByClassName('io-description')[0];
+  const bodyText = dialog.getElementsByClassName('io-body')[0];
 
-  descriptionText.text(title);
-  bodyText.text(body);
+  descriptionText.textContent = title;
+  bodyText.textContent = body;
 
-  dialog.get(0).showModal();
+  dialog.showModal();
 }
