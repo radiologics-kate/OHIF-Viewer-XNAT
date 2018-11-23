@@ -73,7 +73,7 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
  */
 function imageAnnotationNameInput (defaultName) {
 
-  function keyConfirmEventHandler (e) {
+  function keyConfirmEventHandler () {
     if (e.which === 13) { // If Enter is pressed accept and close the dialog
       confirmEventHandler();
     }
@@ -90,14 +90,12 @@ function imageAnnotationNameInput (defaultName) {
     resolveRef(nameText);
   }
 
-  function cancelEventHandler (e) {
+  function cancelEventHandler () {
     removeEventListners();
     resolveRef(null);
   };
 
-  function cancelClickEventHandler(e) {
-    const dialog = document.getElementById('freehandSetName');
-
+  function cancelClickEventHandler () {
     dialog.close();
 
     removeEventListners();

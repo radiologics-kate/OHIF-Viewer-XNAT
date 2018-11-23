@@ -5,7 +5,6 @@ import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { DICOMSEGWriter } from '../classes/DICOMSEGWriter.js';
 import { DICOMSEGExporter } from '../classes/DICOMSEGExporter.js';
 import { segBuilder } from './segBuilder.js';
-import closeIODialog from './closeIODialog.js';
 import getDateTimeAndLabel from '../util/getDateTimeAndLabel.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import messageDialog from '../util/messageDialog.js';
@@ -21,17 +20,13 @@ import {
  * @author JamesAPetts
  */
 export default async function () {
+  if (icrXnatRoiSession.get('writePermissions') === true) {
+    beginExport();
+    return;
+  }
 
-    // TEMP
-    //icrXnatRoiSession.set('writePermissions', true);
-
-    if (icrXnatRoiSession.get('writePermissions') === true) {
-      beginExport();
-      return;
-    }
-
-    // User does not have write access
-    displayInsufficientPermissionsDialog();
+  // User does not have write access
+  displayInsufficientPermissionsDialog();
 }
 
 async function beginExport () {
@@ -40,14 +35,10 @@ async function beginExport () {
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
   const { dateTime, label } = getDateTimeAndLabel('SEG');
 
-  const segBuilderDialog = $('#segBuilderDialog');
-  let roiCollectionName;
+  let roiCollectionName = await segBuilder(label);
 
-  try {
-    roiCollectionName = await segBuilder(segBuilderDialog, label);
-    closeIODialog(segBuilderDialog);
-  } catch (cancel) {
-    closeIODialog(segBuilderDialog);
+  if (!roiCollectionName) {
+    console.log('cancelled.')
     return;
   }
 
@@ -58,8 +49,8 @@ async function beginExport () {
     return;
   }
 
-  const exportInProgressDialog = $('#exportVolumes');
-  exportInProgressDialog.get(0).showModal();
+  const exportInProgressDialog = document.getElementById('exportVolumes');
+  exportInProgressDialog.showModal();
 
   // Get stackToolState // TODO -> Refactor this to a helper.
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
@@ -99,11 +90,11 @@ async function beginExport () {
 
     dicomSegExporter.exportToXNAT().then(success => {
       console.log('PUT successful.');
-      closeIODialog(exportInProgressDialog);
+      exportInProgressDialog.close();
     })
     .catch(error => {
       console.log(error.message);
-      closeIODialog(exportInProgressDialog);
+      exportInProgressDialog.close();
       displayExportFailedDialog();
     });;
   });

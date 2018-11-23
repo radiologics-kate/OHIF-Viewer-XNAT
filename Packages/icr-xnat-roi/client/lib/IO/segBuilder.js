@@ -10,54 +10,66 @@ import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
  * @return {Promise}            A promise which resolves to give the input
  *                              roiCollection name and a list of ROIs to export.
  */
-export function segBuilder (dialog, label) {
+export function segBuilder (label) {
 
-  return new Promise ((resolve, reject) => {
-    const confirm = dialog.find('.seg-builder-export-button');
-    const cancel = dialog.find('.seg-builder-cancel');
-    const textInput = dialog.find('.seg-builder-text-input');
-
-    textInput.val(label);
-
-    const dialogData = Blaze.getData(document.querySelector('#segBuilderDialog'));
-
-    // Trigger recalc of segData.
-    dialogData.recalcSegBuilderSegmentations.set(!dialogData.recalcSegBuilderSegmentations.get());
-
-    console.log(dialogData);
-
-    function confirmHandler () {
-      const roiCollectionName = textInput.val();
-
-      if (roiCollectionName) {
-        resolve(roiCollectionName);
-      }
+  function keyConfirmEventHandler (e) {
+    if (e.which === 13) { // If Enter is pressed accept and close the dialog
+      confirmEventHandler();
     }
+  }
 
-    function cancelHandler () {
-      reject();
-    };
+  function confirmEventHandler () {
+    const roiCollectionName = textInput.value;
 
-    dialog.off('keydown');
-    dialog.on('keydown', e => {
-      if (e.which === 13) { // If Enter is pressed accept and close the dialog
-        confirmHandler();
-      } else if (e.which === 27) { // If Esc is pressed cancel and close the dialog
-        cancelHandler();
-      }
-    });
+    if (roiCollectionName) {
+      dialog.close();
+      removeEventListners();
+      resolveRef(roiCollectionName);
+    }
+  }
 
-    confirm.off('click');
-    confirm.on('click', () => {
-      confirmHandler();
-    });
+  function cancelEventHandler () {
+    removeEventListners();
+    resolveRef(null);
+  };
 
+  function cancelClickEventHandler () {
+    dialog.close();
 
-    cancel.off('click');
-    cancel.on('click', () => {
-      cancelHandler();
-    });
+    removeEventListners();
+    resolveRef(null);
+  }
 
-    dialog.get(0).showModal();
+  function removeEventListners() {
+    dialog.removeEventListener('cancel', cancelEventHandler);
+    cancel.removeEventListener('click', cancelClickEventHandler);
+    dialog.removeEventListener('keydown', keyConfirmEventHandler);
+    confirm.removeEventListener('click', confirmEventHandler);
+  }
+
+  const dialog = document.getElementById('segBuilderDialog');
+  const confirm = dialog.getElementsByClassName('seg-builder-export-button')[0];
+  const cancel = dialog.getElementsByClassName('seg-builder-cancel')[0];
+  const textInput = dialog.getElementsByClassName('seg-builder-text-input')[0];
+
+  dialog.addEventListener('cancel', cancelEventHandler);
+  cancel.addEventListener('click', cancelClickEventHandler);
+  dialog.addEventListener('keydown', keyConfirmEventHandler);
+  confirm.addEventListener('click', confirmEventHandler);
+
+  textInput.value = label;
+
+  const dialogData = Blaze.getData(dialog);
+
+  // Trigger recalc of segData.
+  dialogData.recalcSegBuilderSegmentations.set(!dialogData.recalcSegBuilderSegmentations.get());
+
+  dialog.showModal();
+
+  // Reference to promise.resolve, so that I can use external handlers.
+  let resolveRef;
+
+  return new Promise (resolve => {
+    resolveRef = resolve;
   });
 }
