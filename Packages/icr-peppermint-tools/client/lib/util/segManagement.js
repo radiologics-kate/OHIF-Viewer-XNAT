@@ -10,16 +10,6 @@ const brushModule = cornerstoneTools.store.modules.brush;
  * @author JamesAPetts
  */
 export default async function () {
-  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-
-  // Find components
-  //const dialog = $('#segManagementDialog');
-  const dialog = document.getElementById('segManagementDialog');
-  const dialogData = Blaze.getData(dialog);
-
-  // Trigger recalc of segData.
-  dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
-
   function cancelEventHandler (e) {
     // Reset the focus to the active viewport element
     // This makes the mobile Safari keyboard close
@@ -33,7 +23,13 @@ export default async function () {
     dialog.removeEventListener('cancel', cancelEventHandler);
   }
 
-  dialog.addEventListener('cancel', cancelEventHandler);
+  // Find components
+  const dialog = document.getElementById('segManagementDialog');
 
+  // Trigger recalc of segData.
+  const dialogData = Blaze.getData(dialog);
+  dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
+
+  dialog.addEventListener('cancel', cancelEventHandler);
   dialog.showModal();
 }

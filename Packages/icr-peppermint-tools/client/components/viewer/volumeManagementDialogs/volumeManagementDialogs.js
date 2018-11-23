@@ -15,6 +15,7 @@ Template.volumeManagementDialogs.onCreated(() => {
     const instance = Template.instance();
 
     instance.data.showLocked = new ReactiveVar(false);
+    instance.data.activeSeries = new ReactiveVar('');
 });
 
 Template.volumeManagementDialogs.helpers({
@@ -30,7 +31,8 @@ Template.volumeManagementDialogs.helpers({
   },
   roiCollections: () => {
     const instance = Template.instance();
-    const seriesInstanceUid = icrXnatRoiSession.get('volumeManagementActiveSeries');
+    const seriesInstanceUid = instance.data.activeSeries.get();
+
     const structureSetCollectionData = getOrCreateStructureSetCollectionData(seriesInstanceUid);
 
     return structureSetCollectionData;
