@@ -13,28 +13,27 @@ export default async function () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   // Find components
-  const dialog = $('#segManagementDialog');
-
-  const dialogData = Blaze.getData(document.querySelector('#segManagementDialog'));
+  //const dialog = $('#segManagementDialog');
+  const dialog = document.getElementById('segManagementDialog');
+  const dialogData = Blaze.getData(dialog);
 
   // Trigger recalc of segData.
   dialogData.recalcSegmentations.set(!dialogData.recalcSegmentations.get());
 
-  function closeDialog () {
-    dialog.get(0).close();
-
+  function cancelEventHandler (e) {
     // Reset the focus to the active viewport element
     // This makes the mobile Safari keyboard close
     const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
     element.focus();
+
+    removeEventListeners();
   }
 
-  dialog.off('keydown');
-  dialog.on('keydown', e => {
-    if (e.which === 27) { // If Esc is pressed cancel and close the dialog
-      closeDialog();
-    }
-  });
+  function removeEventListeners () {
+    dialog.removeEventListener('cancel', cancelEventHandler);
+  }
 
-  dialog.get(0).showModal();
+  dialog.addEventListener('cancel', cancelEventHandler);
+
+  dialog.showModal();
 }
