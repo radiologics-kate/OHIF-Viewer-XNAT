@@ -11,18 +11,34 @@ const brushModule = cornerstoneTools.store.modules.brush;
  * @author JamesAPetts
  */
 export default async function (segIndex, label = '', type = '', modifier) {
+
+  function cancelEventListener (e) {
+    // Reset the focus to the active viewport element
+    // This makes the mobile Safari keyboard close
+    const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
+    element.focus();
+
+    e.preventDefault();
+
+    if (dialogData.returnToSegManagement) {
+      dialogData.returnToSegManagement = false;
+      segManagement();
+    }
+  }
+
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   icrXnatRoiSession.set('EditBrushMetadataIndex', segIndex);
 
-  // Find components
-  const dialog = $('#brushMetadataDialog');
+  const dialog = document.getElementById('brushMetadataDialog');
 
-  // Reset the form.
-  const brushMetadataLabelInput = dialog.find('.brush-metadata-label-input');
-  const brushMetadataTypeInput = dialog.find('.brush-metadata-type-input');
+  const brushMetadataLabelInput = dialog.getElementsByClassName('brush-metadata-label-input')[0];
+  const brushMetadataTypeInput = dialog.getElementsByClassName('brush-metadata-type-input')[0];
 
-  const dialogData = Blaze.getData(document.querySelector('#brushMetadataDialog'));
+  brushMetadataLabelInput.value = label;
+  brushMetadataTypeInput.value = type;
+
+  const dialogData = Blaze.getData(dialog);
 
   dialogData.searchQuery.set(type);
   dialogData.label.set(label);
@@ -33,35 +49,14 @@ export default async function (segIndex, label = '', type = '', modifier) {
     dialogData.returnToSegManagement = true;
   }
 
-  brushMetadataLabelInput[0].value = label;
-  brushMetadataTypeInput[0].value = type;
-
   setOptionIfModifier(modifier);
 
-  function closeDialog () {
-    dialog.get(0).close();
+  dialog.removeEventListener('cancel', cancelEventListener);
+  dialog.addEventListener('cancel', cancelEventListener);
 
-    // Reset the focus to the active viewport element
-    // This makes the mobile Safari keyboard close
-    const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
-    element.focus();
-  }
 
-  dialog.off('keydown');
-  dialog.on('keydown', e => {
-    if (e.which === 27) { // If Esc is pressed cancel and close the dialog
-      closeDialog();
-      if (dialogData.returnToSegManagement) {
-        dialogData.returnToSegManagement = false;
-        segManagement();
-      }
-    }
-  });
+  dialog.showModal();
 
-  dialog.get(0).showModal();
-
-  const firstInputField = dialog.find('.brush-segmentation-label-js');
-  firstInputField.focus();
 }
 
 function setOptionIfModifier (modifier) {

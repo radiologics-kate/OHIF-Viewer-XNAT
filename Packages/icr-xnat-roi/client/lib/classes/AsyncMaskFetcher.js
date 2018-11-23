@@ -4,7 +4,7 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { $ } from 'meteor/jquery';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
-const modules = cornerstoneTools.store.modules;
+const brushModule = cornerstoneTools.store.modules.brush;
 
 /**
  * @class AsyncMaskFetcher
@@ -21,6 +21,7 @@ export class AsyncMaskFetcher {
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = '';
     this._dialog = $('#importVolumes');
+    this._ioConfirmationDialog = $('#ioConfirmationDialog');
     this._validTypes = [
       'SEG'
     ];
@@ -92,16 +93,18 @@ export class AsyncMaskFetcher {
    * await user input, and download the selected roiCollections.
    */
   async _selectAndImportRois() {
-    let importMaskID;
-
     // Await user input
-    try {
-      importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
-      closeIODialog(this._maskImportListDialog);
-    } catch (cancel) {
-      closeIODialog(this._maskImportListDialog);
+
+    const importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
+
+    closeIODialog(this._maskImportListDialog);
+
+    if (!importMaskID) {
+      console.log('cancelled');
       return;
     }
+
+    console.log('confirmed');
 
     // Only 1 to parse for masks.
     if (importMaskID === undefined) {
@@ -134,44 +137,130 @@ export class AsyncMaskFetcher {
    * @return {Promise}          A promise that resolves to give a true/false
    *                            array describing which roiCollections to import.
    */
-  async _awaitInputFromListUI(importList) {
+  async _awaitInputFromListUI (importList) {
     icrXnatRoiSession.set('importList', importList);
     icrXnatRoiSession.set('importListReady', true);
 
     const dialog = this._maskImportListDialog;
+    const seriesInstanceUid = this._seriesInstanceUid;
+    //const ioConfirmationDialog = this._ioConfirmationDialog;
 
-    return new Promise((resolve,reject) => {
+
+    console.log(`in _awaitInputFromListUI`);
+    //console.log(`ioConfirmationDialog: ${ioConfirmationDialog}`);
+    console.log(`seriesInstanceUid: ${seriesInstanceUid}`);
+
+    return new Promise((resolve) => {
       const confirm = dialog.find('.mask-import-list-confirm');
       const cancel = dialog.find('.mask-import-list-cancel');
 
-      function confirmHandler () {
+      const confirmHandler = async () => {
         const selection = document.querySelector(".mask-import-list-item-check:checked");
-        console.log(selection);
-
         const importMaskID = selection.value;
 
-        console.log(importMaskID);
-        /*
-        let importMaskID = 0;
+        console.log(`importMaskID: ${importMaskID}`);
 
-        console.log(selections);
+        const existingData = hasExistingData();
 
-        for (let i = 0; i < selections.length; i++) {
-          if (selections[i].checked) {
-            importMaskID = i;
-            break;
+        console.log(existingData);
+
+        if (existingData) {
+          console.log('hasExistingData == true');
+
+          const accept = await this._awaitOverwriteConfirmationUI()
+            .catch(error => console.log(error.message));
+
+          closeIODialog(this._ioConfirmationDialog);
+
+          if (!accept) {
+            console.log('cancelled');
+            return;
+          }
+
+          console.log('confirmed');
+        }
+
+        resolve(importMaskID);
+      };
+
+      function hasExistingData() {
+        // Check if we either have an import (quicker to check), or we have some data.
+        let hasData = false;
+        if (brushModule.state.import && brushModule.state.import.label) {
+          hasData = true;
+        } else {
+          const metadata = brushModule.getters.metadata(seriesInstanceUid);
+          console.log(metadata);
+          if (metadata) {
+            hasData = metadata.some(data =>
+              data !== undefined
+            );
           }
         }
 
-        console.log(importMaskID);
-        */
-
-
-        resolve(importMaskID);
+        return hasData;
       }
 
       function cancelHandler () {
-        reject();
+        resolve();
+      }
+
+      // Register handlers.
+      dialog.off('keydown');
+      dialog.on('keydown', e => {
+        if (e.which === 13) { // If Enter is pressed, accept and close the dialog.
+          confirmHandler();
+        } else if (e.which === 27) { // If Esc is pressed, cancel and close the dialog.
+          cancelHandler();
+        }
+      });
+
+      confirm.off('click');
+      confirm.on('click', () => {
+        confirmHandler();
+      });
+
+
+      cancel.off('click');
+      cancel.on('click', () => {
+        cancelHandler();
+      });
+    });
+  }
+
+  /** @private @async
+   * _awaitOverwriteConfirmationUI - Awaits user input for confirmation.
+   *
+   * @return {Promise} A promise that resolves on accept and rejects on cancel.
+   */
+  async _awaitOverwriteConfirmationUI () {
+    console.log('in _awaitOverwriteConfirmationUI');
+
+    const dialog = this._ioConfirmationDialog;
+    const ioConfirmationTitle = dialog.find('.io-confirmation-title');
+    const ioConfirmationBody = dialog.find('.io-confirmation-body');
+
+    ioConfirmationTitle.html(`
+      Warning
+    `);
+
+    ioConfirmationBody.html(`
+      Loading in another mask will overwrite existing mask data. Are you sure
+      you want to do this?
+    `);
+
+    dialog.get(0).showModal();
+
+    return new Promise((resolve) => {
+      const confirm = dialog.find('.js-io-confirmation-confirm');
+      const cancel = dialog.find('.js-io-confirmation-cancel');
+
+      function confirmHandler () {
+        resolve(true);
+      }
+
+      function cancelHandler () {
+        resolve(false);
       }
 
       // Register handlers.
@@ -314,6 +403,12 @@ export class AsyncMaskFetcher {
       case 'SEG':
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
+
+        // Store that we've imported a collection.
+        brushModule.state.import = {
+          label: collectionInfo.label,
+          name: collectionInfo.name
+        };
 
         console.log(`_getAndImportFile: Importing SEG, url: ${url}`);
         const arrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
