@@ -12,18 +12,22 @@ const brushModule = cornerstoneTools.store.modules.brush;
  */
 export default async function (segIndex, label = '', type = '', modifier) {
 
-  function cancelEventListener (e) {
+  function cancelEventHandler (e) {
     // Reset the focus to the active viewport element
     // This makes the mobile Safari keyboard close
     const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
     element.focus();
 
-    e.preventDefault();
+    removeEventListeners();
 
     if (dialogData.returnToSegManagement) {
       dialogData.returnToSegManagement = false;
       segManagement();
     }
+  }
+
+  function removeEventListeners () {
+    dialog.removeEventListener('cancel', cancelEventHandler);
   }
 
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
@@ -51,12 +55,9 @@ export default async function (segIndex, label = '', type = '', modifier) {
 
   setOptionIfModifier(modifier);
 
-  dialog.removeEventListener('cancel', cancelEventListener);
-  dialog.addEventListener('cancel', cancelEventListener);
-
+  dialog.addEventListener('cancel', cancelEventHandler);
 
   dialog.showModal();
-
 }
 
 function setOptionIfModifier (modifier) {

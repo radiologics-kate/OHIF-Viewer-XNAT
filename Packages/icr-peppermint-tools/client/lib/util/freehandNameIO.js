@@ -18,6 +18,14 @@ export async function createNewVolume () {
   if (name) {
     // Create and activate new ROIContour
     const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+    //Check if default structureSet exists for this series.
+    if (!modules.freehand3D.getters.series(activeSeriesInstanceUid)) {
+      modules.freehand3D.setters.series(activeSeriesInstanceUid, )
+    }
+
+
+
     modules.freehand3D.setters.ROIContourAndSetIndexActive(activeSeriesInstanceUid, 'DEFAULT', name);
   }
 }
@@ -64,47 +72,64 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
  *                              by the user.
  */
 function imageAnnotationNameInput (defaultName) {
-  return new Promise (resolve => {
 
-    function confirmHandler () {
-      dialog.get(0).close();
-      const nameText = textInput.val();
-      resolve(nameText);
+  function keyConfirmEventHandler (e) {
+    if (e.which === 13) { // If Enter is pressed accept and close the dialog
+      confirmEventHandler();
     }
+  }
 
-    function cancelHandler () {
-      dialog.get(0).close();
-      resolve(null);
-    };
+  function confirmEventHandler () {
+    const dialog = document.getElementById('freehandSetName');
+    const textInput = dialog.getElementsByClassName('freehand-set-name-input')[0];
+    const nameText = textInput.value;
 
-    const dialog = $('#freehandSetName');
-    const textInput = dialog.find('.freehand-set-name-input');
-    const confirm = dialog.find('.freehand-set-name-confirm');
-    const cancel = dialog.find('.freehand-set-name-cancel');
+    dialog.close();
 
-    textInput.val(defaultName);
-    textInput.focus();
+    removeEventListners();
+    resolveRef(nameText);
+  }
 
-    dialog.off('keydown');
-    dialog.on('keydown', e => {
-      if (e.which === 13) { // If Enter is pressed accept and close the dialog
-        confirmHandler();
-      } else if (e.which === 27) { // If Esc is pressed cancel and close the dialog
-        cancelHandler();
-      }
-    });
+  function cancelEventHandler (e) {
+    removeEventListners();
+    resolveRef(null);
+  };
 
-    confirm.off('click');
-    confirm.on('click', () => {
-      confirmHandler();
-    });
+  function cancelClickEventHandler(e) {
+    const dialog = document.getElementById('freehandSetName');
 
+    dialog.close();
 
-    cancel.off('click');
-    cancel.on('click', () => {
-      cancelHandler();
-    });
+    removeEventListners();
+    resolveRef(null);
+  }
 
-    dialog.get(0).showModal();
+  function removeEventListners() {
+    dialog.removeEventListener('cancel', cancelEventHandler);
+    cancel.removeEventListener('click', cancelClickEventHandler);
+    dialog.removeEventListener('keydown', keyConfirmEventHandler);
+    confirm.removeEventListener('click', confirmEventHandler);
+  }
+
+  const dialog = document.getElementById('freehandSetName');
+  const textInput = dialog.getElementsByClassName('freehand-set-name-input')[0];
+  const confirm = dialog.getElementsByClassName('freehand-set-name-confirm')[0];
+  const cancel = dialog.getElementsByClassName('freehand-set-name-cancel')[0];
+
+  // Add event listeners.
+  dialog.addEventListener('cancel', cancelEventHandler);
+  cancel.addEventListener('click', cancelClickEventHandler);
+  dialog.addEventListener('keydown', keyConfirmEventHandler);
+  confirm.addEventListener('click', confirmEventHandler);
+
+  textInput.value = defaultName;
+
+  dialog.showModal();
+
+  // Reference to promise.resolve, so that I can use external handlers.
+  let resolveRef;
+
+  return new Promise (resolve => {
+    resolveRef = resolve;
   });
 }

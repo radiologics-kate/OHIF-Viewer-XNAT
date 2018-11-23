@@ -176,6 +176,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     );
 
     await setVolumeName(seriesInstanceUid, 'DEFAULT', activeROIContour.uid);
+
     // Require another click to start the roi now it is (possibly) named.
     return new Promise((resolve, reject) => {
       reject();
