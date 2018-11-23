@@ -1,7 +1,6 @@
 import { RoiImporter } from './RoiImporter.js';
 import closeIODialog from '../IO/closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { $ } from 'meteor/jquery';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 const modules = cornerstoneTools.store.modules;
@@ -20,7 +19,7 @@ export class AsyncRoiFetcher {
     this._roiImporter = new RoiImporter(seriesInstanceUid);
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = '';
-    this._dialog = $('#importVolumes');
+    this._dialog = document.getElementById('importVolumes');
     this._volumeManagementLabels = this._getVolumeManagementLabels();
     this._validTypes = [
       'AIM',
@@ -63,9 +62,12 @@ export class AsyncRoiFetcher {
    */
   async fetchRois () {
     // Open the dialog and display a loading icon whilst data is fetched.
-    icrXnatRoiSession.set('importListReady', false);
-    this._roiImportListDialog = $('#roiImportListDialog');
-    this._roiImportListDialog.get(0).showModal();
+    this._roiImportListDialog = document.getElementById('roiImportListDialog');
+
+    const dialogData = Blaze.getData(this._roiImportListDialog);
+
+    dialogData.importListReady.set(false);
+    this._roiImportListDialog.showModal();
 
     // Fetch list of assessors for the session.
     const sessionAssessorsUrl = `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors?format=json`;
@@ -123,14 +125,11 @@ export class AsyncRoiFetcher {
    * await user input, and download the selected roiCollections.
    */
   async _selectAndImportRois() {
-    let importMask;
-
     // Await user input
-    try {
-      importMask = await this._awaitInputFromListUI(this._collectionInfoArray);
-      closeIODialog(this._roiImportListDialog);
-    } catch (cancel) {
-      closeIODialog(this._roiImportListDialog);
+    const importMask = await this._awaitInputFromListUI(this._collectionInfoArray);
+
+    if (!importMask) {
+      console.log('cancelled');
       return;
     }
 
@@ -164,7 +163,7 @@ export class AsyncRoiFetcher {
    */
   _openProgressDialog() {
     this._updateProgressDialog();
-    this._dialog.get(0).showModal();
+    this._dialog.showModal();
   }
 
 
@@ -176,45 +175,62 @@ export class AsyncRoiFetcher {
    *                            array describing which roiCollections to import.
    */
   async _awaitInputFromListUI(importList) {
-    icrXnatRoiSession.set('importList', importList);
-    icrXnatRoiSession.set('importListReady', true);
+
+    function keyConfirmEventHandler (e) {
+      console.log('keyConfirmEventHandler');
+
+      if (e.which === 13) { // If Enter is pressed accept and close the dialog
+        confirmEventHandler();
+      }
+    }
+
+    function confirmEventHandler () {
+      const dialogData = Blaze.getData(document.querySelector('#roiImportListDialog'));
+
+      dialog.close();
+
+      removeEventListeners();
+      resolveRef(dialogData.importMask);
+    }
+
+    function cancelEventHandler () {
+      removeEventListeners();
+      resolveRef(null);
+    }
+
+    function cancelClickEventHandler () {
+      dialog.close();
+
+      removeEventListeners();
+      resolveRef(null);
+    }
+
+    function removeEventListeners() {
+      dialog.removeEventListener('cancel', cancelEventHandler);
+      cancel.removeEventListener('click', cancelClickEventHandler);
+      dialog.removeEventListener('keydown', keyConfirmEventHandler);
+      confirm.removeEventListener('click', confirmEventHandler);
+    }
 
     const dialog = this._roiImportListDialog;
+    const confirm = dialog.getElementsByClassName('roi-import-list-confirm')[0];
+    const cancel = dialog.getElementsByClassName('roi-import-list-cancel')[0];
+    const dialogData = Blaze.getData(dialog);
 
-    return new Promise((resolve,reject) => {
-      const confirm = dialog.find('.roi-import-list-confirm');
-      const cancel = dialog.find('.roi-import-list-cancel');
+    // Add event listeners.
+    dialog.addEventListener('cancel', cancelEventHandler);
+    cancel.addEventListener('click', cancelClickEventHandler);
+    dialog.addEventListener('keydown', keyConfirmEventHandler);
+    confirm.addEventListener('click', confirmEventHandler);
 
-      function confirmHandler () {
-        const dialogData = Blaze.getData(document.querySelector('#roiImportListDialog'));
+    dialogData.importListReady.set(true);
+    dialogData.importList.set(importList);
 
-        resolve(dialogData.importMask);
-      }
+    // Reference to promise.resolve, so that I can use external handlers.
+    let resolveRef;
 
-      function cancelHandler () {
-        reject();
-      }
-
-      // Register handlers.
-      dialog.off('keydown');
-      dialog.on('keydown', e => {
-        if (e.which === 13) { // If Enter is pressed, accept and close the dialog.
-          confirmHandler();
-        } else if (e.which === 27) { // If Esc is pressed, cancel and close the dialog.
-          cancelHandler();
-        }
-      });
-
-      confirm.off('click');
-      confirm.on('click', () => {
-        confirmHandler();
-      });
-
-
-      cancel.off('click');
-      cancel.on('click', () => {
-        cancelHandler();
-      });
+    return new Promise(resolve => {
+      resolveRef = resolve;
     });
   }
 
@@ -371,7 +387,7 @@ export class AsyncRoiFetcher {
     this._updateProgressDialog();
 
     if (this._numCollectionsParsed === this._numCollectionsToParse) {
-      closeIODialog(this._dialog);
+      this._dialog.close();
     }
   }
 

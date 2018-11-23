@@ -14,16 +14,21 @@ Template.roiImportListDialogs.onCreated(() => {
     const instance = Template.instance();
 
     instance.data.selectAll = new ReactiveVar(true);
+    instance.data.importListReady = new ReactiveVar(false);
+    instance.data.importList = new ReactiveVar([]);
     instance.data.importMask = [];
+
 });
 
 Template.roiImportListDialogs.helpers({
   importListReady: () => {
-    return icrXnatRoiSession.get('importListReady');
+    const instance = Template.instance();
+
+    return instance.data.importListReady.get();
   },
   listHasData: () => {
     const instance = Template.instance();
-    const importList = icrXnatRoiSession.get('importList');
+    const importList = instance.data.importList.get();
 
     if (importList.length > 0) {
       return true;
@@ -45,16 +50,16 @@ Template.roiImportListDialogs.helpers({
   },
   roiCollections: () => {
     const instance = Template.instance();
-    const importList = icrXnatRoiSession.get('importList');
+    const importList = instance.data.importList.get();
     const roiCollections = [];
 
     const selectAll = instance.data.selectAll.get();
 
-    if (!importList) {
-      return []; // Blank array, i.e. no list items.
-    }
-
     instance.data.importMask = [];
+
+    if (!importList) {
+      return roiCollections; // Blank array, i.e. no list items.
+    }
 
     for (let i = 0; i < importList.length; i++) {
       roiCollections.push({
