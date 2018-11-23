@@ -1,5 +1,4 @@
 import { MaskImporter } from './MaskImporter.js';
-import closeIODialog from '../IO/closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { $ } from 'meteor/jquery';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
@@ -20,8 +19,8 @@ export class AsyncMaskFetcher {
     this._maskImporter = new MaskImporter();
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = '';
-    this._dialog = $('#importVolumes');
-    this._ioConfirmationDialog = $('#ioConfirmationDialog');
+    this._dialog = document.getElementById('importVolumes');
+    this._ioConfirmationDialog = document.getElementById('ioConfirmationDialog');
     this._validTypes = [
       'SEG'
     ];
@@ -33,9 +32,12 @@ export class AsyncMaskFetcher {
    */
   async fetchMasks () {
     // Open the dialog and display a loading icon whilst data is fetched.
-    icrXnatRoiSession.set('importListReady', false);
-    this._maskImportListDialog = $('#maskImportListDialog');
-    this._maskImportListDialog.get(0).showModal();
+    this._maskImportListDialog = document.getElementById('maskImportListDialog');
+
+    const dialogData = Blaze.getData(this._maskImportListDialog);
+
+    dialogData.maskImportListReady.set(false);
+    this._maskImportListDialog.showModal();
 
     // Fetch list of assessors for the session.
     const sessionAssessorsUrl = `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors?format=json`;
@@ -93,14 +95,46 @@ export class AsyncMaskFetcher {
    * await user input, and download the selected roiCollections.
    */
   async _selectAndImportRois() {
+
+    const dialog = this._maskImportListDialog;
+    const dialogData = Blaze.getData(dialog);
+
+    dialogData.maskImportList.set(this._collectionInfoArray);
+    dialogData.maskImportListReady.set(true);
+
+    let importMaskID;
+    let confirmed = false;
+
     // Await user input
+    while (!confirmed) {
+      importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
 
-    const importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
+      if (importMaskID === undefined) {
+        console.log(`confirmed: ${confirmed} kinda.. well cancelled.`);
+        confirmed = true;
+      } else {
+        const hasExistingData = this._hasExistingMaskData();
 
-    closeIODialog(this._maskImportListDialog);
+        console.log(hasExistingData);
 
-    if (!importMaskID) {
+        if (hasExistingData) {
+          console.log('Check confirmation first!');
+
+          confirmed = await this._awaitOverwriteConfirmationUI();
+          console.log(`confirmed: ${confirmed}`);
+        } else {
+          confirmed = true;
+          console.log(`confirmed: ${confirmed}`);
+        }
+      }
+
+    }
+
+    dialog.close();
+
+    if (importMaskID === undefined) {
       console.log('cancelled');
+
       return;
     }
 
@@ -126,7 +160,7 @@ export class AsyncMaskFetcher {
    */
   _openProgressDialog() {
     this._updateProgressDialog();
-    this._dialog.get(0).showModal();
+    this._dialog.showModal();
   }
 
 
@@ -138,94 +172,88 @@ export class AsyncMaskFetcher {
    *                            array describing which roiCollections to import.
    */
   async _awaitInputFromListUI (importList) {
-    icrXnatRoiSession.set('importList', importList);
-    icrXnatRoiSession.set('importListReady', true);
+
+    function keyConfirmEventHandler (e) {
+      console.log('keyConfirmEventHandler');
+
+      if (e.which === 13) { // If Enter is pressed accept and close the dialog
+        confirmEventHandler();
+      }
+    }
+
+    function confirmEventHandler () {
+      const selection = document.querySelector(".mask-import-list-item-check:checked");
+      const importMaskID = selection.value;
+
+      console.log(`importMaskID: ${importMaskID}`);
+
+      removeEventListeners();
+      resolveRef(importMaskID);
+    };
+
+    function cancelEventHandler (e) {
+      console.log('prevent default escape.');
+
+      e.preventDefault();
+
+      removeEventListeners();
+      resolveRef();
+    }
+
+    function cancelClickEventHandler () {
+      removeEventListeners();
+      resolveRef();
+    }
+
+    function removeEventListeners() {
+      dialog.removeEventListener('cancel', cancelEventHandler);
+      cancel.removeEventListener('click', cancelClickEventHandler);
+      dialog.removeEventListener('keydown', keyConfirmEventHandler);
+      confirm.removeEventListener('click', confirmEventHandler);
+    }
 
     const dialog = this._maskImportListDialog;
-    const seriesInstanceUid = this._seriesInstanceUid;
-    //const ioConfirmationDialog = this._ioConfirmationDialog;
+    const confirm = dialog.getElementsByClassName('mask-import-list-confirm')[0];
+    const cancel = dialog.getElementsByClassName('mask-import-list-cancel')[0];
 
+    dialog.addEventListener('cancel', cancelEventHandler);
+    cancel.addEventListener('click', cancelClickEventHandler);
+    dialog.addEventListener('keydown', keyConfirmEventHandler);
+    confirm.addEventListener('click', confirmEventHandler);
 
-    console.log(`in _awaitInputFromListUI`);
-    //console.log(`ioConfirmationDialog: ${ioConfirmationDialog}`);
-    console.log(`seriesInstanceUid: ${seriesInstanceUid}`);
+    // Reference to promise.resolve, so that I can use external handlers.
+    let resolveRef;
 
-    return new Promise((resolve) => {
-      const confirm = dialog.find('.mask-import-list-confirm');
-      const cancel = dialog.find('.mask-import-list-cancel');
-
-      const confirmHandler = async () => {
-        const selection = document.querySelector(".mask-import-list-item-check:checked");
-        const importMaskID = selection.value;
-
-        console.log(`importMaskID: ${importMaskID}`);
-
-        const existingData = hasExistingData();
-
-        console.log(existingData);
-
-        if (existingData) {
-          console.log('hasExistingData == true');
-
-          const accept = await this._awaitOverwriteConfirmationUI()
-            .catch(error => console.log(error.message));
-
-          closeIODialog(this._ioConfirmationDialog);
-
-          if (!accept) {
-            console.log('cancelled');
-            return;
-          }
-
-          console.log('confirmed');
-        }
-
-        resolve(importMaskID);
-      };
-
-      function hasExistingData() {
-        // Check if we either have an import (quicker to check), or we have some data.
-        let hasData = false;
-        if (brushModule.state.import && brushModule.state.import.label) {
-          hasData = true;
-        } else {
-          const metadata = brushModule.getters.metadata(seriesInstanceUid);
-          console.log(metadata);
-          if (metadata) {
-            hasData = metadata.some(data =>
-              data !== undefined
-            );
-          }
-        }
-
-        return hasData;
-      }
-
-      function cancelHandler () {
-        resolve();
-      }
-
-      // Register handlers.
-      dialog.off('keydown');
-      dialog.on('keydown', e => {
-        if (e.which === 13) { // If Enter is pressed, accept and close the dialog.
-          confirmHandler();
-        } else if (e.which === 27) { // If Esc is pressed, cancel and close the dialog.
-          cancelHandler();
-        }
-      });
-
-      confirm.off('click');
-      confirm.on('click', () => {
-        confirmHandler();
-      });
-
-
-      cancel.off('click');
-      cancel.on('click', () => {
-        cancelHandler();
-      });
+    return new Promise(resolve => {
+      resolveRef = resolve;
     });
+  }
+
+
+  /**
+   * _hasExistingMaskData - Check if we either have an import
+   *                        (quicker to check), or we have some data.
+   *
+   * @return {boolean}  Whether mask data exists.
+   */
+  _hasExistingMaskData() {
+    let hasData = false;
+    if (brushModule.state.import && brushModule.state.import.label) {
+      hasData = true;
+    } else {
+      const metadata = brushModule.state.segmentationMetadata[this._seriesInstanceUid];
+
+      //const metadata = brushModule.getters.metadata(this._seriesInstanceUid);
+      console.log('metadata:');
+      console.log(metadata);
+      if (metadata) {
+        hasData = metadata.some(data =>
+          data !== undefined
+        );
+      }
+    }
+
+    return hasData;
   }
 
   /** @private @async
@@ -234,55 +262,72 @@ export class AsyncMaskFetcher {
    * @return {Promise} A promise that resolves on accept and rejects on cancel.
    */
   async _awaitOverwriteConfirmationUI () {
+
+    function keyConfirmEventHandler (e) {
+      console.log('keyConfirmEventHandler');
+
+      if (e.which === 13) { // If Enter is pressed accept and close the dialog
+        confirmEventHandler();
+      }
+    }
+
+    function confirmEventHandler () {
+      dialog.close();
+
+      removeEventListeners();
+      resolveRef(true);
+    }
+
+    function cancelEventHandler () {
+      resolveRef(false);
+    }
+
+    function cancelClickEventHandler () {
+      dialog.close();
+
+      removeEventListeners();
+      resolveRef(null);
+    }
+
+    function removeEventListeners() {
+      dialog.removeEventListener('cancel', cancelEventHandler);
+      cancel.removeEventListener('click', cancelClickEventHandler);
+      dialog.removeEventListener('keydown', keyConfirmEventHandler);
+      confirm.removeEventListener('click', confirmEventHandler);
+    }
+
     console.log('in _awaitOverwriteConfirmationUI');
 
     const dialog = this._ioConfirmationDialog;
-    const ioConfirmationTitle = dialog.find('.io-confirmation-title');
-    const ioConfirmationBody = dialog.find('.io-confirmation-body');
+    const ioConfirmationTitle = dialog.getElementsByClassName('io-confirmation-title')[0];
+    const ioConfirmationBody = dialog.getElementsByClassName('io-confirmation-body')[0];
+    const confirm = dialog.getElementsByClassName('js-io-confirmation-confirm')[0];
+    const cancel = dialog.getElementsByClassName('js-io-confirmation-cancel')[0];
 
-    ioConfirmationTitle.html(`
+    // Add event listeners.
+    dialog.addEventListener('cancel', cancelEventHandler);
+    cancel.addEventListener('click', cancelClickEventHandler);
+    dialog.addEventListener('keydown', keyConfirmEventHandler);
+    confirm.addEventListener('click', confirmEventHandler);
+
+    console.log(ioConfirmationTitle);
+
+    ioConfirmationTitle.textContent = `
       Warning
-    `);
+    `;
 
-    ioConfirmationBody.html(`
-      Loading in another mask will overwrite existing mask data. Are you sure
+    ioConfirmationBody.textContent = `
+      Loading in another ROICollection will overwrite existing mask data. Are you sure
       you want to do this?
-    `);
+    `;
 
-    dialog.get(0).showModal();
+    dialog.showModal();
 
-    return new Promise((resolve) => {
-      const confirm = dialog.find('.js-io-confirmation-confirm');
-      const cancel = dialog.find('.js-io-confirmation-cancel');
+    // Reference to promise.resolve, so that I can use external handlers.
+    let resolveRef;
 
-      function confirmHandler () {
-        resolve(true);
-      }
-
-      function cancelHandler () {
-        resolve(false);
-      }
-
-      // Register handlers.
-      dialog.off('keydown');
-      dialog.on('keydown', e => {
-        if (e.which === 13) { // If Enter is pressed, accept and close the dialog.
-          confirmHandler();
-        } else if (e.which === 27) { // If Esc is pressed, cancel and close the dialog.
-          cancelHandler();
-        }
-      });
-
-      confirm.off('click');
-      confirm.on('click', () => {
-        confirmHandler();
-      });
-
-
-      cancel.off('click');
-      cancel.on('click', () => {
-        cancelHandler();
-      });
+    return new Promise(resolve => {
+      resolveRef = resolve;
     });
   }
 
@@ -434,7 +479,7 @@ export class AsyncMaskFetcher {
     this._updateProgressDialog();
 
     if (this._numCollectionsParsed === this._numCollectionsToParse) {
-      closeIODialog(this._dialog);
+      this._dialog.close();
     }
   }
 

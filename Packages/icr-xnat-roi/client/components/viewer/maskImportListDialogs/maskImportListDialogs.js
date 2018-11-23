@@ -1,5 +1,3 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-
 Template.maskImportListDialogs.onRendered(() => {
     const instance = Template.instance();
     const id = 'maskImportListDialog';
@@ -12,15 +10,20 @@ Template.maskImportListDialogs.onRendered(() => {
 
 Template.maskImportListDialogs.onCreated(() => {
     const instance = Template.instance();
+
+    instance.data.maskImportListReady = new ReactiveVar(false);
+    instance.data.maskImportList = new ReactiveVar([]);
 });
 
 Template.maskImportListDialogs.helpers({
   importListReady: () => {
-    return icrXnatRoiSession.get('importListReady');
+    const instance = Template.instance();
+
+    return instance.data.maskImportListReady.get();
   },
   listHasData: () => {
     const instance = Template.instance();
-    const importList = icrXnatRoiSession.get('importList');
+    const importList = instance.data.maskImportList.get();
 
     if (importList.length > 0) {
       return true;
@@ -30,7 +33,7 @@ Template.maskImportListDialogs.helpers({
   },
   roiCollections: () => {
     const instance = Template.instance();
-    const importList = icrXnatRoiSession.get('importList');
+    const importList = instance.data.maskImportList.get();
     const roiCollections = [];
 
     const selectAll = instance.data.selectAll.get();
