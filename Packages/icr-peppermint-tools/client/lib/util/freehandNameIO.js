@@ -73,7 +73,7 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
  */
 function imageAnnotationNameInput (defaultName) {
 
-  function keyConfirmEventHandler () {
+  function keyConfirmEventHandler (e) {
     if (e.which === 13) { // If Enter is pressed accept and close the dialog
       confirmEventHandler();
     }

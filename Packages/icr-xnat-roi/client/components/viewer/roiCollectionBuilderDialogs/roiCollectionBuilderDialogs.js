@@ -1,4 +1,3 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { createNewVolume } from 'meteor/icr:peppermint-tools';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
@@ -12,6 +11,12 @@ Template.roiCollectionBuilderDialogs.onRendered(() => {
     instance.data.dialog = dialog;
 
     dialogPolyfill.registerDialog(dialog.get(0));
+});
+
+Template.roiCollectionBuilderDialogs.onCreated(() => {
+  const instance = Template.instance();
+
+  instance.data.roiCollectionBuilderActiveSeries = new ReactiveVar();
 });
 
 Template.roiCollectionBuilderDialogs.onCreated(() => {
@@ -62,9 +67,6 @@ Template.roiCollectionBuilderDialogs.onCreated(() => {
 });
 
 Template.roiCollectionBuilderDialogs.helpers({
-  roiCollectionName: () => {
-    return icrXnatRoiSession.get('defaultRoiCollectionName');
-  },
   selectAllChecked: () => {
     const instance = Template.instance();
     const selectAll = instance.data.selectAll.get();
@@ -77,7 +79,10 @@ Template.roiCollectionBuilderDialogs.helpers({
   },
   regions: () => {
     const instance = Template.instance();
-    const seriesInstanceUid = icrXnatRoiSession.get('roiCollectionBuilderActiveSeries');
+
+    console.log('regions recalc roiCollectionBuilder');
+
+    const seriesInstanceUid = instance.data.roiCollectionBuilderActiveSeries.get();
 
     // Reset the export Array
     instance.data.exportMask = [];

@@ -7,7 +7,6 @@ import { RoiExtractor } from '../classes/RoiExtractor.js';
 import { AIMExporter } from '../classes/AIMExporter.js';
 import { roiCollectionBuilder } from './roiCollectionBuilder.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import closeIODialog from './closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import messageDialog from '../util/messageDialog.js';
 import {
@@ -26,6 +25,9 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  * @author JamesAPetts
  */
 export default async function () {
+
+  // TEMP
+  icrXnatRoiSession.set('writePermissions', true);
 
   if (icrXnatRoiSession.get('writePermissions') === true) {
     beginExport();
@@ -55,25 +57,18 @@ async function beginExport () {
   }
 
   // Allow the user to choose which ROIs to export.
-  icrXnatRoiSession.set('defaultRoiCollectionName', label);
+  const result = await roiCollectionBuilder(label);
 
-  const roiCollectionBuilderDialog = $('#roiCollectionBuilderDialog');
-  let roiCollectionName;
-  let exportMask;
-
-  try {
-    const result = await roiCollectionBuilder(roiCollectionBuilderDialog);
-    roiCollectionName = result.roiCollectionName;
-    exportMask = result.exportMask;
-    closeIODialog(roiCollectionBuilderDialog);
-  } catch (cancel) {
-    closeIODialog(roiCollectionBuilderDialog);
+  if (!result) {
+    console.log('cancelled');
     return;
   }
 
+  const { roiCollectionName, exportMask } = result;
+
   // Generate AIM file from the selected ROIs.
-  const exportInProgressDialog = $('#exportVolumes');
-  exportInProgressDialog.get(0).showModal();
+  const exportInProgressDialog = document.getElementById('exportVolumes');
+  exportInProgressDialog.showModal();
 
   const volumes = roiExtractor.extractVolumes(exportMask);
 
@@ -91,11 +86,11 @@ async function beginExport () {
         roiCollectionName,
         label
       );
-      closeIODialog(exportInProgressDialog);
+      exportInProgressDialog.close();
     })
     .catch(error => {
       console.log(error.message);
-      closeIODialog(exportInProgressDialog);
+      exportInProgressDialog.close();
       displayExportFailedDialog();
   });
 }

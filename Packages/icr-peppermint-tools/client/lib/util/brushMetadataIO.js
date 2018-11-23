@@ -12,7 +12,7 @@ const brushModule = cornerstoneTools.store.modules.brush;
  */
 export default async function (segIndex, label = '', type = '', modifier) {
 
-  function cancelEventHandler (e) {
+  function cancelEventHandler () {
     // Reset the focus to the active viewport element
     // This makes the mobile Safari keyboard close
     const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
