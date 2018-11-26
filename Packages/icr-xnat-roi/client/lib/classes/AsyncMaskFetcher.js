@@ -279,6 +279,7 @@ export class AsyncMaskFetcher {
     }
 
     function cancelEventHandler () {
+      removeEventListeners();
       resolveRef(false);
     }
 
