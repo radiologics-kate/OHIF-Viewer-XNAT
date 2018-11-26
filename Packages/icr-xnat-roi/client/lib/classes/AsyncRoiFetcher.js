@@ -2,6 +2,7 @@ import { RoiImporter } from './RoiImporter.js';
 import closeIODialog from '../IO/closeIODialog.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { AsyncFetcher } from './AsyncFetcher.js';
 
 const modules = cornerstoneTools.store.modules;
 
@@ -13,18 +14,18 @@ const modules = cornerstoneTools.store.modules;
  * import, and parses them using an instance of RoiImporter.
  *
  */
-export class AsyncRoiFetcher {
+export class AsyncRoiFetcher extends AsyncFetcher {
   constructor (seriesInstanceUid) {
-    this._seriesInstanceUid = seriesInstanceUid;
+    super(
+      seriesInstanceUid,
+      validTypes = [
+        'AIM',
+        'RTSTRUCT'
+      ]
+    );
+
     this._roiImporter = new RoiImporter(seriesInstanceUid);
-    this._numCollectionsParsed = 0;
-    this._roiCollectionLabel = '';
-    this._dialog = document.getElementById('importVolumes');
     this._volumeManagementLabels = this._getVolumeManagementLabels();
-    this._validTypes = [
-      'AIM',
-      'RTSTRUCT'
-    ];
   }
 
   /** @private
@@ -56,11 +57,7 @@ export class AsyncRoiFetcher {
     return structureSetUids;
   }
 
-
-  /** @public @async
-   * fetchRois - Asynchronusly fetch and process all ROIs.
-   */
-  async fetchRois () {
+  _openImportListDialog() {
     // Open the dialog and display a loading icon whilst data is fetched.
     this._roiImportListDialog = document.getElementById('roiImportListDialog');
 
@@ -68,56 +65,6 @@ export class AsyncRoiFetcher {
 
     dialogData.importListReady.set(false);
     this._roiImportListDialog.showModal();
-
-    // Fetch list of assessors for the session.
-    const sessionAssessorsUrl = `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors?format=json`;
-    const sessionAssessorList = await this._getJson(sessionAssessorsUrl).catch(error => console.log(error));
-
-    // Filter roiCollections from assessor list.
-    const assessorList = sessionAssessorList.ResultSet.Result;
-    const roiCollectionList = this._filterRoiCollections(assessorList);
-
-    // Initialise an array of collectionInfo to build up the list.
-    this._collectionInfoArray = [];
-    this._roiCollectionsToCheck = roiCollectionList.length;
-
-    // If no ROICollections at all, load list dialog immediately.
-    if (this._roiCollectionsToCheck=== 0) {
-      this._selectAndImportRois();
-    }
-
-    // Get each roicollection
-    for (let i = 0; i < roiCollectionList.length; i++) {
-      const roiCollectionId = roiCollectionList[i].ID;
-      const getCollectionUrl = `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors/${roiCollectionId}?format=json`;
-
-      this._addCollectionToListIfCanImport(getCollectionUrl, roiCollectionId);
-    }
-  }
-
-
-  /** @private @async
-   * _addCollectionToListIfCanImport - Fetches the requested collectionInfo,
-   * and adds it to the _collectionInfoArray if the collection references the
-   * active series and has not already been imported.
-   *
-   * @param  {String} getCollectionUrl The REST URL to GET the collectionInfo.
-   * @param  {type} roiCollectionId  The ID of the roiCollection.
-   */
-  async _addCollectionToListIfCanImport (getCollectionUrl, roiCollectionId) {
-    const collectionInfoJSON = await this._getJson(getCollectionUrl).catch(error => console.log(error));
-
-    if (this._collectionEligibleForImport(collectionInfoJSON)) {
-      const collectionInfo = this._getCollectionInfo(roiCollectionId, collectionInfoJSON);
-
-      this._collectionInfoArray.push(collectionInfo);
-    }
-
-    this._roiCollectionsToCheck--;
-
-    if (this._roiCollectionsToCheck === 0) {
-      this._selectAndImportRois();
-    }
   }
 
   /** @private @async
@@ -155,17 +102,6 @@ export class AsyncRoiFetcher {
       }
     }
   }
-
-
-  /** @private
-   * _openProgressDialog - Opens the progress dialog.
-   *
-   */
-  _openProgressDialog() {
-    this._updateProgressDialog();
-    this._dialog.showModal();
-  }
-
 
   /** @private @async
    * _awaitInputFromListUI - Awaits user input from the roiImportList UI.
@@ -254,7 +190,6 @@ export class AsyncRoiFetcher {
       return false;
     }
 
-
     // Check collection isn't already imported.
     const roiCollectionLabel = item.data_fields.label;
 
@@ -285,68 +220,6 @@ export class AsyncRoiFetcher {
   }
 
 
-  /**
-   * _isValidCollectionType - Returns true if the collection is a contour type.
-   *
-   * @param  {type} collectionType description
-   * @return {type}                description
-   */
-  _isValidCollectionType (collectionType) {
-
-    return this._validTypes.some(type =>
-      type === collectionType
-    );
-  }
-
-
-  /**
-   * _getCollectionInfo - Constructs a collectionInfo object from the supplied
-   *                      collectionInfoJSON.
-   *
-   * @param  {Object} collectionInfoJSON  The POJO created from the JSON
-   *                                      retrieved via REST.
-   * @return {Object}                     The collectionInfo.
-   */
-  _getCollectionInfo (roiCollectionId, collectionInfoJSON) {
-    const data_fields = collectionInfoJSON.items[0].data_fields;
-
-    return {
-      collectionType: data_fields.collectionType,
-      label: data_fields.label,
-      name: data_fields.name,
-      getFilesUrl: `${Session.get('rootUrl')}/data/archive/experiments/${icrXnatRoiSession.get('experimentId')}/assessors/${roiCollectionId}/files?format=json`
-    };
-  }
-
-
-  /** @private @async
-   * _getFilesFromList - Fetches the data referenced by the collectionInfo.
-   *
-   * @param  {type} collectionInfo  An object describing the roiCollection to
-   *                                import.
-   */
-  async _getFilesFromList (collectionInfo) {
-    const getFilesUrl = collectionInfo.getFilesUrl;
-    const roiList = await this._getJson(getFilesUrl).catch(error => console.log(error));
-
-    const result = roiList.ResultSet.Result;
-
-    // Reduce count if no associated file is found (nothing to import, badly deleted roiCollection).
-    if (result.length === 0) {
-      this._incrementNumCollectionsParsed();
-    }
-
-    // Retrieve each ROI from the list that has the same collectionType as the collection.
-    // In an ideal world this should always be 1, and any other resources -- if any -- are differently formated representations of the same data, but things happen.
-    for (let i = 0; i < result.length; i++ ) {
-      const fileType = result[i].collection;
-      if (fileType === collectionInfo.collectionType) {
-        const fileUrl = `${Session.get('rootUrl')}${result[i].URI}`;
-        this._getAndImportFile(fileUrl, collectionInfo);
-      }
-    }
-  }
-
   /** @private @async
    * _getAndImportFile - Imports the file from the REST url and loads it into
    *                     cornerstoneTools toolData.
@@ -372,148 +245,6 @@ export class AsyncRoiFetcher {
     }
 
     this._incrementNumCollectionsParsed();
-  }
-
-
-  /** @private
-   * _incrementNumCollectionsParsed - Increases the number of collections
-   * parsed, and closes the progress dialog if the collections have all been
-   * imported.
-   *
-   * @return {type}  description
-   */
-  _incrementNumCollectionsParsed () {
-    this._numCollectionsParsed++;
-    this._updateProgressDialog();
-
-    if (this._numCollectionsParsed === this._numCollectionsToParse) {
-      this._dialog.close();
-    }
-  }
-
-
-  /** @private
-   * _filterRoiCollections - Filters out roiCollections from an assessor list
-   * and set the number of roiCollections that need to be parsed.
-   *
-   * @param  {Array} assessors The assessor list that needs to be filtered.
-   * @return {Array}           The filtered list containing only roiCollections.
-   */
-  _filterRoiCollections (assessors) {
-    const roiCollections = [];
-
-    // Get each roicollection
-    for ( let i = 0; i < assessors.length; i++ ) {
-      if ( assessors[i].xsiType === 'icr:roiCollectionData' ) {
-        roiCollections.push(assessors[i]);
-      }
-    }
-
-    this._numCollectionsToParse = roiCollections.length;
-
-    return roiCollections;
-  }
-
-  /** @private
-   * _getJson - GETs JSON from a REST URL.
-   *
-   * @param  {String}   url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
-   */
-  _getJson (url) {
-    return this._GET_file(url, 'json');
-  }
-
-
-  /** @private
-   * _getXml - GETs XML from a REST URL.
-   *
-   * @param  {String} url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
-   */
-  _getXml (url) {
-    return this._GET_file(url, 'xml');
-  }
-
-
-  /** @private
-   * _getArraybuffer - GETs and arraybuffer from a REST URL.
-   *
-   * @param  {type} url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
-   */
-  _getArraybuffer (url) {
-    return this._GET_file(url, 'arraybuffer');
-  }
-
-
-  /** @private
-   * _GET_file - GETs a file of the requested filetype from a REST URL.
-   *
-   * @param  {String} url      The REST URL to request data from.
-   * @param  {String} fileType The requested filetype of the data.
-   * @return {Promise}         A promise that will resolve to the requested file.
-   */
-  _GET_file (url, fileType) {
-    return new Promise ((resolve,reject) => {
-      const xhr = new XMLHttpRequest();
-
-      xhr.onload = () => {
-        console.log(`Request returned, status: ${xhr.status}`);
-        if ( xhr.status === 200 ) {
-          resolve(xhr.response);
-        } else {
-          reject(xhr.response);
-        }
-      }
-
-      xhr.onerror = () => {
-        console.log(`Request returned, status: ${xhr.status}`);
-        reject(xhr.responseText);
-      }
-
-      xhr.open('GET', url);
-      this._setXhrHeaders(xhr, fileType);
-      xhr.send();
-    });
-  }
-
-  /** @private
-   * _setXhrHeaders - Sets the headers of the XMLHttpRequest based on the
-   * fileType supplied.
-   *
-   * @param  {XMLHttpRequest} xhr       The rest client.
-   * @param  {String}         fileType  The filetype being requested.
-   */
-  _setXhrHeaders (xhr, fileType) {
-    switch (fileType) {
-      case 'json':
-        xhr.responseType = 'json';
-        break;
-      case 'xml':
-        xhr.responseType = 'document';
-        break;
-      case 'arraybuffer':
-        xhr.responseType = 'arraybuffer';
-        break;
-      case null:
-        break;
-      default:
-        console.log(`XNATRESTInterface.GET_file not configured for filetype: ${fileType}.`);
-    };
-  }
-
-
-  /** @private
-   * _updateProgressDialog - Updates the progress dialog.
-   *
-   */
-  _updateProgressDialog() {
-    const ioNotificationText = `Importing ROI Collection: ${this._roiCollectionLabel}...`;
-    const ioProgressText = `${this._numCollectionsParsed}/${this._numCollectionsToParse} <i class="fa fa-spin fa-circle-o-notch fa-fw">`;
-
-    document.getElementById('ioNotificationText').innerHTML = ioNotificationText;
-    document.getElementById('ioProgressText').innerHTML = ioProgressText;
   }
 
 }

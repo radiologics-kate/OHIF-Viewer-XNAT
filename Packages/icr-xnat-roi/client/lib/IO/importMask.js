@@ -16,7 +16,7 @@ export default async function () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
-  asyncMaskFetcher.fetchMasks();
+  asyncMaskFetcher.fetch();
 
   // TODO -> Call XNAT to get masks!
   // TODO -> Different paths for NIFTI/DICOM.

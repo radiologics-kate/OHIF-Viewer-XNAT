@@ -11,5 +11,5 @@ export default function () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   const asyncRoiFetcher = new AsyncRoiFetcher(seriesInstanceUid);
-  asyncRoiFetcher.fetchRois();
+  asyncRoiFetcher.fetch();
 }
