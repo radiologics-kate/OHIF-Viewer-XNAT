@@ -61,6 +61,25 @@ Template.segManagementDialogs.helpers({
 
     return segmentationData;
   },
+  roiCollectionInfo: () => {
+    const instance = Template.instance();
+
+    instance.data.recalcSegmentations.get();
+
+    const roiCollection = brushModule.state.import;
+
+    if (roiCollection && roiCollection.name) {
+      return {
+        name: roiCollection.name,
+        label: `(${roiCollection.label})`
+      };
+    };
+
+    return {
+      name: 'New SEG ROI Collection',
+      label: ''
+    };
+  },
   segmentationToDelete: () => {
     const instance = Template.instance();
     const segIndex = instance.data.segToBeDeleted.get();
@@ -137,7 +156,7 @@ Template.segManagementDialogs.events({
 
     // Delete metadata
     brushModule.setters.metadata(seriesInstanceUid, segIndex, undefined);
-    
+
     // Delete pixeldata
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;

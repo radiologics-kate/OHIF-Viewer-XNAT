@@ -35,6 +35,19 @@ export class MaskExtractor {
     };
   };
 
+  hasMasksToExtract () {
+    const metadata = modules.brush.state.segmentationMetadata[this._seriesInstanceUid];
+    let hasMasks = false;
+
+    if (metadata) {
+      hasMasks = metadata.some(data =>
+        data !== undefined
+      );
+    }
+
+    return hasMasks;
+  }
+
   extractMasks() {
     const stackToolState = cornerstoneTools.getToolState(this._element, 'stack');
     const imageIds = stackToolState.data[0].imageIds;

@@ -258,7 +258,7 @@ function moveExportedPolygonsInInstance (exportData) {
  */
 function displayNoROIsToExportDialog () {
   const title = 'Nothing to Export';
-  const body = 'There are no unlocked ROIs to export. Please refer to the ROI/Help menu for more information.';
+  const body = 'There are no unlocked ROIs to export. Please refer to the More/Help/ROI menu for more information.';
 
   messageDialog(title, body);
 }

@@ -20,6 +20,9 @@ import {
  * @author JamesAPetts
  */
 export default async function () {
+
+  icrXnatRoiSession.set('writePermissions', true);
+
   if (icrXnatRoiSession.get('writePermissions') === true) {
     beginExport();
     return;
@@ -34,6 +37,13 @@ async function beginExport () {
   const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
   const { dateTime, label } = getDateTimeAndLabel('SEG');
+
+  // Check if there are any Masks with metadata.
+  if (maskExtractor.hasMasksToExtract() === false) {
+    displayNoMasksToExportDialog();
+    return;
+  }
+
 
   let roiCollectionName = await segBuilder(label);
 
@@ -98,4 +108,16 @@ async function beginExport () {
       displayExportFailedDialog();
     });;
   });
+}
+
+/**
+ * Opens dialog to notify the user there are no ROIs eligable for export.
+ *
+ * @author JamesAPetts
+ */
+function displayNoMasksToExportDialog () {
+  const title = 'Nothing to Export';
+  const body = 'There are no Masks to export. Please refer to the More/Help/Mask menu for more information.';
+
+  messageDialog(title, body);
 }
