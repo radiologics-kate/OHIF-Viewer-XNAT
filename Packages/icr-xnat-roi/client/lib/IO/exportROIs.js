@@ -13,6 +13,7 @@ import {
   displayExportFailedDialog,
   displayInsufficientPermissionsDialog
 } from '../util/displayExportDialogs.js';
+import localBackup from './localBackup.js';
 
 const modules = cornerstoneTools.store.modules;
 const getToolState = cornerstoneTools.import('stateManagement/getToolState');
@@ -91,6 +92,7 @@ async function beginExport () {
     .catch(error => {
       console.log(error.message);
       exportInProgressDialog.close();
+      localBackup.saveBackUpForActiveSeries();
       displayExportFailedDialog();
   });
 }

@@ -9,9 +9,9 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 export function displayExportFailedDialog () {
   const title = 'Export Failed';
   const body = `Export of ROIs to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}`
-    + 'failed. This may be due a bad internet connection. The ROIs have not been locked, if you want'
-    + 'to try again. If you have a good connection to XNAT and this problem persists, please contact'
-    + 'your XNAT administrator.';
+    + ' failed. This may be due a bad internet connection. The ROIs have not been locked, if you want'
+    + ' to try again. If you have a good connection to XNAT and this problem persists, please contact'
+    + ' your XNAT administrator.';
   messageDialog(title, body);
 }
 

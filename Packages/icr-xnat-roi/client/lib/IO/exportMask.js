@@ -12,6 +12,7 @@ import {
   displayExportFailedDialog,
   displayInsufficientPermissionsDialog
 } from '../util/displayExportDialogs.js';
+import localBackup from './localBackup.js';
 
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
@@ -21,6 +22,7 @@ import {
  */
 export default async function () {
 
+  // TEMP
   icrXnatRoiSession.set('writePermissions', true);
 
   if (icrXnatRoiSession.get('writePermissions') === true) {
@@ -105,6 +107,7 @@ async function beginExport () {
     .catch(error => {
       console.log(error.message);
       exportInProgressDialog.close();
+      localBackup.saveBackUpForActiveSeries();
       displayExportFailedDialog();
     });;
   });

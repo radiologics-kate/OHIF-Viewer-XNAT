@@ -44,6 +44,8 @@ export class RoiExtractor {
 
     const toolStateManager = globalToolStateManager.saveToolState();
 
+    console.log(toolStateManager);
+
     Object.keys(toolStateManager).forEach( elementId => {
       // Only get polygons from this series
       if ( this._getSeriesInstanceUidFromImageId(elementId) === this._seriesInstanceUid ) {

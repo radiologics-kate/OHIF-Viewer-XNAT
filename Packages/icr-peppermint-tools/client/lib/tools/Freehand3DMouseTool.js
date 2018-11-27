@@ -576,6 +576,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         if (data.polyBoundingBox && (this.configuration.alwaysShowTextBox || data.active)) {
           // If the textbox has not been moved by the user, it should be displayed on the right-most
           // Side of the tool.
+
           if (!data.handles.textBox.hasMoved) {
             // Find the rightmost side of the polyBoundingBox at its vertical center, and place the textbox here
             // Note that this calculates it in image coordinates

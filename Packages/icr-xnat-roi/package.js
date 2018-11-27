@@ -201,6 +201,9 @@ Package.onUse(function(api) {
       'client'
     );
 
+    // Database
+    api.addFiles('client/lib/IO/indexedDB.js', 'client');
+
 
     api.mainModule('main.js', 'client');
 });
