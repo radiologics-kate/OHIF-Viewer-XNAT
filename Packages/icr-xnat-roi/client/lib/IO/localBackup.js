@@ -53,7 +53,10 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
   let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
 
   // Make a request to GET our newItem object to the object store
-  var request = objectStore.get(generateHashCode(seriesInstanceUid));
+  const username = window.top.username;
+  const request = objectStore.get(
+    generateHashCode(`${username}_${seriesInstanceUid}`)
+  );
 
   request.onsuccess = function() {
     if (!request.result) {
@@ -61,6 +64,8 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
     }
 
     console.log('Found backup data');
+
+    // TODO -> Prompt the user that this data has been found.
 
     const data = JSON.parse(request.result.dataDump);
 
@@ -79,6 +84,10 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
         images
       );
     }
+
+    const toolStateManager = globalToolStateManager.saveToolState();
+
+    console.log(toolStateManager);
   };
 
 
@@ -86,6 +95,8 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
 
 function loadFreehandMouseData (freehandMouseData, seriesInstanceUid, images) {
   const { metadata, toolState } = freehandMouseData;
+
+  console.log(freehandMouseData);
 
   loadFreehandMouseMetadata(metadata, seriesInstanceUid);
   loadFreehandMouseToolState(toolState, seriesInstanceUid, images);
@@ -131,13 +142,17 @@ function loadFreehandMouseMetadata (metadata, seriesInstanceUid) {
 function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
   const toolStateManager = globalToolStateManager.saveToolState();
 
+  console.log(images);
+
   for (let i = 0; i < images.length; i++) {
     if (!toolState[i]) {
       continue;
     }
 
-    const imageId = images[i]._imageId;
+    const imageId = images[i].getImageId();
     const sopInstanceUid = images[i]._sopInstanceUID;
+
+    console.log(`===== IMAGE ID: ${imageId} =====`);
 
     prepareToolStateManager(toolStateManager, imageId, 'freehandMouse');
 
@@ -177,7 +192,7 @@ function loadBrushToolState (toolState, seriesInstanceUid, images) {
       continue;
     }
 
-    const imageId = images[i]._imageId;
+    const imageId = images[i].getImageId();
 
     prepareToolStateManager(toolStateManager, imageId, 'brush');
 
@@ -221,6 +236,14 @@ function prepareToolStateManager (toolStateManager, imageId, toolType) {
   }
 }
 
+// Auto backup once a minute.
+// TODO -> Do for all series open? Could do this using display sets to get the data,
+// but would require a bit more work.
+// TODO -> Make this a webworker.
+
+setInterval(
+  saveBackUpForActiveSeries, 60000
+);
 
 
 function saveBackUpForActiveSeries() {
@@ -250,7 +273,6 @@ function saveBackUpForActiveSeries() {
 
     if (imageToolState.freehandMouse) {
       freehandMouseToolState[i] = createFreehandMouseObjectForFrame(imageToolState.freehandMouse);
-      //freehandMouseToolState[i] = imageToolState.freehandMouse;
     }
   }
 
@@ -277,8 +299,10 @@ function saveBackUpForActiveSeries() {
 
   if (dataDump.brush || dataDump.freehandMouse) {
     // Save data
+    const username = window.top.username;
+
     let newItem = {
-      seriesInstanceUid: generateHashCode(seriesInstanceUid),
+      seriesInstanceUid: generateHashCode(`${username}_${seriesInstanceUid}`),
       dataDump: JSON.stringify(dataDump)
     };
 
@@ -289,7 +313,7 @@ function saveBackUpForActiveSeries() {
     let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
 
     // Make a request to PUT our newItem object to the object store
-    var request = objectStore.put(newItem);
+    const request = objectStore.put(newItem);
 
 
     // Report on the success of the transaction completing, when everything is done
@@ -361,9 +385,9 @@ function createBrushObjectForFrame (brushMouseToolStateI) {
  * @return {number}     The hash code.
  */
 function generateHashCode (str) {
-  var i = str.length
-  var hash1 = 5381
-  var hash2 = 52711
+  let i = str.length
+  let hash1 = 5381
+  let hash2 = 52711
 
   while (i--) {
     const char = str.charCodeAt(i)
