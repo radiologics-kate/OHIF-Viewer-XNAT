@@ -186,7 +186,7 @@ function setStructureSet (seriesInstanceUid, name, options = {}) {
     name,
     isLocked: options.isLocked ? options.isLocked : false,
     visible: options.visible ? options.visible : true,
-    activeROIContourIndex: null,
+    activeROIContourIndex: options.activeROIContourIndex !== undefined ? options.activeROIContourIndex : null,
     ROIContourCollection: []
   };
 
@@ -374,7 +374,7 @@ let currentColorIndex = importColors.length;
  *
  * @return {string} A CSS recognised color with which to render the ROI contour.
  */
-function getNextColor () {
+export function getNextColor () {
   currentColorIndex++;
   if (currentColorIndex >= importColors.length) {
     currentColorIndex = 0;

@@ -16,3 +16,4 @@ export { default as generateUID } from './client/lib/util/generateUID.js';
 export { default as toggleFreehandStats } from './client/lib/util/toggleFreehandStats.js';
 export { default as volumeManagement } from './client/lib/util/volumeManagement.js';
 export { default as segManagement } from './client/lib/util/segManagement.js';
+export { getNextColor } from './client/lib/modules/freehand3DModule.js';
