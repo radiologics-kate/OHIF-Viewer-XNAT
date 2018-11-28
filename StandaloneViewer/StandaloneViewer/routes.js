@@ -3,7 +3,7 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
-const routingMode = 'LOCALHOST';
+const routingMode = 'XNAT';
 
 // --- XNAT MODE --- //
 if (routingMode === 'XNAT') {

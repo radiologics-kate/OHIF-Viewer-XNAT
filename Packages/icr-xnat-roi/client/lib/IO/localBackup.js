@@ -55,193 +55,171 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
   // Make a request to GET our newItem object to the object store
   var request = objectStore.get(generateHashCode(seriesInstanceUid));
 
-
-  // Report on the success of the transaction completing, when everything is done
-
   request.onsuccess = function() {
-
-    if (request.result) {
-      console.log('SUCCESS');
-
-      const data = JSON.parse(request.result.dataDump);
-
-      console.log(data);
-
-      if (data.freehandMouse) {
-        const { metadata, toolState } = data.freehandMouse;
-
-        // Load metadata
-        modules.freehand3D.setters.structureSet(
-          seriesInstanceUid,
-          metadata.name,
-          {
-            uid: metadata.uid,
-            activeROIContourIndex: 0
-          }
-        );
-
-        const ROIContourCollection = metadata.ROIContourCollection;
-
-        for (let i = 0; i < ROIContourCollection.length; i++) {
-          getNextColor();
-          modules.freehand3D.setters.ROIContour(
-            seriesInstanceUid,
-            metadata.uid,
-            ROIContourCollection[i].name,
-            {
-              color: ROIContourCollection[i].color,
-              uid: ROIContourCollection[i].uid,
-              polygonCount: ROIContourCollection[i].polygonCount
-            }
-          );
-        }
-
-        // Load tool data
-
-        //console.log(toolState);
-
-        //console.log(images);
-
-        for (let i = 0; i < images.length; i++) {
-          if (!toolState[i]) {
-            continue;
-          }
-
-          const imageId = images[i]._imageId;
-
-          //console.log(imageId);
-
-          const sopInstanceUid = images[i]._sopInstanceUID;
-
-
-          if (!toolStateManager[imageId]) {
-            toolStateManager[imageId] = {};
-            toolStateManager[imageId].freehandMouse = {};
-            toolStateManager[imageId].freehandMouse.data = [];
-          } else if (!toolStateManager[imageId].freehandMouse) {
-            toolStateManager[imageId].freehandMouse = {};
-            toolStateManager[imageId].freehandMouse.data = [];
-          } else if (!toolStateManager[imageId].freehandMouse.data) {
-            toolStateManager[imageId].freehandMouse.data = [];
-          }
-
-          const toolStateManagerFreehandData = toolStateManager[imageId].freehandMouse.data;
-
-          // Add each polygon.
-          const freehandToolData = toolState[i];
-
-          for (let j = 0; j < freehandToolData.length; j++) {
-            //console.log(j);
-
-            const toolData = freehandToolData[j];
-
-            const polygon = new Polygon(
-              toolData.handles,
-              sopInstanceUid,
-              seriesInstanceUid,
-              'DEFAULT',
-              toolData.ROIContourUid,
-              toolData.uid,
-              1
-            );
-
-            toolStateManagerFreehandData.push(
-              polygon.getFreehandToolData()
-            );
-          }
-        }
-
-
-        //console.log(toolStateManager);
-
-
-
-
-      }
-
-
-      if (data.brush) {
-        const { metadata, toolState } = data.brush;
-
-        console.log(metadata);
-        // Load metadata
-        modules.brush.state.segmentationMetadata[seriesInstanceUid] = metadata;
-
-        console.log(modules.brush.state);
-
-
-        // Load tool data
-
-        for (let i = 0; i < images.length; i++) {
-          if (!toolState[i]) {
-            continue;
-          }
-
-          const imageId = images[i]._imageId;
-
-
-
-          if (!toolStateManager[imageId]) {
-            toolStateManager[imageId] = {};
-            toolStateManager[imageId].brush = {};
-            toolStateManager[imageId].brush.data = [];
-          } else if (!toolStateManager[imageId].brush) {
-            toolStateManager[imageId].brush = {};
-            toolStateManager[imageId].brush.data = [];
-          } else if (!toolStateManager[imageId].brush.data) {
-            toolStateManager[imageId].brush.data = [];
-          }
-
-          const toolStateManagerBrushData = toolStateManager[imageId].brush.data;
-
-          // Add each segmentation
-          const brushToolData = toolState[i];
-
-
-          for (let j = 0; j < brushToolData.length; j++) {
-            //console.log(j);
-
-            const toolData = brushToolData[j];
-
-            if (!toolData) {
-              toolStateManagerBrushData.push({});
-              continue;
-            }
-
-            const length = Object.keys(toolData).length
-
-            console.log();
-
-            const pixelData = new Uint8ClampedArray(length);
-
-            for (let k = 0; k < length; k++) {
-              pixelData[k] = toolData[k]
-            }
-
-            console.log(toolData);
-
-            toolStateManagerBrushData.push({
-              pixelData,
-              invalidated: true
-            });
-
-          }
-
-        }
-
-
-      }
-
-
+    if (!request.result) {
+      return;
     }
 
+    console.log('Found backup data');
 
+    const data = JSON.parse(request.result.dataDump);
+
+    if (data.freehandMouse) {
+      loadFreehandMouseData(
+        data.freehandMouse,
+        seriesInstanceUid,
+        images
+      );
+    }
+
+    if (data.brush) {
+      loadBrushData(
+        data.brush,
+        seriesInstanceUid,
+        images
+      );
+    }
   };
 
 
-  console.log(toolStateManager);
 }
 
+function loadFreehandMouseData (freehandMouseData, seriesInstanceUid, images) {
+  const { metadata, toolState } = freehandMouseData;
+
+  loadFreehandMouseMetadata(metadata, seriesInstanceUid);
+  loadFreehandMouseToolState(toolState, seriesInstanceUid, images);
+}
+
+function loadBrushData (brushData, seriesInstanceUid, images) {
+
+  const { metadata, toolState } = brushData;
+
+  loadBrushMetadata(metadata, seriesInstanceUid);
+  loadBrushToolState(toolState, seriesInstanceUid, images);
+
+}
+
+function loadFreehandMouseMetadata (metadata, seriesInstanceUid) {
+  modules.freehand3D.setters.structureSet(
+    seriesInstanceUid,
+    metadata.name,
+    {
+      uid: metadata.uid,
+      activeROIContourIndex: 0
+    }
+  );
+
+  const ROIContourCollection = metadata.ROIContourCollection;
+
+  for (let i = 0; i < ROIContourCollection.length; i++) {
+    // Incremenet color so that next drawn ROI will be the correct color.
+    getNextColor();
+    modules.freehand3D.setters.ROIContour(
+      seriesInstanceUid,
+      metadata.uid,
+      ROIContourCollection[i].name,
+      {
+        color: ROIContourCollection[i].color,
+        uid: ROIContourCollection[i].uid,
+        polygonCount: ROIContourCollection[i].polygonCount
+      }
+    );
+  }
+}
+
+function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
+  const toolStateManager = globalToolStateManager.saveToolState();
+
+  for (let i = 0; i < images.length; i++) {
+    if (!toolState[i]) {
+      continue;
+    }
+
+    const imageId = images[i]._imageId;
+    const sopInstanceUid = images[i]._sopInstanceUID;
+
+    prepareToolStateManager(toolStateManager, imageId, 'freehandMouse');
+
+    const toolStateManagerFreehandData = toolStateManager[imageId].freehandMouse.data;
+
+    // Add each polygon.
+    const freehandToolData = toolState[i];
+
+    for (let j = 0; j < freehandToolData.length; j++) {
+      const toolData = freehandToolData[j];
+      const polygon = new Polygon(
+        toolData.handles,
+        sopInstanceUid,
+        seriesInstanceUid,
+        'DEFAULT',
+        toolData.ROIContourUid,
+        toolData.uid,
+        1
+      );
+
+      toolStateManagerFreehandData.push(
+        polygon.getFreehandToolData()
+      );
+    }
+  }
+}
+
+function loadBrushMetadata (metadata, seriesInstanceUid) {
+  modules.brush.state.segmentationMetadata[seriesInstanceUid] = metadata;
+}
+
+function loadBrushToolState (toolState, seriesInstanceUid, images) {
+  const toolStateManager = globalToolStateManager.saveToolState();
+
+  for (let i = 0; i < images.length; i++) {
+    if (!toolState[i]) {
+      continue;
+    }
+
+    const imageId = images[i]._imageId;
+
+    prepareToolStateManager(toolStateManager, imageId, 'brush');
+
+    const toolStateManagerBrushData = toolStateManager[imageId].brush.data;
+
+    // Add each segmentation
+    const brushToolData = toolState[i];
+
+    for (let j = 0; j < brushToolData.length; j++) {
+      const toolData = brushToolData[j];
+
+      if (toolData) {
+        const length = Object.keys(toolData).length
+        const pixelData = new Uint8ClampedArray(length);
+
+        for (let k = 0; k < length; k++) {
+          pixelData[k] = toolData[k]
+        }
+
+        toolStateManagerBrushData.push({
+          pixelData,
+          invalidated: true
+        });
+      } else {
+        toolStateManagerBrushData.push({});
+      }
+    }
+  }
+}
+
+function prepareToolStateManager (toolStateManager, imageId, toolType) {
+  if (!toolStateManager[imageId]) {
+    toolStateManager[imageId] = {};
+    toolStateManager[imageId][toolType] = {};
+    toolStateManager[imageId][toolType].data = [];
+  } else if (!toolStateManager[imageId][toolType]) {
+    toolStateManager[imageId][toolType] = {};
+    toolStateManager[imageId][toolType].data = [];
+  } else if (!toolStateManager[imageId][toolType].data) {
+    toolStateManager[imageId][toolType].data = [];
+  }
+}
 
 
 
