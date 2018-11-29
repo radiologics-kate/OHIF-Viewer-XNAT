@@ -43,6 +43,12 @@ export default class Brush3DTool extends BrushTool {
 
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
+
+      if (brushStore.state.import && brushStore.state.import[seriesInstanceUid]) {
+        // Modified an imported mask.
+        brushStore.state.import[seriesInstanceUid].modified = true;
+      }
+
       this._paint(eventData);
       this._drawing = true;
       this._startListeningForMouseUp(element);

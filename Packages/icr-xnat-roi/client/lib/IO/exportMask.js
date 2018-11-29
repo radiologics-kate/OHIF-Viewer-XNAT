@@ -14,6 +14,8 @@ import {
 } from '../util/displayExportDialogs.js';
 import localBackup from './localBackup.js';
 
+const brushModule = cornerstoneTools.store.modules.brush;
+
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
  * user that they don't have sufficient permissions to do this.
@@ -102,6 +104,22 @@ async function beginExport () {
 
     dicomSegExporter.exportToXNAT().then(success => {
       console.log('PUT successful.');
+      // Store that we've 'imported' a collection for this series.
+      // (For all intents and purposes exporting it ends with an imported state,
+      // i.e. not a fresh Mask collection.)
+      if (!brushModule.state.import) {
+        brushModule.state.import = {};
+      }
+
+      brushModule.state.import[seriesInstanceUid] = {
+        label: label,
+        name: roiCollectionName,
+        modified: false
+      };
+
+      console.log('=====checking backup:=====');
+      localBackup.checkBackupOnExport();
+      console.log('=====checking backup DONE=====');
       exportInProgressDialog.close();
     })
     .catch(error => {

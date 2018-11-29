@@ -12,6 +12,7 @@ const modules = cornerstoneTools.store.modules;
 
 export default {
   saveBackUpForActiveSeries,
+  checkBackupOnExport,
   loadBackupData
 };
 
@@ -246,7 +247,45 @@ setInterval(
 );
 
 
-function saveBackUpForActiveSeries() {
+function checkBackupOnExport () {
+  const backedUp = saveBackUpForActiveSeries();
+
+  console.log(`backedUp: ${backedUp}`);
+
+  // If no data to backup now, delete the DB entry.
+  if (!backedUp) {
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+    // open a read/write db transaction, ready for adding the data
+    let transaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
+
+    // call an object store that's already been added to the database
+    let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
+
+    // Make a request to GET our newItem object to the object store
+    const username = window.top.username;
+    const request = objectStore.delete(
+      generateHashCode(`${username}_${seriesInstanceUid}`)
+    );
+
+    request.onsuccess = function () {
+      if (!request.result) {
+        return;
+      }
+
+      console.log('deleted db entry');
+    }
+
+    request.onerror = function () {
+      console.log('no db entry to delete');
+    }
+
+
+  }
+}
+
+
+function saveBackUpForActiveSeries () {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
@@ -254,50 +293,70 @@ function saveBackUpForActiveSeries() {
   const imageIds = stackToolState.data[0].imageIds;
   const toolStateManager = globalToolStateManager.saveToolState();
 
-  console.log(toolStateManager);
+  const brushMetadata = modules.brush.state.segmentationMetadata[seriesInstanceUid];
 
-  const brushToolState = {};
-  const freehandMouseToolState = {};
+  let isNewMaskOrEditedMaskImport = true;
 
-  // Aggregate toolState
-  for (let i = 0; i < imageIds.length; i++) {
-    const imageToolState = toolStateManager[imageIds[i]];
-
-    if (!imageToolState) {
-      continue;
-    }
-
-    if (imageToolState.brush) {
-      brushToolState[i] = createBrushObjectForFrame(imageToolState.brush);
-    }
-
-    if (imageToolState.freehandMouse) {
-      freehandMouseToolState[i] = createFreehandMouseObjectForFrame(imageToolState.freehandMouse);
-    }
+  if (modules.brush.state.import && modules.brush.state.import[seriesInstanceUid]) {
+    isNewMaskOrEditedMaskImport = modules.brush.state.import[seriesInstanceUid].modified;
   }
+
+  console.log(`isNewMaskOrEditedMaskImport: ${isNewMaskOrEditedMaskImport}`);
 
   const dataDump = {};
 
-  const brushMetadata = modules.brush.state.segmentationMetadata[seriesInstanceUid];
-
-  if (brushMetadata) {
+  if (brushMetadata && isNewMaskOrEditedMaskImport) {
     dataDump.brush = {};
     dataDump.brush.metadata = brushMetadata;
+
+    const brushToolState = {};
+
+    for (let i = 0; i < imageIds.length; i++) {
+      const imageToolState = toolStateManager[imageIds[i]];
+
+      if (imageToolState && imageToolState.brush) {
+        brushToolState[i] = createBrushObjectForFrame(imageToolState.brush);
+      }
+    }
+
     dataDump.brush.toolState = brushToolState;
   }
 
   // Get DEFAULT (i.e. working) structureSet.
-  const freehandMouseMetadata = modules.freehand3D.getters.structureSet(seriesInstanceUid);
+  const freehandMouseMetadata = modules.freehand3D.getters.structureSet(
+    seriesInstanceUid,
+    'DEFAULT'
+  );
 
-  if (freehandMouseMetadata) {
+  let freehandDefaultStructureSetHasContours = false;
+
+  if (freehandMouseMetadata.ROIContourCollection
+    && freehandMouseMetadata.ROIContourCollection.length) {
+    freehandDefaultStructureSetHasContours = true;
+  }
+
+  if (freehandMouseMetadata && freehandDefaultStructureSetHasContours) {
     dataDump.freehandMouse = {};
     dataDump.freehandMouse.metadata = freehandMouseMetadata;
+
+    const freehandMouseToolState = {};
+
+    for (let i = 0; i < imageIds.length; i++) {
+      const imageToolState = toolStateManager[imageIds[i]];
+
+      if (imageToolState && imageToolState.freehandMouse) {
+        freehandMouseToolState[i] = createFreehandMouseObjectForFrame(imageToolState.freehandMouse);
+      }
+    }
+
     dataDump.freehandMouse.toolState = freehandMouseToolState;
   }
 
-  console.log(dataDump.brush);
+  console.log(dataDump);
 
   if (dataDump.brush || dataDump.freehandMouse) {
+    console.log('saving backup...');
+
     // Save data
     const username = window.top.username;
 
@@ -324,12 +383,16 @@ function saveBackUpForActiveSeries() {
     transaction.onerror = function() {
       console.log('Transaction not completed due to error');
     };
+
+    return true;
   }
+
+  console.log('no unsaved data, not backing up.');
+  return false;
 }
 
 
 function createFreehandMouseObjectForFrame (freehandMouseToolStateI) {
-  console.log(freehandMouseToolStateI);
   const data = freehandMouseToolStateI.data;
 
   const freehandMouseObjectForFrame = [];
@@ -363,7 +426,6 @@ function createFreehandMouseObjectForFrame (freehandMouseToolStateI) {
 }
 
 function createBrushObjectForFrame (brushMouseToolStateI) {
-  console.log(brushMouseToolStateI);
   const data = brushMouseToolStateI.data;
 
   const brushObjectForFrame = [];

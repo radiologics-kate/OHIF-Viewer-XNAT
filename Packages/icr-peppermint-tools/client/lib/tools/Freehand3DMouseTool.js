@@ -285,7 +285,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param  {Object} evt
    * @param  {Object} handle The selected handle.
    */
-  handleSelectedCallback (evt, handle, data) {
+  handleSelectedCallback (evt, data, handle, interactionType = 'mouse') {
     const freehand3DStore = this._freehand3DStore;
     const eventData = evt.detail;
     const element = eventData.element;
@@ -298,13 +298,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    if (handle.hasBoundingBox) {
-      if (this.configuration.alwaysShowTextBox) {
-        // Use default move handler - Can move textbox of locked ROIContours.
-        moveHandleNearImagePoint(evt, handle, data, this.name);
-        preventPropagation(evt);
-      }
-
+    if (handle.hasBoundingBox && this.configuration.alwaysShowTextBox) {
+      // Use default move handler - Can move textbox of locked ROIContours.
+      moveHandleNearImagePoint(evt, this, data, handle, interactionType);
       return;
     }
 
@@ -436,7 +432,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         // Draw handles
 
         const options = {
-          fill: fillColor
+          color,
+          fill: fillColor,
         };
 
         if (
@@ -445,13 +442,13 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         ) {
           // Render all handles
           options.handleRadius = config.activeHandleRadius;
-          drawHandles(context, eventData, data.handles, color, options);
+          drawHandles(context, eventData, data.handles, options);
         }
 
         if (data.canComplete) {
           // Draw large handle at the origin if can complete drawing
           options.handleRadius = config.completeHandleRadius;
-          drawHandles(context, eventData, [data.handles[0]], color, options);
+          drawHandles(context, eventData, [data.handles[0]], options);
         }
 
         if (data.active && !data.polyBoundingBox) {
@@ -461,10 +458,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             context,
             eventData,
             config.mouseLocation.handles,
-            color,
             options
           );
-          drawHandles(context, eventData, [data.handles[0]], color, options);
+          drawHandles(context, eventData, [data.handles[0]], options);
         }
 
         // Define variables for the area and mean/standard deviation

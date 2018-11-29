@@ -321,10 +321,15 @@ export class AsyncMaskFetcher extends AsyncFetcher {
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
 
-        // Store that we've imported a collection.
-        brushModule.state.import = {
+        // Store that we've imported a collection for this series.
+        if (!brushModule.state.import) {
+          brushModule.state.import = {};
+        }
+
+        brushModule.state.import[this._seriesInstanceUid] = {
           label: collectionInfo.label,
-          name: collectionInfo.name
+          name: collectionInfo.name,
+          modified: false
         };
 
         console.log(`_getAndImportFile: Importing SEG, url: ${url}`);
