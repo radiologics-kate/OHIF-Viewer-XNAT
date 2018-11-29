@@ -1,5 +1,5 @@
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { Polygon } from '../classes/Polygon.js';
 import { getNextColor } from 'meteor/icr:peppermint-tools';
@@ -59,40 +59,139 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
     generateHashCode(`${username}_${seriesInstanceUid}`)
   );
 
-  request.onsuccess = function() {
+  request.onsuccess = async function () {
     if (!request.result) {
       return;
     }
 
-    console.log('Found backup data');
+    console.log(`Found backup data for scan: ${displaySet.seriesDescription}`);
 
     // TODO -> Prompt the user that this data has been found.
+    const recover = await _awaitOverwriteConfirmationUI(displaySet.seriesDescription);
 
-    const data = JSON.parse(request.result.dataDump);
+    if (recover) {
+      console.log('recovering');
 
-    if (data.freehandMouse) {
-      loadFreehandMouseData(
-        data.freehandMouse,
-        seriesInstanceUid,
-        images
+      const data = JSON.parse(request.result.dataDump);
+
+      if (data.freehandMouse) {
+        loadFreehandMouseData(
+          data.freehandMouse,
+          seriesInstanceUid,
+          images
+        );
+      }
+
+      if (data.brush) {
+        loadBrushData(
+          data.brush,
+          seriesInstanceUid,
+          images
+        );
+      }
+
+      // Refresh the visible element
+      const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
+      cornerstone.updateImage(element);
+
+      const toolStateManager = globalToolStateManager.saveToolState();
+
+      console.log(toolStateManager);
+    } else {
+      console.log('Deleting!');
+      // open a read/write db transaction, ready for adding the data
+      let deleteTransaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
+
+      // call an object store that's already been added to the database
+      let objectStore = deleteTransaction.objectStore('XNAT_OHIF_BACKUP');
+      const deleteRequest = objectStore.delete(
+        generateHashCode(`${username}_${seriesInstanceUid}`)
       );
     }
 
-    if (data.brush) {
-      loadBrushData(
-        data.brush,
-        seriesInstanceUid,
-        images
-      );
-    }
 
-    const toolStateManager = globalToolStateManager.saveToolState();
-
-    console.log(toolStateManager);
-  };
+  }
 
 
 }
+
+/** @private @async
+ * _awaitOverwriteConfirmationUI - Awaits user input for confirmation.
+ *
+ * @return {Promise} A promise that resolves on accept and rejects on cancel.
+ */
+async function _awaitOverwriteConfirmationUI (seriesDescription) {
+
+  function keyConfirmEventHandler (e) {
+    console.log('keyConfirmEventHandler');
+
+    if (e.which === 13) { // If Enter is pressed accept and close the dialog
+      confirmEventHandler();
+    }
+  }
+
+  function confirmEventHandler () {
+    dialog.close();
+
+    removeEventListeners();
+    resolveRef(true);
+  }
+
+  function cancelEventHandler () {
+    removeEventListeners();
+    resolveRef(false);
+  }
+
+  function cancelClickEventHandler () {
+    dialog.close();
+
+    removeEventListeners();
+    resolveRef(null);
+  }
+
+  function removeEventListeners() {
+    dialog.removeEventListener('cancel', cancelEventHandler);
+    cancel.removeEventListener('click', cancelClickEventHandler);
+    dialog.removeEventListener('keydown', keyConfirmEventHandler);
+    confirm.removeEventListener('click', confirmEventHandler);
+  }
+
+  console.log('in _awaitOverwriteConfirmationUI');
+
+  const dialog = document.getElementById('ioConfirmationDialog');
+  const ioConfirmationTitle = dialog.getElementsByClassName('io-confirmation-title')[0];
+  const ioConfirmationBody = dialog.getElementsByClassName('io-confirmation-body')[0];
+  const confirm = dialog.getElementsByClassName('js-io-confirmation-confirm')[0];
+  const cancel = dialog.getElementsByClassName('js-io-confirmation-cancel')[0];
+
+  // Add event listeners.
+  dialog.addEventListener('cancel', cancelEventHandler);
+  cancel.addEventListener('click', cancelClickEventHandler);
+  dialog.addEventListener('keydown', keyConfirmEventHandler);
+  confirm.addEventListener('click', confirmEventHandler);
+
+  console.log(ioConfirmationTitle);
+
+  ioConfirmationTitle.textContent = `
+    Recovery
+  `;
+
+  ioConfirmationBody.textContent = `
+    Found backed up annotations for scan: ${seriesDescription} for user ${window.top.username}
+     which were not saved to XNAT, would you like to recover this data?
+  `;
+
+  dialog.showModal();
+
+  // Reference to promise.resolve, so that I can use external handlers.
+  let resolveRef;
+
+  return new Promise(resolve => {
+    resolveRef = resolve;
+  });
+}
+
+
 
 function loadFreehandMouseData (freehandMouseData, seriesInstanceUid, images) {
   const { metadata, toolState } = freehandMouseData;
