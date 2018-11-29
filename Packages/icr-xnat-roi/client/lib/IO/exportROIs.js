@@ -87,10 +87,13 @@ async function beginExport () {
         roiCollectionName,
         label
       );
+      console.log('=====checking backup:=====');
       localBackup.checkBackupOnExport();
+      console.log('=====checking backup DONE=====');
       exportInProgressDialog.close();
     })
     .catch(error => {
+      console.log(error);
       console.log(error.message);
       localBackup.saveBackUpForActiveSeries();
       exportInProgressDialog.close();

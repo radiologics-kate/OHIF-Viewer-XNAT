@@ -248,6 +248,7 @@ setInterval(
 
 
 function checkBackupOnExport () {
+  console.log('inside checkBackupOnExport:');
   const backedUp = saveBackUpForActiveSeries();
 
   console.log(`backedUp: ${backedUp}`);
@@ -264,9 +265,13 @@ function checkBackupOnExport () {
 
     // Make a request to GET our newItem object to the object store
     const username = window.top.username;
+
+    console.log('sending delete request...');
     const request = objectStore.delete(
       generateHashCode(`${username}_${seriesInstanceUid}`)
     );
+
+    console.log(request);
 
     request.onsuccess = function () {
       if (!request.result) {
@@ -303,6 +308,8 @@ function saveBackUpForActiveSeries () {
 
   console.log(`isNewMaskOrEditedMaskImport: ${isNewMaskOrEditedMaskImport}`);
 
+  console.log(`brush data to save: ${brushMetadata && isNewMaskOrEditedMaskImport}`);
+
   const dataDump = {};
 
   if (brushMetadata && isNewMaskOrEditedMaskImport) {
@@ -328,12 +335,10 @@ function saveBackUpForActiveSeries () {
     'DEFAULT'
   );
 
-  let freehandDefaultStructureSetHasContours = false;
+  const freehandDefaultStructureSetHasContours = doesFreehandDefaultStructureSetHaveContours(freehandMouseMetadata);
 
-  if (freehandMouseMetadata.ROIContourCollection
-    && freehandMouseMetadata.ROIContourCollection.length) {
-    freehandDefaultStructureSetHasContours = true;
-  }
+  console.log(`freehand data to save: ${freehandMouseMetadata && freehandDefaultStructureSetHasContours}`);
+
 
   if (freehandMouseMetadata && freehandDefaultStructureSetHasContours) {
     dataDump.freehandMouse = {};
@@ -389,6 +394,21 @@ function saveBackUpForActiveSeries () {
 
   console.log('no unsaved data, not backing up.');
   return false;
+}
+
+function doesFreehandDefaultStructureSetHaveContours (freehandMouseMetadata) {
+  let result = false;
+
+  if (freehandMouseMetadata
+    && freehandMouseMetadata.ROIContourCollection) {
+
+    result = freehandMouseMetadata.ROIContourCollection.some(
+      element => element
+    );
+
+  }
+
+  return result;
 }
 
 
