@@ -242,13 +242,13 @@ Template.toolbarSection.helpers({
             title: 'Masks',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
-          },
+          }/*,
           {
             id: 'toggleDownloadDialog',
             title: 'Snapshot',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-camera'
-          }
+          }*/
         ];
 
         const importMenu = [
