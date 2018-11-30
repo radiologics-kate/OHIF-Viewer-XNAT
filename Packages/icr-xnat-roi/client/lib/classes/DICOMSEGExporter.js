@@ -49,7 +49,7 @@ export class DICOMSEGExporter {
     }
 
     // Create resource
-    const putCreateResourceUrl = `${this._assessorUrl}/resources/SEG?content=EXTERNAL&format=DICOM&description=AIM+instance+file&name=SEG&${csrfTokenParameter}`;
+    const putCreateResourceUrl = `${this._assessorUrl}/resources/SEG?content=EXTERNAL&format=DICOM&description=SEG+instance+file&name=SEG&${csrfTokenParameter}`;
     await this._PUT_createResource(putCreateResourceUrl)
       .catch(error => {
         putFailed = true;
@@ -60,7 +60,7 @@ export class DICOMSEGExporter {
       throw Error('PUT failed, check logs above.');
     }
 
-    // Upload resource (AIM)
+    // Upload resource (DICOM)
     const putUploadSegUrl = `${this._assessorUrl}/resources/SEG/files/${this._name}.dcm?inbody=true&content=EXTERNAL&format=DICOM&${csrfTokenParameter}`;
     await this._PUT_uploadSeg(putUploadSegUrl, this._payload)
       .catch(error => {

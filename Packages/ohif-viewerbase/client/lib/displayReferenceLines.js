@@ -1,5 +1,5 @@
 import { OHIF } from 'meteor/ohif:core';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 
 /**
  * This function disables reference lines for a specific viewport element.
@@ -47,11 +47,9 @@ export function displayReferenceLines(element) {
                 return;
             }
 
-            const referenceLinesTool = cornerstoneTools.getToolForElement(element, 'referenceLines');
-
-            referenceLinesTool.configuration.renderer = OHIF.viewer.updateImageSynchronizer;
-
-            cornerstoneTools.setToolEnabledForElement(viewportElement, 'referenceLines');
+            cornerstoneTools.setToolEnabledForElement(viewportElement, 'referenceLines', {
+                synchronizationContext: OHIF.viewer.updateImageSynchronizer
+            });
         }
     });
 }

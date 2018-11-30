@@ -27,23 +27,19 @@
       <hr/>
 
       <div class="roi-collection-builder-footer">
-        <div class="roi-collection-builder-text-input-options">
-            Name <input name="roiCollectionBuilderTextInput"
-                   class="roi-collection-builder-text-input"
-                   type="text"
-                   tabindex="-1"
-                   autocomplete="off"
-                   onfocus="this.select()"/>
-        </div>
-
-        <div class="roi-collection-builder-export">
-          <a class="roi-collection-builder-export-button btn btn-sm btn-primary">
-              <svg stroke='#fff'>
-                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
-              </svg>
-          </a>
+        <label>Name</label>
+        <input name="roiCollectionBuilderTextInput"
+              class="roi-collection-builder-text-input form-themed form-control"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+              onfocus="this.select()"/>
+        <a class="roi-collection-builder-export-button btn btn-sm btn-primary">
+            <svg stroke='#fff'>
+              <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
+            </svg>
+        </a>
       </div>
-    </div>
 
   </dialog>
 </template>

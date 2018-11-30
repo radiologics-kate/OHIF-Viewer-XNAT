@@ -24,9 +24,6 @@ const brushModule = cornerstoneTools.store.modules.brush;
  */
 export default async function () {
 
-  // TEMP
-  icrXnatRoiSession.set('writePermissions', true);
-
   if (icrXnatRoiSession.get('writePermissions') === true) {
     beginExport();
     return;

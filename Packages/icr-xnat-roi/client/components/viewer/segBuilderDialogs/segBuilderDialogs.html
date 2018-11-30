@@ -27,23 +27,20 @@
       <hr/>
 
       <div class="seg-builder-footer">
-        <div class="seg-builder-text-input-options">
-            Name <input name="segBuilderTextInput"
-                   class="seg-builder-text-input"
-                   type="text"
-                   value="{{roiCollectionName}}"
-                   tabindex="-1"
-                   autocomplete="off"
-                   onfocus="this.select()"/>
-        </div>
+        <label>Name</label>
+        <input name="segBuilderTextInput"
+           class="seg-builder-text-input form-themed form-control"
+           type="text"
+           value="{{roiCollectionName}}"
+           tabindex="-1"
+           autocomplete="off"
+           onfocus="this.select()"/>
 
-        <div class="seg-builder-export">
-          <a class="seg-builder-export-button btn btn-sm btn-primary">
-              <svg stroke='#fff'>
-                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
-              </svg>
-          </a>
-      </div>
+        <a class="seg-builder-export-button btn btn-sm btn-primary">
+            <svg stroke='#fff'>
+              <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
+            </svg>
+        </a>
     </div>
 
   </dialog>

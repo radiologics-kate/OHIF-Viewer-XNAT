@@ -8,9 +8,6 @@ export {
 };
 
 window.onload = function() {
-  console.log('======================= indexedDB TEST =======================');
-
-
   // Open our database; it is created if it doesn't already exist
   // (see onupgradeneeded below)
   let request = window.indexedDB.open('XNAT_OHIF_BACKUP', );
@@ -22,7 +19,7 @@ window.onload = function() {
 
   // onsuccess handler signifies that the database opened successfully
   request.onsuccess = function() {
-    console.log('Database opened successfully');
+    console.log('XNAT_OHIF_BACKUP database opened successfully');
 
     // Store the opened database object in the db variable. This is used a lot below
     db = request.result;

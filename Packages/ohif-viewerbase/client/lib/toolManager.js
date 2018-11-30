@@ -19,6 +19,15 @@ let defaultTool = {
     right: 'zoom',
     middle: 'pan'
 };
+
+const defaultToolConfig = {
+    shadow: false,
+    shadowColor: '#000000',
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    drawHandlesOnHover: true
+};
+
 const buttonNum = {
     'left': 1,
     'right': 2,
@@ -58,9 +67,8 @@ export const toolManager = {
             zoomTouchPinch: 'ZoomTouchPinchTool',
             panMultiTouch: 'PanMultiTouchTool',
             stackScrollMouseWheel: 'StackScrollMouseWheelTool',
-            //brush: 'BrushTool',
-            eraser: 'EraserTool',
-            referenceLines: 'ReferenceLinesTool'
+            referenceLines: 'ReferenceLinesTool',
+            eraser: 'EraserTool'
         };
 
         pluginTools = {
@@ -68,6 +76,25 @@ export const toolManager = {
           freehandSculpterMouse: Freehand3DSculpterMouseTool,
           brush: Brush3DTool
         };
+
+        const { textStyle, toolStyle, toolColors } = cornerstoneTools;
+
+        // Set text box background color
+        textStyle.setBackgroundColor('transparent');
+
+        // Set the tool font and font size
+        // context.font = "[style] [variant] [weight] [size]/[line height] [font family]";
+        const fontFamily = 'Roboto, OpenSans, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif';
+        textStyle.setFont('15px ' + fontFamily);
+
+        // Set the tool width
+        toolStyle.setToolWidth(2);
+
+        // Set color for inactive tools
+        toolColors.setToolColor('rgb(255, 255, 0)'); // yellow
+
+        // Set color for active tools
+        toolColors.setActiveColor('rgb(50, 205, 50)'); // limegreen
 
         initialized = true;
     },
@@ -164,24 +191,32 @@ export const toolManager = {
         Session.set('ToolManagerActiveToolUpdated', Random.id());
     },
 
-    instantiateTools() {
-        // Instantiate all cornerstone tools for all enabled elements
+    instantiateTools(element) {
+        // Instantiate all cornerstone tools for the given element
         Object.keys(tools).forEach(toolName => {
             const apiTool = cornerstoneTools[tools[toolName]];
             if (apiTool) {
-              cornerstoneTools.addTool(apiTool, { name: toolName });
+                cornerstoneTools.addToolForElement(element, apiTool, {
+                    name: toolName,
+                    configuration: defaultToolConfig
+                });
+
+                // Set all tools (except the active tools) passive by default in order to render the external data if exists
+                if (!activeTool || !Object.values(activeTool).includes(toolName)) {
+                    cornerstoneTools.setToolPassive(toolName);
+                }
             }
         });
 
         // JamesAPetts - Peppermint tools
         const freehandTool = pluginTools['freehandMouse'];
-        cornerstoneTools.addTool(freehandTool, { name: 'freehandMouse' });
+        cornerstoneTools.addToolForElement(element, freehandTool, { name: 'freehandMouse' });
 
         const brushTool = pluginTools['brush'];
-        cornerstoneTools.addTool(brushTool, { name: 'brush' });
+        cornerstoneTools.addToolForElement(element, brushTool, { name: 'brush' });
 
         const freehandSculpterMouseTool = pluginTools['freehandSculpterMouse'];
-        cornerstoneTools.addTool(freehandSculpterMouseTool, {
+        cornerstoneTools.addToolForElement(element, freehandSculpterMouseTool, {
           name: 'freehandSculpterMouse',
           referencedToolName: 'freehandMouse'
         });
@@ -224,10 +259,35 @@ export const toolManager = {
         });
     },
 
-    getNearbyToolData() {
-        // TODO: Implement this and let the others (e.g. deleteLesionKeyboardTool) use this function
-        // if it does not exist in cornerstoneTools
-        return undefined;
+    getNearbyToolData(element, coords, toolTypes) {
+        let pointNearTool = false;
+        const nearbyTool = {};
+
+        const toolTypesToCheck = toolTypes || this.getTools();
+        toolTypesToCheck.forEach(toolType => {
+            const toolData = cornerstoneTools.getToolState(element, toolType);
+            if (!toolData) {
+                return;
+            }
+
+            for (let i = 0; i < toolData.data.length; i++) {
+                const data = toolData.data[i];
+                const tool = cornerstoneTools.getToolForElement(element, toolType);
+                if (tool && typeof tool.pointNearTool === 'function' && tool.pointNearTool(element, data, coords)) {
+                    pointNearTool = true;
+                    nearbyTool.tool = data;
+                    nearbyTool.index = i;
+                    nearbyTool.toolType = toolType;
+                    break;
+                }
+            }
+
+            if (pointNearTool === true) {
+                return false;
+            }
+        });
+
+        return pointNearTool ? nearbyTool : undefined;
     },
 
     getActiveTool(button = 'left') {

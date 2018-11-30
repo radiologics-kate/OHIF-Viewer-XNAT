@@ -19,12 +19,7 @@ export default {
 
 function loadBackupData() {
   const toolStateManager = globalToolStateManager.saveToolState();
-
-  console.log(toolStateManager);
-
   const studies = OHIF.viewer.StudyMetadataList.all();
-
-  console.log(studies);
 
   // Loop through studies to find the series
   for ( let i = 0; i < studies.length; i++ ) {
@@ -42,10 +37,6 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
   const seriesInstanceUid = displaySet.seriesInstanceUid;
   const images = displaySet.images;
   const toolStateManager = globalToolStateManager.saveToolState();
-
-  console.log(seriesInstanceUid);
-
-  console.log(displaySet)
 
   // open a read/write db transaction, ready for adding the data
   let transaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readonly');
@@ -95,10 +86,8 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
       cornerstone.updateImage(element);
 
       const toolStateManager = globalToolStateManager.saveToolState();
-
-      console.log(toolStateManager);
     } else {
-      console.log('Deleting!');
+      console.log('Deleting backup');
       // open a read/write db transaction, ready for adding the data
       let deleteTransaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
 
@@ -156,8 +145,6 @@ async function _awaitOverwriteConfirmationUI (seriesDescription) {
     confirm.removeEventListener('click', confirmEventHandler);
   }
 
-  console.log('in _awaitOverwriteConfirmationUI');
-
   const dialog = document.getElementById('ioConfirmationDialog');
   const ioConfirmationTitle = dialog.getElementsByClassName('io-confirmation-title')[0];
   const ioConfirmationBody = dialog.getElementsByClassName('io-confirmation-body')[0];
@@ -169,8 +156,6 @@ async function _awaitOverwriteConfirmationUI (seriesDescription) {
   cancel.addEventListener('click', cancelClickEventHandler);
   dialog.addEventListener('keydown', keyConfirmEventHandler);
   confirm.addEventListener('click', confirmEventHandler);
-
-  console.log(ioConfirmationTitle);
 
   ioConfirmationTitle.textContent = `
     Recovery
@@ -195,8 +180,6 @@ async function _awaitOverwriteConfirmationUI (seriesDescription) {
 
 function loadFreehandMouseData (freehandMouseData, seriesInstanceUid, images) {
   const { metadata, toolState } = freehandMouseData;
-
-  console.log(freehandMouseData);
 
   loadFreehandMouseMetadata(metadata, seriesInstanceUid);
   loadFreehandMouseToolState(toolState, seriesInstanceUid, images);
@@ -242,8 +225,6 @@ function loadFreehandMouseMetadata (metadata, seriesInstanceUid) {
 function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
   const toolStateManager = globalToolStateManager.saveToolState();
 
-  console.log(images);
-
   for (let i = 0; i < images.length; i++) {
     if (!toolState[i]) {
       continue;
@@ -251,8 +232,6 @@ function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
 
     const imageId = images[i].getImageId();
     const sopInstanceUid = images[i]._sopInstanceUID;
-
-    console.log(`===== IMAGE ID: ${imageId} =====`);
 
     prepareToolStateManager(toolStateManager, imageId, 'freehandMouse');
 
@@ -347,10 +326,8 @@ setInterval(
 
 
 function checkBackupOnExport () {
-  console.log('inside checkBackupOnExport:');
+  console.log('checkBackupOnExport:');
   const backedUp = saveBackUpForActiveSeries();
-
-  console.log(`backedUp: ${backedUp}`);
 
   // If no data to backup now, delete the DB entry.
   if (!backedUp) {
@@ -369,8 +346,6 @@ function checkBackupOnExport () {
     const request = objectStore.delete(
       generateHashCode(`${username}_${seriesInstanceUid}`)
     );
-
-    console.log(request);
 
     request.onsuccess = function () {
       if (!request.result) {
@@ -405,10 +380,6 @@ function saveBackUpForActiveSeries () {
     isNewMaskOrEditedMaskImport = modules.brush.state.import[seriesInstanceUid].modified;
   }
 
-  console.log(`isNewMaskOrEditedMaskImport: ${isNewMaskOrEditedMaskImport}`);
-
-  console.log(`brush data to save: ${brushMetadata && isNewMaskOrEditedMaskImport}`);
-
   const dataDump = {};
 
   if (brushMetadata && isNewMaskOrEditedMaskImport) {
@@ -436,9 +407,6 @@ function saveBackUpForActiveSeries () {
 
   const freehandDefaultStructureSetHasContours = doesFreehandDefaultStructureSetHaveContours(freehandMouseMetadata);
 
-  console.log(`freehand data to save: ${freehandMouseMetadata && freehandDefaultStructureSetHasContours}`);
-
-
   if (freehandMouseMetadata && freehandDefaultStructureSetHasContours) {
     dataDump.freehandMouse = {};
     dataDump.freehandMouse.metadata = freehandMouseMetadata;
@@ -455,8 +423,6 @@ function saveBackUpForActiveSeries () {
 
     dataDump.freehandMouse.toolState = freehandMouseToolState;
   }
-
-  console.log(dataDump);
 
   if (dataDump.brush || dataDump.freehandMouse) {
     console.log('saving backup...');
