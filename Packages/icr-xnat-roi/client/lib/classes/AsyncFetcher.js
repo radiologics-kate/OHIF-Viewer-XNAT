@@ -328,7 +328,7 @@ export class AsyncFetcher {
      *
      */
     _updateProgressDialog() {
-      const ioNotificationText = `Importing ROI Collection: ${this._roiCollectionLabel}...`;
+      const ioNotificationText = `Importing ROI Collection: ${this._roiCollectionLabel}. This may take a while...`;
       const ioProgressText = `${this._numCollectionsParsed}/${this._numCollectionsToParse} <i class="fa fa-spin fa-circle-o-notch fa-fw">`;
 
       document.getElementById('ioNotificationText').innerHTML = ioNotificationText;
