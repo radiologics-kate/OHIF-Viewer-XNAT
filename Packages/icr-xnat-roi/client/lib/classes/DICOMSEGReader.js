@@ -51,17 +51,6 @@ export class DICOMSEGReader {
     }
 
     return this._masks;
-    /*
-    console.log(pixelData);
-
-    console.log(segmentSequence);
-
-    const maskImporter = new MaskImporter(stackToolState, dimensions);
-
-    return
-
-    maskImporter.import(this._masks);
-    */
   }
 
   _setSegMetadata (segIndex, metadata) {

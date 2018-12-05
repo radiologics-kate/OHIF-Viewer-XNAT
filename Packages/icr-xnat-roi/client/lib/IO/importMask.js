@@ -1,8 +1,11 @@
 import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { DICOMSEGReader } from '../classes/DICOMSEGReader.js';
 import { AsyncMaskFetcher } from '../classes/AsyncMaskFetcher.js';
+
+// TEMP
+import { MaskImporter } from '../classes/MaskImporter.js';
+// TEMP
 
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
@@ -15,45 +18,29 @@ export default async function () {
 
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
+
   const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
   asyncMaskFetcher.fetch();
 
-  // TODO -> Call XNAT to get masks!
-  // TODO -> Different paths for NIFTI/DICOM.
-  // TEMP -> Grab a local file.
   /*
-  console.log('fetching DICOM-SEG...');
+  // TEMP -> Grab a local file.
+  const maskImporter = new MaskImporter();
+
+  console.log('fetching NIFTI...');
   const startFetch = performance.now();
-  let dicomSegArrayBuffer = await getTestFileFromLocalStorage();
+  let niftiArrayBuffer = await getTestFileFromLocalStorage();
   const endFetch = performance.now();
 
-  console.log(`...found DICOMSEG file in ${endFetch - startFetch} ms!`);
+  console.log(`...found NIFTI file in ${endFetch - startFetch} ms!`);
 
-  // Get stackToolState // TODO -> Make this into a function somewhere else as
-  // Both import and export use it.
-  const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-  const element = activeEnabledElement.element;
-  const stackToolState = cornerstoneTools.getToolState(element, 'stack');
-  const imageIds = stackToolState.data[0].imageIds;
-  const image = cornerstone.getImage(element);
 
-  const dimensions = {
-    rows: image.rows,
-    columns: image.columns,
-    slices: imageIds.length
-  };
-
-  dimensions.sliceLength = dimensions.rows * dimensions.columns;
-  dimensions.cube = dimensions.sliceLength * dimensions.slices;
-
-  const dicomSegReader = new DICOMSEGReader(seriesInfo);
-
-  dicomSegReader.read(
-    dicomSegArrayBuffer,
-    stackToolState,
-    dimensions
+  maskImporter.importNIFTI(
+    niftiArrayBuffer,
+    'exampleCollectionName',
+    'exampleCollectionLabel'
   );
   */
+
 }
 
 

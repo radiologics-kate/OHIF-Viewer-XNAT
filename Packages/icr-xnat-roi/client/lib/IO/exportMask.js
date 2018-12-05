@@ -114,15 +114,17 @@ async function beginExport () {
         modified: false
       };
 
-      console.log('=====checking backup:=====');
-      localBackup.checkBackupOnExport();
-      console.log('=====checking backup DONE=====');
+      // TODO -> Work on backup mechanism, disabled for now.
+      //console.log('=====checking backup:=====');
+      //localBackup.checkBackupOnExport();
+      //console.log('=====checking backup DONE=====');
       exportInProgressDialog.close();
     })
     .catch(error => {
-      console.log(error.message);
+      console.log(error);
       exportInProgressDialog.close();
-      localBackup.saveBackUpForActiveSeries();
+      // TODO -> Work on backup mechanism, disabled for now.
+      //localBackup.saveBackUpForActiveSeries();
       displayExportFailedDialog();
     });;
   });

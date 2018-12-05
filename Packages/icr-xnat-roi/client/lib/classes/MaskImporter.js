@@ -1,6 +1,7 @@
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { DICOMSEGReader } from './DICOMSEGReader.js';
+import { NIFTIReader } from './NIFTIReader.js';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
@@ -41,14 +42,7 @@ export class MaskImporter {
   }
 
   importDICOMSEG (dicomSegArrayBuffer, collectionName, collectionLabel) {
-    // Clear previous Mask metadata.
-    for (let i = 0; i < this._numberOfColors; i++) {
-      brushModule.setters.metadata(
-        this._seriesInfo.seriesInstanceUid,
-        i,
-        undefined
-      );
-    }
+    this._clearMaskMetadata();
 
     const dicomSegReader = new DICOMSEGReader(this._seriesInfo);
 
@@ -58,7 +52,35 @@ export class MaskImporter {
       this._dimensions
     );
 
-    this._import(masks)
+    console.log(masks);
+
+    this._import(masks);
+  }
+
+  importNIFTI (niftyArrayBuffer, collectionName, collectionLabel) {
+    this._clearMaskMetadata();
+
+    const niftiReader = new NIFTIReader(this._seriesInfo, collectionName);
+
+    const masks = niftiReader.read(
+      niftyArrayBuffer,
+      this._stackToolState,
+      this._dimensions
+    );
+
+    console.log(masks);
+
+    this._import(masks);
+  }
+
+  _clearMaskMetadata() {
+    for (let i = 0; i < this._numberOfColors; i++) {
+      brushModule.setters.metadata(
+        this._seriesInfo.seriesInstanceUid,
+        i,
+        undefined
+      );
+    }
   }
 
   _import (masks) {

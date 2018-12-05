@@ -19,7 +19,8 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     super(
       seriesInstanceUid,
       validTypes = [
-        'SEG'
+        'SEG',
+        'NIFTI'
       ]
     );
 
@@ -328,6 +329,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
         brushModule.state.import[this._seriesInstanceUid] = {
           label: collectionInfo.label,
+          type: 'SEG',
           name: collectionInfo.name,
           modified: false
         };
@@ -336,6 +338,28 @@ export class AsyncMaskFetcher extends AsyncFetcher {
         const arrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
         this._maskImporter.importDICOMSEG(arrayBuffer, collectionInfo.name, collectionInfo.label);
         break;
+
+      case 'NIFTI':
+        this._roiCollectionLabel = collectionInfo.label;
+        this._updateProgressDialog();
+
+        // Store that we've imported a collection for this series.
+        if (!brushModule.state.import) {
+          brushModule.state.import = {};
+        }
+
+        brushModule.state.import[this._seriesInstanceUid] = {
+          label: collectionInfo.label,
+          type: 'NIFTI',
+          name: collectionInfo.name,
+          modified: false
+        };
+
+        console.log(`_getAndImportFile: Importing NIFTI, url: ${url}`);
+        const niftiArrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
+        this._maskImporter.importNIFTI(niftiArrayBuffer, collectionInfo.name, collectionInfo.label);
+        break;
+
       default:
         console.error(`asyncMaskFetcher._getAndImportFile not configured for filetype: ${fileType}.`);
     }

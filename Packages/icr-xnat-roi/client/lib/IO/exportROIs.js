@@ -84,15 +84,15 @@ async function beginExport () {
         roiCollectionName,
         label
       );
-      console.log('=====checking backup:=====');
-      localBackup.checkBackupOnExport();
-      console.log('=====checking backup DONE=====');
+      //console.log('=====checking backup:=====');
+      //localBackup.checkBackupOnExport();
+      //console.log('=====checking backup DONE=====');
       exportInProgressDialog.close();
     })
     .catch(error => {
       console.log(error);
-      console.log(error.message);
-      localBackup.saveBackUpForActiveSeries();
+      // TODO -> Work on backup mechanism, disabled for now.
+      //localBackup.saveBackUpForActiveSeries();
       exportInProgressDialog.close();
       displayExportFailedDialog();
   });

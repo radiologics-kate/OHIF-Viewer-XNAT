@@ -316,13 +316,17 @@ function prepareToolStateManager (toolStateManager, imageId, toolType) {
 }
 
 // Auto backup once a minute.
-// TODO -> Do for all series open? Could do this using display sets to get the data,
-// but would require a bit more work.
 // TODO -> Make this a webworker.
+//
+// DISABLED for now. This needs a lot of optimisations, and backing up NIFTI
+// Masks without GPU-enabled reformatting of the data can be super slow. The
+// Masks need to be packed or they would take up too much space on the db.
 
+/*
 setInterval(
   saveBackUpForActiveSeries, 60000
 );
+*/
 
 
 function checkBackupOnExport () {

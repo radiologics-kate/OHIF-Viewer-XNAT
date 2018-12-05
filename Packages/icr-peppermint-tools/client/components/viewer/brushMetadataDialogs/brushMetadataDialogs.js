@@ -281,7 +281,6 @@ Template.brushMetadataDialogs.events({
       }
     }
 
-
     const metadata = generateMetadata(
       data.label.get(),
       data.searchQuery.get(),

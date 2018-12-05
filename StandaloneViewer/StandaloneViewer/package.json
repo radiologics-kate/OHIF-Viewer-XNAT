@@ -10,6 +10,7 @@
     "dcmjs": "^0.2.1-build-6",
     "loglevel": "^1.6.1",
     "mousetrap": "^1.6.2",
+    "nifti-reader-js": "^0.5.4",
     "underscore": "^1.9.1",
     "xml-writer": "^1.7.0"
   }
