@@ -66,12 +66,16 @@ Template.segManagementDialogs.helpers({
 
     instance.data.recalcSegmentations.get();
 
-    const roiCollection = brushModule.state.import;
+    const importInfo = brushModule.state.import;
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-    if (roiCollection && roiCollection.name) {
+    if (importInfo && importInfo[seriesInstanceUid]) {
+      const roiCollection =  importInfo[seriesInstanceUid];
       return {
+        label: roiCollection.label,
+        type: roiCollection.type,
         name: roiCollection.name,
-        label: `(${roiCollection.label})`
+        modified: roiCollection.modified ? 'true' : ' false'
       };
     };
 

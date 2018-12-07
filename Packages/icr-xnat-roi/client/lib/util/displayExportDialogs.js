@@ -23,8 +23,33 @@ export function displayExportFailedDialog () {
  */
 export function displayInsufficientPermissionsDialog () {
   const title = 'Insufficient Permissions';
-  const body = `You do not have the required permissions to write to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}.`
+  const body = `You do not have the required permissions to write ROI Collections to ${icrXnatRoiSession.get("projectId")}/${icrXnatRoiSession.get("experimentLabel")}.`
   + ' If you believe that you should, please contact the project owner.'
+
+  messageDialog(title, body);
+}
+
+/**
+ * Opens dialog to notify the user that the Mask ROI Collection they are trying
+ * to export has not been modified from the XNAT version.
+ *
+ * @author JamesAPetts
+ */
+export function displayMaskNotModifiedDialog (roiCollection) {
+  const title = 'ROI Collection Not Modified';
+  const body = `The segmentations in the ROI Collection "${roiCollection.name}" have not been modified, aborting export.`;
+
+  messageDialog(title, body);
+}
+
+/**
+ * Opens dialog to notify the user that NIFTI exports are not possible yet.
+ *
+ * @author JamesAPetts
+ */
+export function displayCantExportNIFTIDialog (roiCollection) {
+  const title = 'Cannot export NIFTI.';
+  const body = `NIFTI export has not yet been implemented. The modified segmentations in ROI Collection "${roiCollection.name}" have not been saved.`;
 
   messageDialog(title, body);
 }

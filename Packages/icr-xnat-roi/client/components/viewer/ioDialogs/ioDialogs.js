@@ -3,7 +3,13 @@ import closeIODialog from '../../../lib/IO/closeIODialog.js';
 
 Template.ioDialogs.onRendered(() => {
     const instance = Template.instance();
-    const dialogIds = ['exportVolumes', 'importVolumes', 'ioMessage', 'ioConfirmationDialog'];
+    const dialogIds = [
+      'exportVolumes',
+      'importVolumes',
+      'ioMessage',
+      'ioConfirmationDialog',
+      'ioOverwriteConfirmationDialog'
+    ];
 
     dialogIds.forEach(id => {
         const dialog = instance.$('#' + id);

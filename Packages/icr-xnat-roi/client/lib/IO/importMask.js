@@ -2,6 +2,8 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { AsyncMaskFetcher } from '../classes/AsyncMaskFetcher.js';
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { displayInsufficientPermissionsDialog } from '../util/displayImportDialogs.js';
 
 // TEMP
 import { MaskImporter } from '../classes/MaskImporter.js';
@@ -13,7 +15,17 @@ import { MaskImporter } from '../classes/MaskImporter.js';
  *
  * @author JamesAPetts
  */
-export default async function () {
+ export default function () {
+   if (icrXnatRoiSession.get('readPermissions') === false) {
+     // User does not have read access
+     displayInsufficientPermissionsDialog();
+     return;
+   }
+
+   beginImport();
+ }
+
+async function beginImport () {
   console.log('importMask');
 
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();

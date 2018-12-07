@@ -10,9 +10,7 @@ export class DICOMSEGWriter {
   constructor (seriesInfo) {
     this._seriesInfo = seriesInfo;
   }
-
-  // TODO Check if multiframe!
-  // TODO Then grab only one dataset and call dcmjs.normalizers.Normalizer.normalizeToDataset([dataset]);
+  
   async write (masks, dimensions) {
     return new Promise (resolve => {
       // Grab the base image DICOM.

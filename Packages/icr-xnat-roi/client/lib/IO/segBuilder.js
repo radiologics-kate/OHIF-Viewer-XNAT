@@ -6,11 +6,11 @@ import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
  * be exported to XNAT.
  *
  * @author JamesAPetts
- * @param  {HTMLElement} dialog The dialog object to be opened.
+ * @param  {HTMLElement} label The label of the segBuilder, for default input.
  * @return {Promise}            A promise which resolves to give the input
  *                              roiCollection name and a list of ROIs to export.
  */
-export function segBuilder (label) {
+export function segBuilder (label, roiCollectionInfo) {
 
   function keyConfirmEventHandler (e) {
     if (e.which === 13) { // If Enter is pressed accept and close the dialog
@@ -57,12 +57,19 @@ export function segBuilder (label) {
   dialog.addEventListener('keydown', keyConfirmEventHandler);
   confirm.addEventListener('click', confirmEventHandler);
 
-  textInput.value = label;
+  if (roiCollectionInfo && roiCollectionInfo.name) {
+    textInput.value = roiCollectionInfo.name;
+  } else {
+    textInput.value = label;
+  }
 
   const dialogData = Blaze.getData(dialog);
 
   // Trigger recalc of segData.
   dialogData.recalcSegBuilderSegmentations.set(!dialogData.recalcSegBuilderSegmentations.get());
+  if (roiCollectionInfo) {
+    dialogData.roiCollectionInfo.set(roiCollectionInfo);
+  }
 
   dialog.showModal();
 

@@ -8,9 +8,13 @@ import { segBuilder } from './segBuilder.js';
 import getDateTimeAndLabel from '../util/getDateTimeAndLabel.js';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import messageDialog from '../util/messageDialog.js';
+import awaitConfirmationDialog from './awaitConfirmationDialog.js';
+import awaitOverwriteConfirmationDialog from './awaitOverwriteConfirmationDialog.js';
 import {
   displayExportFailedDialog,
-  displayInsufficientPermissionsDialog
+  displayInsufficientPermissionsDialog,
+  displayMaskNotModifiedDialog,
+  displayCantExportNIFTIDialog
 } from '../util/displayExportDialogs.js';
 import localBackup from './localBackup.js';
 
@@ -23,18 +27,40 @@ const brushModule = cornerstoneTools.store.modules.brush;
  * @author JamesAPetts
  */
 export default async function () {
+  const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
 
-  if (icrXnatRoiSession.get('writePermissions') === true) {
-    beginExport();
+  if (icrXnatRoiSession.get('writePermissions') === false) {
+    // User does not have write access
+    displayInsufficientPermissionsDialog();
     return;
   }
 
-  // User does not have write access
-  displayInsufficientPermissionsDialog();
+  let roiCollectionInfo;
+
+  if (brushModule.state.import
+    && brushModule.state.import[seriesInfo.seriesInstanceUid]) {
+    roiCollectionInfo = brushModule.state.import[seriesInfo.seriesInstanceUid];
+
+    if (!roiCollectionInfo.modified) {
+      // Not modified! Display up dialog to say this.
+      console.log('NOT MODIFIED');
+      displayMaskNotModifiedDialog(roiCollectionInfo);
+      return;
+    }
+
+    // TEMP -> Eventually we'll have NIFTI mask export.
+    if (roiCollectionInfo.type === 'NIFTI') {
+      console.log('CAN\'t EXPORT NIFTI!');
+      // Can't export this type yet! Display dialog to say this.
+      displayCantExportNIFTIDialog(roiCollectionInfo);
+      return;
+    }
+  }
+
+  beginExport(seriesInfo, roiCollectionInfo);
 }
 
-async function beginExport () {
-  const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
+async function beginExport (seriesInfo, roiCollectionInfo) {
   const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
   const { dateTime, label } = getDateTimeAndLabel('SEG');
@@ -46,11 +72,68 @@ async function beginExport () {
   }
 
 
-  let roiCollectionName = await segBuilder(label);
+  let roiCollectionName = await segBuilder(label, roiCollectionInfo);
 
   if (!roiCollectionName) {
-    console.log('cancelled.')
+    console.log('cancelled.');
     return;
+  }
+
+  let overwrite = false;
+
+  if (roiCollectionInfo) {
+    // TODO -> Bring this code back to life once it is possible to do an overwrite.
+    /*
+    if (icrXnatRoiSession.get('editPermissions')) {
+      // Ask if user wants to Overwrite.
+      const content = {
+        title: `Warning`,
+        body: `You have edited ${roiCollectionInfo.name} (${roiCollectionInfo.label}).
+          Would you like to overwrite this collection or save a new one?`
+      };
+
+      const confirmed = await awaitOverwriteConfirmationDialog(content);
+
+      if (!confirmed) {
+        // Cancelled
+        return;
+      }
+
+      if (confirmed === 'OVERWRITE') {
+        // TODO overwrite put!
+        overwrite = true;
+        label = roiCollectionInfo.label;
+      }
+
+    } else {
+
+      // Confirm user wants to make a new ROI Collection.
+      const content = {
+        title: `Warning`,
+        body: `You do not have permissions to edit ROI collections.
+          Save the edited collection as a new collection?`
+      };
+
+      const confirmed = await awaitConfirmationDialog(content);
+
+      if (!confirmed) {
+        return;
+      }
+    }
+    */
+
+    // TEMP -> No overwrite functionality yet.
+    // Confirm user wants to make a new ROI Collection.
+    const content = {
+      title: `Warning`,
+      body: `Save the edited collection as a new collection? It is not yet possible to overwrite collections.`
+    };
+
+    const confirmed = await awaitConfirmationDialog(content);
+
+    if (!confirmed) {
+      return;
+    }
   }
 
   const masks = maskExtractor.extractMasks();
@@ -99,7 +182,7 @@ async function beginExport () {
 
     console.log('seg exporter... ready!');
 
-    dicomSegExporter.exportToXNAT().then(success => {
+    dicomSegExporter.exportToXNAT(overwrite).then(success => {
       console.log('PUT successful.');
       // Store that we've 'imported' a collection for this series.
       // (For all intents and purposes exporting it ends with an imported state,

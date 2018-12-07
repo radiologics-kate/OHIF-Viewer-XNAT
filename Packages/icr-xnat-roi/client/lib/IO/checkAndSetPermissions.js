@@ -11,13 +11,15 @@ export async function checkAndSetPermissions () {
 
   const roiCollectionPermissions = await getPermissionsJson(url).catch(error => console.log(error));
 
-  if (roiCollectionPermissions.create) {
-    console.log('ROI Collection write permissions for this project? True.');
-    icrXnatRoiSession.set('writePermissions', true);
-  } else {
-    console.log('ROI Collection write permissions for this project? False.');
-    icrXnatRoiSession.set('writePermissions', false);
-  }
+  console.log(
+    `permissions: create: ${roiCollectionPermissions.create},
+    read: ${roiCollectionPermissions.read},
+    edit: ${roiCollectionPermissions.edit}`
+  );
+
+  icrXnatRoiSession.set('writePermissions', roiCollectionPermissions.create);
+  icrXnatRoiSession.set('readPermissions', roiCollectionPermissions.read);
+  icrXnatRoiSession.set('editPermissions', roiCollectionPermissions.edit);
 }
 
 /**

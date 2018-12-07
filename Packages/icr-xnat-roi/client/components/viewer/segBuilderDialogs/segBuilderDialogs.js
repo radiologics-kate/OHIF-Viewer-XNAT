@@ -20,12 +20,17 @@ Template.segBuilderDialogs.onCreated(() => {
   const instance = Template.instance();
 
   instance.data.recalcSegBuilderSegmentations = new ReactiveVar(false);
+  instance.data.roiCollectionInfo = new ReactiveVar();
 });
 
 Template.segBuilderDialogs.helpers({
+  roiCollectionInfo: () => {
+    const instance = Template.instance();
+
+    return instance.data.roiCollectionInfo.get();
+  },
   segmentations: () => {
     console.log('segBuilderDialogs.helpers.segmentations');
-
 
     const instance = Template.instance();
 

@@ -3,8 +3,17 @@ import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { $ } from 'meteor/jquery';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { AsyncFetcher } from './AsyncFetcher.js';
+import awaitConfirmationDialog from '../IO/awaitConfirmationDialog.js';
 
 const brushModule = cornerstoneTools.store.modules.brush;
+
+const overwriteConfirmationContent = {
+  title: `Warning`,
+  body: `
+    Loading in another ROICollection will overwrite existing mask data. Are you sure
+    you want to do this?
+  `
+};
 
 /**
  * @class AsyncMaskFetcher
@@ -25,7 +34,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     );
 
     this._maskImporter = new MaskImporter();
-    this._ioConfirmationDialog = document.getElementById('ioConfirmationDialog');
   }
 
   _openImportListDialog() {
@@ -68,7 +76,9 @@ export class AsyncMaskFetcher extends AsyncFetcher {
         if (hasExistingData) {
           console.log('Check confirmation first!');
 
-          confirmed = await this._awaitOverwriteConfirmationUI();
+          confirmed = await awaitConfirmationDialog(
+            overwriteConfirmationContent
+          );
           console.log(`confirmed: ${confirmed}`);
         } else {
           confirmed = true;
@@ -193,83 +203,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
     return hasData;
   }
-
-  /** @private @async
-   * _awaitOverwriteConfirmationUI - Awaits user input for confirmation.
-   *
-   * @return {Promise} A promise that resolves on accept and rejects on cancel.
-   */
-  async _awaitOverwriteConfirmationUI () {
-
-    function keyConfirmEventHandler (e) {
-      console.log('keyConfirmEventHandler');
-
-      if (e.which === 13) { // If Enter is pressed accept and close the dialog
-        confirmEventHandler();
-      }
-    }
-
-    function confirmEventHandler () {
-      dialog.close();
-
-      removeEventListeners();
-      resolveRef(true);
-    }
-
-    function cancelEventHandler () {
-      removeEventListeners();
-      resolveRef(false);
-    }
-
-    function cancelClickEventHandler () {
-      dialog.close();
-
-      removeEventListeners();
-      resolveRef(null);
-    }
-
-    function removeEventListeners() {
-      dialog.removeEventListener('cancel', cancelEventHandler);
-      cancel.removeEventListener('click', cancelClickEventHandler);
-      dialog.removeEventListener('keydown', keyConfirmEventHandler);
-      confirm.removeEventListener('click', confirmEventHandler);
-    }
-
-    console.log('in _awaitOverwriteConfirmationUI');
-
-    const dialog = this._ioConfirmationDialog;
-    const ioConfirmationTitle = dialog.getElementsByClassName('io-confirmation-title')[0];
-    const ioConfirmationBody = dialog.getElementsByClassName('io-confirmation-body')[0];
-    const confirm = dialog.getElementsByClassName('js-io-confirmation-confirm')[0];
-    const cancel = dialog.getElementsByClassName('js-io-confirmation-cancel')[0];
-
-    // Add event listeners.
-    dialog.addEventListener('cancel', cancelEventHandler);
-    cancel.addEventListener('click', cancelClickEventHandler);
-    dialog.addEventListener('keydown', keyConfirmEventHandler);
-    confirm.addEventListener('click', confirmEventHandler);
-
-    console.log(ioConfirmationTitle);
-
-    ioConfirmationTitle.textContent = `
-      Warning
-    `;
-
-    ioConfirmationBody.textContent = `
-      Loading in another ROICollection will overwrite existing mask data. Are you sure
-      you want to do this?
-    `;
-
-    dialog.showModal();
-
-    // Reference to promise.resolve, so that I can use external handlers.
-    let resolveRef;
-
-    return new Promise(resolve => {
-      resolveRef = resolve;
-    });
-  }
-
 
   /** @private
    * _collectionEligibleForImport - Returns true if the roiCollection references
