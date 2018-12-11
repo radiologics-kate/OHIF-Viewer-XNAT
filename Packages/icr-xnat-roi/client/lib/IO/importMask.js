@@ -34,6 +34,8 @@ async function beginImport () {
   const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
   asyncMaskFetcher.fetch();
 
+
+
   /*
   // TEMP -> Grab a local file.
   const maskImporter = new MaskImporter();

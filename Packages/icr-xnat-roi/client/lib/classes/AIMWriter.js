@@ -1,9 +1,9 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
+import XMLWriter from 'xml-writer';
 
 const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-const XMLWriter = require('xml-writer');
 
 // Class which extends the XMLWriter with some abstracted AIM specific functionality.
 export class AIMWriter extends XMLWriter {

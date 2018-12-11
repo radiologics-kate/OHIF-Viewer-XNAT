@@ -1,10 +1,35 @@
 import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-const Nifti = require('nifti-reader-js');
+import GPU from 'gpu.js';
+import Nifti from 'nifti-reader-js';
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 const modules = cornerstoneTools.store.modules;
 const tolerance = 0.1;
+
+const gpu = new GPU();
+
+//TODO -> DO THIS PROPERLY. We need a label key in the ROICollection schema.
+const THEO_NAMES = [
+  "Skull",
+  "Scapula Right",
+  "Scapula Left",
+  "Clavicle Right",
+  "Clavicle Left",
+  "Menubrium + Sternum",
+  "Spine Upper",
+  "Spine Middle",
+  "Spine Lower",
+  "Ribs Right",
+  "Ribs Left",
+  "Iliac Blade Right",
+  "Iliac Blade Left",
+  "Sacrum",
+  "Femur Right",
+  "Femur Left",
+  "Humerus Right",
+  "Humerus Left"
+];
 
 export class NIFTIReader {
 
@@ -50,7 +75,7 @@ export class NIFTIReader {
     || metadataOfFirstImage.instance.sliceThickness
     || rowPixelSpacing;
 
-    console.log(this._niftiHeader);
+    //console.log(this._niftiHeader);
 
     let firstVoxelInNeurologicalFrame;
 
@@ -64,8 +89,8 @@ export class NIFTIReader {
 
     // If mapping NIFTI to DICOM, we have to take the leap of faith that when converting
     // To the DICOM PCS that the frame of reference is the same .... Which is why DICOM is superior.
-    // TODO -> Actually grab the data from the other corresponding image...
-    //         Which might not even be fetched yet.
+    // TODO -> Actually grab the data from the other corresponding image...? There may be
+    // Orientations I have not considered.
 
     const firstVoxelInDicomPCSFrame = [
       -firstVoxelInNeurologicalFrame[0],
@@ -73,8 +98,8 @@ export class NIFTIReader {
       firstVoxelInNeurologicalFrame[2]
     ];
 
-    console.log(firstVoxelInNeurologicalFrame);
-    console.log(firstVoxelInDicomPCSFrame);
+    //console.log(firstVoxelInNeurologicalFrame);
+    //console.log(firstVoxelInDicomPCSFrame);
 
     let sliceDirection = this._compareSliceDirection(
       imagePositionPatient,
@@ -179,35 +204,14 @@ export class NIFTIReader {
 
   //TODO -> DO THIS PROPERLY. We need a name in the ROICollection schema.
   _getTheoNames (i) {
-    const theoNames = [
-      "Skull",
-      "Scapula Right",
-      "Scapula Left",
-      "Clavicle Right",
-      "Clavicle Left",
-      "Menubrium + Sternum",
-      "Spine Upper",
-      "Spine Middle",
-      "Spine Lower",
-      "Ribs Right",
-      "Ribs Left",
-      "Iliac Blade Right",
-      "Iliac Blade Left",
-      "Sacrum",
-      "Femur Right",
-      "Femur Left",
-      "Humerus Right",
-      "Humerus Left"
-    ];
-
-    return theoNames[i];
+    return THEO_NAMES[i];
   }
 
   _generateMetadata () {
     // Set segmentation metadata.
     // TODO -> Store the names somewhere on XNAT and retrieve them.
     for (let i = 0; i < this._segmentationCount; i++) {
-      // TEMP -> Generate random metadata since NIFTI seems to have none ¯\_(ツ)_/¯.
+      // TEMP -> Generate random metadata since NIFTI has none ¯\_(ツ)_/¯.
       const metadata = {
         RecommendedDisplayCIELabValue: [255, 0, 0],
         SegmentedPropertyCategoryCodeSequence: {
@@ -320,8 +324,6 @@ export class NIFTIReader {
     const sliceLength = dimensions.sliceLength;
     const numberOfSlices = niftiLabelMap.length / sliceLength;
 
-    console.log(`Segmentation count: ${segmentationCount}`);
-
     this._segmentationCount = segmentationCount;
 
     const masks = [];
@@ -329,13 +331,9 @@ export class NIFTIReader {
     // Generate arrays of zeros.
     for (let i = 0; i < segmentationCount; i++) {
       masks.push(
-        new Array(niftiLabelMap.length).fill(0)
+        new Uint8ClampedArray(niftiLabelMap.length)
       );
     }
-
-    console.log(`cubeLength: ${niftiLabelMap.length}`);
-    console.log(`sliceLength: ${sliceLength}`);
-
 
     if (sliceDirection === 'ascending' && sliceOrientation === 'same') {
       for (let i = 0; i < niftiLabelMap.length; i++) {
@@ -363,10 +361,6 @@ export class NIFTIReader {
         for (let i = 0; i < sliceLength; i++) {
           const niftiI = slice * sliceLength + i;
           const destinationI = sliceToFill * sliceLength + i;
-
-          if (slice === 0 && i < 10) {
-            console.log(`${niftiI}, ${destinationI}`);
-          }
 
           if (niftiLabelMap[niftiI]) {
             // Zero-index the masks, hence niftiLabelMap[i] - 1.
@@ -396,7 +390,6 @@ export class NIFTIReader {
 
   _extractPixelData () {
     const niftiImage = Nifti.readImage(this._niftiHeader, this._niftiArrayBuffer);
-
     const voxelByteLength = this._niftiHeader.numBitsPerVoxel;
 
     switch (voxelByteLength) {
@@ -454,42 +447,3 @@ export class NIFTIReader {
   }
 
 }
-
-
-/*
-if (imageIds.length === 1) {
-  throw new Error(
-    'TODO! Build and import compatible with single frame nifti files, should such a beast occur in the wild.'
-  );
-}
-*/
-
-/*
-const studies = OHIF.viewer.StudyMetadataList.all();
-
-const imagePlaneInfo = {};
-
-// Loop through studies to find the series
-for ( let i = 0; i < studies.length; i++ ) {
-  const displaySets = studies[i].getDisplaySets();
-
-  for (let j = 0; j < displaySets.length; j++) {
-    if (displaySets[i].seriesInstanceUid === this._seriesInfo.seriesInstanceUid) {
-      // We found our series!
-      const displaySet = displaySets[i];
-      const images = displaySet.images;
-      console.log(images);
-
-      imagePlaneInfo.first = {
-        imageOrientationPatient: this._metadataProvider.getFromDataSet(images[0].data, 'string', 'x00200037'),
-        imagePositionPatient: this._metadataProvider.getFromDataSet(images[0].data, 'string', 'x00200032')
-      };
-      imagePlaneInfo.last = {
-        imageOrientationPatient: this._metadataProvider.getFromDataSet(images[images.length - 1].data, 'string', 'x00200037'),
-        imagePositionPatient: this._metadataProvider.getFromDataSet(images[images.length - 1].data, 'string', 'x00200032')
-      };
-    }
-
-  }
-}
-*/

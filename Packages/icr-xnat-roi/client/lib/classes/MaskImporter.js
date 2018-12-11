@@ -52,8 +52,6 @@ export class MaskImporter {
       this._dimensions
     );
 
-    console.log(masks);
-
     this._import(masks);
   }
 
@@ -67,8 +65,6 @@ export class MaskImporter {
       this._stackToolState,
       this._dimensions
     );
-
-    console.log(masks);
 
     this._import(masks);
   }
@@ -123,8 +119,6 @@ export class MaskImporter {
     }
 
     globalToolStateManager.restoreToolState(toolState);
-
-    console.log(toolState);
 
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;

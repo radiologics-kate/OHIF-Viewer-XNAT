@@ -66,7 +66,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
 
       if (importMaskID === undefined) {
-        console.log(`confirmed: ${confirmed} kinda.. well cancelled.`);
+        // Cancelled
         confirmed = true;
       } else {
         const hasExistingData = this._hasExistingMaskData();
