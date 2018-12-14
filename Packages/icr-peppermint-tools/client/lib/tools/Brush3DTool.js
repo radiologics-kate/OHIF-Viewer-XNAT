@@ -35,7 +35,7 @@ export default class Brush3DTool extends BrushTool {
     const segIndex = brushStore.state.drawColorId;
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-    // TODO -> Check if metadata exists,
+    // Check if metadata exists,
     const metaData = brushStore.getters.metadata(
       seriesInstanceUid,
       segIndex
@@ -44,9 +44,15 @@ export default class Brush3DTool extends BrushTool {
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
 
+      this.activeStrategy = 'overlapping';
+
       if (brushStore.state.import && brushStore.state.import[seriesInstanceUid]) {
         // Modified an imported mask.
         brushStore.state.import[seriesInstanceUid].modified = true;
+
+        if (brushStore.state.import[seriesInstanceUid].type === 'NIFTI') {
+          this.activeStrategy = 'nonOverlapping';
+        }
       }
 
       this._paint(evt);

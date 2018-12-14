@@ -1,6 +1,6 @@
 <template name="ioHelpImport">
   <div>
-    <!--{{#if canRead}}-->
+    {{#if canRead}}
       <h5>ROIs</h5>
       <p>
         This interface will allow you to select contour-based ROI Collections to
@@ -19,7 +19,6 @@
         <li>Select which ROI Collection you wish to import.</li>
         <li>Click the large XNAT button to import the ROI Collection from XNAT.</li>
       </ul>
-    <!--
     {{else}}
       <p>
         This command is disabled as you do not have the required permissions to
@@ -27,6 +26,5 @@
         believe that you should, please contact the project owner.
       </p>
     {{/if}}
-    -->
   </div>
 </template>
