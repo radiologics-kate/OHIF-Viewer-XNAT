@@ -1,14 +1,11 @@
 <template name="brushHelpBrush">
   <div>
     <p>
-      The brush tool allows you to draw pixel masks on images, which can later
-      be exported to DICOM-SEG objects if drawing on DICOM images, or NIFTI masks
-      if drawing on NIFTI images. In this alpha the current exports are available:
+      The brush tool allows you to draw pixel masks on images. If you are
+      drawing on a DICOM image segmentations you draw are allowed to overlap.
+      If you are drawing on a NIFTI image (not yet implemented), or editing an
+      imported NIFTI mask, then segmentations overwrite each other and my not overlap.
     </p>
-    <ul>
-      <li>DICOM-SEG: Not yet implemented.</li>
-      <li>NIFTI: Not yet implemented.</li>
-    </ul>
 
     <h5>Painting with the brush</h5>
     <ul>
@@ -16,6 +13,8 @@
       <li>Drag to make brush strokes.</li>
       <li>Use the + and - keys to increase/decrease the brush size.</li>
       <li>Use the [ and ] keys to change the mask color.</li>
+      <li>Ctrl + click with the brush to erase that mask color.</li>
+      <li>Use the N key to quickly switch to the first unused segmentation color.</li>
     </ul>
 
     <h5>Known issues</h5>

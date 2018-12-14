@@ -75,31 +75,10 @@ Template.toolbarSection.helpers({
         });
 
         extraTools.push({
-            id: 'ellipticalRoi',
-            title: 'Ellipse',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-circle-o'
-        });
-
-        extraTools.push({
-            id: 'rectangleRoi',
-            title: 'Rectangle',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-square-o'
-        });
-
-        extraTools.push({
           id: 'showSyncSettings',
           title: 'Sync Settings',
           classes: 'imageViewerCommand',
           iconClasses: 'fa fa-link'
-        });
-
-        extraTools.push({
-          id: 'showHelp',
-          title: 'Help',
-          classes: 'imageViewerCommand',
-          iconClasses: 'fa fa-question'
         });
 
         extraTools.push({
@@ -131,10 +110,10 @@ Template.toolbarSection.helpers({
         });
 
         extraTools.push({
-            id: 'clearTools',
-            title: 'Clear',
+            id: 'resetViewport',
+            title: 'Reset',
             classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-trash'
+            iconClasses: 'fa fa-undo'
         });
 
         const buttonData = [];
@@ -167,25 +146,87 @@ Template.toolbarSection.helpers({
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-pan'
         });
 
+        if (!OHIF.uiSettings.displayEchoUltrasoundWorkflow) {
+
+            buttonData.push({
+                id: 'previousDisplaySet',
+                title: 'Previous',
+                classes: 'imageViewerCommand',
+                iconClasses: 'fa fa-toggle-up fa-fw'
+            });
+
+            buttonData.push({
+                id: 'nextDisplaySet',
+                title: 'Next',
+                classes: 'imageViewerCommand',
+                iconClasses: 'fa fa-toggle-down fa-fw'
+            });
+
+            const { isPlaying } = OHIF.viewerbase.viewportUtils;
+            buttonData.push({
+                id: 'toggleCinePlay',
+                title: () => isPlaying() ? 'Stop' : 'Play',
+                classes: 'imageViewerCommand',
+                iconClasses: () => ('fa fa-fw ' + (isPlaying() ? 'fa-stop' : 'fa-play')),
+                active: isPlaying
+            });
+
+            buttonData.push({
+                id: 'toggleCineDialog',
+                title: 'CINE',
+                classes: 'imageViewerCommand',
+                iconClasses: 'fa fa-youtube-play',
+                active: () => $('#cineDialog').is(':visible')
+            });
+        }
+
         buttonData.push({
+            id: 'layout',
+            title: 'Layout',
+            iconClasses: 'fa fa-th-large',
+            buttonTemplateName: 'layoutButton'
+        });
+
+        const annotationTools = [
+          {
             id: 'length',
             title: 'Length',
             classes: 'imageViewerTool toolbarSectionButton',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-temp'
-        });
-
-        buttonData.push({
+          },
+          {
             id: 'annotate',
             title: 'Annotate',
             classes: 'imageViewerTool',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-non-target'
-        });
-
-        buttonData.push({
+          },
+          {
             id: 'angle',
             title: 'Angle',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-angle-left'
+          },
+          {
+            id: 'ellipticalRoi',
+            title: 'Ellipse',
+            classes: 'imageViewerTool',
+            iconClasses: 'fa fa-circle-o'
+          },
+
+          {
+            id: 'rectangleRoi',
+            title: 'Rectangle',
+            classes: 'imageViewerTool',
+            iconClasses: 'fa fa-square-o'
+          }
+        ];
+
+        buttonData.push({
+            id: 'Annotations',
+            title: 'Annotations',
+            classes: 'rp-x-1 rm-l-3',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#annotations-menu',
+            subTools: annotationTools
         });
 
         const freehandTools = [
@@ -277,7 +318,7 @@ Template.toolbarSection.helpers({
         const brushTools = [
           {
             id: 'brush',
-            title: 'Brush',
+            title: 'Paint',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
           },
@@ -295,54 +336,6 @@ Template.toolbarSection.helpers({
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu',
             subTools: brushTools
-        });
-
-        buttonData.push({
-            id: 'resetViewport',
-            title: 'Reset',
-            classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-undo'
-        });
-
-        if (!OHIF.uiSettings.displayEchoUltrasoundWorkflow) {
-
-            buttonData.push({
-                id: 'previousDisplaySet',
-                title: 'Previous',
-                classes: 'imageViewerCommand',
-                iconClasses: 'fa fa-toggle-up fa-fw'
-            });
-
-            buttonData.push({
-                id: 'nextDisplaySet',
-                title: 'Next',
-                classes: 'imageViewerCommand',
-                iconClasses: 'fa fa-toggle-down fa-fw'
-            });
-
-            const { isPlaying } = OHIF.viewerbase.viewportUtils;
-            buttonData.push({
-                id: 'toggleCinePlay',
-                title: () => isPlaying() ? 'Stop' : 'Play',
-                classes: 'imageViewerCommand',
-                iconClasses: () => ('fa fa-fw ' + (isPlaying() ? 'fa-stop' : 'fa-play')),
-                active: isPlaying
-            });
-
-            buttonData.push({
-                id: 'toggleCineDialog',
-                title: 'CINE',
-                classes: 'imageViewerCommand',
-                iconClasses: 'fa fa-youtube-play',
-                active: () => $('#cineDialog').is(':visible')
-            });
-        }
-
-        buttonData.push({
-            id: 'layout',
-            title: 'Layout',
-            iconClasses: 'fa fa-th-large',
-            buttonTemplateName: 'layoutButton'
         });
 
         buttonData.push({
@@ -367,6 +360,13 @@ Template.toolbarSection.helpers({
           classes: 'rp-x-1 rm-l-3',
           svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export',
           subTools: exportMenu
+        });
+
+        buttonData.push({
+          id: 'showHelp',
+          title: 'Help',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-question'
         });
 
         buttonData.push({

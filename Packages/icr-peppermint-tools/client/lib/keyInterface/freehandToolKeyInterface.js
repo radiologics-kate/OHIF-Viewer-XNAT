@@ -21,7 +21,7 @@ Mousetrap.bind(['n', 'ctrl'], function(evt) {
 
   switch (key) {
     case 'n':
-      if (freehandTool || freehandTool.mode === 'active') {
+      if (freehandTool && freehandTool.mode === 'active') {
         createNewVolume();
       }
       break;

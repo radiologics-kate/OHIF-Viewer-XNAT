@@ -11,7 +11,9 @@
               </svg>
           </a>
           <a class="help-button js-help-brush btn btn-sm btn-primary">
-              <i id="fontAwesomeIcon" class="{{pressed 'Brush'}} fa fa-paint-brush fa-2x"></i>
+            <svg class={{pressed 'Mask'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu"}}></use>
+            </svg>
           </a>
           <a class="help-button js-help-file btn btn-sm btn-primary">
               <svg class={{pressed 'File'}}>
@@ -33,7 +35,7 @@
 
       {{#if showHelp 'ROI'}}
         {{>freehandHelpMenu}}
-      {{else if showHelp 'Brush'}}
+      {{else if showHelp 'Mask'}}
         {{>brushHelpMenu}}
       {{else if showHelp 'File'}}
         {{>ioHelpMenu}}

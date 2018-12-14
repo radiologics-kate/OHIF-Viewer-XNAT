@@ -3,17 +3,14 @@
       <div>
         <div class="sub-help-nav-bar">
           <a class="sub-help-button js-help-export btn btn-sm btn-primary">
-              <svg class={{pressed 'Export ROIs'}}>
+              <svg class={{pressed 'Export'}}>
                 <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
               </svg>
           </a>
           <a class="sub-help-button js-help-import btn btn-sm btn-primary">
-            <svg class={{pressed 'Import ROIs'}}>
+            <svg class={{pressed 'Import'}}>
               <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import"}}></use>
             </svg>
-          </a>
-          <a class="sub-help-button js-help-snapshot btn btn-sm btn-primary">
-            <i id="fontAwesomeIcon" class="{{pressed 'Export Snapshot'}} fa fa fa-camera fa-2x"></i>
           </a>
         </div>
 
@@ -23,12 +20,10 @@
       </div>
 
       <div class="sub-help-body">
-        {{#if showIoHelp 'Export ROIs'}}
+        {{#if showIoHelp 'Export'}}
           {{>ioHelpExport}}
-        {{else if showIoHelp 'Import ROIs'}}
+        {{else if showIoHelp 'Import'}}
           {{>ioHelpImport}}
-        {{else if showIoHelp 'Export Snapshot'}}
-          {{>ioHelpSnapshot}}
         {{/if}}
       </div>
   </div>

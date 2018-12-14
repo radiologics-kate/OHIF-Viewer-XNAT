@@ -3,7 +3,7 @@ import { OHIF } from 'meteor/ohif:core';
 Template.ioHelpMenu.onCreated(() => {
   const instance = Template.instance();
 
-  instance.data.showIoHelp = new ReactiveVar('Import ROIs');
+  instance.data.showIoHelp = new ReactiveVar('Export');
 });
 
 Template.ioHelpMenu.helpers({
@@ -47,12 +47,9 @@ Template.ioHelpMenu.helpers({
 
 Template.ioHelpMenu.events({
     'click .js-help-export'(event) {
-      this.showIoHelp.set('Export ROIs');
+      this.showIoHelp.set('Export');
     },
     'click .js-help-import'(event) {
-      this.showIoHelp.set('Import ROIs');
-    },
-    'click .js-help-snapshot'(event) {
-      this.showIoHelp.set('Export Snapshot');
+      this.showIoHelp.set('Import');
     }
 });

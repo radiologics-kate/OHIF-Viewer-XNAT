@@ -1,13 +1,17 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession, isModalOpen } from 'meteor/icr:xnat-roi-namespace';
+import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import getActiveBrushToolsForElement from '../util/getActiveBrushToolsForElement.js';
+import brushMetadataIO from '../util/brushMetadataIO.js';
 
 const getKeyFromKeyCode = cornerstoneTools.import('util/getKeyFromKeyCode');
 const Mousetrap = require('mousetrap');
 const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
 
-Mousetrap.bind(['[', ']', '-', '=', '+'], function(evt) {
+const brushModule = cornerstoneTools.store.modules.brush;
+
+Mousetrap.bind(['[', ']', '-', '=', '+', 'n'], function(evt) {
   if (isModalOpen()) {
     return;
   }
@@ -42,6 +46,9 @@ Mousetrap.bind(['[', ']', '-', '=', '+'], function(evt) {
       brushTool.increaseBrushSize();
       imageNeedsUpdate = true;
       break;
+    case 'n':
+      newSegmentation();
+      break;
   }
 
   if (imageNeedsUpdate) {
@@ -49,3 +56,25 @@ Mousetrap.bind(['[', ']', '-', '=', '+'], function(evt) {
   }
 
 });
+
+function newSegmentation () {
+  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+  let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
+
+  if (!segMetadata) {
+    brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
+    segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid]
+  }
+
+  const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
+  const numberOfColors = colormap.getNumberOfColors();
+
+  for (let i = 0; i < numberOfColors; i++) {
+    if (!segMetadata[i]) {
+      brushModule.state.drawColorId = i;
+      brushMetadataIO(i);
+      break;
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { OHIF } from 'meteor/ohif:core';
 Template.brushHelpMenu.onCreated(() => {
   const instance = Template.instance();
 
-  instance.data.showBrushHelp = new ReactiveVar('Brush');
+  instance.data.showBrushHelp = new ReactiveVar('Paint');
 });
 
 Template.brushHelpMenu.helpers({
@@ -44,7 +44,10 @@ Template.brushHelpMenu.helpers({
 });
 
 Template.brushHelpMenu.events({
-    'click .js-help-brush'(event) {
-      this.showBrushHelp.set('Brush');
-    }
+    'click .js-help-paint'(event) {
+      this.showBrushHelp.set('Paint');
+    },
+    'click .js-help-seg-management'(event) {
+      this.showBrushHelp.set('Seg Management');
+    },
 });

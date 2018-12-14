@@ -57,7 +57,7 @@ Template.helpDialogs.events({
       this.showHelp.set('ROI');
     },
     'click .js-help-brush'(event) {
-      this.showHelp.set('Brush');
+      this.showHelp.set('Mask');
     },
     'click .js-help-file'(event) {
       this.showHelp.set('File');

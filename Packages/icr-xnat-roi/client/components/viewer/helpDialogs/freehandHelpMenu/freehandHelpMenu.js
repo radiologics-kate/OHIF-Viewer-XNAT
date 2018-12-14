@@ -50,7 +50,7 @@ Template.freehandHelpMenu.events({
       this.showFreehandHelp.set('Sculpt');
     },
     'click .js-help-volumes'(event) {
-      this.showFreehandHelp.set('Volumes');
+      this.showFreehandHelp.set('ROI Management');
     },
     'click .js-help-toggle-stats'(event) {
       this.showFreehandHelp.set('Toggle Stats');

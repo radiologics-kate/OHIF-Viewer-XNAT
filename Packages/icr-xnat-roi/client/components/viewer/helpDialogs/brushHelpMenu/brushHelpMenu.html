@@ -2,8 +2,13 @@
   <div>
       <div>
         <div class="sub-help-nav-bar">
-          <a class="sub-help-button js-help-brush btn btn-sm btn-primary">
-            <i id="fontAwesomeIcon" class="{{pressed 'Brush'}} fa fa fa-paint-brush fa-2x"></i>
+          <a class="sub-help-button js-help-paint btn btn-sm btn-primary">
+            <i id="fontAwesomeIcon" class="{{pressed 'Paint'}} fa fa fa-paint-brush fa-2x"></i>
+          </a>
+          <a class="sub-help-button js-help-seg-management btn btn-sm btn-primary">
+            <svg class={{pressed 'Sculpt'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-seg-management-menu"}}></use>
+            </svg>
           </a>
         </div>
 
@@ -13,8 +18,10 @@
       </div>
 
       <div class="sub-help-body">
-        {{#if showBrushHelp 'Brush'}}
+        {{#if showBrushHelp 'Paint'}}
           {{>brushHelpBrush}}
+        {{else if showBrushHelp 'Seg Management'}}
+          {{>brushHelpSegManagement}}
         {{/if}}
       </div>
   </div>

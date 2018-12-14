@@ -174,6 +174,11 @@ Package.onUse(function(api) {
       'client'
     );
 
+    api.addFiles(
+      'client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpSegManagement.html',
+      'client'
+    );
+
     // -- IO
     api.addFiles(
       'client/components/viewer/helpDialogs/ioHelpMenu/ioHelpMenu.html',
@@ -194,6 +199,10 @@ Package.onUse(function(api) {
     );
     api.addFiles(
       'client/components/viewer/helpDialogs/ioHelpMenu/divs/ioHelpImport.html',
+      'client'
+    );
+    api.addFiles(
+      'client/components/viewer/helpDialogs/ioHelpMenu/divs/ioHelpImport.js',
       'client'
     );
     api.addFiles(

@@ -1,8 +1,32 @@
 <template name="ioHelpImport">
   <div>
-    <p>
-      This command will fetch all ROIs from the XNAT session that reference
-      the active scan and import them for viewing.
-    </p>
+    <!--{{#if canRead}}-->
+      <h5>ROIs</h5>
+      <p>
+        This interface will allow you to select contour-based ROI Collections to
+        import from XNAT.
+      </p>
+      <ul>
+        <li>Tick which ROI Collections you wish to import.</li>
+        <li>Click the large XNAT button to import the ROI Collections from XNAT.</li>
+      </ul>
+      <h5>Masks</h5>
+      <p>
+        This interface will allow you to select a mask-based ROI Collection to
+        import from XNAT. Only one mask can be loaded onto a scan at a time.
+      </p>
+      <ul>
+        <li>Select which ROI Collection you wish to import.</li>
+        <li>Click the large XNAT button to import the ROI Collection from XNAT.</li>
+      </ul>
+    <!--
+    {{else}}
+      <p>
+        This command is disabled as you do not have the required permissions to
+        read ROI Collections from {{projectId}}/{{experimentLabel}}. If you
+        believe that you should, please contact the project owner.
+      </p>
+    {{/if}}
+    -->
   </div>
 </template>

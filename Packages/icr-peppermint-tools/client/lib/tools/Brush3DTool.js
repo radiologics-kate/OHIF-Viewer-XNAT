@@ -49,7 +49,7 @@ export default class Brush3DTool extends BrushTool {
         brushStore.state.import[seriesInstanceUid].modified = true;
       }
 
-      this._paint(eventData);
+      this._paint(evt);
       this._drawing = true;
       this._startListeningForMouseUp(element);
       this._lastImageCoords = eventData.currentPoints.image;
