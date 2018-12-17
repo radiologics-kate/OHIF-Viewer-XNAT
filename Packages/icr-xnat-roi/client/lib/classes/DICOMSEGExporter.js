@@ -28,13 +28,28 @@ export class DICOMSEGExporter {
   }
 
   async exportToXNAT () {
-    const metaDataXml = this._generateResourceMetadata();
+    //const metaDataXml = this._generateResourceMetadata();
 
     const csrfToken = window.top.csrfToken; //csrfToken of parent. Can only perform put when iframe is embedded in XNAT.
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
     let putFailed = false;
 
+    // http://10.1.1.18/XNAT_JPETTS/xapi/roi/projects/ITCRdemo/sessions/XNAT_JPETTS_E00014/collections/mySegCollection?type=SEG&overwrite=false
+    const putSegUrl = `${Session.get('rootUrl')}/xapi/roi/projects/${this._projectID}`
+      + `/sessions/${this._experimentID}/collections/${this._label}?type=SEG&overwrite=false&${csrfTokenParameter}`;
+
+    await this._PUT_uploadSeg(putSegUrl, this._payload)
+      .catch(error => {
+        putFailed = true;
+        console.log(error);
+      });
+
+    if (putFailed) {
+      throw Error('PUT failed, check logs above.');
+    }
+
+    /*
     // Upload resource metaData
     const putResourceMetadataUrl = `${this._assessorUrl}?inbody=true&${csrfTokenParameter}`;
 
@@ -71,6 +86,7 @@ export class DICOMSEGExporter {
     if (putFailed) {
       throw Error('PUT failed, check logs above.');
     }
+    */
 
     console.log('wrote SEG');
 

@@ -5,6 +5,11 @@ import { icrXnatRoiSession, isModalOpen } from 'meteor/icr:xnat-roi-namespace';
 
 import brushMetadataIO from '../util/brushMetadataIO.js';
 
+const MODES = {
+  OVERLAPPING: 'overlapping',
+  NON_OVERLAPPING: 'nonOverlapping'
+};
+
 const BrushTool = cornerstoneTools.BrushTool;
 const brushStore = cornerstoneTools.store.modules.brush;
 
@@ -44,14 +49,14 @@ export default class Brush3DTool extends BrushTool {
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
 
-      this.activeStrategy = 'overlapping';
+      this.activeStrategy = MODES.OVERLAPPING;
 
       if (brushStore.state.import && brushStore.state.import[seriesInstanceUid]) {
         // Modified an imported mask.
         brushStore.state.import[seriesInstanceUid].modified = true;
 
         if (brushStore.state.import[seriesInstanceUid].type === 'NIFTI') {
-          this.activeStrategy = 'nonOverlapping';
+          this.activeStrategy = MODES.NON_OVERLAPPING;
         }
       }
 
