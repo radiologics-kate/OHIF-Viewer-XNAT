@@ -51,16 +51,15 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
       this.referencedToolName
     );
 
-    const isLocked =
-      toolState.data[closestToolIndex].referencedStructureSet.isLocked;
+    const toolData = toolState.data[closestToolIndex];
+
+    const isLocked = toolData.referencedStructureSet.isLocked;
 
     if (isLocked) {
       return;
     }
 
-    console.log(toolState);
-
-    config.referencedROIContour.color;
+    config.hoverColor = toolData.referencedROIContour.color;
 
     config.currentTool = closestToolIndex;
   }
