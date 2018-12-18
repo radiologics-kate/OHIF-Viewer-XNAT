@@ -16,7 +16,7 @@
             </svg>
           </a>
           <a class="help-button js-help-file btn btn-sm btn-primary">
-              <svg class={{pressed 'File'}}>
+              <svg class={{pressed 'XNAT'}}>
                 <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-logo"}}></use>
               </svg>
           </a>
@@ -37,7 +37,7 @@
         {{>freehandHelpMenu}}
       {{else if showHelp 'Mask'}}
         {{>brushHelpMenu}}
-      {{else if showHelp 'File'}}
+      {{else if showHelp 'XNAT'}}
         {{>ioHelpMenu}}
       {{/if}}
 

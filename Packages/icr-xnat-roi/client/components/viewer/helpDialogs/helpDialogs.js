@@ -60,7 +60,7 @@ Template.helpDialogs.events({
       this.showHelp.set('Mask');
     },
     'click .js-help-file'(event) {
-      this.showHelp.set('File');
+      this.showHelp.set('XNAT');
     },
     'click .js-help-cancel'(event) {
       const dialog = $('#showHelpDialog');

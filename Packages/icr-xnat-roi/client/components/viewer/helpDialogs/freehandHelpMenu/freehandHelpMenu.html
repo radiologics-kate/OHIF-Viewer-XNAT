@@ -13,12 +13,12 @@
             </svg>
           </a>
           <a class="sub-help-button js-help-volumes btn btn-sm btn-primary">
-            <svg class={{pressed 'Volumes'}}>
+            <svg class={{pressed 'ROI Management'}}>
               <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-switch-volume"}}></use>
             </svg>
           </a>
           <a class="sub-help-button js-help-toggle-stats btn btn-sm btn-primary">
-            <i id="fontAwesomeIcon" class="{{pressed 'Toggle Stats'}} fa fa-commenting fa-2x"></i>
+            <i id="fontAwesomeIcon" class="{{pressed 'Stats ON/OFF'}} fa fa-commenting fa-2x"></i>
           </a>
         </div>
 
@@ -34,7 +34,7 @@
           {{>freehandHelpSculpt}}
         {{else if showFreehandHelp 'ROI Management'}}
           {{>freehandHelpVolumes}}
-        {{else if showFreehandHelp 'Toggle Stats'}}
+        {{else if showFreehandHelp 'Stats ON/OFF'}}
           {{>freehandHelpToggleStats}}
         {{/if}}
       </div>

@@ -1,6 +1,7 @@
 import { Template } from 'meteor/templating';
 import { OHIF } from 'meteor/ohif:core';
 import 'meteor/ohif:viewerbase';
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
 Template.toolbarSection.onCreated(() => {
     const instance = Template.instance();
@@ -229,6 +230,8 @@ Template.toolbarSection.helpers({
             subTools: annotationTools
         });
 
+        const showFreehandStats = icrXnatRoiSession.get('showFreehandStats');
+
         const freehandTools = [
           {
               id: 'freehandMouse',
@@ -250,9 +253,9 @@ Template.toolbarSection.helpers({
           },
           {
             id: 'toggleFreehandStats',
-            title: 'Toggle Stats',
+            title: showFreehandStats ? 'Stats ON' : 'Stats OFF',
             classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-commenting'
+            iconClasses: showFreehandStats ? 'fa fa-commenting' : 'fa fa-comment-o'
           }
         ];
 
