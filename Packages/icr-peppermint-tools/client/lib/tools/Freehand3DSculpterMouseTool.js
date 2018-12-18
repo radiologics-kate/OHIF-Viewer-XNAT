@@ -1,27 +1,31 @@
-import { cornerstoneTools, cornerstoneMath } from 'meteor/ohif:cornerstone';
-import generateUID from '../util/generateUID.js';
-import { OHIF } from 'meteor/ohif:core';
-import { createNewVolume, setVolumeName } from '../util/freehandNameIO.js';
-
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { cornerstoneTools, cornerstoneMath } from "meteor/ohif:cornerstone";
+import generateUID from "../util/generateUID.js";
+import { OHIF } from "meteor/ohif:core";
+import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import freehandInterpolate from "../util/freehandInterpolate.js";
 
 const FreehandSculpterMouseTool = cornerstoneTools.FreehandSculpterMouseTool;
 const toolColors = cornerstoneTools.toolColors;
+const state = cornerstoneTools.store.state;
+const getToolState = cornerstoneTools.getToolState;
 
 export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: 'FreehandSculpterMouse',
-      referencedToolName: 'FreehandMouse',
-      supportedInteractionTypes: ['Mouse'],
-      mixins: ['activeOrDisabledBinaryTool'],
+      name: "FreehandSculpterMouse",
+      referencedToolName: "FreehandMouse",
+      supportedInteractionTypes: ["Mouse"],
+      mixins: ["activeOrDisabledBinaryTool"],
       configuration: getDefaultFreehandSculpterMouseToolConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
 
     super(initialConfiguration);
-  }
 
+    // Create bound functions for private event loop.
+    this.activeMouseUpCallback = this.activeMouseUpCallback.bind(this);
+  }
 
   /**
    * Select the freehand tool to be edited. Don't allow selecting of locked
@@ -30,7 +34,7 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
    * @private
    * @param {Object} eventData - Data object associated with the event.
    */
-  _selectFreehandTool (eventData) {
+  _selectFreehandTool(eventData) {
     const config = this.configuration;
     const element = eventData.element;
     const closestToolIndex = this._getClosestFreehandToolOnElement(
@@ -42,25 +46,64 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
       return;
     }
 
-    const toolState = cornerstoneTools.getToolState(element, this.referencedToolName);
+    const toolState = cornerstoneTools.getToolState(
+      element,
+      this.referencedToolName
+    );
 
-    const isLocked = toolState.data[closestToolIndex].referencedStructureSet.isLocked;
+    const isLocked =
+      toolState.data[closestToolIndex].referencedStructureSet.isLocked;
 
     if (isLocked) {
       return;
     }
 
+    console.log(toolState);
+
+    config.referencedROIContour.color;
+
     config.currentTool = closestToolIndex;
   }
-}
 
+  /**
+   * Event handler for MOUSE_UP during the active loop.
+   *
+   * @param {Object} evt - The event.
+   */
+  activeMouseUpCallback(evt) {
+    const eventData = evt.detail;
+    const element = eventData.element;
+    const config = this.configuration;
+
+    this._active = false;
+
+    state.isToolLocked = false;
+
+    this._getMouseLocation(eventData);
+    this._invalidateToolData(eventData);
+
+    config.mouseUpRender = true;
+
+    this._deactivateSculpt(element);
+
+    const toolData = getToolState(element, this.referencedToolName);
+    const data = toolData.data[config.currentTool];
+
+    freehandInterpolate(data);
+
+    // Update the image
+    cornerstone.updateImage(eventData.element);
+
+    preventPropagation(evt);
+  }
+}
 
 /**
  * Returns the default freehandSculpterMouseTool configuration.
  *
  * @return {Object} The default configuration object.
  */
-function getDefaultFreehandSculpterMouseToolConfiguration () {
+function getDefaultFreehandSculpterMouseToolConfiguration() {
   return {
     mouseLocation: {
       handles: {
@@ -90,4 +133,10 @@ function getDefaultFreehandSculpterMouseToolConfiguration () {
     hoverCursorFadeAlpha: 0.5,
     hoverCursorFadeDistance: 1.2
   };
+}
+
+function preventPropagation(evt) {
+  evt.stopImmediatePropagation();
+  evt.stopPropagation();
+  evt.preventDefault();
 }

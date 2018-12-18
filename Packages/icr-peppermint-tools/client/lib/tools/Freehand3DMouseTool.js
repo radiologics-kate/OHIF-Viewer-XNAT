@@ -1,9 +1,14 @@
-import { cornerstoneTools, cornerstoneMath } from 'meteor/ohif:cornerstone';
-import generateUID from '../util/generateUID.js';
-import { OHIF } from 'meteor/ohif:core';
-import { createNewVolume, setVolumeName } from '../util/freehandNameIO.js';
+import {
+  cornerstone,
+  cornerstoneTools,
+  cornerstoneMath
+} from "meteor/ohif:cornerstone";
+import generateUID from "../util/generateUID.js";
+import { OHIF } from "meteor/ohif:core";
+import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
+import freehandInterpolate from "../util/freehandInterpolate.js";
 
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
 // Cornerstone 3rd party dev kit imports
 const {
@@ -12,25 +17,30 @@ const {
   calculateFreehandStatistics,
   freehandIntersect,
   FreehandHandleData
-} = cornerstoneTools.import('util/freehandUtils');
-const draw = cornerstoneTools.import('drawing/draw');
-const drawJoinedLines = cornerstoneTools.import('drawing/drawJoinedLines');
-const drawHandles = cornerstoneTools.import('drawing/drawHandles');
-const drawLinkedTextBox = cornerstoneTools.import('drawing/drawLinkedTextBox');
-const moveHandleNearImagePoint = cornerstoneTools.import('manipulators/moveHandleNearImagePoint');
-const getNewContext = cornerstoneTools.import('drawing/getNewContext');
+} = cornerstoneTools.import("util/freehandUtils");
+const draw = cornerstoneTools.import("drawing/draw");
+const drawJoinedLines = cornerstoneTools.import("drawing/drawJoinedLines");
+const drawHandles = cornerstoneTools.import("drawing/drawHandles");
+const drawLinkedTextBox = cornerstoneTools.import("drawing/drawLinkedTextBox");
+const moveHandleNearImagePoint = cornerstoneTools.import(
+  "manipulators/moveHandleNearImagePoint"
+);
+const getNewContext = cornerstoneTools.import("drawing/getNewContext");
 const FreehandMouseTool = cornerstoneTools.FreehandMouseTool;
 const modules = cornerstoneTools.store.modules;
 const toolColors = cornerstoneTools.toolColors;
-const numbersWithCommas = cornerstoneTools.import('util/numbersWithCommas');
-const pointInsideBoundingBox = cornerstoneTools.import('util/pointInsideBoundingBox');
-
+const numbersWithCommas = cornerstoneTools.import("util/numbersWithCommas");
+const pointInsideBoundingBox = cornerstoneTools.import(
+  "util/pointInsideBoundingBox"
+);
+const getToolState = cornerstoneTools.getToolState;
+const state = cornerstoneTools.store.state;
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: 'FreehandMouse',
-      supportedInteractionTypes: ['Mouse'],
+      name: "FreehandMouse",
+      supportedInteractionTypes: ["Mouse"],
       configuration: defaultFreehandConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
@@ -39,7 +49,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     this.configuration.alwaysShowHandles = false;
 
-    this._freehand3DStore  = modules.freehand3D;
+    this._freehand3DStore = modules.freehand3D;
   }
 
   /**
@@ -49,7 +59,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param {object} eventData
    * @returns {object} measurementData
    */
-  createNewMeasurement (eventData) {
+  createNewMeasurement(eventData) {
     const freehand3DStore = this._freehand3DStore;
     const goodEventData =
       eventData && eventData.currentPoints && eventData.currentPoints.image;
@@ -67,7 +77,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
     const referencedStructureSet = freehand3DStore.getters.structureSet(
       seriesInstanceUid,
-      'DEFAULT'
+      "DEFAULT"
     );
     const referencedROIContour = freehand3DStore.getters.activeROIContour(
       seriesInstanceUid
@@ -76,7 +86,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const measurementData = {
       uid: generateUID(),
       seriesInstanceUid,
-      structureSetUid: 'DEFAULT',
+      structureSetUid: "DEFAULT",
       ROIContourUid: referencedROIContour.uid,
       referencedROIContour,
       referencedStructureSet,
@@ -97,13 +107,12 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     freehand3DStore.setters.incrementPolygonCount(
       seriesInstanceUid,
-      'DEFAULT',
+      "DEFAULT",
       referencedROIContour.uid
     );
 
     return measurementData;
   }
-
 
   /**
    * Event handler for called by the mouseDownActivate event, if tool is active and
@@ -113,7 +122,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @event
    * @param {Object} evt - The event.
    */
-  async addNewMeasurement (evt, interactionType) {
+  async addNewMeasurement(evt, interactionType) {
     const eventData = evt.detail;
     const config = this.configuration;
     const freehand3DStore = this._freehand3DStore;
@@ -137,17 +146,19 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    this._checkVolumeName(seriesInstanceUid).then(() => {
-      this._drawing = true;
+    this._checkVolumeName(seriesInstanceUid)
+      .then(() => {
+        this._drawing = true;
 
-      this._startDrawing(eventData);
-      this._addPoint(eventData);
-      preventPropagation(evt);
-    }).catch((error) => {
-      console.log(error);
-      console.log('failure');
-      preventPropagation(evt);
-    });
+        this._startDrawing(eventData);
+        this._addPoint(eventData);
+        preventPropagation(evt);
+      })
+      .catch(error => {
+        console.log(error);
+        console.log("failure");
+        preventPropagation(evt);
+      });
   }
 
   /**
@@ -159,7 +170,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @returns {Promise} A promise that will resolve if the name exists at time of
    * functional call and reject if it doesn't.
    */
-  async _checkVolumeName (seriesInstanceUid) {
+  async _checkVolumeName(seriesInstanceUid) {
     const freehand3DStore = this._freehand3DStore;
     const ROIContour = freehand3DStore.getters.activeROIContour(
       seriesInstanceUid
@@ -175,28 +186,29 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       seriesInstanceUid
     );
 
-    await setVolumeName(seriesInstanceUid, 'DEFAULT', activeROIContour.uid);
+    await setVolumeName(seriesInstanceUid, "DEFAULT", activeROIContour.uid);
 
     // Require another click to start the roi now it is (possibly) named.
     return new Promise((resolve, reject) => {
       reject();
     });
-
   }
 
-
   /**
-  * Event handler for MOUSE_DOUBLE_CLICK event.
-  *
-  * @event
-  * @param {Object} e - The event.
-  */
-  doubleClickCallback (evt) {
+   * Event handler for MOUSE_DOUBLE_CLICK event.
+   *
+   * @event
+   * @param {Object} e - The event.
+   */
+  doubleClickCallback(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
     const freehand3DStore = this._freehand3DStore;
 
-    const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
+    const toolData = cornerstoneTools.getToolState(
+      evt.currentTarget,
+      this.name
+    );
 
     const nearby = this._pointNearHandleAllTools(eventData);
     const config = this.configuration;
@@ -234,10 +246,13 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    *
    * @param {Object} evt - The event.
    */
-  preMouseDownCallback (evt) {
+  preMouseDownCallback(evt) {
     const eventData = evt.detail;
 
-    const toolData = cornerstoneTools.getToolState(evt.currentTarget, this.name);
+    const toolData = cornerstoneTools.getToolState(
+      evt.currentTarget,
+      this.name
+    );
 
     if (!toolData) {
       return false;
@@ -274,8 +289,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return false;
     }
 
-
-
     return false;
   }
 
@@ -285,11 +298,14 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param  {Object} evt
    * @param  {Object} handle The selected handle.
    */
-  handleSelectedCallback (evt, data, handle, interactionType = 'mouse') {
+  handleSelectedCallback(evt, data, handle, interactionType = "mouse") {
     const freehand3DStore = this._freehand3DStore;
     const eventData = evt.detail;
     const element = eventData.element;
-    const toolState = cornerstoneTools.getToolState(eventData.element, this.name);
+    const toolState = cornerstoneTools.getToolState(
+      eventData.element,
+      this.name
+    );
 
     if (eventData.event.metaKey) {
       this._switchROIContour(data);
@@ -338,7 +354,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     preventPropagation(evt);
   }
 
-  _switchROIContour (data) {
+  _switchROIContour(data) {
     const freehand3DStore = this._freehand3DStore;
 
     freehand3DStore.setters.activeROIContour(
@@ -354,12 +370,15 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param {*} evt
    * @returns
    */
-  renderToolData (evt) {
+  renderToolData(evt) {
     const eventData = evt.detail;
     const freehand3DStore = this._freehand3DStore;
 
     // If we have no toolState for this element, return immediately as there is nothing to do
-    const toolState = cornerstoneTools.getToolState(evt.currentTarget, this.name);
+    const toolState = cornerstoneTools.getToolState(
+      evt.currentTarget,
+      this.name
+    );
 
     if (!toolState) {
       return;
@@ -369,7 +388,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const element = eventData.element;
     const config = this.configuration;
     const seriesModule = cornerstone.metaData.get(
-      'generalSeriesModule',
+      "generalSeriesModule",
       image.imageId
     );
 
@@ -393,7 +412,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         continue;
       }
 
-      draw(context, (context) => {
+      draw(context, context => {
         let color = toolColors.getColorIfActive(data);
         let fillColor;
 
@@ -433,13 +452,10 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
         const options = {
           color,
-          fill: fillColor,
+          fill: fillColor
         };
 
-        if (
-          config.alwaysShowHandles ||
-          (data.active && data.polyBoundingBox)
-        ) {
+        if (config.alwaysShowHandles || (data.active && data.polyBoundingBox)) {
           // Render all handles
           options.handleRadius = config.activeHandleRadius;
           drawHandles(context, eventData, data.handles, options);
@@ -523,7 +539,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
               data.handles
             );
 
-            if (modality === 'PT') {
+            if (modality === "PT") {
               // If the image is from a PET scan, use the DICOM tags to
               // Calculate the SUV from the mean and standard deviation.
 
@@ -569,7 +585,10 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
         // Only render text if polygon ROI has been completed, and is active,
         // Or config is set to show the textBox all the time
-        if (data.polyBoundingBox && (this.configuration.alwaysShowTextBox || data.active)) {
+        if (
+          data.polyBoundingBox &&
+          (this.configuration.alwaysShowTextBox || data.active)
+        ) {
           // If the textbox has not been moved by the user, it should be displayed on the right-most
           // Side of the tool.
 
@@ -600,7 +619,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       });
     }
 
-    function textBoxText (data) {
+    function textBoxText(data) {
       const ROIContour = data.referencedROIContour;
       const structureSet = data.referencedStructureSet;
 
@@ -610,8 +629,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
       textLines.push(ROIContour.name);
 
-      if (structureSet.name === 'DEFAULT') {
-        textLines.push('Working ROI Collection');
+      if (structureSet.name === "DEFAULT") {
+        textLines.push("Working ROI Collection");
       } else {
         textLines.push(structureSet.name);
       }
@@ -619,10 +638,10 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       // If the mean and standard deviation values are present, display them
       if (meanStdDev && meanStdDev.mean !== undefined) {
         // If the modality is CT, add HU to denote Hounsfield Units
-        let moSuffix = '';
+        let moSuffix = "";
 
-        if (modality === 'CT') {
-          moSuffix = ' HU';
+        if (modality === "CT") {
+          moSuffix = " HU";
         }
 
         // Create a line of text to display the mean and any units that were specified (i.e. HU)
@@ -636,7 +655,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
         // If this image has SUV values to display, concatenate them to the text line
         if (meanStdDevSUV && meanStdDevSUV.mean !== undefined) {
-          const SUVtext = ' SUV: ';
+          const SUVtext = " SUV: ";
 
           meanText +=
             SUVtext + numbersWithCommas(meanStdDevSUV.mean.toFixed(2));
@@ -672,7 +691,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return textLines;
     }
 
-    function textBoxAnchorPoints (handles) {
+    function textBoxAnchorPoints(handles) {
       return handles;
     }
   }
@@ -685,7 +704,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    * @param {Number} toolIndex - the ID of the tool
    * @return {Number|Object|Boolean}
    */
-  _pointNearHandle (element, data, coords) {
+  _pointNearHandle(element, data, coords) {
     const config = this.configuration;
 
     if (data.handles === undefined) {
@@ -697,14 +716,10 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     for (let i = 0; i < data.handles.length; i++) {
-      const handleCanvas = cornerstone.pixelToCanvas(
-        element,
-        data.handles[i]
-      );
+      const handleCanvas = cornerstone.pixelToCanvas(element, data.handles[i]);
 
       if (
-        cornerstoneMath.point.distance(handleCanvas, coords) <
-        config.spacing
+        cornerstoneMath.point.distance(handleCanvas, coords) < config.spacing
       ) {
         return i;
       }
@@ -718,9 +733,52 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
   }
 
+  /**
+   * Ends the active drawing loop and completes the polygon.
+   *
+   * @private
+   * @param {Object} element - The element on which the roi is being drawn.
+   * @param {Object} handleNearby - the handle nearest to the mouse cursor.
+   */
+  _endDrawing(element, handleNearby) {
+    const toolState = getToolState(element, this.name);
+
+    const config = this.configuration;
+
+    const data = toolState.data[config.currentTool];
+
+    data.active = false;
+    data.highlight = false;
+    data.handles.invalidHandlePlacement = false;
+
+    // Connect the end handle to the origin handle
+    if (handleNearby !== undefined) {
+      data.handles[config.currentHandle - 1].lines.push(data.handles[0]);
+    }
+
+    if (this._modifying) {
+      this._modifying = false;
+      data.invalidated = true;
+    }
+
+    // Reset the current handle
+    config.currentHandle = 0;
+    config.currentTool = -1;
+    data.canComplete = false;
+
+    if (this._drawing) {
+      this._drawing = false;
+      state.isToolLocked = false;
+      this._deactivateDraw(element);
+    }
+
+    freehandInterpolate(data);
+
+    cornerstone.updateImage(element);
+  }
 }
 
-function defaultFreehandConfiguration () {
+function defaultFreehandConfiguration() {
   return {
     mouseLocation: {
       handles: {
@@ -734,14 +792,13 @@ function defaultFreehandConfiguration () {
     activeHandleRadius: 3,
     completeHandleRadius: 6,
     alwaysShowHandles: false,
-    invalidColor: 'crimson',
+    invalidColor: "crimson",
     currentHandle: 0,
     currentTool: -1
   };
 }
 
-
-function preventPropagation (evt) {
+function preventPropagation(evt) {
   evt.stopImmediatePropagation();
   evt.stopPropagation();
   evt.preventDefault();
