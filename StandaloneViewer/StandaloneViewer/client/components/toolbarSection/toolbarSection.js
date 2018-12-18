@@ -231,6 +231,7 @@ Template.toolbarSection.helpers({
         });
 
         const showFreehandStats = icrXnatRoiSession.get('showFreehandStats');
+        const freehandInterpolate = icrXnatRoiSession.get('freehandInterpolate');
 
         const freehandTools = [
           {
@@ -256,7 +257,16 @@ Template.toolbarSection.helpers({
             title: showFreehandStats ? 'Stats ON' : 'Stats OFF',
             classes: 'imageViewerCommand',
             iconClasses: showFreehandStats ? 'fa fa-commenting' : 'fa fa-comment-o'
-          }
+          },
+          {
+            id: 'toggleFreehandInterpolate',
+            title: freehandInterpolate ? 'Interpolate ON' : 'interpolate OFF',
+            classes: 'imageViewerCommand',
+            svgLink: freehandInterpolate
+            ? 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on'
+            : 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-off'
+            //iconClasses: freehandInterpolate ? 'fa fa-commenting' : 'fa fa-comment-o'
+          },
         ];
 
         const deleteTools = [

@@ -12,12 +12,17 @@ const modules = cornerstoneTools.store.modules;
  * @author JamesAPetts
  */
 export default function() {
+  const enabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+
+  if (!enabledElement) {
+    return;
+  }
+
   const freehand3DModule = modules.freehand3D;
+  const interpolate = !freehand3DModule.getters.interpolate();
 
-  const interpolate = !freehand3D.getters.interpolate();
-
-  freehand3D.setters.interpolate = interpolate;
+  freehand3DModule.setters.interpolate(interpolate);
   icrXnatRoiSession.set("freehandInterpolate", interpolate);
 
-  cornerstone.updateImage(element);
+  cornerstone.updateImage(enabledElement.element);
 }
