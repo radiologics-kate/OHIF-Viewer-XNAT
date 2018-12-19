@@ -7,6 +7,7 @@ import freehandInterpolate from "../util/freehandInterpolate.js";
 
 const FreehandSculpterMouseTool = cornerstoneTools.FreehandSculpterMouseTool;
 const toolColors = cornerstoneTools.toolColors;
+const modules = cornerstoneTools.store.modules;
 const state = cornerstoneTools.store.state;
 const getToolState = cornerstoneTools.getToolState;
 
@@ -88,7 +89,9 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
     const toolData = getToolState(element, this.referencedToolName);
     const data = toolData.data[config.currentTool];
 
-    freehandInterpolate(data);
+    if (modules.freehand3D.getters.interpolate()) {
+      freehandInterpolate(data);
+    }
 
     // Update the image
     cornerstone.updateImage(eventData.element);

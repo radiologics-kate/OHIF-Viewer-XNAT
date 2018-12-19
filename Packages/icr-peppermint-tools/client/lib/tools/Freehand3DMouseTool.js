@@ -772,7 +772,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       this._deactivateDraw(element);
     }
 
-    freehandInterpolate(data);
+    if (modules.freehand3D.getters.interpolate()) {
+      freehandInterpolate(data);
+    }
 
     cornerstone.updateImage(element);
   }

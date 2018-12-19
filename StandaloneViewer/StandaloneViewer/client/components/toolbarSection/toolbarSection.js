@@ -206,14 +206,19 @@ Template.toolbarSection.helpers({
             title: 'Angle',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-angle-left'
-          },
+          },/*
+          {
+            id: 'bidirectional',
+            title: 'Bidirectional',
+            classes: 'imageViewerTool',
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#bidirectional-tool'
+          },*/
           {
             id: 'ellipticalRoi',
             title: 'Ellipse',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-circle-o'
           },
-
           {
             id: 'rectangleRoi',
             title: 'Rectangle',
@@ -260,7 +265,7 @@ Template.toolbarSection.helpers({
           },
           {
             id: 'toggleFreehandInterpolate',
-            title: freehandInterpolate ? 'Interpolate ON' : 'interpolate OFF',
+            title: freehandInterpolate ? 'Interpolation ON' : 'Interpolation OFF',
             classes: 'imageViewerCommand',
             svgLink: freehandInterpolate
             ? 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on'

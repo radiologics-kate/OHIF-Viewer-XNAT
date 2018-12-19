@@ -34,6 +34,8 @@ const buttonNum = {
     'middle': 4
 };
 
+console.log(cornerstoneTools.BidirectionalTool);
+
 /**
  * Exported "toolManager" Singleton
  */

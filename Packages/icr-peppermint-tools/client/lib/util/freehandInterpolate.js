@@ -1,31 +1,39 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 
-const modules = cornerstoneTools.store.modules;
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 export default function(toolData) {
-  const freehand3DModule = modules.freehand3D;
-
-  if (!freehand3DModule.getters.interpolate()) {
-    console.log("INTERPOLATION OFF!");
-    return;
-  }
-
-  console.log("TRIGGER INTERPOLATE... GO!");
-
   const ROIContourUid = toolData.ROIContourUid;
   const seriesInstanceUid = toolData.seriesInstanceUid;
 
-  // Get images IDs for this active series.
+  const imageIds = _getImageIdsOfActiveSeries();
+  const ROIContourData = _getROIContourData(imageIds);
+  const extent = _getExtentOfRegion(ROIContourData);
 
+  // If a contour can is missing between drawn slices, see if it can be interpolated.
+  for (i = extent[0] + 1; i < extent[1]; i++) {
+    if (!ROIContourData[i].contours) {
+      const contourPair = _getContoursToInterpolate(i, extent, ROIContourData);
+
+      if (contourPair) {
+        _interpolateBetween(i, contourPair, ROIContourData);
+      }
+    }
+  }
+
+}
+
+function _getImageIdsOfActiveSeries () {
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
   const stackToolState = cornerstoneTools.getToolState(element, "stack");
-  const imageIds = stackToolState.data[0].imageIds;
+  return stackToolState.data[0].imageIds;
+}
 
-  // Trawl through imageIds and get the freehand data that corresponds to the ROIContourUid.
-  const contoursOnSlices = [];
+
+function _getROIContourData (imageIds) {
+  const ROIContourData = [];
   const toolStateManager = globalToolStateManager.saveToolState();
 
   for (let i = 0; i < imageIds.length; i++) {
@@ -33,7 +41,7 @@ export default function(toolData) {
     const imageToolState = toolStateManager[imageId];
 
     if (!imageToolState || !imageToolState.freehandMouse) {
-      contoursOnSlices.push({
+      ROIContourData.push({
         imageId
       });
     } else {
@@ -49,82 +57,71 @@ export default function(toolData) {
         contoursOnSlice.contours = contours;
       }
 
-      contoursOnSlices.push(contoursOnSlice);
+      ROIContourData.push(contoursOnSlice);
     }
   }
+}
 
-  // Get the extend of the drawn slices of the ROIContour.
-  let minContour;
+function _getExtentOfRegion (ROIContourData) {
+  const extent = [];
 
-  for (let i = 0; i < contoursOnSlices.length; i++) {
-    if (contoursOnSlices[i].contours) {
-      minContour = i;
+  for (let i = 0; i < ROIContourData.length; i++) {
+    if (ROIContourData[i].contours) {
+      extent.push(i);
       break;
     }
   }
 
-  let maxContour;
-
-  for (let i = contoursOnSlices.length - 1; i >= 0; i--) {
-    if (contoursOnSlices[i].contours) {
-      maxContour = i;
+  for (let i = ROIContourData.length - 1; i >= 0; i--) {
+    if (ROIContourData[i].contours) {
+      extent.push(i);
       break;
     }
   }
 
-  // If a contour can be interpolated... attempt it!
-  for (i = minContour + 1; i < maxContour; i++) {
-    if (!contoursOnSlices[i].contours) {
-      interpolateIfPossible(i, minContour, maxContour, contoursOnSlices);
-    }
-  }
-
+  return extent;
 }
 
 
-function interpolateIfPossible(index, minContour, maxContour, contoursOnSlices) {
-  let lowerBound;
-  let upperBound;
-
+function _getContoursToInterpolate (index, extent, ROIContourData) {
+  let contours = [];
   let canInterpolate = true;
 
   // Check for nearest lowest index containing contours.
-  for (let i = index - 1; i >= minContour; i--) {
-    if (contoursOnSlices[i].contours) {
-      if (contoursOnSlices[i].contours.length > 1) {
+  for (let i = index - 1; i >= extent[0]; i--) {
+    if (ROIContourData[i].contours) {
+      if (ROIContourData[i].contours.length > 1) {
         canInterpolate = false;
       }
 
-      lowerBound = i;
+      contours.push(i);
       break;
     }
   }
 
   if (!canInterpolate) {
-    console.log(`lowerBound ${lowerBound} has > 1 contour, can't interpolate`);
     return;
   }
 
   // Check for nearest upper index containing contours.
-  for (let i = index + 1; i <= maxContour; i++) {
-    if (contoursOnSlices[i].contours) {
-      if (contoursOnSlices[i].contours.length > 1) {
+  for (let i = index + 1; i <= extent[1]; i++) {
+    if (ROIContourData[i].contours) {
+      if (ROIContourData[i].contours.length > 1) {
         canInterpolate = false;
       }
 
-      upperBound = i;
+      contours.push(i);
       break;
     }
   }
 
   if (!canInterpolate) {
-    console.log(`upperBound ${upperBound} has > 1 contour, can't interpolate`);
     return;
   }
 
-  interpolateBetween(index, lowerBound, upperBound, contoursOnSlices);
+  return contours;
 }
 
-function interpolateBetween(index, lowerBound, upperBound, contoursOnSlices) {
-  console.log(`TODO: interpolate frame ${index + 1} between frames (${lowerBound + 1}, ${upperBound + 1})`);
+function _interpolateBetween (index, contourPair, ROIContourData) {
+  console.log(`TODO: interpolate frame ${index + 1} between frames (${contourPair[0] + 1}, ${contourPair[1] + 1})`);
 }
