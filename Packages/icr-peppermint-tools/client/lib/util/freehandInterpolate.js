@@ -105,10 +105,6 @@ function _getContoursToInterpolate (index, extent, ROIContourData) {
   let contours = [];
   let canInterpolate = true;
 
-  /*
-  console.log(`_getContoursToInterpolate: ${index}`);
-  */
-
   // Check for nearest lowest index containing contours.
   for (let i = index - 1; i >= extent[0]; i--) {
     if (ROIContourData[i].contours) {
@@ -169,7 +165,7 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
   const cumPerim1Norm = normalisedCumulativePerimeter(cumPerim1);
   const cumPerim2Norm = normalisedCumulativePerimeter(cumPerim2);
 
-  // concatinate p1 && cumPerim1Norm
+  // concatinate p && cumPerimNorm
   const perim1Interp = getInterpolatedPerim(interpPoints + c2.x.length, cumPerim1Norm);
   const perim2Interp = getInterpolatedPerim(interpPoints + c1.x.length, cumPerim2Norm);
 
@@ -181,6 +177,49 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
 
   const c1i = getSuperSampledContour(c1, nodesPerSegment1);
   const c2i = getSuperSampledContour(c2, nodesPerSegment2);
+
+  let expectedC1iLength = 0;
+
+  // Keep c2i fixed and check each starting node of c1i for total length of connected segments.
+
+  const cl1iLength = c1i.x.length;
+
+  console.log(`cl1iLength: ${cl1iLength}`);
+  console.log(`c2iLength: ${c2i.x.length}`);
+
+  let optimal = {
+    startingNode: 0,
+    totalSquaredXYLengths: Infinity
+  };
+
+  for (let startingNode = 0; startingNode < cl1iLength; startingNode++) {
+    let node = startingNode;
+
+    // NOTE: 1) Ignore calculating Z, as the sum of all squared Z distances will always be a constant.
+    // NOTE: 2) Don't need actual length, so don't worry about square rooting.
+    let totalSquaredXYLengths = 0;
+
+    for (let itteration = 0; itteration < cl1iLength; itteration++) {
+
+      totalSquaredXYLengths += (c1i.x[node] - c2i.x[itteration])**2
+        + (c1i.y[node] - c2i.y[itteration])**2;
+
+      node++;
+
+      if (node === cl1iLength) node = 0;
+    }
+
+    if (totalSquaredXYLengths < optimal.totalSquaredXYLengths) {
+      optimal.totalSquaredXYLengths = totalSquaredXYLengths;
+      optimal.startingNode = startingNode;
+    }
+  }
+
+  console.log(optimal);
+
+  if (Number.isNaN(optimal.totalSquaredXYLengths)  || optimal.totalSquaredXYLengths === Infinity) {
+    throw new Error(`totalSquaredXYLengths is ${optimal.totalSquaredXYLengths}`);
+  }
 
 
 
@@ -210,7 +249,8 @@ function getSuperSampledContour(c, nodesPerSegment) {
     const xSpacing = (c.x[n+1] - c.x[n]) / (nodesPerSegment[n] + 1);
     const ySpacing = (c.y[n+1] - c.y[n]) / (nodesPerSegment[n] + 1);
 
-    for (let i = 0; i < nodesPerSegment[n]; i++) {
+    // Add other nodesPerSegment - 1 other points (as already put in original point).
+    for (let i = 0; i < nodesPerSegment[n] - 1; i++) {
       ci.x.push(ci.x[ci.x.length - 1] + xSpacing);
       ci.y.push(ci.y[ci.y.length - 1] + ySpacing);
       ci.z.push(zValue);
@@ -334,7 +374,7 @@ function reverseIfAntiClockwise (contour) {
   }
 
   if (checkSum > 0) {
-    console.log('C1 anti-clockwise!');
+    console.log('anti-clockwise!');
     contour.x.reverse();
     contour.y.reverse();
   }

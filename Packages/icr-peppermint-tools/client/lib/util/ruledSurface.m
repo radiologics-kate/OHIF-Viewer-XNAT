@@ -80,8 +80,6 @@ nPerSeg1 = diff(find(perim1ind(idx1))); %% find returns the indicies of the non 
 [~,idx2] = sort(perim2interp);
 nPerSeg2 = diff(find(perim2ind(idx2)));
 
-%% TODO TODO TODO => UP TO HERE!
-
 % make interpolated polygons - these will be open polygons -> Because we are only working out the verticies.
 c1i.x = [];
 c1i.y = [];
@@ -108,6 +106,8 @@ for n = 1:length(c2.x)-1
     c2i.I = [c2i.I; [true; false(nPerSeg2(n)-1,1)]];
 end
 c2i.z = c2.z(1)*ones(size(c2i.x));
+
+%% TODO TODO TODO => UP TO HERE!
 
 % test all correspondances between points on the two interpolated polygons
 % do circular shifting using toeplitz matrices to avoid for loop
