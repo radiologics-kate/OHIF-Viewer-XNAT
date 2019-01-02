@@ -17,9 +17,12 @@ export default function(toolData) {
 
   console.log(extent);
 
+  const lowerCandidate = extent[0] + 1;
+  const upperCandidate = extent[1] - 1;
+
   // If a contour can is missing between drawn slices, see if it can be interpolated.
-  for (i = extent[0] + 1; i < extent[1]; i++) {
-    console.log(i);
+  for (i = lowerCandidate; i <= upperCandidate; i++) {
+    console.log(`checking contour: ${i}`);
 
     if (!ROIContourData[i].contours) {
       const contourPair = _getContoursToInterpolate(i, extent, ROIContourData);
@@ -102,7 +105,9 @@ function _getContoursToInterpolate (index, extent, ROIContourData) {
   let contours = [];
   let canInterpolate = true;
 
+  /*
   console.log(`_getContoursToInterpolate: ${index}`);
+  */
 
   // Check for nearest lowest index containing contours.
   for (let i = index - 1; i >= extent[0]; i--) {
@@ -177,8 +182,6 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
   const c1i = getSuperSampledContour(c1, nodesPerSegment1);
   const c2i = getSuperSampledContour(c2, nodesPerSegment2);
 
-  console.log(c1i);
-
 
 
 }
@@ -195,7 +198,7 @@ function getSuperSampledContour(c, nodesPerSegment) {
   const zValue = c.z[0];
 
   // Length - 1, produces 'open' polygon.
-  for (n = 0; n < c.x.length - 1; n++) {
+  for (let n = 0; n < c.x.length - 1; n++) {
     // Add original point.
     ci.x.push(c.x[n]);
     ci.y.push(c.y[n]);
@@ -207,7 +210,7 @@ function getSuperSampledContour(c, nodesPerSegment) {
     const xSpacing = (c.x[n+1] - c.x[n]) / (nodesPerSegment[n] + 1);
     const ySpacing = (c.y[n+1] - c.y[n]) / (nodesPerSegment[n] + 1);
 
-    for (i = 0; i < nodesPerSegment[n]; i++) {
+    for (let i = 0; i < nodesPerSegment[n]; i++) {
       ci.x.push(ci.x[ci.x.length - 1] + xSpacing);
       ci.y.push(ci.y[ci.y.length - 1] + ySpacing);
       ci.z.push(zValue);
@@ -220,7 +223,7 @@ function getSuperSampledContour(c, nodesPerSegment) {
 
 function getNodesPerSegment(perimInterp, perimInd) {
   const idx = [];
-  for (var i = 0; i < perimInterp.length; ++i) idx[i] = i;
+  for (let i = 0; i < perimInterp.length; ++i) idx[i] = i;
   idx.sort(function (a, b) { return perimInterp[a] < perimInterp[b] ? -1 : perimInterp[a] > perimInterp[b] ? 1 : 0; });
 
   const perimIndSorted = [];
