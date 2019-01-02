@@ -2,7 +2,7 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-const dP = 0.2; // Aim for < 0.2mm between interpolated points when super-sampling.
+const dP = 2; // Aim for < 0.2mm between interpolated points when super-sampling.
 
 export default function(toolData) {
   const ROIContourUid = toolData.ROIContourUid;
@@ -176,15 +176,32 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
   const nodesPerSegment2 = getNodesPerSegment(perim2Interp, perim2Ind);
 
   const c1i = getSuperSampledContour(c1, nodesPerSegment1);
+
+  console.log(c1i.x[0], c1i.y[0]);
+
   const c2i = getSuperSampledContour(c2, nodesPerSegment2);
 
-  let expectedC1iLength = 0;
+  // Keep c2i fixed and shift the starting node of c1i to minimise the total length of segments.
+  shiftSuperSampledContourInPlace(c1i, c2i);
 
-  // Keep c2i fixed and check each starting node of c1i for total length of connected segments.
+  console.log(c1i);
 
-  const cl1iLength = c1i.x.length;
 
-  console.log(`cl1iLength: ${cl1iLength}`);
+}
+
+
+/**
+ * shiftSuperSampledContourInPlace - Shifts the indicies of c1i around to
+ * minimise: SUM (|c1i[i]-c2i[i]|) from 0 to N.
+ *
+ * @param  {type} c1i The contour to shift.
+ * @param  {type} c2i The reference contour.
+ * @modifies c1i
+ */
+function shiftSuperSampledContourInPlace(c1i, c2i) {
+  const c1iLength = c1i.x.length;
+
+  console.log(`c1iLength: ${c1iLength}`);
   console.log(`c2iLength: ${c2i.x.length}`);
 
   let optimal = {
@@ -192,21 +209,21 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
     totalSquaredXYLengths: Infinity
   };
 
-  for (let startingNode = 0; startingNode < cl1iLength; startingNode++) {
+  for (let startingNode = 0; startingNode < c1iLength; startingNode++) {
     let node = startingNode;
 
     // NOTE: 1) Ignore calculating Z, as the sum of all squared Z distances will always be a constant.
     // NOTE: 2) Don't need actual length, so don't worry about square rooting.
     let totalSquaredXYLengths = 0;
 
-    for (let itteration = 0; itteration < cl1iLength; itteration++) {
+    for (let itteration = 0; itteration < c1iLength; itteration++) {
 
       totalSquaredXYLengths += (c1i.x[node] - c2i.x[itteration])**2
         + (c1i.y[node] - c2i.y[itteration])**2;
 
       node++;
 
-      if (node === cl1iLength) node = 0;
+      if (node === c1iLength) node = 0;
     }
 
     if (totalSquaredXYLengths < optimal.totalSquaredXYLengths) {
@@ -217,12 +234,18 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
 
   console.log(optimal);
 
-  if (Number.isNaN(optimal.totalSquaredXYLengths)  || optimal.totalSquaredXYLengths === Infinity) {
-    throw new Error(`totalSquaredXYLengths is ${optimal.totalSquaredXYLengths}`);
-  }
+  let node = optimal.startingNode;
 
+  shiftCircularArray(c1i.x, node);
+  shiftCircularArray(c1i.y, node);
+  shiftCircularArray(c1i.z, node);
+  shiftCircularArray(c1i.I, node);
+}
 
-
+function shiftCircularArray(arr, count) {
+  count -= arr.length * Math.floor(count / arr.length);
+  arr.push.apply(arr, arr.splice(0, count));
+  return arr;
 }
 
 
