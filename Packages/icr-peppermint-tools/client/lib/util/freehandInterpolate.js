@@ -152,6 +152,9 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
     contourPair[1]
   );
 
+  console.log(c1);
+  console.log(c2);
+
   const zInterp = (index - contourPair[0])/(contourPair[1] - contourPair[0]);
 
   console.log(`zInterp: ${zInterp}`);
@@ -179,21 +182,14 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
 
   const c1i = getSuperSampledContour(c1, nodesPerSegment1);
 
-  console.log(c1i.x[0], c1i.y[0]);
-
   const c2i = getSuperSampledContour(c2, nodesPerSegment2);
 
   // Keep c2i fixed and shift the starting node of c1i to minimise the total length of segments.
   shiftSuperSampledContourInPlace(c1i, c2i);
 
-  console.log(c1i);
-
   const {c1iReduced, c2iReduced} = reduceContoursToOriginNodes(c1i, c2i);
 
-  console.log(c1iReduced);
-  console.log(c2iReduced);
-
-  const interpolated2DContour = generateInterpolated2DContour(
+  const interpolated2DContour = generateInterpolatedOpen2DContour(
     c1iReduced,
     c2iReduced,
     zInterp,
@@ -205,31 +201,22 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
 }
 
 
-function generateInterpolated2DContour (c1ir, c2ir, zInterp, c1HasMoreOriginalPoints) {
+function generateInterpolatedOpen2DContour (c1ir, c2ir, zInterp, c1HasMoreOriginalPoints) {
   const cInterp = {
     x: [],
     y: []
   };
 
+  const indicies = c1HasMoreOriginalPoints ? c1ir.I : c2ir.I;
 
-  if (c1HasMoreOriginalPoints) {
-    for (let i = 0; i < c1ir.x.length; i++) {
-      if (c1ir.I[i]) {
-        cInterp.x.push((1-zInterp)*c1ir.x[i] + zInterp*c2ir.x[i]);
-        cInterp.y.push((1-zInterp)*c1ir.y[i] + zInterp*c2ir.y[i]);
-      }
+  for (let i = 0; i < c1ir.x.length; i++) {
+    if (indicies[i]) {
+      cInterp.x.push((1-zInterp)*c1ir.x[i] + zInterp*c2ir.x[i]);
+      cInterp.y.push((1-zInterp)*c1ir.y[i] + zInterp*c2ir.y[i]);
     }
-
-
-  } else {
-    // TODO!
-    throw new Error('Need to implement scenario where c2 has mount points then c1!');
   }
 
-
   return cInterp;
-
-
 }
 
 function reduceContoursToOriginNodes (c1i, c2i) {
@@ -259,17 +246,6 @@ function reduceContoursToOriginNodes (c1i, c2i) {
       c2iReduced.I.push(c2i.I[i]);
     }
   }
-
-  // Close contours.
-  c1iReduced.x.push(c1iReduced.x[0]);
-  c1iReduced.y.push(c1iReduced.y[0]);
-  c1iReduced.z.push(c1iReduced.z[0]);
-  c1iReduced.I.push(c1iReduced.I[0]);
-
-  c2iReduced.x.push(c2iReduced.x[0]);
-  c2iReduced.y.push(c2iReduced.y[0]);
-  c2iReduced.z.push(c2iReduced.z[0]);
-  c2iReduced.I.push(c2iReduced.I[0]);
 
   return {
     c1iReduced,
