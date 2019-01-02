@@ -1,7 +1,7 @@
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
-import { Polygon } from '../classes/Polygon.js';
+import { Polygon } from 'meteor/icr:peppermint-tools';
 import { getNextColor } from 'meteor/icr:peppermint-tools';
 
 import { db } from './indexedDB.js';

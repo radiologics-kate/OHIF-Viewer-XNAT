@@ -1,6 +1,6 @@
 import { OHIF } from 'meteor/ohif:core';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { Polygon } from '../classes/Polygon.js';
+import { Polygon } from 'meteor/icr:peppermint-tools';
 import { AIMReader } from '../classes/AIMReader.js';
 import { RTStructReader } from '../classes/RTStructReader.js';
 

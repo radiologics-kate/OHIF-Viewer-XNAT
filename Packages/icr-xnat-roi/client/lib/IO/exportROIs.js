@@ -2,7 +2,7 @@ import { OHIF } from 'meteor/ohif:core';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { AIMWriter } from "../classes/AIMWriter.js";
 import { AsyncRoiFetcher } from '../classes/AsyncRoiFetcher.js';
-import { Polygon } from '../classes/Polygon.js';
+import { Polygon } from 'meteor/icr:peppermint-tools';
 import { RoiExtractor } from '../classes/RoiExtractor.js';
 import { AIMExporter } from '../classes/AIMExporter.js';
 import { roiCollectionBuilder } from './roiCollectionBuilder.js';

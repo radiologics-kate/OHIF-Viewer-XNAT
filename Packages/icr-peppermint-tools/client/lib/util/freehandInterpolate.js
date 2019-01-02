@@ -1,5 +1,7 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
+import { Polygon } from "./classes/Polygon.js";
+import generateUID from "./generateUID.js";
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
 const dP = 0.2; // Aim for < 0.2mm between interpolated points when super-sampling.
@@ -141,7 +143,7 @@ function _getContoursToInterpolate (index, extent, ROIContourData) {
 }
 
 function _interpolateBetween (index, contourPair, ROIContourData) {
-  console.log(`TODO: interpolate frame ${index + 1} between frames (${contourPair[0] + 1}, ${contourPair[1] + 1})`);
+  console.log(`Interpolating frame ${index + 1} between frames (${contourPair[0] + 1}, ${contourPair[1] + 1})`);
 
   const c1 = generateClosedContour3D(
     ROIContourData[contourPair[0]].contours[0].handles,
@@ -152,12 +154,7 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
     contourPair[1]
   );
 
-  console.log(c1);
-  console.log(c2);
-
   const zInterp = (index - contourPair[0])/(contourPair[1] - contourPair[0]);
-
-  console.log(`zInterp: ${zInterp}`);
 
   const cumPerim1 = getCumulativePerimeter(c1);
   const cumPerim2 = getCumulativePerimeter(c2);
@@ -196,8 +193,59 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
     c1.x.length > c2.x.length
   );
 
-  console.log(interpolated2DContour);
+  const c1Metadata = ROIContourData[contourPair[0]].contours[0];
 
+  const ROIContourMetadata = {
+    ROICOntourUid: c1Metadata.ROIContourUid,
+    seriesInstanceUid: c1Metadata.seriesInstanceUid,
+    structureSetUid: c1Metadata.structureSetUid
+  };
+
+  addInterpolatedContour(
+    interpolated2DContour,
+    ROIContourData[index].imageId,
+    ROIContourData[contourPair[0]].contours[0]
+  );
+
+}
+
+function addInterpolatedContour (interpolated2DContour, imageId, referenceToolData) {
+  const handles = [];
+
+  for (let i = 0; i < interpolated2DContour.x.length; i++) {
+    handles.push({
+      x: interpolated2DContour.x[i],
+      y: interpolated2DContour.y[i]
+    });
+  }
+
+  const polygon = new Polygon(
+    handles, // TODO -> convert interpolated2DContour to handles
+    null,
+    referenceToolData.seriesInstanceUid,
+    referenceToolData.structureSetUid,
+    referenceToolData.ROIContourUid,
+    generateUID()
+  );
+
+  const toolStateManager = globalToolStateManager.saveToolState();
+
+  if (!toolStateManager[imageId]) {
+    toolStateManager[imageId] = {};
+  }
+
+  const imageToolState = toolStateManager[imageId];
+
+  if (!imageToolState.freehandMouse) {
+    imageToolState.freehandMouse = {};
+    imageToolState.freehandMouse.data = [];
+  } else if (!imageToolState.freehandMouse.data) {
+    imageToolState.freehandMouse.data = [];
+  }
+
+  imageToolState.freehandMouse.data.push(
+    polygon.getFreehandToolData(false)
+  );
 }
 
 
@@ -265,9 +313,6 @@ function reduceContoursToOriginNodes (c1i, c2i) {
 function shiftSuperSampledContourInPlace (c1i, c2i) {
   const c1iLength = c1i.x.length;
 
-  console.log(`c1iLength: ${c1iLength}`);
-  console.log(`c2iLength: ${c2i.x.length}`);
-
   let optimal = {
     startingNode: 0,
     totalSquaredXYLengths: Infinity
@@ -295,8 +340,6 @@ function shiftSuperSampledContourInPlace (c1i, c2i) {
       optimal.startingNode = startingNode;
     }
   }
-
-  console.log(optimal);
 
   let node = optimal.startingNode;
 

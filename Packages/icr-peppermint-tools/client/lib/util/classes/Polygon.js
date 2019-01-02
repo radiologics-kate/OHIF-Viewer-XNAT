@@ -64,12 +64,15 @@ export class Polygon {
       ROIContourUid,
       referencedROIContour,
       referencedStructureSet,
-      sopInstanceUID: this._sopInstanceUid,
       visible: true,
       active: false,
       invalidated: true,
       handles: []
     };
+
+    if (this._sopInstanceUid) {
+      data.sopInstanceUID = this._sopInstanceUid;
+    }
 
     this._generateHandles(data.handles);
 

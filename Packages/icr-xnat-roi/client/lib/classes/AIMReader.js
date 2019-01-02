@@ -1,6 +1,6 @@
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { OHIF } from 'meteor/ohif:core';
-import { Polygon } from './Polygon.js';
+import { Polygon } from 'meteor/icr:peppermint-tools';
 
 const modules = cornerstoneTools.store.modules;
 

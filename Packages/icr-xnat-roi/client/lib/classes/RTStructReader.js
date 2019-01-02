@@ -1,5 +1,5 @@
 import { OHIF } from 'meteor/ohif:core';
-import { Polygon } from '../classes/Polygon.js';
+import { Polygon } from 'meteor/icr:peppermint-tools';
 import { dicomParser } from 'meteor/ohif:cornerstone';
 import { cornerstoneTools } from 'meteor/ohif:cornerstone';
 
