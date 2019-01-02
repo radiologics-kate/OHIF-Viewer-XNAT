@@ -1,22 +1,5 @@
 function [cz,c1i,c2i,totalEdgeLength] = ruledSurface(c1,c2,zInterp)
 
-%% I'm guessing [cz,c1i,c2i,totalEdgeLength] is the output.
-
-
-c1 = {
- x: [0.0, 0.0, 1.0, 1.0, 0.0],
- y: [0.0, 1.0, 1.0, 0.0, 0.0],
- z: [0.0, 0.0, 0.0, 0.0, 0.0]
-}
-
-c2 = {
- x: [0.0, 0.0, 1.0, 1.0, 0.5, 0.0],
- y: [0.0, 1.0, 1.0, 0.0. 0.0, 0.0],
- z: [2.0, 2.0, 2.0, 2.0. 2.0, 2.0]
-}
-
-zInterp = 1.0
-
 % assumes input polygons are closed and that they are in x-y plane at
 % different z locations
 
@@ -107,8 +90,6 @@ for n = 1:length(c2.x)-1
 end
 c2i.z = c2.z(1)*ones(size(c2i.x));
 
-%% TODO TODO TODO => UP TO HERE!
-
 % test all correspondances between points on the two interpolated polygons
 % do circular shifting using toeplitz matrices to avoid for loop
 X = toeplitz(c1i.x,[c1i.x(1) flipud(c1i.x(2:end))']);
@@ -162,6 +143,8 @@ c2i.I(end+1) = c2i.I(1);
 %     cz.selfIntersectingSurface = cz.selfIntersectingSurface | ~isempty(setdiff([xi yi],[cI.x cI.y],'rows'));
 % end
 cz.selfIntersectingSurface = false;
+
+%% TODO TODO TODO => UP TO HERE!
 
 % make interpolated polygon if requested by input of new z location
 if nargin==3

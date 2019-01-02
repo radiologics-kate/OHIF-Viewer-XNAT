@@ -2,7 +2,7 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 
 const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-const dP = 2; // Aim for < 0.2mm between interpolated points when super-sampling.
+const dP = 0.2; // Aim for < 0.2mm between interpolated points when super-sampling.
 
 export default function(toolData) {
   const ROIContourUid = toolData.ROIContourUid;
@@ -152,7 +152,9 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
     contourPair[1]
   );
 
-  const zInterp = index;
+  const zInterp = (index - contourPair[0])/(contourPair[1] - contourPair[0]);
+
+  console.log(`zInterp: ${zInterp}`);
 
   const cumPerim1 = getCumulativePerimeter(c1);
   const cumPerim2 = getCumulativePerimeter(c2);
@@ -186,7 +188,93 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
 
   console.log(c1i);
 
+  const {c1iReduced, c2iReduced} = reduceContoursToOriginNodes(c1i, c2i);
 
+  console.log(c1iReduced);
+  console.log(c2iReduced);
+
+  const interpolated2DContour = generateInterpolated2DContour(
+    c1iReduced,
+    c2iReduced,
+    zInterp,
+    c1.x.length > c2.x.length
+  );
+
+  console.log(interpolated2DContour);
+
+}
+
+
+function generateInterpolated2DContour (c1ir, c2ir, zInterp, c1HasMoreOriginalPoints) {
+  const cInterp = {
+    x: [],
+    y: []
+  };
+
+
+  if (c1HasMoreOriginalPoints) {
+    for (let i = 0; i < c1ir.x.length; i++) {
+      if (c1ir.I[i]) {
+        cInterp.x.push((1-zInterp)*c1ir.x[i] + zInterp*c2ir.x[i]);
+        cInterp.y.push((1-zInterp)*c1ir.y[i] + zInterp*c2ir.y[i]);
+      }
+    }
+
+
+  } else {
+    // TODO!
+    throw new Error('Need to implement scenario where c2 has mount points then c1!');
+  }
+
+
+  return cInterp;
+
+
+}
+
+function reduceContoursToOriginNodes (c1i, c2i) {
+  const c1iReduced = {
+    x: [],
+    y: [],
+    z: [],
+    I: []
+  };
+  const c2iReduced = {
+    x: [],
+    y: [],
+    z: [],
+    I: []
+  };
+
+  for (let i = 0; i < c1i.x.length; i++) {
+    if (c1i.I[i] || c2i.I[i]) {
+      c1iReduced.x.push(c1i.x[i]);
+      c1iReduced.y.push(c1i.y[i]);
+      c1iReduced.z.push(c1i.z[i]);
+      c1iReduced.I.push(c1i.I[i]);
+
+      c2iReduced.x.push(c2i.x[i]);
+      c2iReduced.y.push(c2i.y[i]);
+      c2iReduced.z.push(c2i.z[i]);
+      c2iReduced.I.push(c2i.I[i]);
+    }
+  }
+
+  // Close contours.
+  c1iReduced.x.push(c1iReduced.x[0]);
+  c1iReduced.y.push(c1iReduced.y[0]);
+  c1iReduced.z.push(c1iReduced.z[0]);
+  c1iReduced.I.push(c1iReduced.I[0]);
+
+  c2iReduced.x.push(c2iReduced.x[0]);
+  c2iReduced.y.push(c2iReduced.y[0]);
+  c2iReduced.z.push(c2iReduced.z[0]);
+  c2iReduced.I.push(c2iReduced.I[0]);
+
+  return {
+    c1iReduced,
+    c2iReduced
+  };
 }
 
 
@@ -198,7 +286,7 @@ function _interpolateBetween (index, contourPair, ROIContourData) {
  * @param  {type} c2i The reference contour.
  * @modifies c1i
  */
-function shiftSuperSampledContourInPlace(c1i, c2i) {
+function shiftSuperSampledContourInPlace (c1i, c2i) {
   const c1iLength = c1i.x.length;
 
   console.log(`c1iLength: ${c1iLength}`);
