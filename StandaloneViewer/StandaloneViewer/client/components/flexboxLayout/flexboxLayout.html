@@ -6,8 +6,10 @@
         <div class="mainContent {{#if leftSidebarOpen}}sidebar-left-open{{/if}} {{#if rightSidebarOpen}}sidebar-right-open{{/if}}">
             {{>standaloneViewerMain (clone this)}}
         </div>
+        <!-- TODO: Maybe measurements table will be merged with the ROI/Masks interfaces in the future?
         <div class="sidebarMenu sidebar-right {{#if rightSidebarOpen}}sidebar-open{{/if}}">
             {{> measurementLightTable (clone this)}}
         </div>
+        -->
     </div>
 </template>
