@@ -1,8 +1,9 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstone } from 'meteor/ohif:cornerstone';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstone } from "meteor/ohif:cornerstone";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 /**
  * Rescales imported polygons based on imported file type and imagePlane properties.
@@ -11,12 +12,15 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  * @param imageId
  * @param imagePlane
  */
-export function rescaleImportedPolygons (imageId, imagePlane) {
+export function rescaleImportedPolygons(imageId, imagePlane) {
   const toolState = globalToolStateManager.saveToolState();
 
   const imageIdToolState = globalToolStateManager.saveImageIdToolState(imageId);
 
-  if ( imageIdToolState === undefined || imageIdToolState.freehandMouse === undefined ) {
+  if (
+    imageIdToolState === undefined ||
+    imageIdToolState.freehandMouse === undefined
+  ) {
     return;
   }
 
@@ -24,7 +28,7 @@ export function rescaleImportedPolygons (imageId, imagePlane) {
 
   let rescaledPolygons = false;
 
-  for ( let i = 0; i < toolData.length; i++ ) {
+  for (let i = 0; i < toolData.length; i++) {
     if (toolData[i].toBeScaled) {
       scaleHandles(toolData[i], imagePlane);
       toolData[i].toBeScaled = false;
@@ -40,30 +44,42 @@ export function rescaleImportedPolygons (imageId, imagePlane) {
   }
 }
 
-function scaleHandles (toolData, imagePlane) {
+function scaleHandles(toolData, imagePlane) {
   switch (toolData.toBeScaled) {
-    case 'AIM':
+    case "AIM":
       // No scaling, TwoDimensionSpatialCoordinates in AIM are already stored in pixel coordinates.
       break;
-    case 'RTSTRUCT':
+    case "RTSTRUCT":
       try {
         scaleRtStructContourData(toolData, imagePlane);
       } catch (err) {
         console.error(err.message);
-      };
+      }
       break;
     default:
-        console.error(`Unrecognised scaling type: ${toolData.toBeScaled}`);
-        break;
-  };
+      console.error(`Unrecognised scaling type: ${toolData.toBeScaled}`);
+      break;
+  }
 }
 
-function scaleRtStructContourData (toolData, imagePlane) {
+function scaleRtStructContourData(toolData, imagePlane) {
   // See Equation C.7.6.2.1-1 of the DICOM standard
 
-  const X = [ imagePlane.rowCosines.x, imagePlane.rowCosines.y, imagePlane.rowCosines.z ];
-  const Y = [ imagePlane.columnCosines.x, imagePlane.columnCosines.y, imagePlane.columnCosines.z ];
-  const S = [ imagePlane.imagePositionPatient.x, imagePlane.imagePositionPatient.y, imagePlane.imagePositionPatient.z ];
+  const X = [
+    imagePlane.rowCosines.x,
+    imagePlane.rowCosines.y,
+    imagePlane.rowCosines.z
+  ];
+  const Y = [
+    imagePlane.columnCosines.x,
+    imagePlane.columnCosines.y,
+    imagePlane.columnCosines.z
+  ];
+  const S = [
+    imagePlane.imagePositionPatient.x,
+    imagePlane.imagePositionPatient.y,
+    imagePlane.imagePositionPatient.z
+  ];
   const deltaI = imagePlane.rowPixelSpacing;
   const deltaJ = imagePlane.columnPixelSpacing;
 
@@ -90,34 +106,36 @@ function scaleRtStructContourData (toolData, imagePlane) {
     }
   }
 
-  const ci = { // Index of max elements in X and Y
+  const ci = {
+    // Index of max elements in X and Y
     ix,
     iy
   };
 
   // Sanity Check
   const directionCosineMagnitude = {
-    x: Math.pow(X[0],2) + Math.pow(X[1],2) + Math.pow(X[2],2),
-    y: Math.pow(Y[0],2) + Math.pow(Y[1],2) + Math.pow(Y[2],2)
+    x: Math.pow(X[0], 2) + Math.pow(X[1], 2) + Math.pow(X[2], 2),
+    y: Math.pow(Y[0], 2) + Math.pow(Y[1], 2) + Math.pow(Y[2], 2)
   };
 
-  if ( directionCosineMagnitude.x < 0.99 || directionCosineMagnitude.y < 0.99 ) {
+  if (directionCosineMagnitude.x < 0.99 || directionCosineMagnitude.y < 0.99) {
     throw Error(
-      `Direction cosines do not sum to 1 in quadrature. There is likely a mistake in the DICOM metadata.`
-      + `directionCosineMagnitudes: ${directionCosineMagnitude.x}, ${directionCosineMagnitude.y}`
+      `Direction cosines do not sum to 1 in quadrature. There is likely a mistake in the DICOM metadata.` +
+        `directionCosineMagnitudes: ${directionCosineMagnitude.x}, ${
+          directionCosineMagnitude.y
+        }`
     );
   }
 
   // Fill in elements that won't change between points
-  const c = [ undefined, Y[ci.ix], X[ci.ix], undefined, X[ci.iy], Y[ci.iy] ];
+  const c = [undefined, Y[ci.ix], X[ci.ix], undefined, X[ci.iy], Y[ci.iy]];
 
-  for ( let pointI = 0; pointI < toolData.handles.length; pointI++ ) {
-
+  for (let pointI = 0; pointI < toolData.handles.length; pointI++) {
     // Subtract imagePositionPatient from the coordinate
     const r = [
       toolData.handles[pointI].x - S[0],
       toolData.handles[pointI].y - S[1],
-      toolData.handles[pointI].z - S[2],
+      toolData.handles[pointI].z - S[2]
     ];
 
     // Set the variable terms in c.
@@ -125,11 +143,14 @@ function scaleRtStructContourData (toolData, imagePlane) {
     c[3] = r[ci.iy];
 
     // General case: Solves the two choosen simulataneous equations to go from the patient coordinate system to the imagePlane.
-    const i = ( c[0] - c[1]*c[3]/c[5] )  /  ( c[2]*deltaI * ( 1 - (c[1]*c[4])/(c[2]*c[5]) ) );
-    const j = ( c[3] - c[4]*i*deltaI )  /  ( c[5]*deltaJ );
+    const i =
+      (c[0] - (c[1] * c[3]) / c[5]) /
+      (c[2] * deltaI * (1 - (c[1] * c[4]) / (c[2] * c[5])));
+    const j = (c[3] - c[4] * i * deltaI) / (c[5] * deltaJ);
 
-    toolData.handles[pointI].x = i;
-    toolData.handles[pointI].y = j;
+    // NOTE: Add (0.5, 0.5) to the coordinate, as PCS reference frame is with respect to the centre of the first pixel.
+    toolData.handles[pointI].x = i + 0.5;
+    toolData.handles[pointI].y = j + 0.5;
     toolData.handles[pointI].z = 0;
   }
 
