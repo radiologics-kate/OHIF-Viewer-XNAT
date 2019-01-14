@@ -98,6 +98,22 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
 
     preventPropagation(evt);
   }
+
+  /**
+   * Invalidate the freehand tool data, tirggering re-calculation of statistics.
+   *
+   * @private @override
+   * @param {Object} eventData - Data object associated with the event.
+   */
+  _invalidateToolData(eventData) {
+    const config = this.configuration;
+    const element = eventData.element;
+    const toolData = getToolState(element, this.referencedToolName);
+    const data = toolData.data[config.currentTool];
+
+    data.invalidated = true;
+    data.interpolated = false;
+  }
 }
 
 /**

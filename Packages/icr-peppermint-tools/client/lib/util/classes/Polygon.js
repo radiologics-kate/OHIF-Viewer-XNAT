@@ -1,43 +1,45 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 const modules = cornerstoneTools.store.modules;
 
 export class Polygon {
-  constructor (
+  constructor(
     handles,
     sopInstanceUid,
     seriesInstanceUid,
     structureSetUid,
     ROIContourUid,
     polygonUid,
-    frameNumber
+    frameNumber,
+    interpolated
   ) {
-   this._polyHandles = this._deepCopyHandles(handles);
-   this._sopInstanceUid = sopInstanceUid;
-   this._seriesInstanceUid = seriesInstanceUid;
-   this._structureSetUid = structureSetUid;
-   this._ROIContourUid = ROIContourUid;
-   this._polygonUid = polygonUid;
-   this._frameNumber = frameNumber;
+    this._polyHandles = this._deepCopyHandles(handles);
+    this._sopInstanceUid = sopInstanceUid;
+    this._seriesInstanceUid = seriesInstanceUid;
+    this._structureSetUid = structureSetUid;
+    this._ROIContourUid = ROIContourUid;
+    this._polygonUid = polygonUid;
+    this._frameNumber = frameNumber;
+    this._interpolated = interpolated;
   }
 
-  _deepCopyHandles (handles) {
-   // Creates a deep copy of the handles object
-   const polyHandles = [];
-   const isZ = (handles[0].z !== undefined);
+  _deepCopyHandles(handles) {
+    // Creates a deep copy of the handles object
+    const polyHandles = [];
+    const isZ = handles[0].z !== undefined;
 
-   for (let i = 0; i < handles.length; i++) {
-     polyHandles.push({
-       x: handles[i].x,
-       y: handles[i].y
-     });
+    for (let i = 0; i < handles.length; i++) {
+      polyHandles.push({
+        x: handles[i].x,
+        y: handles[i].y
+      });
 
-     if (isZ) {
-       polyHandles[i].z = handles[i].z;
-     }
-   }
+      if (isZ) {
+        polyHandles[i].z = handles[i].z;
+      }
+    }
 
-   return polyHandles;
+    return polyHandles;
   }
 
   getFreehandToolData(importType) {
@@ -74,6 +76,10 @@ export class Polygon {
       data.sopInstanceUID = this._sopInstanceUid;
     }
 
+    if (this._interpolated) {
+      data.interpolated = true;
+    }
+
     this._generateHandles(data.handles);
 
     data.handles.textBox = {
@@ -92,49 +98,49 @@ export class Polygon {
     return data;
   }
 
-  _generateHandles (dataHandles) {
-   // Construct data.handles object
-   for (let i = 0; i < this._polyHandles.length; i++) {
-     handle = this._deepCopyOneHandle(i);
-     dataHandles.push(handle);
-   }
+  _generateHandles(dataHandles) {
+    // Construct data.handles object
+    for (let i = 0; i < this._polyHandles.length; i++) {
+      handle = this._deepCopyOneHandle(i);
+      dataHandles.push(handle);
+    }
 
-   // Generate lines to be drawn
-   for (let i = 0; i < dataHandles.length; i++) {
-     if (i === dataHandles.length - 1) {
-       dataHandles[i].lines.push(dataHandles[0]);
-     } else {
-       dataHandles[i].lines.push(dataHandles[i + 1]);
-     }
-   }
+    // Generate lines to be drawn
+    for (let i = 0; i < dataHandles.length; i++) {
+      if (i === dataHandles.length - 1) {
+        dataHandles[i].lines.push(dataHandles[0]);
+      } else {
+        dataHandles[i].lines.push(dataHandles[i + 1]);
+      }
+    }
   }
 
-  _deepCopyOneHandle (i) {
-   let handle = {
-     x: this._polyHandles[i].x,
-     y: this._polyHandles[i].y,
-     lines: []
-   };
+  _deepCopyOneHandle(i) {
+    let handle = {
+      x: this._polyHandles[i].x,
+      y: this._polyHandles[i].y,
+      lines: []
+    };
 
-   if (this._polyHandles[i].z !== undefined) {
-     handle.z = this._polyHandles[i].z;
-   }
+    if (this._polyHandles[i].z !== undefined) {
+      handle.z = this._polyHandles[i].z;
+    }
 
-   return handle;
+    return handle;
   }
 
   get polyHandles() {
-   return this._polyHandles;
+    return this._polyHandles;
   }
   get sopInstanceUid() {
-   return this._sopInstanceUid;
+    return this._sopInstanceUid;
   }
 
-  get uid () {
-   return this._polygonUid;
+  get uid() {
+    return this._polygonUid;
   }
 
   get frameNumber() {
-   return this._frameNumber;
+    return this._frameNumber;
   }
 }

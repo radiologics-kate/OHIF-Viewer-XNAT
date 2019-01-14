@@ -424,6 +424,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             color = toolColors.getColorIfActive(data);
             fillColor = toolColors.getFillColor();
           }
+        } else if (data.interpolated) {
+          color = "darkblue"; // TEMP -- Change linestyle somehow.
+          fillColor = "darkblue"; // TEMP -- Change linestyle somehow.
         } else {
           color = ROIContour.color;
           fillColor = ROIContour.color;
@@ -759,6 +762,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     if (this._modifying) {
       this._modifying = false;
       data.invalidated = true;
+      data.interpolated = false;
     }
 
     // Reset the current handle
