@@ -25,8 +25,6 @@ export default function(toolData) {
 
   const toInterpolate = [];
 
-  console.log(ROIContourData);
-
   // If a contour can is missing between drawn slices, see if it can be interpolated.
   for (i = lowerCandidate; i <= upperCandidate; i++) {
     console.log(`checking contour: ${i}`);
@@ -51,8 +49,6 @@ export default function(toolData) {
       }
     }
   }
-
-  console.log(toInterpolate);
 
   for (let i = 0; i < toInterpolate.length; i++) {
     if (toInterpolate[i]) {
