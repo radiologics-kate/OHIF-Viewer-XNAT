@@ -31,11 +31,6 @@ export default function(toolData) {
 
     if (!ROIContourData[i].contours) {
       const contourPair = _getContoursToInterpolate(i, extent, ROIContourData);
-      /*
-      if (contourPair) {
-        _interpolateBetween(indicies, contourPair, ROIContourData);
-      }
-      */
 
       if (contourPair) {
         if (!toInterpolate[contourPair[0]]) {

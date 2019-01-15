@@ -308,7 +308,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     );
 
     if (eventData.event.metaKey) {
-      this._switchROIContour(data);
+      this._switchROIContour(evt, data);
       preventPropagation(evt);
 
       return;
@@ -354,7 +354,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     preventPropagation(evt);
   }
 
-  _switchROIContour(data) {
+  _switchROIContour(evt, data) {
     const freehand3DStore = this._freehand3DStore;
 
     freehand3DStore.setters.activeROIContour(
@@ -362,6 +362,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       data.structureSetUid,
       data.ROIContourUid
     );
+
+    cornerstone.updateImage(evt.detail.element);
   }
 
   /**
@@ -412,6 +414,14 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         continue;
       }
 
+      const isROIActive =
+        freehand3DStore.getters.ROIContourIndex(
+          data.seriesInstanceUid,
+          data.structureSetUid,
+          data.ROIContourUid
+        ) ===
+        freehand3DStore.getters.activeROIContourIndex(data.seriesInstanceUid);
+
       draw(context, context => {
         let color = toolColors.getColorIfActive(data);
         let fillColor;
@@ -424,12 +434,13 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             color = toolColors.getColorIfActive(data);
             fillColor = toolColors.getFillColor();
           }
-        } else if (data.interpolated) {
-          color = "darkblue"; // TEMP -- Change linestyle somehow.
-          fillColor = "darkblue"; // TEMP -- Change linestyle somehow.
         } else {
           color = ROIContour.color;
           fillColor = ROIContour.color;
+        }
+
+        if (isROIActive && data.interpolated) {
+          context.globalAlpha = config.interpolatedAlpha;
         }
 
         if (data.handles.length) {
@@ -451,6 +462,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
           }
         }
 
+        context.globalAlpha = 1.0;
+
         // Draw handles
 
         const options = {
@@ -458,7 +471,15 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
           fill: fillColor
         };
 
-        if (config.alwaysShowHandles || (data.active && data.polyBoundingBox)) {
+        if (isROIActive && data.interpolated) {
+          // Render dotted line
+          options.handleRadius = config.interpolatedHandleRadius;
+
+          drawHandles(context, eventData, data.handles, options);
+        } else if (
+          config.alwaysShowHandles ||
+          (data.active && data.polyBoundingBox)
+        ) {
           // Render all handles
           options.handleRadius = config.activeHandleRadius;
           drawHandles(context, eventData, data.handles, options);
@@ -795,6 +816,8 @@ function defaultFreehandConfiguration() {
       }
     },
     spacing: 5,
+    interpolatedHandleRadius: 1,
+    interpolatedAlpha: 0.5,
     activeHandleRadius: 3,
     completeHandleRadius: 6,
     alwaysShowHandles: false,
