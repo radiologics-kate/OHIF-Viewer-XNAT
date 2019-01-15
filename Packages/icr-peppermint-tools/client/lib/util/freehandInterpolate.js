@@ -25,11 +25,18 @@ export default function(toolData) {
 
   const toInterpolate = [];
 
+  console.log(ROIContourData);
+
   // If a contour can is missing between drawn slices, see if it can be interpolated.
   for (i = lowerCandidate; i <= upperCandidate; i++) {
     console.log(`checking contour: ${i}`);
 
-    if (!ROIContourData[i].contours) {
+    if (
+      // Check whether there are no contours on this slice, or one which is an interpolated contour.
+      !ROIContourData[i].contours ||
+      (ROIContourData[i].contours.length === 1 &&
+        ROIContourData[i].contours[0].interpolated)
+    ) {
       const contourPair = _getContoursToInterpolate(i, extent, ROIContourData);
 
       if (contourPair) {
@@ -234,18 +241,26 @@ function _interpolateBetween(indicies, contourPair, ROIContourData) {
       structureSetUid: c1Metadata.structureSetUid
     };
 
-    addInterpolatedContour(
-      interpolated2DContour,
-      ROIContourData[index].imageId,
-      ROIContourData[contourPair[0]].contours[0]
-    );
+    if (ROIContourData[index].contours) {
+      console.log(`TODO: EDIT THE INTERPOLATED CONTOUR! ${index}`);
+      editInterpolatedContour(
+        interpolated2DContour,
+        ROIContourData[index].imageId
+      );
+    } else {
+      addInterpolatedContour(
+        interpolated2DContour,
+        ROIContourData[index].imageId,
+        ROIContourData[contourPair[0]].contours[0]
+      );
+    }
   });
 }
 
 function addInterpolatedContour(
   interpolated2DContour,
   imageId,
-  referenceToolData
+  referencedToolData
 ) {
   const handles = [];
 
@@ -259,9 +274,9 @@ function addInterpolatedContour(
   const polygon = new Polygon(
     handles,
     null,
-    referenceToolData.seriesInstanceUid,
-    referenceToolData.structureSetUid,
-    referenceToolData.ROIContourUid,
+    referencedToolData.seriesInstanceUid,
+    referencedToolData.structureSetUid,
+    referencedToolData.ROIContourUid,
     generateUID(),
     null,
     true
@@ -283,6 +298,45 @@ function addInterpolatedContour(
   }
 
   imageToolState.freehandMouse.data.push(polygon.getFreehandToolData(false));
+}
+
+function editInterpolatedContour(interpolated2DContour, imageId) {
+  // TODO -> EDIT THE INTERPOLATED CONTOUR.
+
+  const toolStateManager = globalToolStateManager.saveToolState();
+  const imageToolState = toolStateManager[imageId];
+
+  if (!imageToolState) {
+    throw new Error(
+      "Image toolstate does not exist. This should not be reached in this case!"
+    );
+  }
+
+  const oldPolygon = imageToolState.freehandMouse.data[0];
+
+  const handles = [];
+
+  for (let i = 0; i < interpolated2DContour.x.length; i++) {
+    handles.push({
+      x: interpolated2DContour.x[i],
+      y: interpolated2DContour.y[i]
+    });
+  }
+
+  const updatedPolygon = new Polygon(
+    handles,
+    null,
+    oldPolygon.seriesInstanceUid,
+    oldPolygon.structureSetUid,
+    oldPolygon.ROIContourUid,
+    oldPolygon.uid,
+    null,
+    true
+  );
+
+  imageToolState.freehandMouse.data[0] = updatedPolygon.getFreehandToolData(
+    false
+  );
 }
 
 function generateInterpolatedOpen2DContour(
