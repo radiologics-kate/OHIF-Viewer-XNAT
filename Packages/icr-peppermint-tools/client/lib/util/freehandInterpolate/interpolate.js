@@ -240,8 +240,6 @@ function editInterpolatedContour(
   imageId,
   referencedToolData
 ) {
-  // TODO -> Edit the correct contour!
-
   const toolStateManager = globalToolStateManager.saveToolState();
   const imageToolState = toolStateManager[imageId];
 
@@ -265,10 +263,7 @@ function editInterpolatedContour(
     }
   }
 
-  console.log(toolDataIndex);
-
   const oldPolygon = imageToolState.freehandMouse.data[toolDataIndex];
-
   const handles = [];
 
   for (let i = 0; i < interpolated2DContour.x.length; i++) {

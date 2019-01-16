@@ -816,7 +816,7 @@ function defaultFreehandConfiguration() {
       }
     },
     spacing: 5,
-    interpolatedHandleRadius: 1,
+    interpolatedHandleRadius: 2,
     interpolatedAlpha: 0.5,
     activeHandleRadius: 3,
     completeHandleRadius: 6,
