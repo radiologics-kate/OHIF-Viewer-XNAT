@@ -25,7 +25,7 @@ export default function(toolData) {
 
   for (let i = 0; i < interpolationList.length; i++) {
     if (interpolationList[i]) {
-      _interpolateBetween(
+      _linearlyInterpolateBetween(
         interpolationList[i].list,
         interpolationList[i].pair,
         ROIContourData
@@ -39,7 +39,18 @@ export default function(toolData) {
   // TEMP
 }
 
-function _interpolateBetween(indicies, contourPair, ROIContourData) {
+/**
+ * _linearlyInterpolateBetween - Linearly interpolate all the slices in the
+ * indicies array between the contourPair.
+ *
+ * @param  {Number[]} indicies     An array of slice indicies to interpolate.
+ * @param  {Number[]} contourPair  The pair of contours to interpolate between.
+ * @param  {object[]} ROIContourData  Data for the slice location of contours
+ *                                    for the ROIContour.
+ * @return {null}
+ */
+
+function _linearlyInterpolateBetween(indicies, contourPair, ROIContourData) {
   const c1 = generateClosedContour3D(
     ROIContourData[contourPair[0]].contours[0].handles,
     contourPair[0]
@@ -49,6 +60,82 @@ function _interpolateBetween(indicies, contourPair, ROIContourData) {
     contourPair[1]
   );
 
+  const { c1Interp, c2Interp } = _generateInterpolationContourPair(c1, c2);
+
+  // Using the newly constructed contours, interpolate each ROI.
+  indicies.forEach(function(index) {
+    _linearlyInterpolateContour(
+      c1Interp,
+      c2Interp,
+      index,
+      contourPair,
+      ROIContourData,
+      c1.x.length > c2.x.length
+    );
+  });
+}
+
+/**
+ * _linearlyInterpolateContour - Inserts a linearly interpolated contour at
+ * specified slice index.
+ *
+ * @param  {object} c1Interp       The first reference contour.
+ * @param  {object} c2Interp       The second reference contour.
+ * @param  {Number} sliceIndex       The slice index to interpolate.
+ * @param  {Number{}} contourPair    The slice indicies of the reference contours.
+ * @param  {object[]} ROIContourData  Data for the slice location of contours
+ *                                  for the ROIContour.
+ * @return {null}
+ */
+function _linearlyInterpolateContour(
+  c1Interp,
+  c2Interp,
+  sliceIndex,
+  contourPair,
+  ROIContourData,
+  c1HasMoreOriginalPoints
+) {
+  const zInterp =
+    (sliceIndex - contourPair[0]) / (contourPair[1] - contourPair[0]);
+  const interpolated2DContour = generateInterpolatedOpen2DContour(
+    c1Interp,
+    c2Interp,
+    zInterp,
+    c1HasMoreOriginalPoints
+  );
+
+  const c1Metadata = ROIContourData[contourPair[0]].contours[0];
+
+  const ROIContourMetadata = {
+    ROICOntourUid: c1Metadata.ROIContourUid,
+    seriesInstanceUid: c1Metadata.seriesInstanceUid,
+    structureSetUid: c1Metadata.structureSetUid
+  };
+
+  if (ROIContourData[sliceIndex].contours) {
+    editInterpolatedContour(
+      interpolated2DContour,
+      ROIContourData[sliceIndex].imageId,
+      c1Metadata
+    );
+  } else {
+    addInterpolatedContour(
+      interpolated2DContour,
+      ROIContourData[sliceIndex].imageId,
+      c1Metadata
+    );
+  }
+}
+
+/**
+ * _generateInterpolationContourPair - generates two aligned contours with an
+ * equal number of points from which an intermediate contour may be interpolated.
+ *
+ * @param  {object} c1 The first contour.
+ * @param  {object} c2 The second contour.
+ * @return {object}  An object containing the two contours.
+ */
+function _generateInterpolationContourPair(c1, c2) {
   const cumPerim1 = getCumulativePerimeter(c1);
   const cumPerim2 = getCumulativePerimeter(c2);
 
@@ -83,43 +170,18 @@ function _interpolateBetween(indicies, contourPair, ROIContourData) {
   // Keep c2i fixed and shift the starting node of c1i to minimise the total length of segments.
   shiftSuperSampledContourInPlace(c1i, c2i);
 
-  const { c1iReduced, c2iReduced } = reduceContoursToOriginNodes(c1i, c2i);
-
-  // Using the newly constructed contours, interpolate each ROI.
-  indicies.forEach(function(index) {
-    const zInterp =
-      (index - contourPair[0]) / (contourPair[1] - contourPair[0]);
-
-    const interpolated2DContour = generateInterpolatedOpen2DContour(
-      c1iReduced,
-      c2iReduced,
-      zInterp,
-      c1.x.length > c2.x.length
-    );
-
-    const c1Metadata = ROIContourData[contourPair[0]].contours[0];
-
-    const ROIContourMetadata = {
-      ROICOntourUid: c1Metadata.ROIContourUid,
-      seriesInstanceUid: c1Metadata.seriesInstanceUid,
-      structureSetUid: c1Metadata.structureSetUid
-    };
-
-    if (ROIContourData[index].contours) {
-      editInterpolatedContour(
-        interpolated2DContour,
-        ROIContourData[index].imageId
-      );
-    } else {
-      addInterpolatedContour(
-        interpolated2DContour,
-        ROIContourData[index].imageId,
-        ROIContourData[contourPair[0]].contours[0]
-      );
-    }
-  });
+  return reduceContoursToOriginNodes(c1i, c2i);
 }
 
+/**
+ * addInterpolatedContour - Adds a new contour to the imageId.
+ *
+ * @param  {object} interpolated2DContour The polygon to add to the ROIContour.
+ * @param  {String} imageId               The imageId to add the polygon to.
+ * @param  {type} referencedToolData    The toolData of another polygon in the
+ * ROIContour, to assign appropriate metadata to the new polygon.
+ * @return {null}
+ */
 function addInterpolatedContour(
   interpolated2DContour,
   imageId,
@@ -163,8 +225,22 @@ function addInterpolatedContour(
   imageToolState.freehandMouse.data.push(polygon.getFreehandToolData(false));
 }
 
-function editInterpolatedContour(interpolated2DContour, imageId) {
-  // TODO -> EDIT THE INTERPOLATED CONTOUR.
+/**
+ * editInterpolatedContour - Edits an interpolated polygon on the imageId
+ * that corresponds to the specified ROIContour.
+ *
+ * @param  {object} interpolated2DContour The polygon to add to the ROIContour.
+ * @param  {String} imageId               The imageId to add the polygon to.
+ * @param  {type} referencedToolData    The toolData of another polygon in the
+ * ROIContour, to assign appropriate metadata to the new polygon.
+ * @return {null}
+ */
+function editInterpolatedContour(
+  interpolated2DContour,
+  imageId,
+  referencedToolData
+) {
+  // TODO -> Edit the correct contour!
 
   const toolStateManager = globalToolStateManager.saveToolState();
   const imageToolState = toolStateManager[imageId];
@@ -175,7 +251,23 @@ function editInterpolatedContour(interpolated2DContour, imageId) {
     );
   }
 
-  const oldPolygon = imageToolState.freehandMouse.data[0];
+  // Find the index of the polygon on this slice corresponding to
+  // The ROIContour.
+  let toolDataIndex;
+
+  for (let i = 0; i < imageToolState.freehandMouse.data.length; i++) {
+    if (
+      imageToolState.freehandMouse.data[i].ROIContourUid ===
+      referencedToolData.ROIContourUid
+    ) {
+      toolDataIndex = i;
+      break;
+    }
+  }
+
+  console.log(toolDataIndex);
+
+  const oldPolygon = imageToolState.freehandMouse.data[toolDataIndex];
 
   const handles = [];
 
@@ -197,9 +289,9 @@ function editInterpolatedContour(interpolated2DContour, imageId) {
     true
   );
 
-  imageToolState.freehandMouse.data[0] = updatedPolygon.getFreehandToolData(
-    false
-  );
+  imageToolState.freehandMouse.data[
+    toolDataIndex
+  ] = updatedPolygon.getFreehandToolData(false);
 }
 
 function generateInterpolatedOpen2DContour(
@@ -226,13 +318,13 @@ function generateInterpolatedOpen2DContour(
 }
 
 function reduceContoursToOriginNodes(c1i, c2i) {
-  const c1iReduced = {
+  const c1Interp = {
     x: [],
     y: [],
     z: [],
     I: []
   };
-  const c2iReduced = {
+  const c2Interp = {
     x: [],
     y: [],
     z: [],
@@ -241,21 +333,21 @@ function reduceContoursToOriginNodes(c1i, c2i) {
 
   for (let i = 0; i < c1i.x.length; i++) {
     if (c1i.I[i] || c2i.I[i]) {
-      c1iReduced.x.push(c1i.x[i]);
-      c1iReduced.y.push(c1i.y[i]);
-      c1iReduced.z.push(c1i.z[i]);
-      c1iReduced.I.push(c1i.I[i]);
+      c1Interp.x.push(c1i.x[i]);
+      c1Interp.y.push(c1i.y[i]);
+      c1Interp.z.push(c1i.z[i]);
+      c1Interp.I.push(c1i.I[i]);
 
-      c2iReduced.x.push(c2i.x[i]);
-      c2iReduced.y.push(c2i.y[i]);
-      c2iReduced.z.push(c2i.z[i]);
-      c2iReduced.I.push(c2i.I[i]);
+      c2Interp.x.push(c2i.x[i]);
+      c2Interp.y.push(c2i.y[i]);
+      c2Interp.z.push(c2i.z[i]);
+      c2Interp.I.push(c2i.I[i]);
     }
   }
 
   return {
-    c1iReduced,
-    c2iReduced
+    c1Interp,
+    c2Interp
   };
 }
 
