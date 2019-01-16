@@ -136,29 +136,26 @@ function _linearlyInterpolateContour(
  * @return {object}  An object containing the two contours.
  */
 function _generateInterpolationContourPair(c1, c2) {
-  const cumPerim1 = getCumulativePerimeter(c1);
-  const cumPerim2 = getCumulativePerimeter(c2);
+  const cumPerim1 = _getCumulativePerimeter(c1);
+  const cumPerim2 = _getCumulativePerimeter(c2);
 
   const interpPoints = Math.max(
     Math.ceil(cumPerim1[cumPerim1.length - 1] / dP),
     Math.ceil(cumPerim2[cumPerim2.length - 1] / dP)
   );
 
-  const cumPerim1Norm = normalisedCumulativePerimeter(cumPerim1);
-  const cumPerim2Norm = normalisedCumulativePerimeter(cumPerim2);
+  const cumPerim1Norm = _normalisedCumulativePerimeter(cumPerim1);
+  const cumPerim2Norm = _normalisedCumulativePerimeter(cumPerim2);
+
+  const numPoints1 = interpPoints + c2.x.length;
+  const numPoints2 = interpPoints + c1.x.length;
 
   // concatinate p && cumPerimNorm
-  const perim1Interp = getInterpolatedPerim(
-    interpPoints + c2.x.length,
-    cumPerim1Norm
-  );
-  const perim2Interp = getInterpolatedPerim(
-    interpPoints + c1.x.length,
-    cumPerim2Norm
-  );
+  const perim1Interp = getInterpolatedPerim(numPoints1, cumPerim1Norm);
+  const perim2Interp = getInterpolatedPerim(numPoints2, cumPerim2Norm);
 
-  const perim1Ind = getIndicatorArray(c1, c2, interpPoints);
-  const perim2Ind = getIndicatorArray(c2, c1, interpPoints);
+  const perim1Ind = getIndicatorArray(c1, numPoints1);
+  const perim2Ind = getIndicatorArray(c2, numPoints2);
 
   const nodesPerSegment1 = getNodesPerSegment(perim1Interp, perim1Ind);
   const nodesPerSegment2 = getNodesPerSegment(perim2Interp, perim2Ind);
@@ -168,7 +165,7 @@ function _generateInterpolationContourPair(c1, c2) {
   const c2i = getSuperSampledContour(c2, nodesPerSegment2);
 
   // Keep c2i fixed and shift the starting node of c1i to minimise the total length of segments.
-  shiftSuperSampledContourInPlace(c1i, c2i);
+  _shiftSuperSampledContourInPlace(c1i, c2i);
 
   return reduceContoursToOriginNodes(c1i, c2i);
 }
@@ -347,14 +344,14 @@ function reduceContoursToOriginNodes(c1i, c2i) {
 }
 
 /**
- * shiftSuperSampledContourInPlace - Shifts the indicies of c1i around to
+ * _shiftSuperSampledContourInPlace - Shifts the indicies of c1i around to
  * minimise: SUM (|c1i[i]-c2i[i]|) from 0 to N.
  *
  * @param  {type} c1i The contour to shift.
  * @param  {type} c2i The reference contour.
  * @modifies c1i
  */
-function shiftSuperSampledContourInPlace(c1i, c2i) {
+function _shiftSuperSampledContourInPlace(c1i, c2i) {
   const c1iLength = c1i.x.length;
 
   let optimal = {
@@ -472,10 +469,10 @@ function getNodesPerSegment(perimInterp, perimInd) {
   return nodesPerSegment;
 }
 
-function getIndicatorArray(contour3D, otherContour3D, interpPoints) {
+function getIndicatorArray(contour3D, numPoints) {
   const perimInd = [];
 
-  for (let i = 0; i < interpPoints + otherContour3D.x.length - 2; i++) {
+  for (let i = 0; i < numPoints - 2; i++) {
     perimInd.push(0);
   }
 
@@ -498,13 +495,20 @@ function getInterpolatedPerim(length, cumPerimNorm) {
   return linspace.concat(cumPerimNorm);
 }
 
-function getCumulativePerimeter(contour3D) {
+/**
+ * _getCumulativePerimeter - Returns an array of the the cumulative perimeter at
+ * each point of the contour.
+ *
+ * @param  {object} contour The contour.
+ * @return {Number[]}         An array of the cumulative perimeter at each point.
+ */
+function _getCumulativePerimeter(contour) {
   let cumulativePerimeter = [0];
 
-  for (let i = 1; i < contour3D.x.length; i++) {
+  for (let i = 1; i < contour.x.length; i++) {
     const lengthOfSegment = Math.sqrt(
-      (contour3D.x[i] - contour3D.x[i - 1]) ** 2 +
-        (contour3D.y[i] - contour3D.y[i - 1]) ** 2
+      (contour.x[i] - contour.x[i - 1]) ** 2 +
+        (contour.y[i] - contour.y[i - 1]) ** 2
     );
 
     cumulativePerimeter.push(cumulativePerimeter[i - 1] + lengthOfSegment);
@@ -513,7 +517,14 @@ function getCumulativePerimeter(contour3D) {
   return cumulativePerimeter;
 }
 
-function normalisedCumulativePerimeter(cumPerim) {
+/**
+ * _normalisedCumulativePerimeter - Normalises the cumulative perimeter array.
+ *
+ * @param  {type} cumPerim An array of the cumulative perimeter at each of a
+ * contour.
+ * @return {type}          The normalised array.
+ */
+function _normalisedCumulativePerimeter(cumPerim) {
   const cumPerimNorm = [];
 
   for (let i = 0; i < cumPerim.length; i++) {
