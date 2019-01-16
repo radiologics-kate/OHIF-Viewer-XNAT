@@ -151,8 +151,8 @@ function _generateInterpolationContourPair(c1, c2) {
   const numPoints2 = interpPoints + c1.x.length;
 
   // concatinate p && cumPerimNorm
-  const perim1Interp = getInterpolatedPerim(numPoints1, cumPerim1Norm);
-  const perim2Interp = getInterpolatedPerim(numPoints2, cumPerim2Norm);
+  const perim1Interp = _getInterpolatedPerim(numPoints1, cumPerim1Norm);
+  const perim2Interp = _getInterpolatedPerim(numPoints2, cumPerim2Norm);
 
   const perim1Ind = getIndicatorArray(c1, numPoints1);
   const perim2Ind = getIndicatorArray(c2, numPoints2);
@@ -483,12 +483,20 @@ function getIndicatorArray(contour3D, numPoints) {
   return perimInd;
 }
 
-function getInterpolatedPerim(length, cumPerimNorm) {
-  const diff = 1 / (length - 1);
+/**
+ * _getInterpolatedPerim - Adds additional interpolated points to the
+ * normalised perimeter array.
+ *
+ * @param  {Number} numPoints    The number of points to add.
+ * @param  {Number[]} cumPerimNorm The cumulative perimeter array.
+ * @return {Number[]}              The array of points.
+ */
+function _getInterpolatedPerim(numPoints, cumPerimNorm) {
+  const diff = 1 / (numPoints - 1);
   const linspace = [diff];
 
   // Length - 2 as we are discarding 0 an 1 for efficiency (no need to calculate them).
-  for (let i = 1; i < length - 2; i++) {
+  for (let i = 1; i < numPoints - 2; i++) {
     linspace.push(linspace[linspace.length - 1] + diff);
   }
 
