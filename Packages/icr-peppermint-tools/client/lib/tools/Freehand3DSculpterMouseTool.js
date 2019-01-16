@@ -3,7 +3,7 @@ import generateUID from "../util/generateUID.js";
 import { OHIF } from "meteor/ohif:core";
 import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import freehandInterpolate from "../util/freehandInterpolate.js";
+import interpolate from "../util/freehandInterpolate/interpolate.js";
 
 const FreehandSculpterMouseTool = cornerstoneTools.FreehandSculpterMouseTool;
 const toolColors = cornerstoneTools.toolColors;
@@ -90,7 +90,7 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
     const data = toolData.data[config.currentTool];
 
     if (modules.freehand3D.getters.interpolate()) {
-      freehandInterpolate(data);
+      interpolate(data);
     }
 
     // Update the image

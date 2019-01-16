@@ -6,7 +6,7 @@ import {
 import generateUID from "../util/generateUID.js";
 import { OHIF } from "meteor/ohif:core";
 import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
-import freehandInterpolate from "../util/freehandInterpolate.js";
+import interpolate from "../util/freehandInterpolate/interpolate.js";
 
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
@@ -798,7 +798,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     if (modules.freehand3D.getters.interpolate()) {
-      freehandInterpolate(data);
+      interpolate(data);
     }
 
     cornerstone.updateImage(element);

@@ -1,60 +1,33 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { Polygon } from "./classes/Polygon.js";
-import generateUID from "./generateUID.js";
+import { Polygon } from "../classes/Polygon.js";
+import generateUID from "../generateUID.js";
+import generateInterpolationData from "./generateInterpolationData.js";
 
 const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 const dP = 0.2; // Aim for < 0.2mm between interpolated points when super-sampling.
 
+/**
+ * interpolate - Interpolate missing contours in the ROIContour.
+ *
+ * @param  {object} toolData The tool data of the freehand3D contour.
+ * @return {null}
+ */
 export default function(toolData) {
-  const ROIContourUid = toolData.ROIContourUid;
-
-  const imageIds = _getImageIdsOfActiveSeries();
-  const ROIContourData = _getROIContourData(imageIds, ROIContourUid);
-  const extent = _getExtentOfRegion(ROIContourData);
+  const { ROIContourData, interpolationList } = generateInterpolationData(
+    toolData
+  );
 
   // TEMP
   const t0 = performance.now();
   // TEMP
 
-  console.log(extent);
-
-  const lowerCandidate = extent[0] + 1;
-  const upperCandidate = extent[1] - 1;
-
-  const toInterpolate = [];
-
-  // If a contour can is missing between drawn slices, see if it can be interpolated.
-  for (i = lowerCandidate; i <= upperCandidate; i++) {
-    console.log(`checking contour: ${i}`);
-
-    if (
-      // Check whether there are no contours on this slice, or one which is an interpolated contour.
-      !ROIContourData[i].contours ||
-      (ROIContourData[i].contours.length === 1 &&
-        ROIContourData[i].contours[0].interpolated)
-    ) {
-      const contourPair = _getContoursToInterpolate(i, extent, ROIContourData);
-
-      if (contourPair) {
-        if (!toInterpolate[contourPair[0]]) {
-          toInterpolate[contourPair[0]] = {
-            pair: contourPair,
-            list: []
-          };
-        }
-
-        toInterpolate[contourPair[0]].list.push(i);
-      }
-    }
-  }
-
-  for (let i = 0; i < toInterpolate.length; i++) {
-    if (toInterpolate[i]) {
+  for (let i = 0; i < interpolationList.length; i++) {
+    if (interpolationList[i]) {
       _interpolateBetween(
-        toInterpolate[i].list,
-        toInterpolate[i].pair,
+        interpolationList[i].list,
+        interpolationList[i].pair,
         ROIContourData
       );
     }
@@ -62,114 +35,11 @@ export default function(toolData) {
 
   // TEMP
   const t1 = performance.now();
-
-  console.log(`interpolation took ${t1 - t0} ms.`);
+  console.log(`${t1 - t0} ms`);
   // TEMP
 }
 
-function _getImageIdsOfActiveSeries() {
-  const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-  const element = activeEnabledElement.element;
-  const stackToolState = cornerstoneTools.getToolState(element, "stack");
-  return stackToolState.data[0].imageIds;
-}
-
-function _getROIContourData(imageIds, ROIContourUid) {
-  const ROIContourData = [];
-  const toolStateManager = globalToolStateManager.saveToolState();
-
-  for (let i = 0; i < imageIds.length; i++) {
-    const imageId = imageIds[i];
-    const imageToolState = toolStateManager[imageId];
-
-    if (!imageToolState || !imageToolState.freehandMouse) {
-      ROIContourData.push({
-        imageId
-      });
-    } else {
-      const contours = imageToolState.freehandMouse.data.filter(contour => {
-        return contour.ROIContourUid === ROIContourUid;
-      });
-
-      const contoursOnSlice = {
-        imageId
-      };
-
-      if (contours.length) {
-        contoursOnSlice.contours = contours;
-      }
-
-      ROIContourData.push(contoursOnSlice);
-    }
-  }
-
-  return ROIContourData;
-}
-
-function _getExtentOfRegion(ROIContourData) {
-  const extent = [];
-
-  for (let i = 0; i < ROIContourData.length; i++) {
-    if (ROIContourData[i].contours) {
-      extent.push(i);
-      break;
-    }
-  }
-
-  for (let i = ROIContourData.length - 1; i >= 0; i--) {
-    if (ROIContourData[i].contours) {
-      extent.push(i);
-      break;
-    }
-  }
-
-  return extent;
-}
-
-function _getContoursToInterpolate(index, extent, ROIContourData) {
-  let contours = [];
-  let canInterpolate = true;
-
-  // Check for nearest lowest index containing contours.
-  for (let i = index - 1; i >= extent[0]; i--) {
-    if (ROIContourData[i].contours) {
-      if (ROIContourData[i].contours.length > 1) {
-        canInterpolate = false;
-      }
-
-      contours.push(i);
-      break;
-    }
-  }
-
-  if (!canInterpolate) {
-    return;
-  }
-
-  // Check for nearest upper index containing contours.
-  for (let i = index + 1; i <= extent[1]; i++) {
-    if (ROIContourData[i].contours) {
-      if (ROIContourData[i].contours.length > 1) {
-        canInterpolate = false;
-      }
-
-      contours.push(i);
-      break;
-    }
-  }
-
-  if (!canInterpolate) {
-    return;
-  }
-
-  return contours;
-}
-
 function _interpolateBetween(indicies, contourPair, ROIContourData) {
-  console.log(
-    `Interpolating between frames (${contourPair[0]}, ${contourPair[1]})`
-  );
-
   const c1 = generateClosedContour3D(
     ROIContourData[contourPair[0]].contours[0].handles,
     contourPair[0]
@@ -217,8 +87,6 @@ function _interpolateBetween(indicies, contourPair, ROIContourData) {
 
   // Using the newly constructed contours, interpolate each ROI.
   indicies.forEach(function(index) {
-    console.log(index);
-
     const zInterp =
       (index - contourPair[0]) / (contourPair[1] - contourPair[0]);
 
@@ -238,7 +106,6 @@ function _interpolateBetween(indicies, contourPair, ROIContourData) {
     };
 
     if (ROIContourData[index].contours) {
-      console.log(`TODO: EDIT THE INTERPOLATED CONTOUR! ${index}`);
       editInterpolatedContour(
         interpolated2DContour,
         ROIContourData[index].imageId
