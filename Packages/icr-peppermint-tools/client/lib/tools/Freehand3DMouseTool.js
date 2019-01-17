@@ -35,6 +35,7 @@ const pointInsideBoundingBox = cornerstoneTools.import(
 );
 const getToolState = cornerstoneTools.getToolState;
 const state = cornerstoneTools.store.state;
+const EVENTS = cornerstoneTools.EVENTS;
 
 export default class Freehand3DMouseTool extends FreehandMouseTool {
   constructor(configuration = {}) {
@@ -50,6 +51,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     this.configuration.alwaysShowHandles = false;
 
     this._freehand3DStore = modules.freehand3D;
+
+    this._onMeasurementRemoved = this._onMeasurementRemoved.bind(this);
   }
 
   /**
@@ -802,6 +805,60 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     cornerstone.updateImage(element);
+  }
+
+  /**
+   * Custom callback for when toolData is deleted.
+   *
+   * @param  {Object} evt
+   */
+  _onMeasurementRemoved(evt) {
+    const eventData = evt.detail;
+
+    if (eventData.toolType !== this.name) {
+      return;
+    }
+
+    const measurementData = eventData.measurementData;
+
+    this._freehand3DStore.setters.decrementPolygonCount(
+      measurementData.seriesInstanceUid,
+      measurementData.structureSetUid,
+      measurementData.ROIContourUid
+    );
+  }
+
+  passiveCallback(element) {
+    this._closeToolIfDrawing(element);
+    this._addMeasurementRemovedListener(element);
+  }
+
+  enabledCallback(element) {
+    this._closeToolIfDrawing(element);
+    this._addMeasurementRemovedListener(element);
+  }
+
+  activeCallback(element) {
+    this._addMeasurementRemovedListener(element);
+  }
+
+  disabledCallback(element) {
+    this._closeToolIfDrawing(element);
+    element.removeEventListener(
+      EVENTS.MEASUREMENT_REMOVED,
+      this._onMeasurementRemoved
+    );
+  }
+
+  _addMeasurementRemovedListener(element) {
+    element.removeEventListener(
+      EVENTS.MEASUREMENT_REMOVED,
+      this._onMeasurementRemoved
+    );
+    element.addEventListener(
+      EVENTS.MEASUREMENT_REMOVED,
+      this._onMeasurementRemoved
+    );
   }
 }
 
