@@ -7,6 +7,7 @@ import generateInterpolationData from "./generateInterpolationData.js";
 const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 const dP = 0.2; // Aim for < 0.2mm between interpolated nodes when super-sampling.
+const modules = cornerstoneTools.store.modules;
 
 /**
  * interpolate - Interpolate missing contours in the ROIContour.
@@ -221,6 +222,12 @@ function _addInterpolatedContour(
   }
 
   imageToolState.freehandMouse.data.push(polygon.getFreehandToolData(false));
+
+  modules.freehand3D.setters.incrementPolygonCount(
+    referencedToolData.seriesInstanceUid,
+    referencedToolData.structureSetUid,
+    referencedToolData.ROIContourUid
+  );
 }
 
 /**
