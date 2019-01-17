@@ -154,11 +154,11 @@ function _generateInterpolationContourPair(c1, c2) {
   const perim1Interp = _getInterpolatedPerim(numPoints1, cumPerim1Norm);
   const perim2Interp = _getInterpolatedPerim(numPoints2, cumPerim2Norm);
 
-  const perim1Ind = getIndicatorArray(c1, numPoints1);
-  const perim2Ind = getIndicatorArray(c2, numPoints2);
+  const perim1Ind = _getIndicatorArray(c1, numPoints1);
+  const perim2Ind = _getIndicatorArray(c2, numPoints2);
 
-  const nodesPerSegment1 = getNodesPerSegment(perim1Interp, perim1Ind);
-  const nodesPerSegment2 = getNodesPerSegment(perim2Interp, perim2Ind);
+  const nodesPerSegment1 = _getNodesPerSegment(perim1Interp, perim1Ind);
+  const nodesPerSegment2 = _getNodesPerSegment(perim2Interp, perim2Ind);
 
   const c1i = getSuperSampledContour(c1, nodesPerSegment1);
 
@@ -431,7 +431,17 @@ function getSuperSampledContour(c, nodesPerSegment) {
   return ci;
 }
 
-function getNodesPerSegment(perimInterp, perimInd) {
+/**
+ * _getNodesPerSegment - Returns an array of the number of interpolated points
+ * to be added along each line segment of a polygon.
+ *
+ * @param  {Number[]} perimInterp Normalised array of original and added points.
+ * @param  {Number[]} perimInd    The indicator array describing the location of
+ *                            the original contours points.
+ * @return {Number[]}             An array containging the number of points to be
+ *                            added per original line segment.
+ */
+function _getNodesPerSegment(perimInterp, perimInd) {
   const idx = [];
   for (let i = 0; i < perimInterp.length; ++i) idx[i] = i;
   idx.sort(function(a, b) {
@@ -469,14 +479,22 @@ function getNodesPerSegment(perimInterp, perimInd) {
   return nodesPerSegment;
 }
 
-function getIndicatorArray(contour3D, numPoints) {
+/**
+ * _getIndicatorArray - Produces an array of the location of the original points
+ * in a super sampled contour.
+ *
+ * @param  {object} contour   The original contour.
+ * @param  {Number} numPoints The number of points added.
+ * @return {Number[]}           The indicator array of original point locations.
+ */
+function _getIndicatorArray(contour, numPoints) {
   const perimInd = [];
 
   for (let i = 0; i < numPoints - 2; i++) {
     perimInd.push(0);
   }
 
-  for (let i = 0; i < contour3D.x.length; i++) {
+  for (let i = 0; i < contour.x.length; i++) {
     perimInd.push(1);
   }
 
