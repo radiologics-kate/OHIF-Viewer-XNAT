@@ -53,12 +53,10 @@ export default function(toolData) {
 
 function _linearlyInterpolateBetween(indicies, contourPair, ROIContourData) {
   const c1 = _generateClosedContour(
-    ROIContourData[contourPair[0]].contours[0].handles,
-    contourPair[0]
+    ROIContourData[contourPair[0]].contours[0].handles
   );
   const c2 = _generateClosedContour(
-    ROIContourData[contourPair[1]].contours[0].handles,
-    contourPair[1]
+    ROIContourData[contourPair[1]].contours[0].handles
   );
 
   const { c1Interp, c2Interp } = _generateInterpolationContourPair(c1, c2);
@@ -163,7 +161,6 @@ function _generateInterpolationContourPair(c1, c2) {
   const nodesPerSegment2 = _getNodesPerSegment(perim2Interp, perim2Ind);
 
   const c1i = _getSuperSampledContour(c1, nodesPerSegment1);
-
   const c2i = _getSuperSampledContour(c2, nodesPerSegment2);
 
   // Keep c2i fixed and shift the starting node of c1i to minimise the total length of segments.
@@ -338,13 +335,11 @@ function _reduceContoursToOriginNodes(c1i, c2i) {
   const c1Interp = {
     x: [],
     y: [],
-    z: [],
     I: []
   };
   const c2Interp = {
     x: [],
     y: [],
-    z: [],
     I: []
   };
 
@@ -352,12 +347,10 @@ function _reduceContoursToOriginNodes(c1i, c2i) {
     if (c1i.I[i] || c2i.I[i]) {
       c1Interp.x.push(c1i.x[i]);
       c1Interp.y.push(c1i.y[i]);
-      c1Interp.z.push(c1i.z[i]);
       c1Interp.I.push(c1i.I[i]);
 
       c2Interp.x.push(c2i.x[i]);
       c2Interp.y.push(c2i.y[i]);
-      c2Interp.z.push(c2i.z[i]);
       c2Interp.I.push(c2i.I[i]);
     }
   }
@@ -440,22 +433,17 @@ function _getSuperSampledContour(c, nodesPerSegment) {
   const ci = {
     x: [],
     y: [],
-    z: [],
     I: []
   };
-
-  const zValue = c.z[0];
 
   // Length - 1, produces 'open' polygon.
   for (let n = 0; n < c.x.length - 1; n++) {
     // Add original node.
     ci.x.push(c.x[n]);
     ci.y.push(c.y[n]);
-    ci.z.push(zValue);
     ci.I.push(1);
 
     // Add linerally interpolated nodes.
-
     const xSpacing = (c.x[n + 1] - c.x[n]) / (nodesPerSegment[n] + 1);
     const ySpacing = (c.y[n + 1] - c.y[n]) / (nodesPerSegment[n] + 1);
 
@@ -463,7 +451,6 @@ function _getSuperSampledContour(c, nodesPerSegment) {
     for (let i = 0; i < nodesPerSegment[n] - 1; i++) {
       ci.x.push(ci.x[ci.x.length - 1] + xSpacing);
       ci.y.push(ci.y[ci.y.length - 1] + ySpacing);
-      ci.z.push(zValue);
       ci.I.push(0);
     }
   }
@@ -605,27 +592,23 @@ function _normalisedCumulativePerimeter(cumPerim) {
  * handles of a clockwise or anti-clockwise polygon.
  *
  * @param  {object[]} handles The handles to generate the contour from.
- * @param  {Number} z         The z position of the contour.
  * @return {object}           The generated contour object.
  */
-function _generateClosedContour(handles, z) {
+function _generateClosedContour(handles) {
   const c = {
     x: [],
-    y: [],
-    z: []
+    y: []
   };
 
   // NOTE: For z positions we only need the relative difference for interpolation, thus use frame index as Z.
   for (let i = 0; i < handles.length; i++) {
     c.x[i] = handles[i].x;
     c.y[i] = handles[i].y;
-    c.z[i] = z;
   }
 
   // Push last node to create closed contour.
   c.x.push(c.x[0]);
   c.y.push(c.y[0]);
-  c.z.push(z);
 
   _reverseIfAntiClockwise(c);
 
