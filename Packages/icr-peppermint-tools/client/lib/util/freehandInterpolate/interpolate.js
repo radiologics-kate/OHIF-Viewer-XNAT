@@ -441,7 +441,7 @@ function _getSuperSampledContour(c, nodesPerSegment) {
     // Add original node.
     ci.x.push(c.x[n]);
     ci.y.push(c.y[n]);
-    ci.I.push(1);
+    ci.I.push(true);
 
     // Add linerally interpolated nodes.
     const xSpacing = (c.x[n + 1] - c.x[n]) / (nodesPerSegment[n] + 1);
@@ -451,7 +451,7 @@ function _getSuperSampledContour(c, nodesPerSegment) {
     for (let i = 0; i < nodesPerSegment[n] - 1; i++) {
       ci.x.push(ci.x[ci.x.length - 1] + xSpacing);
       ci.y.push(ci.y[ci.y.length - 1] + ySpacing);
-      ci.I.push(0);
+      ci.I.push(false);
     }
   }
 
@@ -463,9 +463,9 @@ function _getSuperSampledContour(c, nodesPerSegment) {
  * to be added along each line segment of a polygon.
  *
  * @param  {Number[]} perimInterp Normalised array of original and added nodes.
- * @param  {Number[]} perimInd    The indicator array describing the location of
+ * @param  {boolean[]} perimInd    The indicator array describing the location of
  *                            the original contour's nodes.
- * @return {Number[]}             An array containging the number of nodes to be
+ * @return {Number[]}         An array containging the number of nodes to be
  *                            added per original line segment.
  */
 function _getNodesPerSegment(perimInterp, perimInd) {
@@ -475,8 +475,8 @@ function _getNodesPerSegment(perimInterp, perimInd) {
     return perimInterp[a] < perimInterp[b]
       ? -1
       : perimInterp[a] > perimInterp[b]
-      ? 1
-      : 0;
+      ? true
+      : false;
   });
 
   const perimIndSorted = [];
@@ -487,10 +487,10 @@ function _getNodesPerSegment(perimInterp, perimInd) {
 
   const indiciesOfOriginNodes = perimIndSorted.reduce(function(
     arr,
-    element,
+    elementValue,
     i
   ) {
-    if (element === 1) arr.push(i);
+    if (elementValue) arr.push(i);
     return arr;
   },
   []);
@@ -512,17 +512,17 @@ function _getNodesPerSegment(perimInterp, perimInd) {
  *
  * @param  {object} contour   The original contour.
  * @param  {Number} numNodes The number of nodes added.
- * @return {Number[]}           The indicator array of original node locations.
+ * @return {boolean[]}           The indicator array of original node locations.
  */
 function _getIndicatorArray(contour, numNodes) {
   const perimInd = [];
 
   for (let i = 0; i < numNodes - 2; i++) {
-    perimInd.push(0);
+    perimInd.push(false);
   }
 
   for (let i = 0; i < contour.x.length; i++) {
-    perimInd.push(1);
+    perimInd.push(true);
   }
 
   return perimInd;
