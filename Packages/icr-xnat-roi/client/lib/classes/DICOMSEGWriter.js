@@ -29,8 +29,6 @@ export class DICOMSEGWriter {
         const datasets = [];
         const metadataProvider = OHIF.viewer.metadataProvider;
 
-        console.log("DICOM SEG WRITER TEST 1");
-
         // Check if multiframe
         if (
           metadataProvider.getMultiframeModuleMetadata(images[0])
@@ -63,15 +61,9 @@ export class DICOMSEGWriter {
           }
         }
 
-        console.log("DICOM SEG WRITER TEST 2");
-
-        console.log(datasets);
-
         const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(
           datasets
         );
-
-        console.log("DICOM SEG WRITER TEST 3");
 
         const seg = new dcmjs.derivations.Segmentation([multiframe]);
         const dataSet = seg.dataset;
@@ -80,8 +72,6 @@ export class DICOMSEGWriter {
 
         let numSegments = 0;
 
-        console.log("DICOM SEG WRITER TEST 4");
-
         for (let i = 0; i < masks.length; i++) {
           if (masks[i]) {
             numSegments++;
@@ -89,8 +79,6 @@ export class DICOMSEGWriter {
               this._seriesInfo.seriesInstanceUid,
               i
             );
-
-            console.log(segMetadata);
 
             seg.addSegment(segMetadata);
           }
