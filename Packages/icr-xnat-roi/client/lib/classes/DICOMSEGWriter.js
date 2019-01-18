@@ -1,58 +1,77 @@
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
 
 const modules = cornerstoneTools.store.modules;
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-const dcmjs = require('dcmjs');
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
+const dcmjs = require("dcmjs");
 
 export class DICOMSEGWriter {
-
-  constructor (seriesInfo) {
+  constructor(seriesInfo) {
     this._seriesInfo = seriesInfo;
   }
-  
-  async write (masks, dimensions) {
-    return new Promise (resolve => {
+
+  async write(masks, dimensions) {
+    return new Promise(resolve => {
       // Grab the base image DICOM.
       const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
       const element = activeEnabledElement.element;
 
-      const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+      const stackToolState = cornerstoneTools.getToolState(element, "stack");
       const imageIds = stackToolState.data[0].imageIds;
 
       let imagePromises = [];
       for (let i = 0; i < imageIds.length; i++) {
-        imagePromises.push(
-          cornerstone.loadImage(imageIds[0])
-        );
+        imagePromises.push(cornerstone.loadImage(imageIds[0]));
       }
 
-      Promise.all(imagePromises).then((images) => {
+      Promise.all(imagePromises).then(images => {
         const datasets = [];
         const metadataProvider = OHIF.viewer.metadataProvider;
 
+        console.log("DICOM SEG WRITER TEST 1");
+
         // Check if multiframe
-        if (metadataProvider.getMultiframeModuleMetadata(images[0]).isMultiframeImage) {
+        if (
+          metadataProvider.getMultiframeModuleMetadata(images[0])
+            .isMultiframeImage
+        ) {
           const image = images[0];
           const arrayBuffer = image.data.byteArray.buffer;
           const dicomData = dcmjs.data.DicomMessage.readFile(arrayBuffer);
-          const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
+          const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(
+            dicomData.dict
+          );
 
-          dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
+          dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(
+            dicomData.meta
+          );
           datasets.push(dataset);
         } else {
           for (let i = 0; i < images.length; i++) {
             const image = images[i];
             const arrayBuffer = image.data.byteArray.buffer;
             const dicomData = dcmjs.data.DicomMessage.readFile(arrayBuffer);
-            const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(dicomData.dict);
+            const dataset = dcmjs.data.DicomMetaDictionary.naturalizeDataset(
+              dicomData.dict
+            );
 
-            dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(dicomData.meta);
+            dataset._meta = dcmjs.data.DicomMetaDictionary.namifyDataset(
+              dicomData.meta
+            );
             datasets.push(dataset);
           }
         }
 
-        const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(datasets);
+        console.log("DICOM SEG WRITER TEST 2");
+
+        console.log(datasets);
+
+        const multiframe = dcmjs.normalizers.Normalizer.normalizeToDataset(
+          datasets
+        );
+
+        console.log("DICOM SEG WRITER TEST 3");
 
         const seg = new dcmjs.derivations.Segmentation([multiframe]);
         const dataSet = seg.dataset;
@@ -60,6 +79,8 @@ export class DICOMSEGWriter {
         const SegmentSequence = dataSet.SegmentSequence;
 
         let numSegments = 0;
+
+        console.log("DICOM SEG WRITER TEST 4");
 
         for (let i = 0; i < masks.length; i++) {
           if (masks[i]) {
@@ -78,7 +99,7 @@ export class DICOMSEGWriter {
         // Re-define the PixelData ArrayBuffer to be the correct length
         // => segments * rows * columns * slices / 8 (As 8 bits/byte)
         seg.dataset.PixelData = new ArrayBuffer(
-          numSegments * dimensions.cube / 8
+          (numSegments * dimensions.cube) / 8
         );
 
         const pixels = new Uint8Array(seg.dataset.PixelData);
@@ -91,7 +112,7 @@ export class DICOMSEGWriter {
             const bitArray = dcmjs.data.BitArray.pack(masks[i]);
 
             for (let j = 0; j < lengthOfCubeInBytes; j++) {
-              pixels[(i * lengthOfCubeInBytes) + j] = bitArray[j];
+              pixels[i * lengthOfCubeInBytes + j] = bitArray[j];
             }
           }
         }
@@ -101,7 +122,5 @@ export class DICOMSEGWriter {
         resolve(segBlob);
       });
     });
-
   }
-
 }

@@ -1,22 +1,22 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { MaskExtractor } from '../classes/MaskExtractor.js';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { DICOMSEGWriter } from '../classes/DICOMSEGWriter.js';
-import { DICOMSEGExporter } from '../classes/DICOMSEGExporter.js';
-import { segBuilder } from './segBuilder.js';
-import getDateTimeAndLabel from '../util/getDateTimeAndLabel.js';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import messageDialog from '../util/messageDialog.js';
-import awaitConfirmationDialog from './awaitConfirmationDialog.js';
-import awaitOverwriteConfirmationDialog from './awaitOverwriteConfirmationDialog.js';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { MaskExtractor } from "../classes/MaskExtractor.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { DICOMSEGWriter } from "../classes/DICOMSEGWriter.js";
+import { DICOMSEGExporter } from "../classes/DICOMSEGExporter.js";
+import { segBuilder } from "./segBuilder.js";
+import getDateTimeAndLabel from "../util/getDateTimeAndLabel.js";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import messageDialog from "../util/messageDialog.js";
+import awaitConfirmationDialog from "./awaitConfirmationDialog.js";
+import awaitOverwriteConfirmationDialog from "./awaitOverwriteConfirmationDialog.js";
 import {
   displayExportFailedDialog,
   displayInsufficientPermissionsDialog,
   displayMaskNotModifiedDialog,
   displayCantExportNIFTIDialog
-} from '../util/displayExportDialogs.js';
-import localBackup from './localBackup.js';
+} from "../util/displayExportDialogs.js";
+import localBackup from "./localBackup.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -26,10 +26,10 @@ const brushModule = cornerstoneTools.store.modules.brush;
  *
  * @author JamesAPetts
  */
-export default async function () {
+export default async function() {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
 
-  if (icrXnatRoiSession.get('writePermissions') === false) {
+  if (icrXnatRoiSession.get("writePermissions") === false) {
     // User does not have write access
     displayInsufficientPermissionsDialog();
     return;
@@ -37,33 +37,35 @@ export default async function () {
 
   let roiCollectionInfo;
 
-  if (brushModule.state.import
-    && brushModule.state.import[seriesInfo.seriesInstanceUid]) {
+  if (
+    brushModule.state.import &&
+    brushModule.state.import[seriesInfo.seriesInstanceUid]
+  ) {
     roiCollectionInfo = brushModule.state.import[seriesInfo.seriesInstanceUid];
 
     if (!roiCollectionInfo.modified) {
       // Not modified! Display up dialog to say this.
-      console.log('NOT MODIFIED');
+      console.log("NOT MODIFIED");
       displayMaskNotModifiedDialog(roiCollectionInfo);
       return;
     }
 
     // TEMP -> Eventually we'll have NIFTI mask export.
-    if (roiCollectionInfo.type === 'NIFTI') {
-      console.log('CAN\'t EXPORT NIFTI!');
+    if (roiCollectionInfo.type === "NIFTI") {
+      console.log("CAN't EXPORT NIFTI!");
       // Can't export this type yet! Display dialog to say this.
-      displayCantExportNIFTIDialog(roiCollectionInfo);
-      return;
+      //displayCantExportNIFTIDialog(roiCollectionInfo);
+      //return;
     }
   }
 
   beginExport(seriesInfo, roiCollectionInfo);
 }
 
-async function beginExport (seriesInfo, roiCollectionInfo) {
+async function beginExport(seriesInfo, roiCollectionInfo) {
   const seriesInstanceUid = seriesInfo.seriesInstanceUid;
   const maskExtractor = new MaskExtractor(seriesInstanceUid);
-  const { dateTime, label } = getDateTimeAndLabel('SEG');
+  const { dateTime, label } = getDateTimeAndLabel("SEG");
 
   // Check if there are any Masks with metadata.
   if (maskExtractor.hasMasksToExtract() === false) {
@@ -71,11 +73,10 @@ async function beginExport (seriesInfo, roiCollectionInfo) {
     return;
   }
 
-
   let roiCollectionName = await segBuilder(label, roiCollectionInfo);
 
   if (!roiCollectionName) {
-    console.log('cancelled.');
+    console.log("cancelled.");
     return;
   }
 
@@ -139,17 +140,19 @@ async function beginExport (seriesInfo, roiCollectionInfo) {
   const masks = maskExtractor.extractMasks();
 
   if (!masks) {
-    console.log('no mask to extract!');
+    console.log("no mask to extract!");
     return;
   }
 
-  const exportInProgressDialog = document.getElementById('exportVolumes');
+  const exportInProgressDialog = document.getElementById("exportVolumes");
   exportInProgressDialog.showModal();
+
+  console.log("test1");
 
   // Get stackToolState // TODO -> Refactor this to a helper.
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
-  const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+  const stackToolState = cornerstoneTools.getToolState(element, "stack");
   const imageIds = stackToolState.data[0].imageIds;
   const image = cornerstone.getImage(element);
 
@@ -166,12 +169,15 @@ async function beginExport (seriesInfo, roiCollectionInfo) {
 
   // DICOM-SEG
   const dicomSegWriter = new DICOMSEGWriter(seriesInfo);
+
+  console.log("test2");
+
   const DICOMSegPromise = dicomSegWriter.write(masks, dimensions);
 
   console.log(DICOMSegPromise);
 
   DICOMSegPromise.then(segBlob => {
-    console.log('test');
+    console.log("test");
     console.log(segBlob);
     const dicomSegExporter = new DICOMSEGExporter(
       segBlob,
@@ -180,36 +186,38 @@ async function beginExport (seriesInfo, roiCollectionInfo) {
       roiCollectionName
     );
 
-    console.log('seg exporter... ready!');
+    console.log("seg exporter... ready!");
 
-    dicomSegExporter.exportToXNAT(overwrite).then(success => {
-      console.log('PUT successful.');
-      // Store that we've 'imported' a collection for this series.
-      // (For all intents and purposes exporting it ends with an imported state,
-      // i.e. not a fresh Mask collection.)
-      if (!brushModule.state.import) {
-        brushModule.state.import = {};
-      }
+    dicomSegExporter
+      .exportToXNAT(overwrite)
+      .then(success => {
+        console.log("PUT successful.");
+        // Store that we've 'imported' a collection for this series.
+        // (For all intents and purposes exporting it ends with an imported state,
+        // i.e. not a fresh Mask collection.)
+        if (!brushModule.state.import) {
+          brushModule.state.import = {};
+        }
 
-      brushModule.state.import[seriesInstanceUid] = {
-        label: label,
-        name: roiCollectionName,
-        modified: false
-      };
+        brushModule.state.import[seriesInstanceUid] = {
+          label: label,
+          name: roiCollectionName,
+          modified: false
+        };
 
-      // TODO -> Work on backup mechanism, disabled for now.
-      //console.log('=====checking backup:=====');
-      //localBackup.checkBackupOnExport();
-      //console.log('=====checking backup DONE=====');
-      exportInProgressDialog.close();
-    })
-    .catch(error => {
-      console.log(error);
-      exportInProgressDialog.close();
-      // TODO -> Work on backup mechanism, disabled for now.
-      //localBackup.saveBackUpForActiveSeries();
-      displayExportFailedDialog();
-    });;
+        // TODO -> Work on backup mechanism, disabled for now.
+        //console.log('=====checking backup:=====');
+        //localBackup.checkBackupOnExport();
+        //console.log('=====checking backup DONE=====');
+        exportInProgressDialog.close();
+      })
+      .catch(error => {
+        console.log(error);
+        exportInProgressDialog.close();
+        // TODO -> Work on backup mechanism, disabled for now.
+        //localBackup.saveBackUpForActiveSeries();
+        displayExportFailedDialog();
+      });
   });
 }
 
@@ -218,9 +226,10 @@ async function beginExport (seriesInfo, roiCollectionInfo) {
  *
  * @author JamesAPetts
  */
-function displayNoMasksToExportDialog () {
-  const title = 'Nothing to Export';
-  const body = 'There are no Masks to export. Please refer to the More/Help/Mask menu for more information.';
+function displayNoMasksToExportDialog() {
+  const title = "Nothing to Export";
+  const body =
+    "There are no Masks to export. Please refer to the More/Help/Mask menu for more information.";
 
   messageDialog(title, body);
 }
