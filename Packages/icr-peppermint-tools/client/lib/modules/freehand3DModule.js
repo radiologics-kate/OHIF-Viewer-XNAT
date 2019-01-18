@@ -67,7 +67,7 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
 const state = {
   seriesCollection: [],
-  interpolate: true
+  interpolate: false
 };
 
 function check(object, name) {
