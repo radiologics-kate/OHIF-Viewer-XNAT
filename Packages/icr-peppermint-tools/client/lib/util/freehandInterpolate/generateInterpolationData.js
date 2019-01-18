@@ -16,16 +16,24 @@ const dP = 0.2; // Aim for < 0.2mm between interpolated points when super-sampli
  */
 export default function(toolData) {
   const ROIContourUid = toolData.ROIContourUid;
-
   const imageIds = _getImageIdsOfActiveSeries();
   const ROIContourData = _getROIContourData(imageIds, ROIContourUid);
   const extent = _getExtentOfRegion(ROIContourData);
+  const sliceEdited = _getSlicePositionOfToolData(ROIContourData, toolData.uid);
+
   const interpolationList = [];
 
   // Check if contours between the extent can be interpolated.
   for (i = extent[0] + 1; i <= extent[1] - 1; i++) {
     if (_sliceNeedsInterpolating(ROIContourData, i)) {
-      _appendinterpolationList(i, extent, ROIContourData, interpolationList);
+      const contourPair = _getBoundingPair(i, extent, ROIContourData);
+
+      if (
+        contourPair &&
+        (contourPair[0] === sliceEdited || contourPair[1] === sliceEdited)
+      ) {
+        _appendinterpolationList(contourPair, interpolationList);
+      }
     }
   }
 
@@ -33,6 +41,28 @@ export default function(toolData) {
     ROIContourData,
     interpolationList
   };
+}
+
+/**
+ * _getSlicePositionOfToolData - Finds the slice that was edited.
+ *
+ * @param  {type} ROIContourData description
+ * @param  {type} polygonUid     description
+ * @return {type}                description
+ */
+function _getSlicePositionOfToolData(ROIContourData, polygonUid) {
+  for (let i = 0; i < ROIContourData.length; i++) {
+    if (ROIContourData[i].contours) {
+      const contours = ROIContourData[i].contours;
+      for (let j = 0; j < contours.length; j++) {
+        if (contours[j].uid === polygonUid) {
+          return i;
+        }
+      }
+    }
+  }
+
+  return;
 }
 
 /**
@@ -149,24 +179,15 @@ function _sliceNeedsInterpolating(ROIContourData, sliceIndex) {
  * @param  {object[]} interpolationList The list of contours to be interpolated.
  * @return {null}
  */
-function _appendinterpolationList(
-  sliceIndex,
-  extent,
-  ROIContourData,
-  interpolationList
-) {
-  const contourPair = _getBoundingPair(sliceIndex, extent, ROIContourData);
-
-  if (contourPair) {
-    if (!interpolationList[contourPair[0]]) {
-      interpolationList[contourPair[0]] = {
-        pair: contourPair,
-        list: []
-      };
-    }
-
-    interpolationList[contourPair[0]].list.push(i);
+function _appendinterpolationList(contourPair, interpolationList) {
+  if (!interpolationList[contourPair[0]]) {
+    interpolationList[contourPair[0]] = {
+      pair: contourPair,
+      list: []
+    };
   }
+
+  interpolationList[contourPair[0]].list.push(i);
 }
 
 /**
@@ -190,10 +211,21 @@ function _getBoundingPair(sliceIndex, extent, ROIContourData) {
   // Check for nearest lowest sliceIndex containing contours.
   for (let i = sliceIndex - 1; i >= extent[0]; i--) {
     if (ROIContourData[i].contours) {
-      if (ROIContourData[i].contours.length > 1) {
+      const contours = ROIContourData[i].contours;
+
+      //console.log(contours);
+
+      if (contours[0].interpolated) {
+        // This contour is interpolated. We need to
+        // Find a solid contour to interpolate from.
+        continue;
+      }
+
+      if (contours.length > 1) {
         canInterpolate = false;
       }
 
+      // Found single, non interpolated contour to interpolate from.
       contourPair.push(i);
       break;
     }
@@ -206,7 +238,15 @@ function _getBoundingPair(sliceIndex, extent, ROIContourData) {
   // Check for nearest upper sliceIndex containing contours.
   for (let i = sliceIndex + 1; i <= extent[1]; i++) {
     if (ROIContourData[i].contours) {
-      if (ROIContourData[i].contours.length > 1) {
+      const contours = ROIContourData[i].contours;
+
+      if (contours[0].interpolated) {
+        // This contour is interpolated. We need to
+        // Find a solid contour to interpolate from.
+        continue;
+      }
+
+      if (contours.length > 1) {
         canInterpolate = false;
       }
 
