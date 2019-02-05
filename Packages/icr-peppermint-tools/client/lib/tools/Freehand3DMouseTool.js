@@ -342,6 +342,11 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     // Have to do this to get tool index.
     const nearby = this._pointNearHandleAllTools(eventData);
+
+    if (!nearby) {
+      return;
+    }
+
     const handleNearby = nearby.handleNearby;
     const toolIndex = nearby.toolIndex;
 

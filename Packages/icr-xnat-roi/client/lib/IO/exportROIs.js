@@ -1,23 +1,24 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { AIMWriter } from "../classes/AIMWriter.js";
-import { AsyncRoiFetcher } from '../classes/AsyncRoiFetcher.js';
-import { Polygon } from 'meteor/icr:peppermint-tools';
-import { RoiExtractor } from '../classes/RoiExtractor.js';
-import { AIMExporter } from '../classes/AIMExporter.js';
-import { roiCollectionBuilder } from './roiCollectionBuilder.js';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import messageDialog from '../util/messageDialog.js';
+import { AsyncRoiFetcher } from "../classes/AsyncRoiFetcher.js";
+import { Polygon } from "meteor/icr:peppermint-tools";
+import { RoiExtractor } from "../classes/RoiExtractor.js";
+import { AIMExporter } from "../classes/AIMExporter.js";
+import { roiCollectionBuilder } from "./roiCollectionBuilder.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import messageDialog from "../util/messageDialog.js";
 import {
   displayExportFailedDialog,
   displayInsufficientPermissionsDialog
-} from '../util/displayExportDialogs.js';
-import localBackup from './localBackup.js';
+} from "../util/displayExportDialogs.js";
+import localBackup from "./localBackup.js";
 
 const modules = cornerstoneTools.store.modules;
-const getToolState = cornerstoneTools.import('stateManagement/getToolState');
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const getToolState = cornerstoneTools.import("stateManagement/getToolState");
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
@@ -25,9 +26,12 @@ const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateMa
  *
  * @author JamesAPetts
  */
-export default async function () {
+export default async function() {
+  // TEMP
+  icrXnatRoiSession.set("writePermissions", true);
+  // TEMP
 
-  if (icrXnatRoiSession.get('writePermissions') === true) {
+  if (icrXnatRoiSession.get("writePermissions") === true) {
     beginExport();
     return;
   }
@@ -42,7 +46,7 @@ export default async function () {
  *
  * @author JamesAPetts
  */
-async function beginExport () {
+async function beginExport() {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
   const roiExtractor = new RoiExtractor(seriesInfo.seriesInstanceUid);
   const dateTime = AIMWriter.generateDateTime();
@@ -58,14 +62,14 @@ async function beginExport () {
   const result = await roiCollectionBuilder(label);
 
   if (!result) {
-    console.log('cancelled');
+    console.log("cancelled");
     return;
   }
 
   const { roiCollectionName, exportMask } = result;
 
   // Generate AIM file from the selected ROIs.
-  const exportInProgressDialog = document.getElementById('exportVolumes');
+  const exportInProgressDialog = document.getElementById("exportVolumes");
   exportInProgressDialog.showModal();
 
   const volumes = roiExtractor.extractVolumes(exportMask);
@@ -73,11 +77,25 @@ async function beginExport () {
   const aw = new AIMWriter(roiCollectionName, label, dateTime);
   aw.writeImageAnnotationCollection(volumes, seriesInfo);
 
+  // TEMP
+  lockExportedROIs(
+    exportMask,
+    seriesInfo.seriesInstanceUid,
+    roiCollectionName,
+    label
+  );
+
+  exportInProgressDialog.close();
+
+  return;
+  // TEMP
+
   // Attempt export to XNAT. Lock ROIs for editing if the export is successful.
   const aimExporter = new AIMExporter(aw);
-  await aimExporter.exportToXNAT()
+  await aimExporter
+    .exportToXNAT()
     .then(success => {
-      console.log('PUT successful.');
+      console.log("PUT successful.");
       lockExportedROIs(
         exportMask,
         seriesInfo.seriesInstanceUid,
@@ -95,7 +113,7 @@ async function beginExport () {
       //localBackup.saveBackUpForActiveSeries();
       exportInProgressDialog.close();
       displayExportFailedDialog();
-  });
+    });
 }
 
 /**
@@ -111,31 +129,30 @@ async function beginExport () {
  *                                    roiCollection.
  * @param {string} uid                The uid of the newly created roiCollection.
  */
-function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, structureSetUid) {
+function lockExportedROIs(
+  exportMask,
+  seriesInstanceUid,
+  structureSetName,
+  structureSetUid
+) {
   const freehand3DStore = modules.freehand3D;
 
-  const structureSet = freehand3DStore.getters.structureSet(
-    seriesInstanceUid
-  );
+  const structureSet = freehand3DStore.getters.structureSet(seriesInstanceUid);
 
   const workingRoiCollection = structureSet.ROIContourCollection;
   const activeROIContourIndex = structureSet.activeROIContourIndex;
 
-  // If active volume has been exported, set active volume to null.
-  if (exportMask[activeROIContourIndex]) {
-    structureSet.activeROIContourIndex = null;
-  }
+  let activeROIContourUid = freehand3DStore.getters.activeROIContour(
+    seriesInstanceUid
+  ).uid;
+
   // Create copies of ROIContours inside the new structureSet
   const newIndicies = [];
 
-  freehand3DStore.setters.structureSet(
-    seriesInstanceUid,
-    structureSetName,
-    {
-      uid: structureSetUid,
-      isLocked: true
-    }
-  );
+  freehand3DStore.setters.structureSet(seriesInstanceUid, structureSetName, {
+    uid: structureSetUid,
+    isLocked: true
+  });
 
   let ROIContourIndex = 0;
 
@@ -146,7 +163,7 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
       freehand3DStore.setters.ROIContour(
         seriesInstanceUid,
         structureSetUid,
-        structureSetName,
+        oldROIContour.name,
         {
           uid: oldROIContour.uid,
           polygonCount: oldROIContour.polygonCount,
@@ -165,14 +182,12 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
     structureSetUid
   );
 
-  console.log(newStructureSet);
-
   const toolStateManager = globalToolStateManager.saveToolState();
 
-  Object.keys(toolStateManager).forEach( elementId => {
+  Object.keys(toolStateManager).forEach(elementId => {
     // Only get polygons from this series
     // TODO => There must be a better way to do this with the stack tool now.
-    if ( getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid ) {
+    if (getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid) {
       // grab the freehand tool for this DICOM instance
       const toolState = toolStateManager[elementId].freehandMouse;
       const toolData = toolState.data;
@@ -190,11 +205,28 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
     }
   });
 
-  // Set old working volumes undefined
-  for (let i = 0; i < exportMask.length; i++) {
+  // Remove old working volumes.
+  for (let i = exportMask.length - 1; i >= 0; i--) {
     if (exportMask[i]) {
-      workingRoiCollection[i] = undefined;
+      freehand3DStore.setters.deleteROIFromStructureSet(
+        seriesInstanceUid,
+        "DEFAULT",
+        workingRoiCollection[i].uid
+      );
     }
+  }
+
+  if (exportMask[activeROIContourIndex]) {
+    // If active volume has been exported, set active volume to null.
+    structureSet.activeROIContourIndex = null;
+  } else {
+    console.log(`didnt export active contour..`);
+    // Make sure we are pointing to the right contour now.
+    freehand3DStore.setters.activeROIContour(
+      seriesInstanceUid,
+      "DEFAULT",
+      activeROIContourUid
+    );
   }
 }
 
@@ -205,7 +237,7 @@ function lockExportedROIs (exportMask, seriesInstanceUid, structureSetName, stru
  * @author JamesAPetts
  * @param {String} imageId The ID of the image being queried.
  */
-function getSeriesInstanceUidFromImageId (imageId) {
+function getSeriesInstanceUidFromImageId(imageId) {
   const metaData = OHIF.viewer.metadataProvider.getMetadata(imageId);
   return metaData.series.seriesInstanceUid;
 }
@@ -218,10 +250,10 @@ function getSeriesInstanceUidFromImageId (imageId) {
  * @param  {Object} exportData  An object containing the required information
  *                              to execute the move opperation.
  */
-function moveExportedPolygonsInInstance (exportData) {
+function moveExportedPolygonsInInstance(exportData) {
   const freehand3DStore = modules.freehand3D;
 
-  console.log('====moving exported polygons in instance..');
+  console.log("====moving exported polygons in instance..");
   const {
     toolData,
     elementId,
@@ -232,7 +264,7 @@ function moveExportedPolygonsInInstance (exportData) {
     seriesInstanceUid
   } = exportData;
 
-  for ( let i = 0; i < toolData.length; i++ ) {
+  for (let i = 0; i < toolData.length; i++) {
     const data = toolData[i];
 
     const ROIContourIndex = freehand3DStore.getters.ROIContourIndex(
@@ -242,14 +274,14 @@ function moveExportedPolygonsInInstance (exportData) {
     );
     const structureSetUid = data.structureSetUid;
 
-
     // Check to see if the volume referencing this contour is eligable for export.
-    if (structureSetUid === 'DEFAULT' && exportMask[ROIContourIndex]) {
+    if (structureSetUid === "DEFAULT" && exportMask[ROIContourIndex]) {
       const newROIContourIndex = newIndicies[ROIContourIndex];
 
-      data.structureSetUid = newStructureSet.uid,
-      data.referencedStructureSet = newStructureSet;
-      data.referencedROIContour = newStructureSet.ROIContourCollection[newROIContourIndex];
+      (data.structureSetUid = newStructureSet.uid),
+        (data.referencedStructureSet = newStructureSet);
+      data.referencedROIContour =
+        newStructureSet.ROIContourCollection[newROIContourIndex];
     }
   }
 }
@@ -259,9 +291,10 @@ function moveExportedPolygonsInInstance (exportData) {
  *
  * @author JamesAPetts
  */
-function displayNoROIsToExportDialog () {
-  const title = 'Nothing to Export';
-  const body = 'There are no unlocked ROIs to export. Please refer to the More/Help/ROI menu for more information.';
+function displayNoROIsToExportDialog() {
+  const title = "Nothing to Export";
+  const body =
+    "There are no unlocked ROIs to export. Please refer to the More/Help/ROI menu for more information.";
 
   messageDialog(title, body);
 }

@@ -234,6 +234,21 @@ function setROIContourAndSetIndexActive(
     structureSet.ROIContourCollection.length - 1;
 }
 
+function setDeleteROIFromStructureSet(
+  seriesInstanceUid,
+  structureSetUid,
+  ROIContourUid
+) {
+  const structureSet = getStructureSet(seriesInstanceUid, structureSetUid);
+  const ROIContourCollection = structureSet.ROIContourCollection;
+
+  const ROIContourIndex = ROIContourCollection.findIndex(ROIContour => {
+    return ROIContour.uid === ROIContourUid;
+  });
+
+  ROIContourCollection.splice(ROIContourIndex, 1);
+}
+
 function setStructureSetName(name, seriesInstanceUid, structureSetUid) {
   check(name, "name");
 
@@ -274,7 +289,7 @@ function setActiveStructureSet(seriesInstanceUid, structureSetUid) {
   const structureSetCollection = series.structureSetCollection;
 
   const structureSetIndex = structureSetCollection.findIndex(structureSet => {
-    return (structureSet.uid = structureSetUid);
+    return structureSet.uid === structureSetUid;
   });
 
   series.activeStructureSetIndex = structureSetIndex;
@@ -301,7 +316,7 @@ function setActiveROIContour(
   const ROIContourCollection = structureSet.ROIContourCollection;
 
   const ROIContourIndex = ROIContourCollection.findIndex(ROIContour => {
-    return (ROIContour.uid = ROIContourUid);
+    return ROIContour.uid === ROIContourUid;
   });
 
   structureSet.activeROIContourIndex = ROIContourIndex;
@@ -353,6 +368,7 @@ const setters = {
   structureSet: setStructureSet,
   ROIContour: setROIContour,
   ROIContourAndSetIndexActive: setROIContourAndSetIndexActive,
+  deleteROIFromStructureSet: setDeleteROIFromStructureSet,
   structureSetName: setStructureSetName,
   ROIContourName: setROIContourName,
   activeStructureSetIndex: setActiveStructureSetIndex,

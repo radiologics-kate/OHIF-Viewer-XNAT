@@ -1,17 +1,17 @@
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { icrXnatRoiSession, isModalOpen } from 'meteor/icr:xnat-roi-namespace';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import getActiveBrushToolsForElement from '../util/getActiveBrushToolsForElement.js';
-import brushMetadataIO from '../util/brushMetadataIO.js';
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveBrushToolsForElement from "../util/getActiveBrushToolsForElement.js";
+import brushMetadataIO from "../util/brushMetadataIO.js";
 
-const getKeyFromKeyCode = cornerstoneTools.import('util/getKeyFromKeyCode');
-const Mousetrap = require('mousetrap');
-const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
+const getKeyFromKeyCode = cornerstoneTools.import("util/getKeyFromKeyCode");
+const Mousetrap = require("mousetrap");
+const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
-Mousetrap.bind(['[', ']', '-', '=', '+', 'n'], function(evt) {
+Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
   if (isModalOpen()) {
     return;
   }
@@ -29,24 +29,25 @@ Mousetrap.bind(['[', ']', '-', '=', '+', 'n'], function(evt) {
   let imageNeedsUpdate = false;
 
   switch (key) {
-    case '[':
+    case "[":
       brushTool.previousSegmentation();
       imageNeedsUpdate = true;
       break;
-    case ']':
+    case "]":
       brushTool.nextSegmentation();
       imageNeedsUpdate = true;
       break;
-    case '-':
+    case "-":
       brushTool.decreaseBrushSize();
       imageNeedsUpdate = true;
       break;
-    case '+':
-    case '=':
+    case "+":
+    case "=":
       brushTool.increaseBrushSize();
       imageNeedsUpdate = true;
       break;
-    case 'n':
+    case "n":
+    case "N":
       newSegmentation();
       break;
   }
@@ -54,17 +55,16 @@ Mousetrap.bind(['[', ']', '-', '=', '+', 'n'], function(evt) {
   if (imageNeedsUpdate) {
     cornerstone.updateImage(element);
   }
-
 });
 
-function newSegmentation () {
+function newSegmentation() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
 
   if (!segMetadata) {
     brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
-    segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid]
+    segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
   }
 
   const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);

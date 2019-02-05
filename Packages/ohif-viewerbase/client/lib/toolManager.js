@@ -119,6 +119,9 @@ export const toolManager = {
       },
       bidirectional: {
         className: "BidirectionalTool"
+      },
+      eraser: {
+        className: "EraserTool"
       }
     };
 

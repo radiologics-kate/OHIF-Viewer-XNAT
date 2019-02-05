@@ -1,7 +1,7 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 const modules = cornerstoneTools.store.modules;
 
@@ -12,8 +12,8 @@ const modules = cornerstoneTools.store.modules;
  * @author JamesAPetts
  *
  */
-export async function createNewVolume () {
-  const name = await imageAnnotationNameInput('Unnamed Lesion');
+export async function createNewVolume() {
+  const name = await imageAnnotationNameInput("Unnamed Lesion");
 
   if (name) {
     // Create and activate new ROIContour
@@ -21,12 +21,14 @@ export async function createNewVolume () {
 
     //Check if default structureSet exists for this series.
     if (!modules.freehand3D.getters.series(activeSeriesInstanceUid)) {
-      modules.freehand3D.setters.series(activeSeriesInstanceUid, )
+      modules.freehand3D.setters.series(activeSeriesInstanceUid);
     }
 
-
-
-    modules.freehand3D.setters.ROIContourAndSetIndexActive(activeSeriesInstanceUid, 'DEFAULT', name);
+    modules.freehand3D.setters.ROIContourAndSetIndexActive(
+      activeSeriesInstanceUid,
+      "DEFAULT",
+      name
+    );
   }
 }
 
@@ -40,15 +42,23 @@ export async function createNewVolume () {
  * @param {String} ROIContourUid      The UID of the ROIContourUid.
  *
  */
-export async function setVolumeName (seriesInstanceUid, structureSetUid, ROIContourUid) {
-  const ROIContour = modules.freehand3D.getters.ROIContour(seriesInstanceUid, structureSetUid, ROIContourUid);
+export async function setVolumeName(
+  seriesInstanceUid,
+  structureSetUid,
+  ROIContourUid
+) {
+  const ROIContour = modules.freehand3D.getters.ROIContour(
+    seriesInstanceUid,
+    structureSetUid,
+    ROIContourUid
+  );
 
   // Current name:
   let oldName;
   if (ROIContour.name) {
     oldName = ROIContour.name;
   } else {
-    oldName = 'Unnamed Lesion';
+    oldName = "Unnamed Lesion";
   }
 
   // Await new name input.
@@ -71,17 +81,19 @@ export async function setVolumeName (seriesInstanceUid, structureSetUid, ROICont
  * @return {Promise}            A promise that resolves to return the name given
  *                              by the user.
  */
-function imageAnnotationNameInput (defaultName) {
-
-  function keyConfirmEventHandler (e) {
-    if (e.which === 13) { // If Enter is pressed accept and close the dialog
+function imageAnnotationNameInput(defaultName) {
+  function keyConfirmEventHandler(e) {
+    if (e.which === 13) {
+      // If Enter is pressed accept and close the dialog
       confirmEventHandler();
     }
   }
 
-  function confirmEventHandler () {
-    const dialog = document.getElementById('freehandSetName');
-    const textInput = dialog.getElementsByClassName('freehand-set-name-input')[0];
+  function confirmEventHandler() {
+    const dialog = document.getElementById("freehandSetName");
+    const textInput = dialog.getElementsByClassName(
+      "freehand-set-name-input"
+    )[0];
     const nameText = textInput.value;
 
     dialog.close();
@@ -90,12 +102,12 @@ function imageAnnotationNameInput (defaultName) {
     resolveRef(nameText);
   }
 
-  function cancelEventHandler () {
+  function cancelEventHandler() {
     removeEventListners();
     resolveRef(null);
-  };
+  }
 
-  function cancelClickEventHandler () {
+  function cancelClickEventHandler() {
     dialog.close();
 
     removeEventListners();
@@ -103,22 +115,22 @@ function imageAnnotationNameInput (defaultName) {
   }
 
   function removeEventListners() {
-    dialog.removeEventListener('cancel', cancelEventHandler);
-    cancel.removeEventListener('click', cancelClickEventHandler);
-    dialog.removeEventListener('keydown', keyConfirmEventHandler);
-    confirm.removeEventListener('click', confirmEventHandler);
+    dialog.removeEventListener("cancel", cancelEventHandler);
+    cancel.removeEventListener("click", cancelClickEventHandler);
+    dialog.removeEventListener("keydown", keyConfirmEventHandler);
+    confirm.removeEventListener("click", confirmEventHandler);
   }
 
-  const dialog = document.getElementById('freehandSetName');
-  const textInput = dialog.getElementsByClassName('freehand-set-name-input')[0];
-  const confirm = dialog.getElementsByClassName('freehand-set-name-confirm')[0];
-  const cancel = dialog.getElementsByClassName('freehand-set-name-cancel')[0];
+  const dialog = document.getElementById("freehandSetName");
+  const textInput = dialog.getElementsByClassName("freehand-set-name-input")[0];
+  const confirm = dialog.getElementsByClassName("freehand-set-name-confirm")[0];
+  const cancel = dialog.getElementsByClassName("freehand-set-name-cancel")[0];
 
   // Add event listeners.
-  dialog.addEventListener('cancel', cancelEventHandler);
-  cancel.addEventListener('click', cancelClickEventHandler);
-  dialog.addEventListener('keydown', keyConfirmEventHandler);
-  confirm.addEventListener('click', confirmEventHandler);
+  dialog.addEventListener("cancel", cancelEventHandler);
+  cancel.addEventListener("click", cancelClickEventHandler);
+  dialog.addEventListener("keydown", keyConfirmEventHandler);
+  confirm.addEventListener("click", confirmEventHandler);
 
   textInput.value = defaultName;
 
@@ -127,7 +139,7 @@ function imageAnnotationNameInput (defaultName) {
   // Reference to promise.resolve, so that I can use external handlers.
   let resolveRef;
 
-  return new Promise (resolve => {
+  return new Promise(resolve => {
     resolveRef = resolve;
   });
 }
