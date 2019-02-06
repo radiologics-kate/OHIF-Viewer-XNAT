@@ -27,10 +27,6 @@ const globalToolStateManager =
  * @author JamesAPetts
  */
 export default async function() {
-  // TEMP
-  icrXnatRoiSession.set("writePermissions", true);
-  // TEMP
-
   if (icrXnatRoiSession.get("writePermissions") === true) {
     beginExport();
     return;
@@ -76,19 +72,6 @@ async function beginExport() {
 
   const aw = new AIMWriter(roiCollectionName, label, dateTime);
   aw.writeImageAnnotationCollection(volumes, seriesInfo);
-
-  // TEMP
-  lockExportedROIs(
-    exportMask,
-    seriesInfo.seriesInstanceUid,
-    roiCollectionName,
-    label
-  );
-
-  exportInProgressDialog.close();
-
-  return;
-  // TEMP
 
   // Attempt export to XNAT. Lock ROIs for editing if the export is successful.
   const aimExporter = new AIMExporter(aw);
