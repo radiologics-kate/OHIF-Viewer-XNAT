@@ -172,19 +172,26 @@ function lockExportedROIs(
     // TODO => There must be a better way to do this with the stack tool now.
     if (getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid) {
       // grab the freehand tool for this DICOM instance
-      const toolState = toolStateManager[elementId].freehandMouse;
-      const toolData = toolState.data;
-      // Append new ROIs to polygon list
-      const exportData = {
-        toolData,
-        elementId,
-        exportMask,
-        newIndicies,
-        newStructureSet,
-        structureSetName,
-        seriesInstanceUid
-      };
-      moveExportedPolygonsInInstance(exportData);
+
+      if (
+        toolStateManager &&
+        toolStateManager[elementId] &&
+        toolStateManager[elementId].freehandMouse
+      ) {
+        const toolState = toolStateManager[elementId].freehandMouse;
+        const toolData = toolState.data;
+        // Append new ROIs to polygon list
+        const exportData = {
+          toolData,
+          elementId,
+          exportMask,
+          newIndicies,
+          newStructureSet,
+          structureSetName,
+          seriesInstanceUid
+        };
+        moveExportedPolygonsInInstance(exportData);
+      }
     }
   });
 

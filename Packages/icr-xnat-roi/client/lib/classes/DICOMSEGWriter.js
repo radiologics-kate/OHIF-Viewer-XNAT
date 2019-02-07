@@ -22,7 +22,7 @@ export class DICOMSEGWriter {
 
       let imagePromises = [];
       for (let i = 0; i < imageIds.length; i++) {
-        imagePromises.push(cornerstone.loadImage(imageIds[0]));
+        imagePromises.push(cornerstone.loadImage(imageIds[i]));
       }
 
       Promise.all(imagePromises).then(images => {
