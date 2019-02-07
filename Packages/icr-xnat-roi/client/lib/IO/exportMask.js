@@ -29,6 +29,10 @@ const brushModule = cornerstoneTools.store.modules.brush;
 export default async function() {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
 
+  // TEMP
+  icrXnatRoiSession.set("writePermissions", true);
+  // TEMP
+
   if (icrXnatRoiSession.get("writePermissions") === false) {
     // User does not have write access
     displayInsufficientPermissionsDialog();
