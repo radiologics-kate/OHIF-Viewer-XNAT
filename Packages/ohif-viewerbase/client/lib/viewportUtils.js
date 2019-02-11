@@ -183,13 +183,23 @@ const clearTools = () => {
   const element = getActiveViewportElement();
   const enabledImage = cornerstone.getEnabledElement(element);
   const imageId = enabledImage.image.imageId;
-
   const toolStateManager =
     cornerstoneTools.globalImageIdSpecificToolStateManager;
   const toolState = toolStateManager.saveImageIdToolState(imageId);
 
   if (!toolState) {
     return;
+  }
+
+  const freehandTool = cornerstoneTools.getToolForElement(
+    element,
+    "freehandMouse"
+  );
+
+  // Close the freehandTool
+  if (freehandTool) {
+    console.log("closing");
+    freehandTool._closeToolIfDrawing(element);
   }
 
   // Delete all toolData apart from freehand toolData from the element

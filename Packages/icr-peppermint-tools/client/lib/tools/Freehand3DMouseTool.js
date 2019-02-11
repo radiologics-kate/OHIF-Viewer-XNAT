@@ -118,6 +118,47 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   }
 
   /**
+   * Returns a handle of a particular tool if it is close to the mouse cursor
+   *
+   * @private
+   * @param {Object} element - The element on which the roi is being drawn.
+   * @param {Object} data      Data object associated with the tool.
+   * @param {*} coords
+   * @returns {Number|Object|Boolean}
+   */
+  _pointNearHandle(element, data, coords) {
+    const config = this.configuration;
+
+    if (data.handles === undefined) {
+      return;
+    }
+
+    console.log("test");
+
+    if (data.visible === false) {
+      return;
+    }
+
+    for (let i = 0; i < data.handles.length; i++) {
+      const handleCanvas = external.cornerstone.pixelToCanvas(
+        element,
+        data.handles[i]
+      );
+
+      if (external.cornerstoneMath.point.distance(handleCanvas, coords) < 6) {
+        return i;
+      }
+    }
+
+    // Check to see if mouse in bounding box of textbox
+    if (data.handles.textBox) {
+      if (pointInsideBoundingBox(data.handles.textBox, coords)) {
+        return data.handles.textBox;
+      }
+    }
+  }
+
+  /**
    * Event handler for called by the mouseDownActivate event, if tool is active and
    * the event is not caught by mouseDownCallback.
    * @override
@@ -241,6 +282,45 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       data.structureSetUid,
       data.ROIContourUid
     );
+  }
+
+  /**
+   * Returns a handle of a particular tool if it is close to the mouse cursor
+   *
+   * @private
+   * @param {Object} element - The element on which the roi is being drawn.
+   * @param {Object} data      Data object associated with the tool.
+   * @param {*} coords
+   * @returns {Number|Object|Boolean}
+   */
+  _pointNearHandle(element, data, coords) {
+    const config = this.configuration;
+
+    if (data.handles === undefined) {
+      return;
+    }
+
+    if (data.visible === false) {
+      return;
+    }
+
+    for (let i = 0; i < data.handles.length; i++) {
+      const handleCanvas = external.cornerstone.pixelToCanvas(
+        element,
+        data.handles[i]
+      );
+
+      if (external.cornerstoneMath.point.distance(handleCanvas, coords) < 6) {
+        return i;
+      }
+    }
+
+    // Check to see if mouse in bounding box of textbox
+    if (data.handles.textBox) {
+      if (pointInsideBoundingBox(data.handles.textBox, coords)) {
+        return data.handles.textBox;
+      }
+    }
   }
 
   /**
@@ -877,7 +957,7 @@ function defaultFreehandConfiguration() {
         }
       }
     },
-    spacing: 5,
+    spacing: 1,
     interpolatedHandleRadius: 2,
     interpolatedAlpha: 0.5,
     activeHandleRadius: 3,
