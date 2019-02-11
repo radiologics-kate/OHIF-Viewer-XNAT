@@ -198,7 +198,6 @@ const clearTools = () => {
 
   // Close the freehandTool
   if (freehandTool) {
-    console.log("closing");
     freehandTool._closeToolIfDrawing(element);
   }
 
@@ -209,14 +208,10 @@ const clearTools = () => {
     }
   });
 
-  let freehandData;
   if (toolState.freehandMouse && toolState.freehandMouse.data) {
-    freehandData = toolState.freehandMouse.data;
-  }
+    const freehandData = toolState.freehandMouse.data;
+    const freehand3DStore = cornerstoneTools.store.modules.freehand3D;
 
-  const freehand3DStore = cornerstoneTools.store.modules.freehand3D;
-
-  if (freehandData) {
     // Delete any non-locked polygons (NOTE: Traverse the array in reverse order to reduce the complexity of the algorithm).
     for (let i = freehandData.length - 1; i >= 0; i--) {
       const freehandDataI = freehandData[i];
@@ -231,12 +226,26 @@ const clearTools = () => {
         freehandData.splice(i, 1);
       }
     }
+
+    // If freehandData is now empty as a result of the deletion, delete it.
+    if (freehandData.length === 0) {
+      delete toolState.freehandMouse;
+    }
   }
 
-  // If freehandData is now empty as a result of the deletion, delete it.
-  if (freehandData.length === 0) {
-    delete toolState.freehand;
+  const BrushTool = cornerstoneTools.BrushTool;
+
+  for (let i = 0; i < BrushTool.getNumberOfColors(); i++) {
+    cornerstoneTools.addToolState(
+      element,
+      BrushTool.getReferencedToolDataName(),
+      {}
+    );
   }
+
+  const brushStore = cornerstoneTools.store.modules.brush;
+
+  brushStore.setters.clearImageBitmapCacheForElement(enabledImage.uuid);
 
   toolStateManager.restoreImageIdToolState(imageId, toolState);
   cornerstone.updateImage(element);
