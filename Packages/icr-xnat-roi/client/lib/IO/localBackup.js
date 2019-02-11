@@ -1,12 +1,13 @@
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { Polygon } from 'meteor/icr:peppermint-tools';
-import { getNextColor } from 'meteor/icr:peppermint-tools';
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { Polygon } from "meteor/icr:peppermint-tools";
+import { getNextColor } from "meteor/icr:peppermint-tools";
 
-import { db } from './indexedDB.js';
+import { db } from "./indexedDB.js";
 
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 const modules = cornerstoneTools.store.modules;
 
@@ -16,33 +17,30 @@ export default {
   loadBackupData
 };
 
-
 function loadBackupData() {
   const toolStateManager = globalToolStateManager.saveToolState();
   const studies = OHIF.viewer.StudyMetadataList.all();
 
   // Loop through studies to find the series
-  for ( let i = 0; i < studies.length; i++ ) {
+  for (let i = 0; i < studies.length; i++) {
     const displaySets = studies[i].getDisplaySets();
 
     for (let j = 0; j < displaySets.length; j++) {
       _loadDataIfDisplaySetHasBackup(displaySets[i]);
     }
-
   }
 }
 
-
-function _loadDataIfDisplaySetHasBackup (displaySet) {
+function _loadDataIfDisplaySetHasBackup(displaySet) {
   const seriesInstanceUid = displaySet.seriesInstanceUid;
   const images = displaySet.images;
   const toolStateManager = globalToolStateManager.saveToolState();
 
   // open a read/write db transaction, ready for adding the data
-  let transaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readonly');
+  let transaction = db.transaction(["XNAT_OHIF_BACKUP"], "readonly");
 
   // call an object store that's already been added to the database
-  let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
+  let objectStore = transaction.objectStore("XNAT_OHIF_BACKUP");
 
   // Make a request to GET our newItem object to the object store
   const username = window.top.username;
@@ -50,7 +48,7 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
     generateHashCode(`${username}_${seriesInstanceUid}`)
   );
 
-  request.onsuccess = async function () {
+  request.onsuccess = async function() {
     if (!request.result) {
       return;
     }
@@ -58,27 +56,21 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
     console.log(`Found backup data for scan: ${displaySet.seriesDescription}`);
 
     // TODO -> Prompt the user that this data has been found.
-    const recover = await _awaitOverwriteConfirmationUI(displaySet.seriesDescription);
+    const recover = await _awaitOverwriteConfirmationUI(
+      displaySet.seriesDescription
+    );
 
     if (recover) {
-      console.log('recovering');
+      console.log("recovering");
 
       const data = JSON.parse(request.result.dataDump);
 
       if (data.freehandMouse) {
-        loadFreehandMouseData(
-          data.freehandMouse,
-          seriesInstanceUid,
-          images
-        );
+        loadFreehandMouseData(data.freehandMouse, seriesInstanceUid, images);
       }
 
       if (data.brush) {
-        loadBrushData(
-          data.brush,
-          seriesInstanceUid,
-          images
-        );
+        loadBrushData(data.brush, seriesInstanceUid, images);
       }
 
       // Refresh the visible element
@@ -87,21 +79,17 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
 
       const toolStateManager = globalToolStateManager.saveToolState();
     } else {
-      console.log('Deleting backup');
+      console.log("Deleting backup");
       // open a read/write db transaction, ready for adding the data
-      let deleteTransaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
+      let deleteTransaction = db.transaction(["XNAT_OHIF_BACKUP"], "readwrite");
 
       // call an object store that's already been added to the database
-      let objectStore = deleteTransaction.objectStore('XNAT_OHIF_BACKUP');
+      let objectStore = deleteTransaction.objectStore("XNAT_OHIF_BACKUP");
       const deleteRequest = objectStore.delete(
         generateHashCode(`${username}_${seriesInstanceUid}`)
       );
     }
-
-
-  }
-
-
+  };
 }
 
 /** @private @async
@@ -109,29 +97,29 @@ function _loadDataIfDisplaySetHasBackup (displaySet) {
  *
  * @return {Promise} A promise that resolves on accept and rejects on cancel.
  */
-async function _awaitOverwriteConfirmationUI (seriesDescription) {
+async function _awaitOverwriteConfirmationUI(seriesDescription) {
+  function keyConfirmEventHandler(e) {
+    console.log("keyConfirmEventHandler");
 
-  function keyConfirmEventHandler (e) {
-    console.log('keyConfirmEventHandler');
-
-    if (e.which === 13) { // If Enter is pressed accept and close the dialog
+    if (e.which === 13) {
+      // If Enter is pressed accept and close the dialog
       confirmEventHandler();
     }
   }
 
-  function confirmEventHandler () {
+  function confirmEventHandler() {
     dialog.close();
 
     removeEventListeners();
     resolveRef(true);
   }
 
-  function cancelEventHandler () {
+  function cancelEventHandler() {
     removeEventListeners();
     resolveRef(false);
   }
 
-  function cancelClickEventHandler () {
+  function cancelClickEventHandler() {
     dialog.close();
 
     removeEventListeners();
@@ -139,30 +127,38 @@ async function _awaitOverwriteConfirmationUI (seriesDescription) {
   }
 
   function removeEventListeners() {
-    dialog.removeEventListener('cancel', cancelEventHandler);
-    cancel.removeEventListener('click', cancelClickEventHandler);
-    dialog.removeEventListener('keydown', keyConfirmEventHandler);
-    confirm.removeEventListener('click', confirmEventHandler);
+    dialog.removeEventListener("cancel", cancelEventHandler);
+    cancel.removeEventListener("click", cancelClickEventHandler);
+    dialog.removeEventListener("keydown", keyConfirmEventHandler);
+    confirm.removeEventListener("click", confirmEventHandler);
   }
 
-  const dialog = document.getElementById('ioConfirmationDialog');
-  const ioConfirmationTitle = dialog.getElementsByClassName('io-confirmation-title')[0];
-  const ioConfirmationBody = dialog.getElementsByClassName('io-confirmation-body')[0];
-  const confirm = dialog.getElementsByClassName('js-io-confirmation-confirm')[0];
-  const cancel = dialog.getElementsByClassName('js-io-confirmation-cancel')[0];
+  const dialog = document.getElementById("ioConfirmationDialog");
+  const ioConfirmationTitle = dialog.getElementsByClassName(
+    "io-confirmation-title"
+  )[0];
+  const ioConfirmationBody = dialog.getElementsByClassName(
+    "io-confirmation-body"
+  )[0];
+  const confirm = dialog.getElementsByClassName(
+    "js-io-confirmation-confirm"
+  )[0];
+  const cancel = dialog.getElementsByClassName("js-io-confirmation-cancel")[0];
 
   // Add event listeners.
-  dialog.addEventListener('cancel', cancelEventHandler);
-  cancel.addEventListener('click', cancelClickEventHandler);
-  dialog.addEventListener('keydown', keyConfirmEventHandler);
-  confirm.addEventListener('click', confirmEventHandler);
+  dialog.addEventListener("cancel", cancelEventHandler);
+  cancel.addEventListener("click", cancelClickEventHandler);
+  dialog.addEventListener("keydown", keyConfirmEventHandler);
+  confirm.addEventListener("click", confirmEventHandler);
 
   ioConfirmationTitle.textContent = `
     Recovery
   `;
 
   ioConfirmationBody.textContent = `
-    Found backed up annotations for scan: ${seriesDescription} for user ${window.top.username}
+    Found backed up annotations for scan: ${seriesDescription} for user ${
+    window.top.username
+  }
      which were not saved to XNAT, would you like to recover this data?
   `;
 
@@ -176,33 +172,25 @@ async function _awaitOverwriteConfirmationUI (seriesDescription) {
   });
 }
 
-
-
-function loadFreehandMouseData (freehandMouseData, seriesInstanceUid, images) {
+function loadFreehandMouseData(freehandMouseData, seriesInstanceUid, images) {
   const { metadata, toolState } = freehandMouseData;
 
   loadFreehandMouseMetadata(metadata, seriesInstanceUid);
   loadFreehandMouseToolState(toolState, seriesInstanceUid, images);
 }
 
-function loadBrushData (brushData, seriesInstanceUid, images) {
-
+function loadBrushData(brushData, seriesInstanceUid, images) {
   const { metadata, toolState } = brushData;
 
   loadBrushMetadata(metadata, seriesInstanceUid);
   loadBrushToolState(toolState, seriesInstanceUid, images);
-
 }
 
-function loadFreehandMouseMetadata (metadata, seriesInstanceUid) {
-  modules.freehand3D.setters.structureSet(
-    seriesInstanceUid,
-    metadata.name,
-    {
-      uid: metadata.uid,
-      activeROIContourIndex: 0
-    }
-  );
+function loadFreehandMouseMetadata(metadata, seriesInstanceUid) {
+  modules.freehand3D.setters.structureSet(seriesInstanceUid, metadata.name, {
+    uid: metadata.uid,
+    activeROIContourIndex: 0
+  });
 
   const ROIContourCollection = metadata.ROIContourCollection;
 
@@ -222,7 +210,7 @@ function loadFreehandMouseMetadata (metadata, seriesInstanceUid) {
   }
 }
 
-function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
+function loadFreehandMouseToolState(toolState, seriesInstanceUid, images) {
   const toolStateManager = globalToolStateManager.saveToolState();
 
   for (let i = 0; i < images.length; i++) {
@@ -233,9 +221,10 @@ function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
     const imageId = images[i].getImageId();
     const sopInstanceUid = images[i]._sopInstanceUID;
 
-    prepareToolStateManager(toolStateManager, imageId, 'freehandMouse');
+    prepareToolStateManager(toolStateManager, imageId, "freehandMouse");
 
-    const toolStateManagerFreehandData = toolStateManager[imageId].freehandMouse.data;
+    const toolStateManagerFreehandData =
+      toolStateManager[imageId].freehandMouse.data;
 
     // Add each polygon.
     const freehandToolData = toolState[i];
@@ -243,27 +232,25 @@ function loadFreehandMouseToolState (toolState, seriesInstanceUid, images) {
     for (let j = 0; j < freehandToolData.length; j++) {
       const toolData = freehandToolData[j];
       const polygon = new Polygon(
-        toolData.handles,
+        toolData.handles.points,
         sopInstanceUid,
         seriesInstanceUid,
-        'DEFAULT',
+        "DEFAULT",
         toolData.ROIContourUid,
         toolData.uid,
         1
       );
 
-      toolStateManagerFreehandData.push(
-        polygon.getFreehandToolData()
-      );
+      toolStateManagerFreehandData.push(polygon.getFreehandToolData());
     }
   }
 }
 
-function loadBrushMetadata (metadata, seriesInstanceUid) {
+function loadBrushMetadata(metadata, seriesInstanceUid) {
   modules.brush.state.segmentationMetadata[seriesInstanceUid] = metadata;
 }
 
-function loadBrushToolState (toolState, seriesInstanceUid, images) {
+function loadBrushToolState(toolState, seriesInstanceUid, images) {
   const toolStateManager = globalToolStateManager.saveToolState();
 
   for (let i = 0; i < images.length; i++) {
@@ -273,7 +260,7 @@ function loadBrushToolState (toolState, seriesInstanceUid, images) {
 
     const imageId = images[i].getImageId();
 
-    prepareToolStateManager(toolStateManager, imageId, 'brush');
+    prepareToolStateManager(toolStateManager, imageId, "brush");
 
     const toolStateManagerBrushData = toolStateManager[imageId].brush.data;
 
@@ -284,11 +271,11 @@ function loadBrushToolState (toolState, seriesInstanceUid, images) {
       const toolData = brushToolData[j];
 
       if (toolData) {
-        const length = Object.keys(toolData).length
+        const length = Object.keys(toolData).length;
         const pixelData = new Uint8ClampedArray(length);
 
         for (let k = 0; k < length; k++) {
-          pixelData[k] = toolData[k]
+          pixelData[k] = toolData[k];
         }
 
         toolStateManagerBrushData.push({
@@ -302,7 +289,7 @@ function loadBrushToolState (toolState, seriesInstanceUid, images) {
   }
 }
 
-function prepareToolStateManager (toolStateManager, imageId, toolType) {
+function prepareToolStateManager(toolStateManager, imageId, toolType) {
   if (!toolStateManager[imageId]) {
     toolStateManager[imageId] = {};
     toolStateManager[imageId][toolType] = {};
@@ -318,9 +305,7 @@ function prepareToolStateManager (toolStateManager, imageId, toolType) {
 // Auto backup once a minute.
 // TODO -> Make this a webworker.
 //
-// DISABLED for now. This needs a lot of optimisations, and backing up NIFTI
-// Masks without GPU-enabled reformatting of the data can be super slow. The
-// Masks need to be packed or they would take up too much space on the db.
+// DISABLED for now. Contours work well, but mask based backup is super slow/breaks the db.
 
 /*
 setInterval(
@@ -328,9 +313,8 @@ setInterval(
 );
 */
 
-
-function checkBackupOnExport () {
-  console.log('checkBackupOnExport:');
+function checkBackupOnExport() {
+  console.log("checkBackupOnExport:");
   const backedUp = saveBackUpForActiveSeries();
 
   // If no data to backup now, delete the DB entry.
@@ -338,50 +322,52 @@ function checkBackupOnExport () {
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     // open a read/write db transaction, ready for adding the data
-    let transaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
+    let transaction = db.transaction(["XNAT_OHIF_BACKUP"], "readwrite");
 
     // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
+    let objectStore = transaction.objectStore("XNAT_OHIF_BACKUP");
 
     // Make a request to GET our newItem object to the object store
     const username = window.top.username;
 
-    console.log('sending delete request...');
+    console.log("sending delete request...");
     const request = objectStore.delete(
       generateHashCode(`${username}_${seriesInstanceUid}`)
     );
 
-    request.onsuccess = function () {
+    request.onsuccess = function() {
       if (!request.result) {
         return;
       }
 
-      console.log('deleted db entry');
-    }
+      console.log("deleted db entry");
+    };
 
-    request.onerror = function () {
-      console.log('no db entry to delete');
-    }
-
-
+    request.onerror = function() {
+      console.log("no db entry to delete");
+    };
   }
 }
 
-
-function saveBackUpForActiveSeries () {
+function saveBackUpForActiveSeries() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
   const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
   const element = activeEnabledElement.element;
-  const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+  const stackToolState = cornerstoneTools.getToolState(element, "stack");
   const imageIds = stackToolState.data[0].imageIds;
   const toolStateManager = globalToolStateManager.saveToolState();
 
-  const brushMetadata = modules.brush.state.segmentationMetadata[seriesInstanceUid];
+  const brushMetadata =
+    modules.brush.state.segmentationMetadata[seriesInstanceUid];
 
   let isNewMaskOrEditedMaskImport = true;
 
-  if (modules.brush.state.import && modules.brush.state.import[seriesInstanceUid]) {
-    isNewMaskOrEditedMaskImport = modules.brush.state.import[seriesInstanceUid].modified;
+  if (
+    modules.brush.state.import &&
+    modules.brush.state.import[seriesInstanceUid]
+  ) {
+    isNewMaskOrEditedMaskImport =
+      modules.brush.state.import[seriesInstanceUid].modified;
   }
 
   const dataDump = {};
@@ -406,10 +392,12 @@ function saveBackUpForActiveSeries () {
   // Get DEFAULT (i.e. working) structureSet.
   const freehandMouseMetadata = modules.freehand3D.getters.structureSet(
     seriesInstanceUid,
-    'DEFAULT'
+    "DEFAULT"
   );
 
-  const freehandDefaultStructureSetHasContours = doesFreehandDefaultStructureSetHaveContours(freehandMouseMetadata);
+  const freehandDefaultStructureSetHasContours = doesFreehandDefaultStructureSetHaveContours(
+    freehandMouseMetadata
+  );
 
   if (freehandMouseMetadata && freehandDefaultStructureSetHasContours) {
     dataDump.freehandMouse = {};
@@ -421,7 +409,9 @@ function saveBackUpForActiveSeries () {
       const imageToolState = toolStateManager[imageIds[i]];
 
       if (imageToolState && imageToolState.freehandMouse) {
-        freehandMouseToolState[i] = createFreehandMouseObjectForFrame(imageToolState.freehandMouse);
+        freehandMouseToolState[i] = createFreehandMouseObjectForFrame(
+          imageToolState.freehandMouse
+        );
       }
     }
 
@@ -429,7 +419,7 @@ function saveBackUpForActiveSeries () {
   }
 
   if (dataDump.brush || dataDump.freehandMouse) {
-    console.log('saving backup...');
+    console.log("saving backup...");
 
     // Save data
     const username = window.top.username;
@@ -440,71 +430,68 @@ function saveBackUpForActiveSeries () {
     };
 
     // open a read/write db transaction, ready for adding the data
-    let transaction = db.transaction(['XNAT_OHIF_BACKUP'], 'readwrite');
+    let transaction = db.transaction(["XNAT_OHIF_BACKUP"], "readwrite");
 
     // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore('XNAT_OHIF_BACKUP');
+    let objectStore = transaction.objectStore("XNAT_OHIF_BACKUP");
 
     // Make a request to PUT our newItem object to the object store
     const request = objectStore.put(newItem);
 
-
     // Report on the success of the transaction completing, when everything is done
     transaction.oncomplete = function() {
-      console.log('Transaction completed: database modification finished.');
+      console.log("Transaction completed: database modification finished.");
     };
 
     transaction.onerror = function() {
-      console.log('Transaction not completed due to error');
+      console.log("Transaction not completed due to error");
     };
 
     return true;
   }
 
-  console.log('no unsaved data, not backing up.');
+  console.log("no unsaved data, not backing up.");
   return false;
 }
 
-function doesFreehandDefaultStructureSetHaveContours (freehandMouseMetadata) {
+function doesFreehandDefaultStructureSetHaveContours(freehandMouseMetadata) {
   let result = false;
 
-  if (freehandMouseMetadata
-    && freehandMouseMetadata.ROIContourCollection) {
-
+  if (freehandMouseMetadata && freehandMouseMetadata.ROIContourCollection) {
     result = freehandMouseMetadata.ROIContourCollection.some(
       element => element
     );
-
   }
 
   return result;
 }
 
-
-function createFreehandMouseObjectForFrame (freehandMouseToolStateI) {
+function createFreehandMouseObjectForFrame(freehandMouseToolStateI) {
   const data = freehandMouseToolStateI.data;
 
   const freehandMouseObjectForFrame = [];
 
   for (let i = 0; i < data.length; i++) {
-    const handles = [];
+    const points = [];
     const dataI = data[i];
 
     // Only hoover up working ROICollection data.
-    if (dataI.structureSetUid !== 'DEFAULT') {
+    if (dataI.structureSetUid !== "DEFAULT") {
       continue;
     }
 
-    for (let j = 0; j < dataI.handles.length; j++) {
-      handles.push({
-        x: dataI.handles[j].x,
-        y: dataI.handles[j].y
+    const dataIPoints = dataI.handles.points;
+
+    for (let j = 0; j < dataIPoints.length; j++) {
+      points.push({
+        x: dataIPoints[j].x,
+        y: dataIPoints[j].y
       });
     }
 
     freehandMouseObjectForFrame.push({
       uid: dataI.uid,
-      handles,
+      points,
       // Deliberately don't store the seriesInstanceUid.
       // structureSetUid will just be DEFAULT
       ROIContourUid: dataI.ROIContourUid
@@ -514,20 +501,17 @@ function createFreehandMouseObjectForFrame (freehandMouseToolStateI) {
   return freehandMouseObjectForFrame;
 }
 
-function createBrushObjectForFrame (brushMouseToolStateI) {
+function createBrushObjectForFrame(brushMouseToolStateI) {
   const data = brushMouseToolStateI.data;
 
   const brushObjectForFrame = [];
 
   for (let i = 0; i < data.length; i++) {
-    brushObjectForFrame.push(
-      data[i].pixelData
-    );
+    brushObjectForFrame.push(data[i].pixelData);
   }
 
   return brushObjectForFrame;
 }
-
 
 /**
  * hash - credit: https://github.com/mstdokumaci/string-hash-64 MIT Licensed.
@@ -535,16 +519,16 @@ function createBrushObjectForFrame (brushMouseToolStateI) {
  * @param  {string} str The string to generate a hashcode from.
  * @return {number}     The hash code.
  */
-function generateHashCode (str) {
-  let i = str.length
-  let hash1 = 5381
-  let hash2 = 52711
+function generateHashCode(str) {
+  let i = str.length;
+  let hash1 = 5381;
+  let hash2 = 52711;
 
   while (i--) {
-    const char = str.charCodeAt(i)
-    hash1 = (hash1 * 33) ^ char
-    hash2 = (hash2 * 33) ^ char
+    const char = str.charCodeAt(i);
+    hash1 = (hash1 * 33) ^ char;
+    hash2 = (hash2 * 33) ^ char;
   }
 
-  return (hash1 >>> 0) * 4096 + (hash2 >>> 0)
+  return (hash1 >>> 0) * 4096 + (hash2 >>> 0);
 }

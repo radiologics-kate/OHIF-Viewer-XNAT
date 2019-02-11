@@ -130,12 +130,14 @@ function scaleRtStructContourData(toolData, imagePlane) {
   // Fill in elements that won't change between points
   const c = [undefined, Y[ci.ix], X[ci.ix], undefined, X[ci.iy], Y[ci.iy]];
 
-  for (let pointI = 0; pointI < toolData.handles.length; pointI++) {
+  const points = toolData.handles.points;
+
+  for (let pointI = 0; pointI < points.length; pointI++) {
     // Subtract imagePositionPatient from the coordinate
     const r = [
-      toolData.handles[pointI].x - S[0],
-      toolData.handles[pointI].y - S[1],
-      toolData.handles[pointI].z - S[2]
+      points[pointI].x - S[0],
+      points[pointI].y - S[1],
+      points[pointI].z - S[2]
     ];
 
     // Set the variable terms in c.
@@ -149,9 +151,9 @@ function scaleRtStructContourData(toolData, imagePlane) {
     const j = (c[3] - c[4] * i * deltaI) / (c[5] * deltaJ);
 
     // NOTE: Add (0.5, 0.5) to the coordinate, as PCS reference frame is with respect to the centre of the first pixel.
-    toolData.handles[pointI].x = i + 0.5;
-    toolData.handles[pointI].y = j + 0.5;
-    toolData.handles[pointI].z = 0;
+    points[pointI].x = i + 0.5;
+    points[pointI].y = j + 0.5;
+    points[pointI].z = 0;
   }
 
   return;

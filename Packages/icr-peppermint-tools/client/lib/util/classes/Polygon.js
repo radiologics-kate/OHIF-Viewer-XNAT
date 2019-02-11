@@ -4,7 +4,7 @@ const modules = cornerstoneTools.store.modules;
 
 export class Polygon {
   constructor(
-    handles,
+    points,
     sopInstanceUid,
     seriesInstanceUid,
     structureSetUid,
@@ -13,7 +13,7 @@ export class Polygon {
     frameNumber,
     interpolated
   ) {
-    this._polyHandles = this._deepCopyHandles(handles);
+    this._polyPoints = this._deepCopyPoints(points);
     this._sopInstanceUid = sopInstanceUid;
     this._seriesInstanceUid = seriesInstanceUid;
     this._structureSetUid = structureSetUid;
@@ -23,23 +23,23 @@ export class Polygon {
     this._interpolated = interpolated;
   }
 
-  _deepCopyHandles(handles) {
-    // Creates a deep copy of the handles object
-    const polyHandles = [];
-    const isZ = handles[0].z !== undefined;
+  _deepCopyPoints(points) {
+    // Creates a deep copy of the points array
+    const polyPoints = [];
+    const isZ = points[0].z !== undefined;
 
-    for (let i = 0; i < handles.length; i++) {
-      polyHandles.push({
-        x: handles[i].x,
-        y: handles[i].y
+    for (let i = 0; i < points.length; i++) {
+      polyPoints.push({
+        x: points[i].x,
+        y: points[i].y
       });
 
       if (isZ) {
-        polyHandles[i].z = handles[i].z;
+        polyPoints[i].z = points[i].z;
       }
     }
 
-    return polyHandles;
+    return polyPoints;
   }
 
   getFreehandToolData(importType) {
@@ -69,7 +69,9 @@ export class Polygon {
       visible: true,
       active: false,
       invalidated: true,
-      handles: []
+      handles: {
+        points: []
+      }
     };
 
     if (this._sopInstanceUid) {
@@ -80,7 +82,7 @@ export class Polygon {
       data.interpolated = true;
     }
 
-    this._generateHandles(data.handles);
+    this._generatePoints(data.handles.points);
 
     data.handles.textBox = {
       active: false,
@@ -98,39 +100,38 @@ export class Polygon {
     return data;
   }
 
-  _generateHandles(dataHandles) {
-    // Construct data.handles object
-    for (let i = 0; i < this._polyHandles.length; i++) {
-      handle = this._deepCopyOneHandle(i);
-      dataHandles.push(handle);
+  _generatePoints(points) {
+    // Construct data.handles.points array
+    for (let i = 0; i < this._polyPoints.length; i++) {
+      points.push(this._deepCopyOnePoint(i));
     }
 
     // Generate lines to be drawn
-    for (let i = 0; i < dataHandles.length; i++) {
-      if (i === dataHandles.length - 1) {
-        dataHandles[i].lines.push(dataHandles[0]);
+    for (let i = 0; i < points.length; i++) {
+      if (i === points.length - 1) {
+        points[i].lines.push(points[0]);
       } else {
-        dataHandles[i].lines.push(dataHandles[i + 1]);
+        points[i].lines.push(points[i + 1]);
       }
     }
   }
 
-  _deepCopyOneHandle(i) {
-    let handle = {
-      x: this._polyHandles[i].x,
-      y: this._polyHandles[i].y,
+  _deepCopyOnePoint(i) {
+    let point = {
+      x: this._polyPoints[i].x,
+      y: this._polyPoints[i].y,
       lines: []
     };
 
-    if (this._polyHandles[i].z !== undefined) {
-      handle.z = this._polyHandles[i].z;
+    if (this._polyPoints[i].z !== undefined) {
+      point.z = this._polyPoints[i].z;
     }
 
-    return handle;
+    return point;
   }
 
-  get polyHandles() {
-    return this._polyHandles;
+  get polyPoints() {
+    return this._polyPoints;
   }
   get sopInstanceUid() {
     return this._sopInstanceUid;

@@ -1,14 +1,17 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { Polygon } from 'meteor/icr:peppermint-tools';
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { Polygon } from "meteor/icr:peppermint-tools";
 
 const modules = cornerstoneTools.store.modules;
 
 //Parses aim files and extracts individual ROIs
 export class AIMReader {
-
-  constructor (xmlDocument, seriesInstanceUidToImport, roiCollectionName, roiCollectionLabel) {
-
+  constructor(
+    xmlDocument,
+    seriesInstanceUidToImport,
+    roiCollectionName,
+    roiCollectionLabel
+  ) {
     this._doc = xmlDocument;
 
     try {
@@ -28,44 +31,44 @@ export class AIMReader {
     console.log(this._polygons);
   }
 
-  _checkXML () {
-    if ( !(this._doc instanceof Document) ) {
-      throw 'Input is not of type Document!';
+  _checkXML() {
+    if (!(this._doc instanceof Document)) {
+      throw "Input is not of type Document!";
     }
 
-    if ( !this._checkIfAIMv4_0() ) {
-      throw 'Input is not an AIMv4_0 ImageAnnotationCollection file!';
+    if (!this._checkIfAIMv4_0()) {
+      throw "Input is not an AIMv4_0 ImageAnnotationCollection file!";
     }
   }
 
-  _checkIfAIMv4_0 () {
-    const imageAnnotationCollections = this._doc.getElementsByTagName('ImageAnnotationCollection');
-    if ( imageAnnotationCollections.length === 0 ) {
-
+  _checkIfAIMv4_0() {
+    const imageAnnotationCollections = this._doc.getElementsByTagName(
+      "ImageAnnotationCollection"
+    );
+    if (imageAnnotationCollections.length === 0) {
       return false;
     }
-    const aimVersion = imageAnnotationCollections[0].getAttribute('aimVersion');
-    if ( aimVersion !== 'AIMv4_0' ) {
-
+    const aimVersion = imageAnnotationCollections[0].getAttribute("aimVersion");
+    if (aimVersion !== "AIMv4_0") {
       return false;
     }
 
     return true;
   }
 
-  _getSopInstancesInSeries () {
+  _getSopInstancesInSeries() {
     let sopInstancesInSeries = [];
-    const imageSeriesList = this._doc.getElementsByTagName('imageSeries');
+    const imageSeriesList = this._doc.getElementsByTagName("imageSeries");
 
-    if ( imageSeriesList.length === 0 ) {
-      throw 'No image series information in AIM file!';
+    if (imageSeriesList.length === 0) {
+      throw "No image series information in AIM file!";
     }
 
-    for ( let i = 0; i < imageSeriesList.length; i++ ) {
+    for (let i = 0; i < imageSeriesList.length; i++) {
       const seriesInstanceUid = this._getSeriesInstanceUid(imageSeriesList[i]);
       console.log(`imageSeries: ${i}, seriesInstanceUid: ${seriesInstanceUid}`);
-      if ( seriesInstanceUid === this._seriesInstanceUidToImport ) {
-        this._appendSopInstances(sopInstancesInSeries,imageSeriesList[i]);
+      if (seriesInstanceUid === this._seriesInstanceUidToImport) {
+        this._appendSopInstances(sopInstancesInSeries, imageSeriesList[i]);
       }
     }
 
@@ -73,72 +76,94 @@ export class AIMReader {
   }
 
   _getSeriesInstanceUid(imageSeries) {
-    const seriesInstanceUidElement = imageSeries.getElementsByTagName('instanceUid')[0];
-    const seriesInstanceUid = seriesInstanceUidElement.getAttribute('root');
+    const seriesInstanceUidElement = imageSeries.getElementsByTagName(
+      "instanceUid"
+    )[0];
+    const seriesInstanceUid = seriesInstanceUidElement.getAttribute("root");
 
-    return seriesInstanceUid
+    return seriesInstanceUid;
   }
 
   _appendSopInstances(sopInstancesInSeries, imageSeries) {
-    sopInstanceUidElements = imageSeries.getElementsByTagName('sopInstanceUid');
-    for (let i = 0; i < sopInstanceUidElements.length; i++ ) {
-      const sopInstanceUid = sopInstanceUidElements[i].getAttribute('root');
+    sopInstanceUidElements = imageSeries.getElementsByTagName("sopInstanceUid");
+    for (let i = 0; i < sopInstanceUidElements.length; i++) {
+      const sopInstanceUid = sopInstanceUidElements[i].getAttribute("root");
       if (!sopInstancesInSeries.includes(sopInstanceUid)) {
         sopInstancesInSeries.push(sopInstanceUid);
       }
     }
   }
 
-  _extractAnnotations () {
-    const annotations = this._doc.getElementsByTagName('ImageAnnotation');
+  _extractAnnotations() {
+    const annotations = this._doc.getElementsByTagName("ImageAnnotation");
 
-    for ( let i = 0; i < annotations.length; i++ ) {
+    for (let i = 0; i < annotations.length; i++) {
       this._extractPolygons(annotations[i]);
     }
   }
 
-  _extractPolygons (annotation) {
+  _extractPolygons(annotation) {
     const children = annotation.children;
     const ROIContourUid = this._createNewVolumeAndGetUid(children);
-    const markupEntitys = annotation.getElementsByTagName('MarkupEntity');
+    const markupEntitys = annotation.getElementsByTagName("MarkupEntity");
 
     console.log(`Number of Polygons in annotation: ${markupEntitys.length}`);
-    for ( let i = 0; i < markupEntitys.length; i++ ) {
+    for (let i = 0; i < markupEntitys.length; i++) {
       this._addMarkupEntityIfPolygon(markupEntitys[i], ROIContourUid);
     }
   }
 
-  _addMarkupEntityIfPolygon (markupEntity, ROIContourUid) {
-    if ( markupEntity.getAttribute('xsi:type') === 'TwoDimensionPolyline' ) {
+  _addMarkupEntityIfPolygon(markupEntity, ROIContourUid) {
+    if (markupEntity.getAttribute("xsi:type") === "TwoDimensionPolyline") {
       this._addPolygon(markupEntity, ROIContourUid);
     }
   }
 
-  _addPolygon (markupEntity, ROIContourUid) {
-    const sopInstanceUid = markupEntity.getElementsByTagName('imageReferenceUid')[0].getAttribute('root');
+  _addPolygon(markupEntity, ROIContourUid) {
+    const sopInstanceUid = markupEntity
+      .getElementsByTagName("imageReferenceUid")[0]
+      .getAttribute("root");
 
     // Don't extract polygon if it doesn't belong to the series being imported
     if (!this._sopInstancesInSeries.includes(sopInstanceUid)) {
-      console.log('referencedSopInstance not in active series');
+      console.log("referencedSopInstance not in active series");
       return;
     }
 
-    const polygonUid = markupEntity.getElementsByTagName('uniqueIdentifier')[0].getAttribute('root');
-    const referencedFrameNumber = markupEntity.getElementsByTagName('referencedFrameNumber')[0].getAttribute('value');
-    const twoDimensionSpatialCoordinateCollection = markupEntity.getElementsByTagName('twoDimensionSpatialCoordinateCollection')[0].children;
+    const polygonUid = markupEntity
+      .getElementsByTagName("uniqueIdentifier")[0]
+      .getAttribute("root");
+    const referencedFrameNumber = markupEntity
+      .getElementsByTagName("referencedFrameNumber")[0]
+      .getAttribute("value");
+    const twoDimensionSpatialCoordinateCollection = markupEntity.getElementsByTagName(
+      "twoDimensionSpatialCoordinateCollection"
+    )[0].children;
 
-    const handles = [];
+    const points = [];
 
     // NOTE: itterate up to length - 1, as first and last points are the same for closed polygons.
-    for ( let i = 0; i < twoDimensionSpatialCoordinateCollection.length - 1; i++ ) {
-      handles.push({
-        x: Number(twoDimensionSpatialCoordinateCollection[i].getElementsByTagName('x')[0].getAttribute('value')),
-        y: Number(twoDimensionSpatialCoordinateCollection[i].getElementsByTagName('y')[0].getAttribute('value'))
+    for (
+      let i = 0;
+      i < twoDimensionSpatialCoordinateCollection.length - 1;
+      i++
+    ) {
+      points.push({
+        x: Number(
+          twoDimensionSpatialCoordinateCollection[i]
+            .getElementsByTagName("x")[0]
+            .getAttribute("value")
+        ),
+        y: Number(
+          twoDimensionSpatialCoordinateCollection[i]
+            .getElementsByTagName("y")[0]
+            .getAttribute("value")
+        )
       });
     }
 
     const polygon = new Polygon(
-      handles,
+      points,
       sopInstanceUid,
       this._seriesInstanceUidToImport,
       this._roiCollectionLabel,
@@ -156,24 +181,26 @@ export class AIMReader {
     let comment;
 
     for (let i = 0; i < element.length; i++) {
-      if (element[i].tagName === 'uniqueIdentifier') {
-        uid = element[i].getAttribute('root');
-      } else if (element[i].tagName === 'name') {
-        name = element[i].getAttribute('value');
-      } else if (element[i].tagName === 'comment') {
-        comment = element[i].getAttribute('value');
+      if (element[i].tagName === "uniqueIdentifier") {
+        uid = element[i].getAttribute("root");
+      } else if (element[i].tagName === "name") {
+        name = element[i].getAttribute("value");
+      } else if (element[i].tagName === "comment") {
+        comment = element[i].getAttribute("value");
       }
     }
 
     if (!uid) {
-      throw Error('Invalid AIM, no imageAnnotation uniqueIdentifier found!');
+      throw Error("Invalid AIM, no imageAnnotation uniqueIdentifier found!");
     }
     if (!name) {
       if (comment) {
         name = comment;
       } else {
-        console.log('No name or comment for imageAnnotation, using default name \"Untitled Lession\"');
-        name = 'Untitled Lession'
+        console.log(
+          'No name or comment for imageAnnotation, using default name "Untitled Lession"'
+        );
+        name = "Untitled Lession";
       }
     }
 
@@ -207,16 +234,15 @@ export class AIMReader {
   }
 
   _isIncluded(includeElement) {
-    if (includeElement.getAttribute('root') === 'true') {
+    if (includeElement.getAttribute("root") === "true") {
       return true;
     }
 
-    throw 'Holes (i.e. includeFlag === false) are currently unsupported!';
+    throw "Holes (i.e. includeFlag === false) are currently unsupported!";
     return false;
   }
 
   get polygons() {
     return this._polygons;
   }
-
 }

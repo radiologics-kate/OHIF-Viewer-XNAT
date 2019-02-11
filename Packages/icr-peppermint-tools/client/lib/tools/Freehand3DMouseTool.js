@@ -96,7 +96,9 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       visible: true,
       active: true,
       invalidated: true,
-      handles: []
+      handles: {
+        points: []
+      }
     };
 
     measurementData.handles.textBox = {
@@ -115,47 +117,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     );
 
     return measurementData;
-  }
-
-  /**
-   * Returns a handle of a particular tool if it is close to the mouse cursor
-   *
-   * @private
-   * @param {Object} element - The element on which the roi is being drawn.
-   * @param {Object} data      Data object associated with the tool.
-   * @param {*} coords
-   * @returns {Number|Object|Boolean}
-   */
-  _pointNearHandle(element, data, coords) {
-    const config = this.configuration;
-
-    if (data.handles === undefined) {
-      return;
-    }
-
-    console.log("test");
-
-    if (data.visible === false) {
-      return;
-    }
-
-    for (let i = 0; i < data.handles.length; i++) {
-      const handleCanvas = external.cornerstone.pixelToCanvas(
-        element,
-        data.handles[i]
-      );
-
-      if (external.cornerstoneMath.point.distance(handleCanvas, coords) < 6) {
-        return i;
-      }
-    }
-
-    // Check to see if mouse in bounding box of textbox
-    if (data.handles.textBox) {
-      if (pointInsideBoundingBox(data.handles.textBox, coords)) {
-        return data.handles.textBox;
-      }
-    }
   }
 
   /**
@@ -206,8 +167,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   }
 
   /**
-   * Checks that the volume name is set, and calls external library to let the
-   * user enter a name if the volume is unnamed.
+   * Checks that the volume name is set, and calls UI to let the user enter a
+   * name if the volume is unnamed.
    * @async @private @method
    *
    * @param {string} seriesInstanceUid The uid of the series.
@@ -296,7 +257,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   _pointNearHandle(element, data, coords) {
     const config = this.configuration;
 
-    if (data.handles === undefined) {
+    if (!data.handles || data.handles.points === undefined) {
       return;
     }
 
@@ -304,19 +265,18 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    for (let i = 0; i < data.handles.length; i++) {
-      const handleCanvas = external.cornerstone.pixelToCanvas(
-        element,
-        data.handles[i]
-      );
+    const points = data.handles.points;
 
-      if (external.cornerstoneMath.point.distance(handleCanvas, coords) < 6) {
+    for (let i = 0; i < points.length; i++) {
+      const handleCanvas = cornerstone.pixelToCanvas(element, points[i]);
+
+      if (cornerstoneMath.point.distance(handleCanvas, coords) < 6) {
         return i;
       }
     }
 
     // Check to see if mouse in bounding box of textbox
-    if (data.handles.textBox) {
+    if (config.alwaysShowTextBox && data.handles.textBox) {
       if (pointInsideBoundingBox(data.handles.textBox, coords)) {
         return data.handles.textBox;
       }
@@ -514,6 +474,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         let color = toolColors.getColorIfActive(data);
         let fillColor;
 
+        const points = data.handles.points;
+
         if (data.active && !structureSet.isLocked) {
           if (data.handles.invalidHandlePlacement) {
             color = config.invalidColor;
@@ -531,20 +493,20 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
           context.globalAlpha = config.interpolatedAlpha;
         }
 
-        if (data.handles.length) {
-          for (let j = 0; j < data.handles.length; j++) {
-            const points = [...data.handles[j].lines];
+        if (data.handles.points.length) {
+          for (let j = 0; j < points.length; j++) {
+            const lines = [...points[j].lines];
 
-            if (j === data.handles.length - 1 && !data.polyBoundingBox) {
+            if (j === points.length - 1 && !data.polyBoundingBox) {
               // If it's still being actively drawn, keep the last line to
               // The mouse location
-              points.push(config.mouseLocation.handles.start);
+              lines.push(config.mouseLocation.handles.start);
             }
             drawJoinedLines(
               context,
               eventData.element,
-              data.handles[j],
-              points,
+              data.handles.points[j],
+              lines,
               { color }
             );
           }
@@ -562,21 +524,20 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         if (isROIActive && data.interpolated) {
           // Render dotted line
           options.handleRadius = config.interpolatedHandleRadius;
-
-          drawHandles(context, eventData, data.handles, options);
+          drawHandles(context, eventData, points, options);
         } else if (
           config.alwaysShowHandles ||
           (data.active && data.polyBoundingBox)
         ) {
           // Render all handles
           options.handleRadius = config.activeHandleRadius;
-          drawHandles(context, eventData, data.handles, options);
+          drawHandles(context, eventData, points, options);
         }
 
         if (data.canComplete) {
           // Draw large handle at the origin if can complete drawing
           options.handleRadius = config.completeHandleRadius;
-          drawHandles(context, eventData, [data.handles[0]], options);
+          drawHandles(context, eventData, [points[0]], options);
         }
 
         if (data.active && !data.polyBoundingBox) {
@@ -588,7 +549,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             config.mouseLocation.handles,
             options
           );
-          drawHandles(context, eventData, [data.handles[0]], options);
+          drawHandles(context, eventData, [points[0]], options);
         }
 
         // Define variables for the area and mean/standard deviation
@@ -608,17 +569,17 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
           // Retrieve the bounds of the ROI in image coordinates
           const bounds = {
-            left: data.handles[0].x,
-            right: data.handles[0].x,
-            bottom: data.handles[0].y,
-            top: data.handles[0].x
+            left: points[0].x,
+            right: points[0].x,
+            bottom: points[0].y,
+            top: points[0].x
           };
 
-          for (let i = 0; i < data.handles.length; i++) {
-            bounds.left = Math.min(bounds.left, data.handles[i].x);
-            bounds.right = Math.max(bounds.right, data.handles[i].x);
-            bounds.bottom = Math.min(bounds.bottom, data.handles[i].y);
-            bounds.top = Math.max(bounds.top, data.handles[i].y);
+          for (let i = 0; i < points.length; i++) {
+            bounds.left = Math.min(bounds.left, points[i].x);
+            bounds.right = Math.max(bounds.right, points[i].x);
+            bounds.bottom = Math.min(bounds.bottom, points[i].y);
+            bounds.top = Math.max(bounds.top, points[i].y);
           }
 
           const polyBoundingBox = {
@@ -648,7 +609,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
               this,
               pixels,
               polyBoundingBox,
-              data.handles
+              points
             );
 
             if (modality === "PT") {
@@ -684,7 +645,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
           const rowPixelSpacing = image.rowPixelSpacing || 1;
           const scaling = columnPixelSpacing * rowPixelSpacing;
 
-          area = freehandArea(data.handles, scaling);
+          area = freehandArea(points, scaling);
 
           // If the area value is sane, store it for later retrieval
           if (!isNaN(area)) {
@@ -720,7 +681,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
             element,
             data.handles.textBox,
             text,
-            data.handles,
+            points,
             textBoxAnchorPoints,
             color,
             lineWidth,
@@ -803,45 +764,8 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return textLines;
     }
 
-    function textBoxAnchorPoints(handles) {
-      return handles;
-    }
-  }
-
-  /**
-   * Returns a handle of a particular tool if it is close to the mouse cursor
-   *
-   * @private
-   * @param {Object} eventData - data object associated with an event.
-   * @param {Number} toolIndex - the ID of the tool
-   * @return {Number|Object|Boolean}
-   */
-  _pointNearHandle(element, data, coords) {
-    const config = this.configuration;
-
-    if (data.handles === undefined) {
-      return;
-    }
-
-    if (data.visible === false) {
-      return;
-    }
-
-    for (let i = 0; i < data.handles.length; i++) {
-      const handleCanvas = cornerstone.pixelToCanvas(element, data.handles[i]);
-
-      if (
-        cornerstoneMath.point.distance(handleCanvas, coords) < config.spacing
-      ) {
-        return i;
-      }
-    }
-
-    // Check to see if mouse in bounding box of textbox
-    if (config.alwaysShowTextBox && data.handles.textBox) {
-      if (pointInsideBoundingBox(data.handles.textBox, coords)) {
-        return data.handles.textBox;
-      }
+    function textBoxAnchorPoints(points) {
+      return points;
     }
   }
 
@@ -859,13 +783,15 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     const data = toolState.data[config.currentTool];
 
+    const points = data.handles.points;
+
     data.active = false;
     data.highlight = false;
     data.handles.invalidHandlePlacement = false;
 
     // Connect the end handle to the origin handle
     if (handleNearby !== undefined) {
-      data.handles[config.currentHandle - 1].lines.push(data.handles[0]);
+      points[config.currentHandle - 1].lines.push(points[0]);
     }
 
     if (this._modifying) {
@@ -958,7 +884,7 @@ function defaultFreehandConfiguration() {
       }
     },
     spacing: 1,
-    interpolatedHandleRadius: 2,
+    interpolatedHandleRadius: 0.5,
     interpolatedAlpha: 0.5,
     activeHandleRadius: 3,
     completeHandleRadius: 6,

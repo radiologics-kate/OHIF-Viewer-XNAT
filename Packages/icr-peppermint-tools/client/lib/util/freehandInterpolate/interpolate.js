@@ -53,10 +53,10 @@ export default function(toolData) {
 
 function _linearlyInterpolateBetween(indicies, contourPair, ROIContourData) {
   const c1 = _generateClosedContour(
-    ROIContourData[contourPair[0]].contours[0].handles
+    ROIContourData[contourPair[0]].contours[0].handles.points
   );
   const c2 = _generateClosedContour(
-    ROIContourData[contourPair[1]].contours[0].handles
+    ROIContourData[contourPair[1]].contours[0].handles.points
   );
 
   const { c1Interp, c2Interp } = _generateInterpolationContourPair(c1, c2);
@@ -183,17 +183,17 @@ function _addInterpolatedContour(
   imageId,
   referencedToolData
 ) {
-  const handles = [];
+  const points = [];
 
   for (let i = 0; i < interpolated2DContour.x.length; i++) {
-    handles.push({
+    points.push({
       x: interpolated2DContour.x[i],
       y: interpolated2DContour.y[i]
     });
   }
 
   const polygon = new Polygon(
-    handles,
+    points,
     null,
     referencedToolData.seriesInstanceUid,
     referencedToolData.structureSetUid,
@@ -266,17 +266,17 @@ function _editInterpolatedContour(
   }
 
   const oldPolygon = imageToolState.freehandMouse.data[toolDataIndex];
-  const handles = [];
+  const points = [];
 
   for (let i = 0; i < interpolated2DContour.x.length; i++) {
-    handles.push({
+    points.push({
       x: interpolated2DContour.x[i],
       y: interpolated2DContour.y[i]
     });
   }
 
   const updatedPolygon = new Polygon(
-    handles,
+    points,
     null,
     oldPolygon.seriesInstanceUid,
     oldPolygon.structureSetUid,
@@ -588,22 +588,22 @@ function _normalisedCumulativePerimeter(cumPerim) {
 }
 
 /**
- * _generateClosedContour - Generate a clockwise contour object from the data
- * handles of a clockwise or anti-clockwise polygon.
+ * _generateClosedContour - Generate a clockwise contour object from the points
+ * of a clockwise or anti-clockwise polygon.
  *
- * @param  {object[]} handles The handles to generate the contour from.
+ * @param  {object[]} points The points to generate the contour from.
  * @return {object}           The generated contour object.
  */
-function _generateClosedContour(handles) {
+function _generateClosedContour(points) {
   const c = {
     x: [],
     y: []
   };
 
   // NOTE: For z positions we only need the relative difference for interpolation, thus use frame index as Z.
-  for (let i = 0; i < handles.length; i++) {
-    c.x[i] = handles[i].x;
-    c.y[i] = handles[i].y;
+  for (let i = 0; i < points.length; i++) {
+    c.x[i] = points[i].x;
+    c.y[i] = points[i].y;
   }
 
   // Push last node to create closed contour.
