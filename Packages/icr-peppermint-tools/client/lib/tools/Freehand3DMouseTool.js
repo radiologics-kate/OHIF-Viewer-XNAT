@@ -130,26 +130,15 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   async addNewMeasurement(evt, interactionType) {
     const eventData = evt.detail;
     const config = this.configuration;
-    const freehand3DStore = this._freehand3DStore;
 
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-    let series = freehand3DStore.getters.series(seriesInstanceUid);
+    const newVolumeDialogOpened = this.constructor.checkIfFirstVolumeOnSeries();
 
-    if (!series) {
-      freehand3DStore.setters.series(seriesInstanceUid);
-      series = freehand3DStore.getters.series(seriesInstanceUid);
-    }
-
-    const activeROIContour = freehand3DStore.getters.activeROIContour(
-      seriesInstanceUid
-    );
-
-    if (activeROIContour === undefined || activeROIContour === null) {
-      createNewVolume(seriesInstanceUid);
+    if (newVolumeDialogOpened) {
       preventPropagation(evt);
-
       return;
     }
+
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     this._checkVolumeName(seriesInstanceUid)
       .then(() => {
@@ -164,6 +153,29 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         console.log("failure");
         preventPropagation(evt);
       });
+  }
+
+  static checkIfFirstVolumeOnSeries() {
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const freehand3DStore = modules.freehand3D;
+    let series = freehand3DStore.getters.series(seriesInstanceUid);
+
+    if (!series) {
+      freehand3DStore.setters.series(seriesInstanceUid);
+      series = freehand3DStore.getters.series(seriesInstanceUid);
+    }
+
+    const activeROIContour = freehand3DStore.getters.activeROIContour(
+      seriesInstanceUid
+    );
+
+    if (activeROIContour === undefined || activeROIContour === null) {
+      createNewVolume(seriesInstanceUid);
+
+      return true;
+    }
+
+    return false;
   }
 
   /**

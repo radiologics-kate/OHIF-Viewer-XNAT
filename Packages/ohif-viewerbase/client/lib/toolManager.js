@@ -222,6 +222,14 @@ export const toolManager = {
     };
   },
 
+  setActiveToolWithHook(params) {
+    const { toolName, hook } = params;
+
+    toolManager.setActiveTool(toolName, "left");
+
+    hook();
+  },
+
   setActiveTool(toolName, button = "left") {
     // Using setActiveTool with no arguments activates the default tools for all buttons
     if (!toolName) {

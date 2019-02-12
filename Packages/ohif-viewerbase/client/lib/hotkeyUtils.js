@@ -9,6 +9,7 @@ import { switchToImageByIndex } from "./switchToImageByIndex";
 import { viewportUtils } from "./viewportUtils";
 import { panelNavigation } from "./panelNavigation";
 import { WLPresets } from "./WLPresets";
+import { Freehand3DMouseTool, Brush3DTool } from "meteor/icr:peppermint-tools";
 
 // TODO: add this to namespace definitions
 Meteor.startup(function() {
@@ -130,10 +131,26 @@ Meteor.startup(function() {
     wwwcRegion: "W/L by Region",
     crosshairs: "Crosshairs",
     referenceLines: "Reference Lines",
-    freehandMouse: "Freehand Mouse",
     freehandSculpterMouse: "Freehand Sculpter Mouse",
-    brush: "Brush",
     eraser: "Eraser"
+  });
+
+  OHIF.commands.register(contextName, "freehandMouse", {
+    name: "Freehand Mouse",
+    action: toolManager.setActiveToolWithHook,
+    params: {
+      toolName: "freehandMouse",
+      hook: Freehand3DMouseTool.checkIfFirstVolumeOnSeries
+    }
+  });
+
+  OHIF.commands.register(contextName, "brush", {
+    name: "Brush",
+    action: toolManager.setActiveToolWithHook,
+    params: {
+      toolName: "brush",
+      hook: Brush3DTool.checkIfAnyMetadataOnSeries
+    }
   });
 
   // Functions to register the viewport commands
