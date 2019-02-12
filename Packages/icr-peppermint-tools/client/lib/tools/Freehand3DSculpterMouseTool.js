@@ -153,8 +153,7 @@ function getDefaultFreehandSculpterMouseToolConfiguration() {
         }
       }
     },
-    minSpacing: 5,
-    maxSpacing: 20,
+    minSpacing: 1,
     currentTool: null,
     dragColor: toolColors.getActiveColor(),
     hoverColor: toolColors.getToolColor(),

@@ -20,10 +20,6 @@ export default function(toolData) {
     toolData
   );
 
-  // TEMP
-  const t0 = performance.now();
-  // TEMP
-
   for (let i = 0; i < interpolationList.length; i++) {
     if (interpolationList[i]) {
       _linearlyInterpolateBetween(
@@ -33,11 +29,6 @@ export default function(toolData) {
       );
     }
   }
-
-  // TEMP
-  const t1 = performance.now();
-  console.log(`${t1 - t0} ms`);
-  // TEMP
 }
 
 /**
