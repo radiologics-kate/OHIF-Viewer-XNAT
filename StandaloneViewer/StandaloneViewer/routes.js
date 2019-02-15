@@ -3,42 +3,26 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
-if (Meteor.isClient && window.top.XNAT) {
+const productionMode = false;
+
+if (Meteor.isClient && productionMode) {
   // XNAT deployment mode.
   // Disconnect from the Meteor Server since we don't need it
   OHIF.log.info('Disconnecting from the Meteor server');
   Meteor.disconnect();
 
-  let rootUrl = window.top.XNAT.url.getProtocol() + '//' + window.top.XNAT.url.getDomain() + ":" + window.top.XNAT.url.getPort() + window.top.XNAT.url.rootUrl('').replace(/\/+$/, "");
+  const url = window.location.href;
+  const hostname = window.location.hostname;
+
+  const origin = window.location.origin;
+  const urlExtention = url.replace(origin, '');
+
+  const viewerRoot = urlExtention.split('VIEWER')[0] + 'VIEWER';
+
+  const rootUrl = origin + '/' + urlExtention.split('VIEWER')[0].replace(/\//g, '');
 
   Session.set('rootUrl', rootUrl);
-
-  const sessionData = window.top.XNAT.data.context;
-  icrXnatRoiSession.set('experimentId', sessionData.ID);
-  icrXnatRoiSession.set('experimentLabel', sessionData.label);
-  icrXnatRoiSession.set('subjectId', sessionData.subjectID);
-  icrXnatRoiSession.set('projectId', sessionData.projectID);
-
-  OHIF.RoiStateManagement.checkAndSetPermissions();
-
-  const urlNoProtocol = rootUrl.split("//")[1];
-  const urlArray = urlNoProtocol.split("/");
-
-  let extention = "/";
-  for (let i = 1; i < urlArray.length; i++) {
-    extention += `${urlArray[i]}/`;
-  }
-
-  const viewerRoot = `${extention}VIEWER`;
-
   Session.set('viewerRoot', viewerRoot);
-
-  console.log(`extention: ${extention}`);
-  console.log(`viewer route: ${viewerRoot}`);
-
-  let jsonRequestUrl = window.top.jsonRequestUrl;
-
-  console.log(`jsonRequestUrl in viewer: ${jsonRequestUrl}`);
 
   Router.configure({
       loadingTemplate: 'loading'
@@ -52,7 +36,39 @@ if (Meteor.isClient && window.top.XNAT) {
           console.log('onRun');
 
           const next = this.next;
-          const url = jsonRequestUrl;
+
+          console.log(this.params);
+
+          let subjectId;
+          let projectId;
+          let experimentId;
+          let experimentLabel;
+          let parentProjectId;
+
+          if (this.params.query) {
+            const query = this.params.query;
+
+            experimentLabel = query.experimentLabel;
+            parentProjectId = query.parentProjectId;
+            subjectId = query.subjectId;
+            projectId = query.projectId;
+            experimentId = query.experimentId;
+            csrfToken = query.csrfToken;
+          } else {
+            console.error('insufficient query parameters.');
+          }
+
+          icrXnatRoiSession.set('experimentId', experimentId);
+          icrXnatRoiSession.set('experimentLabel', experimentLabel);
+          icrXnatRoiSession.set('subjectId', subjectId);
+          icrXnatRoiSession.set('projectId', projectId);
+          icrXnatRoiSession.set('csrfToken', csrfToken);
+
+          OHIF.RoiStateManagement.checkAndSetPermissions();
+
+
+          // TODO -> build json request URL.
+          const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
 
           // Define a request to the server to retrieve the study data
           // as JSON, given a URL that was in the Route
@@ -84,8 +100,8 @@ if (Meteor.isClient && window.top.XNAT) {
           // Open the Request to the server for the JSON data
           // In this case we have a server-side route called /api/
           // which responds to GET requests with the study data
-          OHIF.log.info(`Sending Request to: ${url}`);
-          oReq.open('GET', url);
+          console.log(`Sending Request to: ${jsonRequestUrl}`);
+          oReq.open('GET', jsonRequestUrl);
           oReq.setRequestHeader('Accept', 'application/json')
 
           // Fire the request to the server

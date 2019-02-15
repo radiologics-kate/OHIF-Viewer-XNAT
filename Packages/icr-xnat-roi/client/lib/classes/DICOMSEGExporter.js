@@ -32,7 +32,7 @@ export class DICOMSEGExporter {
   async exportToXNAT() {
     const metaDataXml = this._generateResourceMetadata();
 
-    const csrfToken = window.top.csrfToken; //csrfToken of parent. Can only perform put when iframe is embedded in XNAT.
+    const csrfToken = icrXnatRoiSession.get("csrfToken", csrfToken);
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
     let putFailed = false;
