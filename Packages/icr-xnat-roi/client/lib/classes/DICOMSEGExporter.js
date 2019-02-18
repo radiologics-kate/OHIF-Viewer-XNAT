@@ -7,7 +7,7 @@ const XMLWriter = require("xml-writer");
 export class DICOMSEGExporter {
   constructor(segBlob, seriesInstanceUid, label, name) {
     this._payload = segBlob;
-    this._projectID = icrXnatRoiSession.get("projectId");
+    this._projectID = icrXnatRoiSession.get("sourceProjectId");
     this._subjectID = icrXnatRoiSession.get("subjectId");
     this._experimentID = icrXnatRoiSession.get("experimentId");
     this._seriesInstanceUID = seriesInstanceUid;

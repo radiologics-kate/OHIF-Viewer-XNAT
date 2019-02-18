@@ -3,7 +3,7 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
-const productionMode = false;
+const productionMode = true;
 
 if (Meteor.isClient && productionMode) {
   // XNAT deployment mode.
@@ -53,21 +53,28 @@ if (Meteor.isClient && productionMode) {
             subjectId = query.subjectId;
             projectId = query.projectId;
             experimentId = query.experimentId;
-            csrfToken = query.csrfToken;
+            csrfToken = decodeURIComponent(atob(query.csrfToken));
           } else {
             console.error('insufficient query parameters.');
           }
 
+          if (parentProjectId) {
+            console.log(`This experiment is shared view of ${experimentId} from ${parentProjectId}`);
+          }
+
+          icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
           icrXnatRoiSession.set('experimentId', experimentId);
           icrXnatRoiSession.set('experimentLabel', experimentLabel);
           icrXnatRoiSession.set('subjectId', subjectId);
           icrXnatRoiSession.set('projectId', projectId);
           icrXnatRoiSession.set('csrfToken', csrfToken);
+          icrXnatRoiSession.set('parentProjectId', parentProjectId);
+
+          console.log(`decoded csrfToken: ${csrfToken}`)
 
           OHIF.RoiStateManagement.checkAndSetPermissions();
 
-
-          // TODO -> build json request URL.
+          // Build JSON GET url.
           const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
 
           // Define a request to the server to retrieve the study data
@@ -91,7 +98,17 @@ if (Meteor.isClient && productionMode) {
               }
 
               OHIF.log.info(JSON.stringify(oReq.responseText, null, 2));
-              this.data = JSON.parse(oReq.responseText);
+
+              let jsonString = oReq.responseText;
+
+              if (parentProjectId) {
+                console.log(`replacing ${parentProjectId} with ${projectId}`);
+                jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
+              }
+
+              console.log(jsonString);
+
+              this.data = JSON.parse(jsonString);
               console.log(this.data);
 
               next();

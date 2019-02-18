@@ -5,7 +5,7 @@ const XMLWriter = require("xml-writer");
 export class AIMExporter {
   constructor(aimWriter) {
     this._aimString = aimWriter.toString();
-    this._projectID = icrXnatRoiSession.get("projectId");
+    this._projectID = icrXnatRoiSession.get("sourceProjectId");
     this._subjectID = icrXnatRoiSession.get("subjectId");
     this._experimentID = icrXnatRoiSession.get("experimentId");
     this._seriesInstanceUID = aimWriter.seriesInfo.seriesInstanceUid;

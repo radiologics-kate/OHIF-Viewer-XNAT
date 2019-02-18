@@ -7,27 +7,47 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
  * @author JamesAPetts
  */
 export async function checkAndSetPermissions() {
+  const parentProjectId = icrXnatRoiSession.get("parentProjectId");
+  const sourceProjectId = icrXnatRoiSession.get("sourceProjectId");
+
   const url = `${Session.get(
     "rootUrl"
-  )}/xapi/roi/projects/${icrXnatRoiSession.get(
-    "projectId"
-  )}/permissions/RoiCollection`;
+  )}/xapi/roi/projects/${sourceProjectId}/permissions/RoiCollection`;
 
   console.log(`checkAndSetPermissions: ${url}`);
 
-  const roiCollectionPermissions = await getPermissionsJson(url).catch(error =>
-    console.log(error)
-  );
+  getPermissionsJson(url)
+    .then(result => {
+      console.log("checkAndSetPermissions GET result:");
+      console.log(result);
 
-  console.log(
-    `permissions: create: ${roiCollectionPermissions.create},
-    read: ${roiCollectionPermissions.read},
-    edit: ${roiCollectionPermissions.edit}`
-  );
+      const { status, response } = result;
 
-  icrXnatRoiSession.set("writePermissions", roiCollectionPermissions.create);
-  icrXnatRoiSession.set("readPermissions", roiCollectionPermissions.read);
-  icrXnatRoiSession.set("editPermissions", roiCollectionPermissions.edit);
+      if (status === 200) {
+        console.log(
+          `permissions: create: ${response.create},
+        read: ${response.read},
+        edit: ${response.edit}`
+        );
+
+        icrXnatRoiSession.set("writePermissions", response.create);
+        icrXnatRoiSession.set("readPermissions", response.read);
+        icrXnatRoiSession.set("editPermissions", response.edit);
+      } else if (parentProjectId) {
+        // Assume read only of parent  project.
+        console.log("Can only read from parent project");
+        icrXnatRoiSession.set("writePermissions", false);
+        icrXnatRoiSession.set("readPermissions", true);
+        icrXnatRoiSession.set("editPermissions", false);
+      }
+    })
+    .catch(err => {
+      console.log(err);
+
+      icrXnatRoiSession.set("writePermissions", false);
+      icrXnatRoiSession.set("readPermissions", false);
+      icrXnatRoiSession.set("editPermissions", false);
+    });
 }
 
 /**
@@ -43,11 +63,7 @@ function getPermissionsJson(url) {
     const xhr = new XMLHttpRequest();
 
     xhr.onload = () => {
-      if (xhr.status === 200) {
-        resolve(xhr.response);
-      } else {
-        reject(xhr.response);
-      }
+      resolve(xhr);
     };
 
     xhr.onerror = () => {

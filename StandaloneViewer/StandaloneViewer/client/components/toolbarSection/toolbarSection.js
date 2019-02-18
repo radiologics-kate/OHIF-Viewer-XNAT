@@ -289,42 +289,6 @@ Template.toolbarSection.helpers({
           }
         ];
 
-        const exportMenu = [
-          {
-            id: 'exportROIs',
-            title: 'ROIs',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
-          },
-          {
-            id: 'exportMask',
-            title: 'Masks',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
-          }/*,
-          {
-            id: 'toggleDownloadDialog',
-            title: 'Snapshot',
-            classes: 'imageViewerCommand',
-            iconClasses: 'fa fa-camera'
-          }*/
-        ];
-
-        const importMenu = [
-          {
-            id: 'importROIs',
-            title: 'ROIs',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
-          },
-          {
-            id: 'importMask',
-            title: 'Masks',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
-          }
-        ];
-
         buttonData.push({
             id: 'Freehand',
             title: 'ROI',
@@ -364,21 +328,63 @@ Template.toolbarSection.helpers({
           subTools: deleteTools
         });
 
-        buttonData.push({
-          id: 'importMenu',
-          title: 'Import',
-          classes: 'rp-x-1 rm-l-3',
-          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import',
-          subTools: importMenu
-        });
+        if (icrXnatRoiSession.get("readPermissions")) {
+          const importMenu = [
+            {
+              id: 'importROIs',
+              title: 'ROIs',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
+            },
+            {
+              id: 'importMask',
+              title: 'Masks',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
+            }
+          ];
 
-        buttonData.push({
-          id: 'exportMenu',
-          title: 'Export',
-          classes: 'rp-x-1 rm-l-3',
-          svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export',
-          subTools: exportMenu
-        });
+          buttonData.push({
+            id: 'importMenu',
+            title: 'Import',
+            classes: 'rp-x-1 rm-l-3',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-import',
+            subTools: importMenu
+          });
+        }
+
+        if (icrXnatRoiSession.get("writePermissions")) {
+          const exportMenu = [
+            {
+              id: 'exportROIs',
+              title: 'ROIs',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-menu'
+            },
+            {
+              id: 'exportMask',
+              title: 'Masks',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu'
+            }/*,
+            {
+              id: 'toggleDownloadDialog',
+              title: 'Snapshot',
+              classes: 'imageViewerCommand',
+              iconClasses: 'fa fa-camera'
+            }*/
+          ];
+
+          buttonData.push({
+            id: 'exportMenu',
+            title: 'Export',
+            classes: 'rp-x-1 rm-l-3',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export',
+            subTools: exportMenu
+          });
+        }
+
+
 
         buttonData.push({
           id: 'showHelp',
