@@ -76,24 +76,31 @@ export class AsyncFetcher {
    */
   async _addCollectionToListIfCanImport(getCollectionUrl, roiCollectionId) {
     console.log(`_addCollectionToListIfCanImport ${getCollectionUrl}`);
-    const collectionInfoJSON = await this._getJson(getCollectionUrl).catch(
-      error => console.log(error)
-    );
+    const collectionInfoJSON = await this._getJson(getCollectionUrl)
+      .then(collectionInfoJSON => {
+        if (this._collectionEligibleForImport(collectionInfoJSON)) {
+          const collectionInfo = this._getCollectionInfo(
+            roiCollectionId,
+            collectionInfoJSON
+          );
 
-    if (this._collectionEligibleForImport(collectionInfoJSON)) {
-      const collectionInfo = this._getCollectionInfo(
-        roiCollectionId,
-        collectionInfoJSON
-      );
+          this._collectionInfoArray.push(collectionInfo);
+        }
 
-      this._collectionInfoArray.push(collectionInfo);
-    }
+        this._roiCollectionsToCheck--;
 
-    this._roiCollectionsToCheck--;
+        if (this._roiCollectionsToCheck === 0) {
+          this._selectAndImportRois();
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this._roiCollectionsToCheck--;
 
-    if (this._roiCollectionsToCheck === 0) {
-      this._selectAndImportRois();
-    }
+        if (this._roiCollectionsToCheck === 0) {
+          this._selectAndImportRois();
+        }
+      });
   }
 
   /** @public @async
