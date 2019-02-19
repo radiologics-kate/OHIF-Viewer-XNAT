@@ -105,7 +105,11 @@ export class AsyncFetcher {
     // Fetch list of assessors for the session.
     const sessionAssessorsUrl = `${Session.get(
       "rootUrl"
-    )}/data/archive/experiments/${icrXnatRoiSession.get(
+    )}/data/archive/projects/${icrXnatRoiSession.get(
+      "projectId"
+    )}/subjects/${icrXnatRoiSession.get(
+      "subjectId"
+    )}/experiments/${icrXnatRoiSession.get(
       "experimentId"
     )}/assessors?format=json`;
     const sessionAssessorList = await this._getJson(sessionAssessorsUrl).catch(

@@ -70,8 +70,6 @@ if (Meteor.isClient && productionMode) {
           icrXnatRoiSession.set('csrfToken', csrfToken);
           icrXnatRoiSession.set('parentProjectId', parentProjectId);
 
-          console.log(`decoded csrfToken: ${csrfToken}`)
-
           OHIF.RoiStateManagement.checkAndSetPermissions();
 
           // Build JSON GET url.
