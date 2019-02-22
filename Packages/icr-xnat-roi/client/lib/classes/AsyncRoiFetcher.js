@@ -1,8 +1,8 @@
-import { RoiImporter } from './RoiImporter.js';
-import closeIODialog from '../IO/closeIODialog.js';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { AsyncFetcher } from './AsyncFetcher.js';
+import { RoiImporter } from "./RoiImporter.js";
+import closeIODialog from "../IO/closeIODialog.js";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { AsyncFetcher } from "./AsyncFetcher.js";
 
 const modules = cornerstoneTools.store.modules;
 
@@ -15,14 +15,8 @@ const modules = cornerstoneTools.store.modules;
  *
  */
 export class AsyncRoiFetcher extends AsyncFetcher {
-  constructor (seriesInstanceUid) {
-    super(
-      seriesInstanceUid,
-      validTypes = [
-        'AIM',
-        'RTSTRUCT'
-      ]
-    );
+  constructor(seriesInstanceUid) {
+    super(seriesInstanceUid, (validTypes = ["AIM", "RTSTRUCT"]));
 
     this._roiImporter = new RoiImporter(seriesInstanceUid);
     this._volumeManagementLabels = this._getVolumeManagementLabels();
@@ -34,7 +28,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    *
    * @return {string[]} An array of the labels of roiCollections already imported.
    */
-  _getVolumeManagementLabels () {
+  _getVolumeManagementLabels() {
     const freehand3DStore = modules.freehand3D;
     const structureSetUids = [];
 
@@ -49,7 +43,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
     for (let i = 0; i < structureSetCollection.length; i++) {
       const label = structureSetCollection[i].uid;
 
-      if (label !== 'DEFAULT') {
+      if (label !== "DEFAULT") {
         structureSetUids.push(label);
       }
     }
@@ -59,7 +53,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
 
   _openImportListDialog() {
     // Open the dialog and display a loading icon whilst data is fetched.
-    this._roiImportListDialog = document.getElementById('roiImportListDialog');
+    this._roiImportListDialog = document.getElementById("roiImportListDialog");
 
     const dialogData = Blaze.getData(this._roiImportListDialog);
 
@@ -73,10 +67,12 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    */
   async _selectAndImportRois() {
     // Await user input
-    const importMask = await this._awaitInputFromListUI(this._collectionInfoArray);
+    const importMask = await this._awaitInputFromListUI(
+      this._collectionInfoArray
+    );
 
     if (!importMask) {
-      console.log('cancelled');
+      console.log("cancelled");
       return;
     }
 
@@ -90,7 +86,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
 
     // Exit if zero collections selected.
     if (this._numCollectionsToParse === 0) {
-      console.log('numCollectionToParse = 0');
+      console.log("numCollectionToParse = 0");
       return;
     }
 
@@ -111,17 +107,19 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    *                            array describing which roiCollections to import.
    */
   async _awaitInputFromListUI(importList) {
+    function keyConfirmEventHandler(e) {
+      console.log("keyConfirmEventHandler");
 
-    function keyConfirmEventHandler (e) {
-      console.log('keyConfirmEventHandler');
-
-      if (e.which === 13) { // If Enter is pressed accept and close the dialog
+      if (e.which === 13) {
+        // If Enter is pressed accept and close the dialog
         confirmEventHandler();
       }
     }
 
-    function confirmEventHandler () {
-      const dialogData = Blaze.getData(document.querySelector('#roiImportListDialog'));
+    function confirmEventHandler() {
+      const dialogData = Blaze.getData(
+        document.querySelector("#roiImportListDialog")
+      );
 
       dialog.close();
 
@@ -129,12 +127,12 @@ export class AsyncRoiFetcher extends AsyncFetcher {
       resolveRef(dialogData.importMask);
     }
 
-    function cancelEventHandler () {
+    function cancelEventHandler() {
       removeEventListeners();
       resolveRef(null);
     }
 
-    function cancelClickEventHandler () {
+    function cancelClickEventHandler() {
       dialog.close();
 
       removeEventListeners();
@@ -142,22 +140,22 @@ export class AsyncRoiFetcher extends AsyncFetcher {
     }
 
     function removeEventListeners() {
-      dialog.removeEventListener('cancel', cancelEventHandler);
-      cancel.removeEventListener('click', cancelClickEventHandler);
-      dialog.removeEventListener('keydown', keyConfirmEventHandler);
-      confirm.removeEventListener('click', confirmEventHandler);
+      dialog.removeEventListener("cancel", cancelEventHandler);
+      cancel.removeEventListener("click", cancelClickEventHandler);
+      dialog.removeEventListener("keydown", keyConfirmEventHandler);
+      confirm.removeEventListener("click", confirmEventHandler);
     }
 
     const dialog = this._roiImportListDialog;
-    const confirm = dialog.getElementsByClassName('roi-import-list-confirm')[0];
-    const cancel = dialog.getElementsByClassName('roi-import-list-cancel')[0];
+    const confirm = dialog.getElementsByClassName("roi-import-list-confirm")[0];
+    const cancel = dialog.getElementsByClassName("roi-import-list-cancel")[0];
     const dialogData = Blaze.getData(dialog);
 
     // Add event listeners.
-    dialog.addEventListener('cancel', cancelEventHandler);
-    cancel.addEventListener('click', cancelClickEventHandler);
-    dialog.addEventListener('keydown', keyConfirmEventHandler);
-    confirm.addEventListener('click', confirmEventHandler);
+    dialog.addEventListener("cancel", cancelEventHandler);
+    cancel.addEventListener("click", cancelClickEventHandler);
+    dialog.addEventListener("keydown", keyConfirmEventHandler);
+    confirm.addEventListener("click", confirmEventHandler);
 
     dialogData.importListReady.set(true);
     dialogData.importList.set(importList);
@@ -170,7 +168,6 @@ export class AsyncRoiFetcher extends AsyncFetcher {
     });
   }
 
-
   /** @private
    * _collectionEligibleForImport - Returns true if the roiCollection references
    * the active series, and hasn't already been imported.
@@ -180,7 +177,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    * @return {Boolean}                    Whether the collection is eligible
    *                                      for import.
    */
-  _collectionEligibleForImport (collectionInfoJSON) {
+  _collectionEligibleForImport(collectionInfoJSON) {
     const item = collectionInfoJSON.items[0];
     const children = item.children;
 
@@ -203,11 +200,12 @@ export class AsyncRoiFetcher extends AsyncFetcher {
 
     // Check the collection references this seriesInstanceUid.
     for (let i = 0; i < children.length; i++) {
-      if (children[i].field === 'references/seriesUID') {
+      if (children[i].field === "references/seriesUID") {
         const referencedSeriesInstanceUidList = children[i].items;
 
         for (let j = 0; j < referencedSeriesInstanceUidList.length; j++) {
-          const seriesInstanceUid = referencedSeriesInstanceUidList[j].data_fields.seriesUID;
+          const seriesInstanceUid =
+            referencedSeriesInstanceUidList[j].data_fields.seriesUID;
 
           if (seriesInstanceUid === this._seriesInstanceUid) {
             return true;
@@ -219,7 +217,6 @@ export class AsyncRoiFetcher extends AsyncFetcher {
     return false;
   }
 
-
   /** @private @async
    * _getAndImportFile - Imports the file from the REST url and loads it into
    *                     cornerstoneTools toolData.
@@ -228,23 +225,36 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    * @param  {type} collectionInfo  An object describing the roiCollection to
    *                                import.
    */
-  async _getAndImportFile (url, collectionInfo) {
+  async _getAndImportFile(url, collectionInfo) {
     switch (collectionInfo.collectionType) {
-      case 'AIM':
+      case "AIM":
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
-        const aimFile = await this._getXml(url).catch(error => console.log(error));
-        this._roiImporter.importAIMfile(aimFile, collectionInfo.name, collectionInfo.label);
+        const aimFile = await this._getXml(url).catch(error =>
+          console.log(error)
+        );
+        this._roiImporter.importAIMfile(
+          aimFile,
+          collectionInfo.name,
+          collectionInfo.label
+        );
         break;
-      case 'RTSTRUCT':
-        const rtStructFile = await this._getArraybuffer(url).catch(error => console.log(error));
-        this._roiImporter.importRTStruct(rtStructFile, collectionInfo.name, collectionInfo.label);
+      case "RTSTRUCT":
+        const rtStructFile = await this._getArraybuffer(url).catch(error =>
+          console.log(error)
+        );
+        this._roiImporter.importRTStruct(
+          rtStructFile,
+          collectionInfo.name,
+          collectionInfo.label
+        );
         break;
       default:
-        console.error(`asyncRoiFetcher._getAndImportFile not configured for filetype: ${fileType}.`);
+        console.error(
+          `asyncRoiFetcher._getAndImportFile not configured for filetype: ${fileType}.`
+        );
     }
 
     this._incrementNumCollectionsParsed();
   }
-
 }

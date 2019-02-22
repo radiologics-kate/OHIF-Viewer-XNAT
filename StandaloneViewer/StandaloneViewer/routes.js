@@ -12,17 +12,30 @@ if (Meteor.isClient && productionMode) {
   Meteor.disconnect();
 
   const url = window.location.href;
-  const hostname = window.location.hostname;
 
   const origin = window.location.origin;
-  const urlExtention = url.replace(origin, '');
+  const urlExtention = url.replace(origin, '').split('VIEWER')[0].replace(/\//g, '');
 
-  const viewerRoot = urlExtention.split('VIEWER')[0] + 'VIEWER';
+  console.log(urlExtention);
 
-  const rootUrl = origin + '/' + urlExtention.split('VIEWER')[0].replace(/\//g, '');
+  let viewerRoot;
+  let rootUrl;
+
+  if (urlExtention) {
+    viewerRoot = `/${urlExtention}/VIEWER`;
+    rootUrl = `${origin}/${urlExtention}`;
+  } else {
+    viewerRoot = `/VIEWER`;
+    rootUrl = origin;
+  }
 
   Session.set('rootUrl', rootUrl);
   Session.set('viewerRoot', viewerRoot);
+
+  console.log(`origin: ${origin}`);
+  console.log(`urlExtention ${urlExtention}`);
+  console.log(`rootUrl: ${rootUrl}`);
+  console.log(`viewerRoot" ${viewerRoot}`);
 
   Router.configure({
       loadingTemplate: 'loading'
