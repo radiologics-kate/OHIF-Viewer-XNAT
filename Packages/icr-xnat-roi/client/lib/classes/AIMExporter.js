@@ -1,4 +1,5 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { fetchCSRFToken } from "../IO/csrfToken.js";
 
 const XMLWriter = require("xml-writer");
 
@@ -25,7 +26,7 @@ export class AIMExporter {
 
   async exportToXNAT() {
     const metaDataXml = this._generateResourceMetadata();
-    const csrfToken = icrXnatRoiSession.get("csrfToken", csrfToken);
+    const csrfToken = await fetchCSRFToken();
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
     let putFailed = false;

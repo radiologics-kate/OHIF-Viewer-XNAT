@@ -32,7 +32,7 @@ export class DICOMSEGExporter {
   async exportToXNAT() {
     const metaDataXml = this._generateResourceMetadata();
 
-    const csrfToken = icrXnatRoiSession.get("csrfToken", csrfToken);
+    const csrfToken = await fetchCSRFToken();
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
     let putFailed = false;

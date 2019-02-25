@@ -66,7 +66,6 @@ if (Meteor.isClient && productionMode) {
             subjectId = query.subjectId;
             projectId = query.projectId;
             experimentId = query.experimentId;
-            csrfToken = decodeURIComponent(atob(query.csrfToken));
           } else {
             console.error('insufficient query parameters.');
           }
@@ -80,7 +79,6 @@ if (Meteor.isClient && productionMode) {
           icrXnatRoiSession.set('experimentLabel', experimentLabel);
           icrXnatRoiSession.set('subjectId', subjectId);
           icrXnatRoiSession.set('projectId', projectId);
-          icrXnatRoiSession.set('csrfToken', csrfToken);
           icrXnatRoiSession.set('parentProjectId', parentProjectId);
 
           OHIF.RoiStateManagement.checkAndSetPermissions();
