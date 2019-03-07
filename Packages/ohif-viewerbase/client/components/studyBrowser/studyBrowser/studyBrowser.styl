@@ -1,3 +1,5 @@
+@import "{ohif:design}/app"
+
 .studyBrowser
   float: left
   height: 100%
@@ -5,6 +7,7 @@
   overflow: hidden
   background-color: black
   padding-bottom: 20px
+  theme('color', '$textSecondaryColor')
 
   .scrollableStudyThumbnails
     height: 100%
@@ -17,3 +20,22 @@
 
     &::-webkit-scrollbar
       display: none
+
+  // JamesAPetts
+  .scrollableStudyThumbnailsStudyDescription
+    theme('color', '$textPrimaryColor')
+    font-size: 20px
+    line-height: 1.3em
+    margin-left: 5px
+    margin-top: 5px
+    max-width: 217px
+    min-height: 36px
+    position: relative
+    word-wrap: break-word
+    display: inline-block
+
+  .isVisible
+    display: inline
+
+  .isHidden
+    display: none

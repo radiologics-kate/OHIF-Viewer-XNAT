@@ -1,6 +1,6 @@
 import { RoiImporter } from "./RoiImporter.js";
 import closeIODialog from "../IO/closeIODialog.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 /**
@@ -14,6 +14,7 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 export class AsyncFetcher {
   constructor(seriesInstanceUid, validTypes) {
     this._seriesInstanceUid = seriesInstanceUid;
+    this._experimentId = sessionMap[this._seriesInstanceUid].experimentId;
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = "";
     this._progressDialog = document.getElementById("importVolumes");
@@ -114,11 +115,9 @@ export class AsyncFetcher {
       "rootUrl"
     )}/data/archive/projects/${icrXnatRoiSession.get(
       "projectId"
-    )}/subjects/${icrXnatRoiSession.get(
-      "subjectId"
-    )}/experiments/${icrXnatRoiSession.get(
-      "experimentId"
-    )}/assessors?format=json`;
+    )}/subjects/${icrXnatRoiSession.get("subjectId")}/experiments/${
+      this._experimentId
+    }/assessors?format=json`;
     const sessionAssessorList = await this._getJson(sessionAssessorsUrl).catch(
       error => console.log(error)
     );
@@ -144,9 +143,9 @@ export class AsyncFetcher {
       const roiCollectionId = roiCollectionList[i].ID;
       const getCollectionUrl = `${Session.get(
         "rootUrl"
-      )}/data/archive/experiments/${icrXnatRoiSession.get(
-        "experimentId"
-      )}/assessors/${roiCollectionId}?format=json`;
+      )}/data/archive/experiments/${
+        this._experimentId
+      }/assessors/${roiCollectionId}?format=json`;
 
       this._addCollectionToListIfCanImport(getCollectionUrl, roiCollectionId);
     }
@@ -187,11 +186,9 @@ export class AsyncFetcher {
       collectionType: data_fields.collectionType,
       label: data_fields.label,
       name: data_fields.name,
-      getFilesUrl: `${Session.get(
-        "rootUrl"
-      )}/data/archive/experiments/${icrXnatRoiSession.get(
-        "experimentId"
-      )}/assessors/${roiCollectionId}/files?format=json`
+      getFilesUrl: `${Session.get("rootUrl")}/data/archive/experiments/${
+        this._experimentId
+      }/assessors/${roiCollectionId}/files?format=json`
     };
   }
 

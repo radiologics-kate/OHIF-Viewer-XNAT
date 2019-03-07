@@ -1,0 +1,3 @@
+const sessionMap = {};
+
+export { sessionMap };

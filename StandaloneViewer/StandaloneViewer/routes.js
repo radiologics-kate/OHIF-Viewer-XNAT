@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { icrXnatRoiSession, sessionMap } from 'meteor/icr:xnat-roi-namespace';
 
 const productionMode = true;
 
@@ -52,6 +52,17 @@ if (Meteor.isClient && productionMode) {
 
           console.log(this.params);
 
+          // Query params:
+          //
+          // Single Session:
+          //   projectId, subjectId, experimentId, experimentLabel
+          //
+          // Single Session in shared project:
+          //   projectId, subjectId, experimentId, experimentLabel, parentProjectId
+          //
+          // Subject (WIP):
+          //   projectId, subjectId
+
           let subjectId;
           let projectId;
           let experimentId;
@@ -74,64 +85,134 @@ if (Meteor.isClient && productionMode) {
             console.log(`This experiment is shared view of ${experimentId} from ${parentProjectId}`);
           }
 
-          icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
-          icrXnatRoiSession.set('experimentId', experimentId);
-          icrXnatRoiSession.set('experimentLabel', experimentLabel);
-          icrXnatRoiSession.set('subjectId', subjectId);
-          icrXnatRoiSession.set('projectId', projectId);
-          icrXnatRoiSession.set('parentProjectId', parentProjectId);
+          if (experimentId) {
+            // Single Session
+            //
+            icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
+            icrXnatRoiSession.set('experimentId', experimentId);
+            icrXnatRoiSession.set('experimentLabel', experimentLabel);
+            icrXnatRoiSession.set('subjectId', subjectId);
+            icrXnatRoiSession.set('projectId', projectId);
+            icrXnatRoiSession.set('parentProjectId', parentProjectId);
 
-          OHIF.RoiStateManagement.checkAndSetPermissions();
+            OHIF.RoiStateManagement.checkAndSetPermissions();
 
-          // Build JSON GET url.
-          const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
+            // Build JSON GET url.
+            const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
 
-          // Define a request to the server to retrieve the study data
-          // as JSON, given a URL that was in the Route
-          const oReq = new XMLHttpRequest();
-
-          // Add event listeners for request failure
-          oReq.addEventListener('error', () => {
-              OHIF.log.warn('An error occurred while retrieving the JSON data');
-              next();
-          });
-
-          // When the JSON has been returned, parse it into a JavaScript Object
-          // and render the OHIF Viewer with this data
-          oReq.addEventListener('load', () => {
+            getJson(jsonRequestUrl).then(json => {
               // Parse the response content
               // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText
-              if (!oReq.responseText) {
+              if (!json) {
                   OHIF.log.warn('Response was undefined');
                   return;
               }
 
-              OHIF.log.info(JSON.stringify(oReq.responseText, null, 2));
+              updateSessionMap(json, experimentId, experimentLabel);
 
-              let jsonString = oReq.responseText;
+              console.log('Session Map:')
+              console.log(sessionMap);
+
+              let jsonString = JSON.stringify(json);
 
               if (parentProjectId) {
                 console.log(`replacing ${parentProjectId} with ${projectId}`);
                 jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
               }
 
+              console.log(`jsonString:`);
               console.log(jsonString);
 
               this.data = JSON.parse(jsonString);
+              console.log(this);
               console.log(this.data);
 
               next();
-          });
+            }).catch(error => {
+              console.log(error);
+              OHIF.log.warn('An error occurred while retrieving the JSON data');
+              next();
+            });
+          } else {
+            // Whole Subject.
+            //
 
-          // Open the Request to the server for the JSON data
-          // In this case we have a server-side route called /api/
-          // which responds to GET requests with the study data
-          console.log(`Sending Request to: ${jsonRequestUrl}`);
-          oReq.open('GET', jsonRequestUrl);
-          oReq.setRequestHeader('Accept', 'application/json')
+            icrXnatRoiSession.set('sourceProjectId', projectId);
+            icrXnatRoiSession.set('projectId', projectId);
+            icrXnatRoiSession.set('subjectId', subjectId);
 
-          // Fire the request to the server
-          oReq.send();
+
+            const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
+
+
+            // TODO -> How do we check permissions for the subject view?
+            OHIF.RoiStateManagement.checkAndSetPermissions();
+
+
+
+            //
+            // TODO:
+            // ROICollection IO restructure.
+            // SeriesInstanceUID -> ExperimentId + projectId map.
+            // Update IO to deal with the new Schema.
+
+            getJson(subjectExperimentListUrl).then(json => {
+              // TODO -> Fetch each json.
+              // Promise.all and combine JSON.
+              // Load up viewer.
+              console.log(json);
+
+              const experimentList = json.ResultSet.Result;
+              const results = [];
+
+              for (let i = 0; i < experimentList.length; i++) {
+                const experimentIdI = experimentList[i].ID;
+
+                const experimentJSONFetchUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentIdI}`;
+
+                results[i] = getJson(experimentJSONFetchUrl);
+              }
+
+              Promise.all(results).then((jsonFiles) => {
+                console.log(jsonFiles);
+
+                const studyList = {
+                  transactionId: subjectId,
+                  studies: []
+                };
+
+                for (let i = 0; i < jsonFiles.length; i++) {
+                  const experimentJsonI = jsonFiles[i];
+                  const studiesI = experimentJsonI.studies;
+
+                  updateSessionMap(experimentJsonI, experimentList[i].ID, experimentList[i].label);
+
+                  console.log('Session Map:')
+                  console.log(sessionMap);
+
+                  // TODO -> clean this
+                  studiesI[0].studyDescription = experimentList[i].label || experimentList[i].ID;
+
+                  console.log(`Studies[${i}]`);
+
+                  console.log(studiesI);
+
+                  studyList.studies = [...studyList.studies, ...studiesI];
+                }
+
+                console.log(studyList);
+
+                this.data = studyList;
+
+                console.log(this);
+                console.log(this.data);
+
+                next();
+              });
+
+            });
+
+          }
       },
       action() {
         console.log('Loading up viewer with json!');
@@ -249,4 +330,51 @@ if (Meteor.isClient && productionMode) {
         this.response.end();
       });
     }
+}
+
+
+function updateSessionMap(json, experimentId, experimentLabel) {
+  console.log(json);
+
+  const studies = json.studies;
+
+  for (let i = 0; i < studies.length; i++) {
+    const seriesList = studies[i].seriesList;
+
+    console.log(`seriesList ${i}`);
+
+    for (let j = 0; j < seriesList.length; j++) {
+      console.log(`series [${i}, ${j}]`);
+
+      sessionMap[seriesList[j].seriesInstanceUid] = {
+        experimentId,
+        experimentLabel
+      };
+    }
+  }
+
+  console.log(`end of updateSessionMap:`);
+  console.log(sessionMap);
+}
+
+
+function getJson(url) {
+  return new Promise((resolve, reject) => {
+    // Define a request to the server to retrieve the session data as JSON.
+    const xhr = new XMLHttpRequest();
+
+    xhr.onload = () => {
+      console.log(`GET ${url}... ${xhr.status}`);
+
+      resolve(xhr.response);
+    };
+
+    xhr.onerror = () => {
+      reject(xhr.responseText);
+    };
+
+    xhr.open("GET", url);
+    xhr.responseType = "json";
+    xhr.send();
+  });
 }

@@ -9,8 +9,8 @@ export class DICOMSEGExporter {
     this._payload = segBlob;
     this._projectID = icrXnatRoiSession.get("sourceProjectId");
     this._subjectID = icrXnatRoiSession.get("subjectId");
-    this._experimentID = icrXnatRoiSession.get("experimentId");
     this._seriesInstanceUID = seriesInstanceUid;
+    this._experimentID = sessionMap[this._seriesInstanceUID].experimentId;
     this._label = label;
     this._UID = generateUID();
     this._ID = this._generateCollectionId();

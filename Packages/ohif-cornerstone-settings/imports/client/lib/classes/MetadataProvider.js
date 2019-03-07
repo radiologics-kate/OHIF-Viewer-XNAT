@@ -261,6 +261,8 @@ export class MetadataProvider {
       );
     }
 
+    // JamesAPetts - Obtain multiframe from metadata.
+
     if (
       imageMetadata.instance.multiframeMetadata.isMultiframeImage &&
       (!imageMetadata.imagePlane ||
@@ -283,7 +285,7 @@ export class MetadataProvider {
   /**
    * Constructs and returns the imagePlane given the metadata instance
    *
-   * @param metadataInstance The metadata instance (InstanceMetadata class) containing information to construct imagePlane
+   * @param instance The metadata instance (InstanceMetadata class) containing information to construct imagePlane
    * @returns imagePlane The constructed imagePlane to be used in viewer easily
    */
   getImagePlane(instance) {
@@ -333,6 +335,15 @@ export class MetadataProvider {
     };
   }
 
+  /**
+   * getPerFrameImagePlane - get the imageplane for a specific frame of a
+   * multiframe image.
+   * @author JamesAPetts
+   *
+   * @param  {object} image    The image.
+   * @param  {object} instance The metadataInstance.
+   * @return {object}          The imagePlane object.
+   */
   getPerFrameImagePlane(image, instance) {
     if (!instance.rows || !instance.columns || !instance.frameOfReferenceUID) {
       return;
