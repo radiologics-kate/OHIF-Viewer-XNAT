@@ -89,8 +89,8 @@ if (Meteor.isClient && productionMode) {
             // Single Session
             //
             icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
-            icrXnatRoiSession.set('experimentId', experimentId);
-            icrXnatRoiSession.set('experimentLabel', experimentLabel);
+            //icrXnatRoiSession.set('experimentId', experimentId);
+            //icrXnatRoiSession.set('experimentLabel', experimentLabel);
             icrXnatRoiSession.set('subjectId', subjectId);
             icrXnatRoiSession.set('projectId', projectId);
             icrXnatRoiSession.set('parentProjectId', parentProjectId);
@@ -110,9 +110,6 @@ if (Meteor.isClient && productionMode) {
 
               updateSessionMap(json, experimentId, experimentLabel);
 
-              console.log('Session Map:')
-              console.log(sessionMap);
-
               let jsonString = JSON.stringify(json);
 
               if (parentProjectId) {
@@ -120,12 +117,7 @@ if (Meteor.isClient && productionMode) {
                 jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
               }
 
-              console.log(`jsonString:`);
-              console.log(jsonString);
-
               this.data = JSON.parse(jsonString);
-              console.log(this);
-              console.log(this.data);
 
               next();
             }).catch(error => {
@@ -145,7 +137,6 @@ if (Meteor.isClient && productionMode) {
             const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
 
 
-            // TODO -> How do we check permissions for the subject view?
             OHIF.RoiStateManagement.checkAndSetPermissions();
 
 
