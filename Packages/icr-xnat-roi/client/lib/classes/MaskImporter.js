@@ -1,23 +1,23 @@
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { DICOMSEGReader } from './DICOMSEGReader.js';
-import { NIFTIReader } from './NIFTIReader.js';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { DICOMSEGReader } from "./DICOMSEGReader.js";
+import { NIFTIReader } from "./NIFTIReader.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+const dcmjs = require("dcmjs");
 
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
-
 export class MaskImporter {
-
-  constructor () {
+  constructor() {
     // Get stackToolState // TODO -> Make this into a function somewhere else as
     // Both import and export use it.
     //
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
-    const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+    const stackToolState = cornerstoneTools.getToolState(element, "stack");
     const imageIds = stackToolState.data[0].imageIds;
     const image = cornerstone.getImage(element);
 
@@ -38,12 +38,49 @@ export class MaskImporter {
     const colormap = cornerstone.colors.getColormap(colorMapId);
 
     this._numberOfColors = colormap.getNumberOfColors();
-
   }
 
-  importDICOMSEG (dicomSegArrayBuffer, collectionName, collectionLabel) {
+  importDICOMSEG(dicomSegArrayBuffer, collectionName, collectionLabel) {
     this._clearMaskMetadata();
 
+    console.log("importDICOMSEG... GO!");
+
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const element = activeEnabledElement.element;
+
+    console.log(element);
+
+    const stackToolState = cornerstoneTools.getToolState(element, "stack");
+
+    console.log(stackToolState);
+
+    const imageIds = stackToolState.data[0].imageIds;
+
+    const {
+      toolState,
+      segMetadata
+    } = dcmjs.adapters.Cornerstone.Segmentation.generateToolState(
+      imageIds,
+      arrayBuffer,
+      cornerstone.metaData
+    );
+
+    console.log(toolState);
+    console.log("TEMP -- JUST LOAD IN SEG OVER TOOL STATE!");
+
+    cornerstoneTools.globalImageIdSpecificToolStateManager.restoreToolState(
+      toolState
+    );
+
+    const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
+
+    console.log(seriesInstanceUid);
+
+    for (let i = 0; i < segMetadata.length; i++) {
+      modules.brush.setters.metadata(seriesInstanceUid, i, segMetadata[i]);
+    }
+
+    /*
     const dicomSegReader = new DICOMSEGReader(this._seriesInfo);
 
     const masks = dicomSegReader.read(
@@ -53,9 +90,10 @@ export class MaskImporter {
     );
 
     this._import(masks);
+    */
   }
 
-  importNIFTI (niftyArrayBuffer, collectionName, collectionLabel) {
+  importNIFTI(niftyArrayBuffer, collectionName, collectionLabel) {
     this._clearMaskMetadata();
 
     const niftiReader = new NIFTIReader(this._seriesInfo, collectionName);
@@ -79,7 +117,7 @@ export class MaskImporter {
     }
   }
 
-  _import (masks) {
+  _import(masks) {
     const stackToolState = this._stackToolState;
     const dimensions = this._dimensions;
     const sliceLength = dimensions.sliceLength;
@@ -96,10 +134,7 @@ export class MaskImporter {
       const mask = masks[i];
 
       for (let j = 0; j < dimensions.slices; j++) {
-
-        const pixelData = new Uint8ClampedArray(
-          sliceLength
-        );
+        const pixelData = new Uint8ClampedArray(sliceLength);
 
         for (let k = 0; k < pixelData.length; k++) {
           pixelData[k] = mask[j * sliceLength + k] ? 1 : 0;
@@ -113,8 +148,6 @@ export class MaskImporter {
           pixelData,
           invalidated: true
         };
-
-
       }
     }
 
@@ -126,7 +159,7 @@ export class MaskImporter {
     cornerstone.updateImage(element);
   }
 
-  _initialiseBrushState (toolState, imageIds) {
+  _initialiseBrushState(toolState, imageIds) {
     const dimensions = this._dimensions;
 
     for (let i = 0; i < imageIds.length; i++) {
@@ -143,13 +176,9 @@ export class MaskImporter {
 
       const brushData = toolState[imageId].brush.data;
 
-
       for (let j = 0; j < this._numberOfColors; j++) {
         brushData.push({});
       }
     }
   }
-
-
-
 }

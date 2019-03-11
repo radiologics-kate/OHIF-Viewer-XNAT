@@ -8,7 +8,7 @@ const Mousetrap = require("mousetrap");
 const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 
 Mousetrap.bind(
-  ["n", "N", "ctrl"],
+  ["n", "N", "ctrl", "del"],
   function(evt) {
     if (isModalOpen()) {
       return;
@@ -24,6 +24,8 @@ Mousetrap.bind(
     const key = evt.key;
     let imageNeedsUpdate = false;
 
+    console.log("Key:" + key);
+
     switch (key) {
       case "n":
       case "N":
@@ -35,6 +37,10 @@ Mousetrap.bind(
         freehandTool.configuration.alwaysShowHandles = false;
         imageNeedsUpdate = true;
 
+        break;
+      case "Delete":
+        freehandTool.cancelDrawing(element);
+        imageNeedsUpdate = true;
         break;
     }
 

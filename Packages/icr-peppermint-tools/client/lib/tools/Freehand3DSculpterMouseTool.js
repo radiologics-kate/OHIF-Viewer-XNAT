@@ -99,7 +99,7 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
 
     this._active = false;
 
-    state.isToolLocked = false;
+    state.isMultiPartToolActive = false;
 
     this._getMouseLocation(eventData);
     this._invalidateToolData(eventData);

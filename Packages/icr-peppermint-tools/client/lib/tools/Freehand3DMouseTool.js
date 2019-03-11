@@ -53,6 +53,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     this._freehand3DStore = modules.freehand3D;
 
     this._onMeasurementRemoved = this._onMeasurementRemoved.bind(this);
+    this._drawingMouseUpCallback = this._drawingMouseUpCallback.bind(this);
   }
 
   /**
@@ -409,7 +410,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     this._activateModify(element);
 
     // Interupt eventDispatchers
-    cornerstoneTools.store.state.isToolLocked = true;
+    state.isMultiPartToolActive = true;
 
     preventPropagation(evt);
   }
@@ -819,7 +820,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     if (this._drawing) {
       this._drawing = false;
-      state.isToolLocked = false;
+      state.isMultiPartToolActive = false;
       this._deactivateDraw(element);
     }
 
@@ -828,6 +829,43 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     cornerstone.updateImage(element);
+  }
+
+  /**
+   * Event handler for MOUSE_UP during drawing event loop.
+   *
+   * @event
+   * @param {Object} evt - The event.
+   * @returns {undefined}
+   */
+  _drawingMouseUpCallback(evt) {
+    const eventData = evt.detail;
+
+    if (!this._dragging) {
+      return;
+    }
+
+    this._dragging = false;
+
+    const element = eventData.element;
+
+    const config = this.configuration;
+    const currentTool = config.currentTool;
+    const toolState = getToolState(eventData.element, this.name);
+    const data = toolState.data[currentTool];
+
+    console.log(freehandIntersect.end(data.handles.points));
+    console.log(data.canComplete);
+
+    if (!freehandIntersect.end(data.handles.points) && data.canComplete) {
+      const lastHandlePlaced = config.currentHandle;
+
+      this._endDrawing(element, lastHandlePlaced);
+    }
+
+    preventPropagation(evt);
+
+    return;
   }
 
   /**
