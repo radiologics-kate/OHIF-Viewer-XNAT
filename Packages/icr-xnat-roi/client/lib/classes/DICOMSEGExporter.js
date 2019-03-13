@@ -1,4 +1,5 @@
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
+import { fetchCSRFToken } from "../IO/csrfToken.js";
 import { generateUID } from "meteor/icr:peppermint-tools";
 import getDateAndTime from "../util/getDateAndTime.js";
 

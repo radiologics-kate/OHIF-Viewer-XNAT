@@ -408,10 +408,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     config.currentTool = toolIndex;
 
     this._activateModify(element);
-
-    // Interupt eventDispatchers
-    state.isMultiPartToolActive = true;
-
     preventPropagation(evt);
   }
 
@@ -820,7 +816,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
 
     if (this._drawing) {
       this._drawing = false;
-      state.isMultiPartToolActive = false;
       this._deactivateDraw(element);
     }
 

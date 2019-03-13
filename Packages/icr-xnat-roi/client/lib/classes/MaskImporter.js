@@ -48,49 +48,49 @@ export class MaskImporter {
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
 
-    console.log(element);
-
     const stackToolState = cornerstoneTools.getToolState(element, "stack");
 
     console.log(stackToolState);
 
     const imageIds = stackToolState.data[0].imageIds;
 
+    console.log("provider:===");
+    //console.log(provider.get("imagePlaneModule", imageIds[0]));
+
+    console.log(cornerstone.metaData);
+    console.log("============");
+
     const {
       toolState,
       segMetadata
     } = dcmjs.adapters.Cornerstone.Segmentation.generateToolState(
       imageIds,
-      arrayBuffer,
+      dicomSegArrayBuffer,
       cornerstone.metaData
     );
 
-    console.log(toolState);
-    console.log("TEMP -- JUST LOAD IN SEG OVER TOOL STATE!");
-
-    cornerstoneTools.globalImageIdSpecificToolStateManager.restoreToolState(
-      toolState
-    );
+    this._addBrushToolStateToGlobalToolState(toolState);
 
     const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
 
-    console.log(seriesInstanceUid);
-
-    for (let i = 0; i < segMetadata.length; i++) {
-      modules.brush.setters.metadata(seriesInstanceUid, i, segMetadata[i]);
+    for (let i = 0; i < segMetadata.data.length; i++) {
+      brushModule.setters.metadata(seriesInstanceUid, i, segMetadata.data[i]);
     }
+  }
 
-    /*
-    const dicomSegReader = new DICOMSEGReader(this._seriesInfo);
+  _addBrushToolStateToGlobalToolState(brushToolState) {
+    const globalToolState = cornerstoneTools.globalImageIdSpecificToolStateManager.saveToolState();
 
-    const masks = dicomSegReader.read(
-      dicomSegArrayBuffer,
-      this._stackToolState,
-      this._dimensions
-    );
+    Object.keys(brushToolState).forEach(imageId => {
+      if (!globalToolState[imageId]) {
+        globalToolState[imageId] = {};
+        globalToolState[imageId].brush = {};
+      } else if (!globalToolState[imageId].brush) {
+        globalToolState[imageId].brush = {};
+      }
 
-    this._import(masks);
-    */
+      globalToolState[imageId].brush.data = brushToolState[imageId].brush.data;
+    });
   }
 
   importNIFTI(niftyArrayBuffer, collectionName, collectionLabel) {
