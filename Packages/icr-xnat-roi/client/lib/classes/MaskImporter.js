@@ -1,6 +1,5 @@
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { DICOMSEGReader } from "./DICOMSEGReader.js";
 import { NIFTIReader } from "./NIFTIReader.js";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 const dcmjs = require("dcmjs");
@@ -43,22 +42,12 @@ export class MaskImporter {
   importDICOMSEG(dicomSegArrayBuffer, collectionName, collectionLabel) {
     this._clearMaskMetadata();
 
-    console.log("importDICOMSEG... GO!");
-
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
 
     const stackToolState = cornerstoneTools.getToolState(element, "stack");
 
-    console.log(stackToolState);
-
     const imageIds = stackToolState.data[0].imageIds;
-
-    console.log("provider:===");
-    //console.log(provider.get("imagePlaneModule", imageIds[0]));
-
-    console.log(cornerstone.metaData);
-    console.log("============");
 
     const {
       toolState,
@@ -79,7 +68,7 @@ export class MaskImporter {
   }
 
   _addBrushToolStateToGlobalToolState(brushToolState) {
-    const globalToolState = cornerstoneTools.globalImageIdSpecificToolStateManager.saveToolState();
+    const globalToolState = globalToolStateManager.saveToolState();
 
     Object.keys(brushToolState).forEach(imageId => {
       if (!globalToolState[imageId]) {
