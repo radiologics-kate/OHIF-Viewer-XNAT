@@ -161,7 +161,7 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
 
   console.log("test2");
 
-  const DICOMSegPromise = dicomSegWriter.write();
+  const DICOMSegPromise = dicomSegWriter.write(roiCollectionName);
 
   console.log(DICOMSegPromise);
 

@@ -11,7 +11,7 @@ export class DICOMSEGWriter {
     this._seriesInfo = seriesInfo;
   }
 
-  async write() {
+  async write(name) {
     return new Promise(resolve => {
       // Grab the base image DICOM.
       const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
@@ -38,9 +38,19 @@ export class DICOMSEGWriter {
           console.log(images);
           console.log(brushData);
 
+          const options = {
+            includeSliceSpacing: true,
+            SeriesDescription: name,
+            Manufacturer: this._seriesInfo.equipment.manufacturerName,
+            ManufacturerModelName: this._seriesInfo.equipment
+              .manufacturerModelName,
+            SoftwareVersions: this._seriesInfo.equipment.softwareVersion
+          };
+
           const segBlob = dcmjs.adapters.Cornerstone.Segmentation.generateSegmentation(
             images,
-            brushData
+            brushData,
+            options
           );
 
           console.log(segBlob);

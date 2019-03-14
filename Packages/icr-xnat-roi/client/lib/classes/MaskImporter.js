@@ -40,8 +40,6 @@ export class MaskImporter {
   }
 
   importDICOMSEG(dicomSegArrayBuffer, collectionName, collectionLabel) {
-    this._clearMaskMetadata();
-
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
 
@@ -58,6 +56,11 @@ export class MaskImporter {
       cornerstone.metaData
     );
 
+    this._clearMaskMetadata();
+    this._clearGlobalBrushToolState(
+      globalToolStateManager.saveToolState(),
+      imageIds
+    );
     this._addBrushToolStateToGlobalToolState(toolState);
 
     const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
@@ -117,7 +120,7 @@ export class MaskImporter {
     const imageIds = stackToolState.data[0].imageIds;
     const toolState = globalToolStateManager.saveToolState();
 
-    this._initialiseBrushState(toolState, imageIds);
+    this._initialiseBrushStateNifti(toolState, imageIds);
 
     for (let i = 0; i < masks.length; i++) {
       const mask = masks[i];
@@ -148,9 +151,17 @@ export class MaskImporter {
     cornerstone.updateImage(element);
   }
 
-  _initialiseBrushState(toolState, imageIds) {
-    const dimensions = this._dimensions;
+  _clearGlobalBrushToolState(toolState, imageIds) {
+    for (let i = 0; i < imageIds.length; i++) {
+      const imageId = imageIds[i];
 
+      if (toolState[imageId] && toolState[imageId].brush) {
+        delete toolState[imageId].brush;
+      }
+    }
+  }
+
+  _initialiseBrushStateNifti(toolState, imageIds) {
     for (let i = 0; i < imageIds.length; i++) {
       const imageId = imageIds[i];
 
