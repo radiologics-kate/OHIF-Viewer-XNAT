@@ -114,6 +114,9 @@ export const toolManager = {
       stackScrollMouseWheel: {
         className: "StackScrollMouseWheelTool"
       },
+      stackScrollMultiTouchTool: {
+        className: "StackScrollMultiTouchTool"
+      },
       referenceLines: {
         className: "ReferenceLinesTool"
       },
@@ -349,6 +352,11 @@ export const toolManager = {
 
     // Activate mouse wheel and three (or more) finger stack scroll
     cornerstoneTools.setToolActive("stackScrollMouseWheel", {
+      mouseButtonMask: 0,
+      isTouchActive: true
+    });
+
+    cornerstoneTools.setToolActive("stackScrollMultiTouchTool", {
       mouseButtonMask: 0,
       isTouchActive: true
     });

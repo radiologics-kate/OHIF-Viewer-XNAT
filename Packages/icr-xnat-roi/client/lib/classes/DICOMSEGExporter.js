@@ -74,7 +74,6 @@ export class DICOMSEGExporter {
       };
 
       xhr.open("PUT", url);
-      //TEMP: xhr.setRequestHeader("Content-Type", "application/dicom");
       xhr.setRequestHeader("Content-Type", "application/octet-stream");
       xhr.send(seg);
     });

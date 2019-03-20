@@ -34,6 +34,8 @@ const pointInsideBoundingBox = cornerstoneTools.import(
   "util/pointInsideBoundingBox"
 );
 const getToolState = cornerstoneTools.getToolState;
+const removeToolState = cornerstoneTools.removeToolState;
+const getElementToolStateManager = cornerstoneTools.getElementToolStateManager;
 const state = cornerstoneTools.store.state;
 const EVENTS = cornerstoneTools.EVENTS;
 
@@ -848,9 +850,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     const currentTool = config.currentTool;
     const toolState = getToolState(eventData.element, this.name);
     const data = toolState.data[currentTool];
-
-    console.log(freehandIntersect.end(data.handles.points));
-    console.log(data.canComplete);
 
     if (!freehandIntersect.end(data.handles.points) && data.canComplete) {
       const lastHandlePlaced = config.currentHandle;

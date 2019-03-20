@@ -3,7 +3,7 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession, sessionMap } from 'meteor/icr:xnat-roi-namespace';
 
-const productionMode = true;
+const productionMode = false;
 
 if (Meteor.isClient && productionMode) {
   // XNAT deployment mode.
