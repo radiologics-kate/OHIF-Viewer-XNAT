@@ -43,7 +43,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   constructor(configuration = {}) {
     const defaultConfig = {
       name: "FreehandMouse",
-      supportedInteractionTypes: ["Mouse"],
       configuration: defaultFreehandConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
@@ -147,7 +146,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       .then(() => {
         this._drawing = true;
 
-        this._startDrawing(eventData);
+        this._startDrawing(evt);
         this._addPoint(eventData);
         preventPropagation(evt);
       })
@@ -829,40 +828,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   }
 
   /**
-   * Event handler for MOUSE_UP during drawing event loop.
-   *
-   * @event
-   * @param {Object} evt - The event.
-   * @returns {undefined}
-   */
-  _drawingMouseUpCallback(evt) {
-    const eventData = evt.detail;
-
-    if (!this._dragging) {
-      return;
-    }
-
-    this._dragging = false;
-
-    const element = eventData.element;
-
-    const config = this.configuration;
-    const currentTool = config.currentTool;
-    const toolState = getToolState(eventData.element, this.name);
-    const data = toolState.data[currentTool];
-
-    if (!freehandIntersect.end(data.handles.points) && data.canComplete) {
-      const lastHandlePlaced = config.currentHandle;
-
-      this._endDrawing(element, lastHandlePlaced);
-    }
-
-    preventPropagation(evt);
-
-    return;
-  }
-
-  /**
    * Custom callback for when toolData is deleted.
    *
    * @param  {Object} evt
@@ -932,6 +897,7 @@ function defaultFreehandConfiguration() {
     interpolatedAlpha: 0.5,
     activeHandleRadius: 3,
     completeHandleRadius: 6,
+    completeHandleRadiusTouch: 28,
     alwaysShowHandles: false,
     invalidColor: "crimson",
     currentHandle: 0,

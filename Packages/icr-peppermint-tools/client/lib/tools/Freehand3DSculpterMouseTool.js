@@ -16,8 +16,6 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
     const defaultConfig = {
       name: "FreehandSculpterMouse",
       referencedToolName: "FreehandMouse",
-      supportedInteractionTypes: ["Mouse"],
-      mixins: ["activeOrDisabledBinaryTool"],
       configuration: getDefaultFreehandSculpterMouseToolConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);

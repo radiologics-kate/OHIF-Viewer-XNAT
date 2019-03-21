@@ -16,15 +16,14 @@ const brushStore = cornerstoneTools.store.modules.brush;
 export default class Brush3DTool extends BrushTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: "Brush",
-      supportedInteractionTypes: ["Mouse"],
-      configuration: {}
+      name: "Brush"
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
 
     super(initialConfiguration);
 
     this.initialConfiguration = initialConfiguration;
+    this.touchDragCallback = this._startPaintingTouch.bind(this);
   }
 
   /**
@@ -45,30 +44,52 @@ export default class Brush3DTool extends BrushTool {
 
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
-
-      this.activeStrategy = MODES.OVERLAPPING;
-
-      if (
-        brushStore.state.import &&
-        brushStore.state.import[seriesInstanceUid]
-      ) {
-        // Modified an imported mask.
-        brushStore.state.import[seriesInstanceUid].modified = true;
-
-        if (brushStore.state.import[seriesInstanceUid].type === "NIFTI") {
-          this.activeStrategy = MODES.NON_OVERLAPPING;
-        }
-      }
-
+      this._setActiveStrategy(seriesInstanceUid);
       this._paint(evt);
       this._drawing = true;
       this._startListeningForMouseUp(element);
       this._lastImageCoords = eventData.currentPoints.image;
-    } else {
+    } else if (!isModalOpen()) {
       // Open the UI and let the user input data!
+      brushMetadataIO(brushStore.state.drawColorId);
+    }
+  }
 
-      if (!isModalOpen()) {
-        brushMetadataIO(brushStore.state.drawColorId);
+  /**
+   * Initialise painting with baseBrushTool
+   *
+   * @override @protected
+   * @event
+   * @param {Object} evt - The event.
+   */
+  _startPaintingTouch(evt) {
+    const eventData = evt.detail;
+    const element = eventData.element;
+    const segIndex = brushStore.state.drawColorId;
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+    // Check if metadata exists,
+    const metaData = brushStore.getters.metadata(seriesInstanceUid, segIndex);
+
+    if (metaData && metaData.SegmentLabel) {
+      // Metadata assigned, start drawing.
+      this._setActiveStrategy(seriesInstanceUid);
+      this._paint(evt);
+    } else if (!isModalOpen()) {
+      // Open the UI and let the user input data!
+      brushMetadataIO(brushStore.state.drawColorId);
+    }
+  }
+
+  _setActiveStrategy(seriesInstanceUid) {
+    this.activeStrategy = MODES.OVERLAPPING;
+
+    if (brushStore.state.import && brushStore.state.import[seriesInstanceUid]) {
+      // Modified an imported mask.
+      brushStore.state.import[seriesInstanceUid].modified = true;
+
+      if (brushStore.state.import[seriesInstanceUid].type === "NIFTI") {
+        this.activeStrategy = MODES.NON_OVERLAPPING;
       }
     }
   }

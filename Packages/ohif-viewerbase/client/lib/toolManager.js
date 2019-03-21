@@ -242,38 +242,58 @@ export const toolManager = {
       return;
     }
 
+    console.log(toolManager.getActiveTool(button));
+
     let options = {};
     const mouseButtonMask = toolManager.getMouseButtonMask(button);
     if (mouseButtonMask) {
       options = {
-        mouseButtonMask
+        mouseButtonMask,
+        isTouchActive: true
       };
     }
+
+    cornerstoneTools.setToolPassive(toolManager.getActiveTool(button));
+
+    /*
+    Object.keys(tools).forEach(tool => {
+      // Set all tools (except the active tools) passive by default in order to render the external data if exists
+      if (tool !== toolName) {
+        cornerstoneTools.setToolPassive(tool);
+      }
+    });
+    */
 
     // Set active tools for the other buttons than this one
     switch (button) {
       case "left":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("right"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("right")
+          mouseButtonMask: toolManager.getMouseButtonMask("right"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("middle"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("middle")
+          mouseButtonMask: toolManager.getMouseButtonMask("middle"),
+          isTouchActive: true
         });
         break;
       case "right":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("left"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("left")
+          mouseButtonMask: toolManager.getMouseButtonMask("left"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("middle"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("middle")
+          mouseButtonMask: toolManager.getMouseButtonMask("middle"),
+          isTouchActive: true
         });
         break;
       case "middle":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("left"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("left")
+          mouseButtonMask: toolManager.getMouseButtonMask("left"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("right"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("right")
+          mouseButtonMask: toolManager.getMouseButtonMask("right"),
+          isTouchActive: true
         });
         break;
     }
