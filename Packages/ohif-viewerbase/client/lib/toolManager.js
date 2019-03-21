@@ -253,16 +253,11 @@ export const toolManager = {
       };
     }
 
+    // Need to set it passive so that it doesn't keep touch control.
+    // TODO: This seems necessary for this to work, but should shouldn't
+    // `cornerstoneTools.setToolActive()`` with `isTouchActive = true` set
+    // the other tool passive automagically?
     cornerstoneTools.setToolPassive(toolManager.getActiveTool(button));
-
-    /*
-    Object.keys(tools).forEach(tool => {
-      // Set all tools (except the active tools) passive by default in order to render the external data if exists
-      if (tool !== toolName) {
-        cornerstoneTools.setToolPassive(tool);
-      }
-    });
-    */
 
     // Set active tools for the other buttons than this one
     switch (button) {
