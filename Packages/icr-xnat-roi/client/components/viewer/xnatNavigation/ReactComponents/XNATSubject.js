@@ -24,7 +24,7 @@ export default class XNATSubject extends React.Component {
   render() {
     return (
       <>
-        <h5>{this.props.ID}</h5>
+        <h5>{this.props.label}</h5>
         <ul>
           {this.state.sessions.map(session => (
             <li key={session.ID}>
