@@ -1,6 +1,6 @@
 import { OHIF } from "meteor/ohif:core";
 
-const productionMode = true;
+const productionMode = false;
 
 // Return an absolute URL with the page domain using sub path of ROOT_URL
 // to let multiple domains directed to the same server work

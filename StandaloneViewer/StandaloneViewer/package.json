@@ -12,6 +12,8 @@
     "loglevel": "^1.6.1",
     "mousetrap": "^1.6.2",
     "nifti-reader-js": "^0.5.4",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
     "underscore": "^1.9.1",
     "xml-writer": "^1.7.0"
   }

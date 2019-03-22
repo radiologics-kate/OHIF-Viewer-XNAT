@@ -1,0 +1,40 @@
+@import "{ohif:design}/app"
+
+.xnat-navigation-dialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+  position: absolute
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  margin: auto
+  overflow: hidden
+  padding: 10px
+  max-height: 500px
+  min-height: 200px
+  height: calc(100% - 150px)
+  max-width: calc(100% - 100px)
+  border-radius: 8px
+
+  h5
+    font-weight: 400
+    text-align: left
+
+
+  h3
+    font-weight: 400
+    text-align: center
+
+  .xnat-navigation-tree
+    max-height: calc(100%)
+    text-align: left
+    padding-right: 18px
+    overflow-y: auto
+    overflow-x: hidden
+    display:inline-block;
+
+  ul
+    padding-left: 20px
