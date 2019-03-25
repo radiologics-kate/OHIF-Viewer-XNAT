@@ -21,7 +21,7 @@ export default class XNATNavigation extends React.Component {
   render() {
     return (
       <>
-        <h3>Switch Subject/Session</h3>
+        <h3>Change Subject/Session</h3>
         <hr />
         <div className="xnat-navigation-tree">
           <ul>

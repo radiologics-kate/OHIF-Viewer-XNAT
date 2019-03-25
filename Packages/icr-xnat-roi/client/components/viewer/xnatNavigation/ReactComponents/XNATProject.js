@@ -5,8 +5,12 @@ import fetchMockJSON from "../testJSON/fetchMockJSON.js";
 export default class XNATProject extends React.Component {
   constructor(props = {}) {
     super(props);
-    this.state = { subjects: [] };
+    this.state = {
+      subjects: [],
+      expanded: true
+    };
     this.getProjectId = this.getProjectId.bind(this);
+    this.getExpandIcon = this.getExpandIcon.bind(this);
   }
 
   componentDidMount() {
@@ -25,10 +29,19 @@ export default class XNATProject extends React.Component {
     return this.props.ID;
   }
 
+  getExpandIcon() {
+    if (this.state.expanded) {
+      return "fa fa-plus-circle";
+    }
+
+    return "fa fa-minus-circle";
+  }
+
   render() {
-    return (
-      <>
-        <h5>{this.props.ID}</h5>
+    let body;
+
+    if (this.state.expanded) {
+      body = (
         <ul>
           {this.state.subjects.map(subject => (
             <li key={subject.ID}>
@@ -40,6 +53,18 @@ export default class XNATProject extends React.Component {
             </li>
           ))}
         </ul>
+      );
+    }
+
+    return (
+      <>
+        <div className="xnat-nav-horizontal-box">
+          <a className="btn btn-sm btn-secondary">
+            <i className={this.getExpandIcon()} />
+          </a>
+          <h5>{this.props.ID}</h5>
+        </div>
+        {body}
       </>
     );
   }
