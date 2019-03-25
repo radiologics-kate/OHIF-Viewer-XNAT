@@ -1,16 +1,28 @@
 import React from "react";
 import XNATSession from "./XNATSession.js";
-import fetchMockJSON from "../testJSON/fetchMockJSON.js";
+import { Router } from "meteor/clinical:router";
+import fetchJSON from "./helpers/fetchJSON.js";
+import onExpandIconClick from "./helpers/onExpandIconClick.js";
+import getExpandIcon from "./helpers/getExpandIcon.js";
+import compareOnProperty from "./helpers/compareOnProperty.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { sessions: [] };
+    this.state = {
+      sessions: [],
+      expanded: false,
+      fetched: false
+    };
     this.getSubjectId = this.getSubjectId.bind(this);
+    this.onViewSubjectClick = this.onViewSubjectClick.bind(this);
+
+    this.getExpandIcon = getExpandIcon.bind(this);
+    this.onExpandIconClick = onExpandIconClick.bind(this);
   }
 
-  componentDidMount() {
-    fetchMockJSON(
+  fetchData() {
+    fetchJSON(
       `/data/archive/projects/${this.props.getProjectId()}/subjects/${
         this.props.ID
       }/experiments?format=json`
@@ -18,7 +30,13 @@ export default class XNATSubject extends React.Component {
       .then(result => {
         const sessions = result.ResultSet.Result;
         console.log(sessions);
-        this.setState({ sessions });
+
+        sessions.sort((a, b) => compareOnProperty(a, b, "label"));
+
+        this.setState({
+          sessions,
+          fetched: true
+        });
       })
       .catch(err => console.log(err));
   }
@@ -27,22 +45,74 @@ export default class XNATSubject extends React.Component {
     return this.props.ID;
   }
 
+  onViewSubjectClick() {
+    const params = `?subjectId=${
+      this.props.ID
+    }&projectId=${this.props.getProjectId()}`;
+
+    console.log(`TODO: -> GO: ${params}`);
+
+    //const viewerRoot = Session.get("viewerRoot");
+    const rootUrl = Session.get("rootUrl");
+
+    console.log(`rootUrl: ${rootUrl}`);
+
+    const url = `${rootUrl}/VIEWER${params}`;
+
+    window.location.href = url;
+  }
+
   render() {
+    let body;
+
+    if (this.state.expanded) {
+      if (this.state.fetched) {
+        body = (
+          <ul>
+            {this.state.sessions.map(session => (
+              <li className="xnat-nav-session-item" key={session.ID}>
+                <XNATSession
+                  ID={session.ID}
+                  label={session.label}
+                  getProjectId={this.props.getProjectId}
+                  getSubjectId={this.getSubjectId}
+                />
+              </li>
+            ))}
+          </ul>
+        );
+      } else {
+        body = (
+          <ul>
+            <li key={`${this.ID} loading`}>
+              <i className="fa fa-spin fa-circle-o-notch fa-fw" />
+            </li>
+          </ul>
+        );
+      }
+    }
+
     return (
       <>
-        <h5>{this.props.label}</h5>
-        <ul>
-          {this.state.sessions.map(session => (
-            <li key={session.ID}>
-              <XNATSession
-                ID={session.ID}
-                label={session.label}
-                getProjectId={this.props.getProjectId}
-                getSubjectId={this.props.getSubjectId}
-              />
-            </li>
-          ))}
-        </ul>
+        <div className="xnat-nav-horizontal-box">
+          <a
+            className="btn btn-sm btn-secondary"
+            onClick={this.onExpandIconClick}
+          >
+            <i className={this.getExpandIcon()} />
+          </a>
+          <a
+            className="btn btn-sm btn-primary xnat-nav-button"
+            onClick={this.onViewSubjectClick}
+          >
+            <i className="fa fa-eye" />
+          </a>
+          <div>
+            <h5>{this.props.label}</h5>
+            <h6>{`ID: ${this.props.ID}`}</h6>
+          </div>
+        </div>
+        {body}
       </>
     );
   }

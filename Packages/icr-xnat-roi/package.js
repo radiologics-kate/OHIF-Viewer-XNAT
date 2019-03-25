@@ -19,7 +19,8 @@ Package.onUse(function(api) {
     "ohif:log",
     "icr:xnat-roi-namespace",
     "icr:peppermint-tools",
-    "icr:series-info-provider"
+    "icr:series-info-provider",
+    "clinical:router"
   ]);
 
   // ===== Assets =====

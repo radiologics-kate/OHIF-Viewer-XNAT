@@ -1,6 +1,9 @@
 import React from "react";
 import XNATSubject from "./XNATSubject";
-import fetchMockJSON from "../testJSON/fetchMockJSON.js";
+import fetchJSON from "./helpers/fetchJSON.js";
+import onExpandIconClick from "./helpers/onExpandIconClick.js";
+import getExpandIcon from "./helpers/getExpandIcon.js";
+import compareOnProperty from "./helpers/compareOnProperty.js";
 
 export default class XNATProject extends React.Component {
   constructor(props = {}) {
@@ -11,17 +14,18 @@ export default class XNATProject extends React.Component {
       fetched: false
     };
     this.getProjectId = this.getProjectId.bind(this);
-    this.getExpandIcon = this.getExpandIcon.bind(this);
-    this.onExpandIconClick = this.onExpandIconClick.bind(this);
+    this.getExpandIcon = getExpandIcon.bind(this);
+    this.onExpandIconClick = onExpandIconClick.bind(this);
   }
 
   fetchData() {
-    fetchMockJSON(
-      `/data/archive/projects/${this.props.ID}/subjects?format=json`
-    )
+    fetchJSON(`/data/archive/projects/${this.props.ID}/subjects?format=json`)
       .then(result => {
         const subjects = result.ResultSet.Result;
         console.log(subjects);
+
+        subjects.sort((a, b) => compareOnProperty(a, b, "label"));
+
         this.setState({
           subjects,
           fetched: true
@@ -32,24 +36,6 @@ export default class XNATProject extends React.Component {
 
   getProjectId() {
     return this.props.ID;
-  }
-
-  getExpandIcon() {
-    if (this.state.expanded) {
-      return "fa fa-minus-circle";
-    }
-
-    return "fa fa-plus-circle";
-  }
-
-  onExpandIconClick() {
-    const expanded = !this.state.expanded;
-
-    if (expanded && !this.state.fetched) {
-      this.fetchData();
-    }
-
-    this.setState({ expanded });
   }
 
   render() {
@@ -76,7 +62,7 @@ export default class XNATProject extends React.Component {
         body = (
           <ul>
             <li key={`${this.ID} loading`}>
-              <i class="fa fa-spin fa-circle-o-notch fa-fw" />
+              <i className="fa fa-spin fa-circle-o-notch fa-fw" />
             </li>
           </ul>
         );
@@ -86,13 +72,16 @@ export default class XNATProject extends React.Component {
     return (
       <>
         <div className="xnat-nav-horizontal-box">
-          <a className="btn btn-sm btn-secondary">
-            <i
-              className={this.getExpandIcon()}
-              onClick={this.onExpandIconClick}
-            />
+          <a
+            className="btn btn-sm btn-secondary"
+            onClick={this.onExpandIconClick}
+          >
+            <i className={this.getExpandIcon()} />
           </a>
-          <h5>{this.props.ID}</h5>
+          <div>
+            <h5>{this.props.name}</h5>
+            <h6>{`ID: ${this.props.ID}`}</h6>
+          </div>
         </div>
         {body}
       </>

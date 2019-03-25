@@ -15,9 +15,10 @@
     font-weight: 400
     text-align: left
 
-  h3
+  h6
     font-weight: 400
-    text-align: center
+    text-align: left
+    theme('color', '$textSecondaryColor')
 
   .xnat-navigation-tree
     max-height: calc(100%)
@@ -27,14 +28,22 @@
     overflow-x: hidden
     display:inline-block
 
+    .xnat-nav-button
+      margin-left: 10px
+      margin-right: 10px
+
     .xnat-nav-horizontal-box
       display: -webkit-flex
       display: -ms-flexbox
       display: flex
       flex-direction: row
-      align-items: baseline
+      align-items: center
       align-self: flex-start
 
     ul
       padding-left: 10px
       list-style-type: none
+
+      .xnat-nav-session-caret
+        padding-left: 30px
+        padding-right: 10px
