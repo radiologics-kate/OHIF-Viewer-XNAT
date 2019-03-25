@@ -9,10 +9,6 @@ export default class XNATProject extends React.Component {
     this.getProjectId = this.getProjectId.bind(this);
   }
 
-  getProjectId() {
-    return this.props.ID;
-  }
-
   componentDidMount() {
     fetchMockJSON(
       `/data/archive/projects/${this.props.ID}/subjects?format=json`
@@ -24,6 +20,11 @@ export default class XNATProject extends React.Component {
       })
       .catch(err => console.log(err));
   }
+
+  getProjectId() {
+    return this.props.ID;
+  }
+
   render() {
     return (
       <>

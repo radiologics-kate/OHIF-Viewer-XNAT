@@ -1,10 +1,12 @@
 import React from "react";
+import XNATSession from "./XNATSession.js";
 import fetchMockJSON from "../testJSON/fetchMockJSON.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
     super(props);
     this.state = { sessions: [] };
+    this.getSubjectId = this.getSubjectId.bind(this);
   }
 
   componentDidMount() {
@@ -21,6 +23,10 @@ export default class XNATSubject extends React.Component {
       .catch(err => console.log(err));
   }
 
+  getSubjectId() {
+    return this.props.ID;
+  }
+
   render() {
     return (
       <>
@@ -28,7 +34,12 @@ export default class XNATSubject extends React.Component {
         <ul>
           {this.state.sessions.map(session => (
             <li key={session.ID}>
-              <h5>{session.label}</h5>
+              <XNATSession
+                ID={session.ID}
+                label={session.label}
+                getProjectId={this.props.getProjectId}
+                getSubjectId={this.props.getSubjectId}
+              />
             </li>
           ))}
         </ul>
