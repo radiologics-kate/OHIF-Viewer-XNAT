@@ -60,8 +60,11 @@ if (Meteor.isClient && productionMode) {
           // Single Session in shared project:
           //   projectId, subjectId, experimentId, experimentLabel, parentProjectId
           //
-          // Subject (WIP):
+          // Subject:
           //   projectId, subjectId
+          //
+          // Subject in shared project (WIP):
+          //  projectId, subjectId, parentProjectId
 
           let subjectId;
           let projectId;
@@ -129,7 +132,7 @@ if (Meteor.isClient && productionMode) {
             // Whole Subject.
             //
 
-            icrXnatRoiSession.set('sourceProjectId', projectId);
+            icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
             icrXnatRoiSession.set('projectId', projectId);
             icrXnatRoiSession.set('subjectId', subjectId);
 
@@ -167,7 +170,7 @@ if (Meteor.isClient && productionMode) {
               Promise.all(results).then((jsonFiles) => {
                 console.log(jsonFiles);
 
-                const studyList = {
+                let studyList = {
                   transactionId: subjectId,
                   studies: []
                 };
@@ -189,6 +192,19 @@ if (Meteor.isClient && productionMode) {
                   console.log(studiesI);
 
                   studyList.studies = [...studyList.studies, ...studiesI];
+                }
+
+                console.log(studyList);
+
+
+                if (parentProjectId) {
+                  console.log(`replacing ${parentProjectId} with ${projectId}`);
+
+                  let jsonString = JSON.stringify(studyList);
+
+                  jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
+
+                  studyList = JSON.parse(jsonString);
                 }
 
                 console.log(studyList);
