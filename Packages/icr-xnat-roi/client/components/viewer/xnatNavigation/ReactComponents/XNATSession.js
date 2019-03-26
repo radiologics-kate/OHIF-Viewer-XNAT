@@ -6,11 +6,28 @@ export default class XNATSubject extends React.Component {
   constructor(props) {
     super(props);
 
+    const active =
+      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
+      this.props.getSubjectId() === icrXnatRoiSession.get("subjectId") &&
+      this.props.ID === icrXnatRoiSession.get("experimentId");
+
+    const shared =
+      this.props.getParentProjectId() !== this.props.getProjectId();
+
+    this.state = {
+      active,
+      shared
+    };
+
     this.onViewSessionClick = this.onViewSessionClick.bind(this);
-    this.getSessionInfo = this.getSessionInfo.bind(this);
+    this._getSessionInfo = this._getSessionInfo.bind(this);
   }
 
   onViewSessionClick() {
+    if (this.state.active) {
+      return;
+    }
+
     console.log(this.props);
 
     let params = `?subjectId=${this.props.getSubjectId()}&projectId=${this.props.getProjectId()}&experimentId=${
@@ -34,21 +51,17 @@ export default class XNATSubject extends React.Component {
     window.location.href = url;
   }
 
-  getSessionInfo() {
+  _getSessionInfo() {
     let sessionInfo;
     let label;
 
-    if (
-      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
-      this.props.getSubjectId() === icrXnatRoiSession.get("subjectId") &&
-      this.props.ID === icrXnatRoiSession.get("experimentId")
-    ) {
+    if (this.state.active) {
       label = <h5 className="xnat-nav-active">{this.props.label}</h5>;
     } else {
       label = <h5>{this.props.label}</h5>;
     }
 
-    if (this.props.getParentProjectId() !== this.props.getProjectId()) {
+    if (this.state.shared) {
       sessionInfo = (
         <div>
           {label}
@@ -69,17 +82,23 @@ export default class XNATSubject extends React.Component {
   }
 
   render() {
+    let subjectButtonClassNames = "btn btn-sm btn-primary xnat-nav-button";
+
+    if (this.state.active) {
+      subjectButtonClassNames += " xnat-nav-button-disabled";
+    }
+
     return (
       <>
         <div className="xnat-nav-horizontal-box">
           <i className="fa fa-caret-right xnat-nav-session-caret" />
           <a
-            className="btn btn-sm btn-primary xnat-nav-button"
+            className={subjectButtonClassNames}
             onClick={this.onViewSessionClick}
           >
             <i className="fa fa-eye" />
           </a>
-          {this.getSessionInfo()}
+          {this._getSessionInfo()}
         </div>
       </>
     );

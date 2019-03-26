@@ -11,13 +11,14 @@ export default class XNATNavigation extends React.Component {
       activeProjects: [],
       otherProjects: []
     };
+
+    this._getOtherProjectsList = this._getOtherProjectsList.bind(this);
   }
 
   componentDidMount() {
     fetchJSON("/data/archive/projects/?format=json")
       .then(result => {
         const otherProjects = result.ResultSet.Result;
-        console.log(otherProjects);
 
         const activeProjectId = icrXnatRoiSession.get("projectId");
         const thisProjectIndex = otherProjects.findIndex(
@@ -25,10 +26,6 @@ export default class XNATNavigation extends React.Component {
         );
 
         const activeProjects = otherProjects.splice(thisProjectIndex, 1);
-
-        console.log(activeProjects);
-
-        console.log(thisProjectIndex);
 
         otherProjects.sort((a, b) => compareOnProperty(a, b, "name"));
 
@@ -40,14 +37,7 @@ export default class XNATNavigation extends React.Component {
       .catch(err => console.log(err));
   }
 
-  /*
-  <h5>Change Subject/Session View</h5>
-  <hr />
-  */
-
-  render() {
-    // TODO: Only render "Other Projects" if other projects exist.
-
+  _getOtherProjectsList() {
     let otherProjectsList;
 
     if (this.state.otherProjects.length) {
@@ -63,6 +53,10 @@ export default class XNATNavigation extends React.Component {
       );
     }
 
+    return otherProjectsList;
+  }
+
+  render() {
     return (
       <>
         <div className="xnat-navigation-tree">
@@ -73,7 +67,7 @@ export default class XNATNavigation extends React.Component {
                 <XNATProject ID={project.ID} name={project.name} />
               </li>
             ))}
-            {otherProjectsList}
+            {this._getOtherProjectsList()}
           </ul>
         </div>
       </>

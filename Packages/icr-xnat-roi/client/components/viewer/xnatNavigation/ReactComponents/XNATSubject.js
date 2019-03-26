@@ -10,15 +10,32 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 export default class XNATSubject extends React.Component {
   constructor(props) {
     super(props);
+
+    const active =
+      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
+      this.props.ID === icrXnatRoiSession.get("subjectId");
+    const subjectViewActive =
+      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
+      this.props.ID === icrXnatRoiSession.get("subjectId") &&
+      icrXnatRoiSession.get("experimentId") === undefined;
+
+    console.log(`subjectViewActive: ${subjectViewActive}`);
+    const shared = this.props.parentProjectId !== this.props.getProjectId();
+
     this.state = {
       sessions: [],
+      active,
+      subjectViewActive,
+      shared,
       expanded: false,
       fetched: false
     };
+
     this.getSubjectId = this.getSubjectId.bind(this);
     this.getParentProjectId = this.getParentProjectId.bind(this);
     this.onViewSubjectClick = this.onViewSubjectClick.bind(this);
-    this.getSubjectInfo = this.getSubjectInfo.bind(this);
+    this._getSubjectInfo = this._getSubjectInfo.bind(this);
+    this._getSessionList = this._getSessionList.bind(this);
 
     this.getExpandIcon = getExpandIcon.bind(this);
     this.onExpandIconClick = onExpandIconClick.bind(this);
@@ -53,6 +70,10 @@ export default class XNATSubject extends React.Component {
   }
 
   onViewSubjectClick() {
+    if (this.state.subjectViewActive) {
+      return;
+    }
+
     let params = `?subjectId=${
       this.props.ID
     }&projectId=${this.props.getProjectId()}`;
@@ -73,20 +94,17 @@ export default class XNATSubject extends React.Component {
     window.location.href = url;
   }
 
-  getSubjectInfo() {
+  _getSubjectInfo() {
     let subjectInfo;
     let label;
 
-    if (
-      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
-      this.props.ID === icrXnatRoiSession.get("subjectId")
-    ) {
+    if (this.state.active) {
       label = <h5 className="xnat-nav-active">{this.props.label}</h5>;
     } else {
       label = <h5>{this.props.label}</h5>;
     }
 
-    if (this.props.parentProjectId !== this.props.getProjectId()) {
+    if (this.state.shared) {
       subjectInfo = (
         <div>
           {label}
@@ -108,7 +126,7 @@ export default class XNATSubject extends React.Component {
     return subjectInfo;
   }
 
-  render() {
+  _getSessionList() {
     let body;
 
     if (this.state.expanded) {
@@ -139,6 +157,16 @@ export default class XNATSubject extends React.Component {
       }
     }
 
+    return body;
+  }
+
+  render() {
+    let subjectButtonClassNames = "btn btn-sm btn-primary xnat-nav-button";
+
+    if (this.state.subjectViewActive) {
+      subjectButtonClassNames += " xnat-nav-button-disabled";
+    }
+
     return (
       <>
         <div className="xnat-nav-horizontal-box">
@@ -149,14 +177,14 @@ export default class XNATSubject extends React.Component {
             <i className={this.getExpandIcon()} />
           </a>
           <a
-            className="btn btn-sm btn-primary xnat-nav-button"
+            className={subjectButtonClassNames}
             onClick={this.onViewSubjectClick}
           >
             <i className="fa fa-eye" />
           </a>
-          {this.getSubjectInfo()}
+          {this._getSubjectInfo()}
         </div>
-        {body}
+        {this._getSessionList()}
       </>
     );
   }

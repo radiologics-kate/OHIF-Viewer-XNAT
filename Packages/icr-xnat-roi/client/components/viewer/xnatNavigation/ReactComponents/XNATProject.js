@@ -10,12 +10,19 @@ export default class XNATProject extends React.Component {
   constructor(props = {}) {
     super(props);
 
+    const active = this.props.ID === icrXnatRoiSession.get("projectId");
+
     this.state = {
       subjects: [],
+      active,
       expanded: false,
       fetched: false
     };
+
     this.getProjectId = this.getProjectId.bind(this);
+    this._getProjectInfo = this._getProjectInfo.bind(this);
+    this._getSubjectList = this._getSubjectList.bind(this);
+
     this.getExpandIcon = getExpandIcon.bind(this);
     this.onExpandIconClick = onExpandIconClick.bind(this);
   }
@@ -40,10 +47,10 @@ export default class XNATProject extends React.Component {
     return this.props.ID;
   }
 
-  render() {
+  _getProjectInfo() {
     let projectInfo;
 
-    if (this.props.ID === icrXnatRoiSession.get("projectId")) {
+    if (this.state.active) {
       projectInfo = (
         <div>
           <h5 className="xnat-nav-active">{this.props.name}</h5>
@@ -59,6 +66,10 @@ export default class XNATProject extends React.Component {
       );
     }
 
+    return projectInfo;
+  }
+
+  _getSubjectList() {
     let body;
 
     if (this.state.expanded) {
@@ -88,6 +99,10 @@ export default class XNATProject extends React.Component {
       }
     }
 
+    return body;
+  }
+
+  render() {
     return (
       <>
         <div className="xnat-nav-horizontal-box">
@@ -97,9 +112,9 @@ export default class XNATProject extends React.Component {
           >
             <i className={this.getExpandIcon()} />
           </a>
-          {projectInfo}
+          {this._getProjectInfo()}
         </div>
-        {body}
+        {this._getSubjectList()}
       </>
     );
   }
