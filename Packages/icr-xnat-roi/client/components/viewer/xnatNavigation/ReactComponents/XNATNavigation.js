@@ -4,23 +4,6 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
-// TEMP
-//icrXnatRoiSession.set("projectId", "ITCRdemo");
-// TEMP
-//
-//
-//
-//
-// TODO ^ Deactivate that and try the project filtering in XNAT.
-//
-//
-//
-//
-//
-//
-//
-//
-
 export default class XNATNavigation extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -36,9 +19,7 @@ export default class XNATNavigation extends React.Component {
         const otherProjects = result.ResultSet.Result;
         console.log(otherProjects);
 
-        // TODO -> Put active project at the top!
         const activeProjectId = icrXnatRoiSession.get("projectId");
-
         const thisProjectIndex = otherProjects.findIndex(
           element => element.ID === activeProjectId
         );

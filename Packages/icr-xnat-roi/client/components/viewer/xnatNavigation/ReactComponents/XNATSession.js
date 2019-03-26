@@ -1,4 +1,5 @@
 import React from "react";
+import fetchJSON from "./helpers/fetchJSON.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
@@ -10,20 +11,37 @@ export default class XNATSubject extends React.Component {
   onViewSessionClick() {
     console.log(this.props);
 
-    const params = `?subjectId=${this.props.getSubjectId()}&projectId=${this.props.getProjectId()}&experimentId=${
-      this.props.ID
-    }&experimentLabel=${this.props.label}`;
+    fetchJSON(
+      `/data/archive/projects/${this.props.getProjectId()}/subjects/${this.props.getSubjectId()}/experiments/${
+        this.props.ID
+      }?format=json`
+    )
+      .then(result => {
+        console.log(result);
 
-    console.log(`TODO: -> GO: ${params}`);
+        const parentProjectId = result.items[0].data_fields.project;
 
-    //const viewerRoot = Session.get("viewerRoot");
-    const rootUrl = Session.get("rootUrl");
+        let params = `?subjectId=${this.props.getSubjectId()}&projectId=${this.props.getProjectId()}&experimentId=${
+          this.props.ID
+        }&experimentLabel=${this.props.label}`;
 
-    console.log(`rootUrl: ${rootUrl}`);
+        if (parentProjectId !== this.props.getProjectId()) {
+          //Shared Project
+          params += `&parentProjectId=${parentProjectId}`;
+        }
 
-    const url = `${rootUrl}/VIEWER${params}`;
+        console.log(`-> GO: ${params}`);
 
-    window.location.href = url;
+        //const viewerRoot = Session.get("viewerRoot");
+        const rootUrl = Session.get("rootUrl");
+
+        console.log(`rootUrl: ${rootUrl}`);
+
+        const url = `${rootUrl}/VIEWER${params}`;
+
+        window.location.href = url;
+      })
+      .catch(err => console.log(err));
   }
 
   //
