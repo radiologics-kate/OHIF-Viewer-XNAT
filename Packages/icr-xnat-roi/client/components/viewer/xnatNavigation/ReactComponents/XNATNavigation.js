@@ -5,7 +5,7 @@ import compareOnProperty from "./helpers/compareOnProperty.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 // TEMP
-icrXnatRoiSession.set("projectId", "ITCRdemo");
+//icrXnatRoiSession.set("projectId", "ITCRdemo");
 // TEMP
 //
 //

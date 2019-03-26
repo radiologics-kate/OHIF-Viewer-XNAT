@@ -1,6 +1,6 @@
 import fetchMockJSON from "../../testJSON/fetchMockJSON.js";
 
-const productionMode = false;
+const productionMode = true;
 
 let fetchJSON;
 
