@@ -13,7 +13,7 @@ export const ITCRdemo_subjects = JSON.parse(`{
       },
       {
         "insert_date": "2018-05-14 15:25:07.609",
-        "project": "ITCRdemo",
+        "project": "TestParentProject",
         "ID": "XNAT_JPETTS_S00012",
         "label": "Patient1",
         "insert_user": "admin",

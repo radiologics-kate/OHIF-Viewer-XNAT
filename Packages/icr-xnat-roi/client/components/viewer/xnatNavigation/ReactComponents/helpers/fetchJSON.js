@@ -1,7 +1,7 @@
 import fetchMockJSON from "../../testJSON/fetchMockJSON.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
-const productionMode = true;
+const productionMode = false;
 
 let fetchJSON;
 
@@ -35,6 +35,8 @@ if (productionMode) {
   };
 } else {
   icrXnatRoiSession.set("projectId", "ITCRdemo");
+  icrXnatRoiSession.set("subjectId", "XNAT_JPETTS_S00011");
+  icrXnatRoiSession.set("experimentId", "XNAT_JPETTS_E00014");
 
   fetchJSON = fetchMockJSON;
 }

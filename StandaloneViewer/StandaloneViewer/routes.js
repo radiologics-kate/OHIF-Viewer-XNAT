@@ -3,7 +3,7 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession, sessionMap } from 'meteor/icr:xnat-roi-namespace';
 
-const productionMode = true;
+const productionMode = false;
 
 if (Meteor.isClient && productionMode) {
   // XNAT deployment mode.
@@ -92,8 +92,7 @@ if (Meteor.isClient && productionMode) {
             // Single Session
             //
             icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
-            //icrXnatRoiSession.set('experimentId', experimentId);
-            //icrXnatRoiSession.set('experimentLabel', experimentLabel);
+            icrXnatRoiSession.set('experimentId', experimentId);
             icrXnatRoiSession.set('subjectId', subjectId);
             icrXnatRoiSession.set('projectId', projectId);
             icrXnatRoiSession.set('parentProjectId', parentProjectId);

@@ -5,6 +5,7 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
@@ -15,7 +16,9 @@ export default class XNATSubject extends React.Component {
       fetched: false
     };
     this.getSubjectId = this.getSubjectId.bind(this);
+    this.getParentProjectId = this.getParentProjectId.bind(this);
     this.onViewSubjectClick = this.onViewSubjectClick.bind(this);
+    this.getSubjectInfo = this.getSubjectInfo.bind(this);
 
     this.getExpandIcon = getExpandIcon.bind(this);
     this.onExpandIconClick = onExpandIconClick.bind(this);
@@ -45,10 +48,18 @@ export default class XNATSubject extends React.Component {
     return this.props.ID;
   }
 
+  getParentProjectId() {
+    return this.props.parentProjectId;
+  }
+
   onViewSubjectClick() {
-    const params = `?subjectId=${
+    let params = `?subjectId=${
       this.props.ID
     }&projectId=${this.props.getProjectId()}`;
+
+    if (this.props.parentProjectId !== this.props.getProjectId()) {
+      params += `&parentProjectId=${this.props.parentProjectId}`;
+    }
 
     console.log(`TODO: -> GO: ${params}`);
 
@@ -60,6 +71,41 @@ export default class XNATSubject extends React.Component {
     const url = `${rootUrl}/VIEWER${params}`;
 
     window.location.href = url;
+  }
+
+  getSubjectInfo() {
+    let subjectInfo;
+    let label;
+
+    if (
+      this.props.getProjectId() === icrXnatRoiSession.get("projectId") &&
+      this.props.ID === icrXnatRoiSession.get("subjectId")
+    ) {
+      label = <h5 className="xnat-nav-active">{this.props.label}</h5>;
+    } else {
+      label = <h5>{this.props.label}</h5>;
+    }
+
+    if (this.props.parentProjectId !== this.props.getProjectId()) {
+      subjectInfo = (
+        <div>
+          {label}
+          <h6>{`ID: ${this.props.ID}`}</h6>
+          <h6 className="xnat-nav-shared">{`Shared from ${
+            this.props.parentProjectId
+          }`}</h6>
+        </div>
+      );
+    } else {
+      subjectInfo = (
+        <div>
+          {label}
+          <h6>{`ID: ${this.props.ID}`}</h6>
+        </div>
+      );
+    }
+
+    return subjectInfo;
   }
 
   render() {
@@ -75,6 +121,7 @@ export default class XNATSubject extends React.Component {
                   ID={session.ID}
                   label={session.label}
                   getProjectId={this.props.getProjectId}
+                  getParentProjectId={this.getParentProjectId}
                   getSubjectId={this.getSubjectId}
                 />
               </li>
@@ -107,10 +154,7 @@ export default class XNATSubject extends React.Component {
           >
             <i className="fa fa-eye" />
           </a>
-          <div>
-            <h5>{this.props.label}</h5>
-            <h6>{`ID: ${this.props.ID}`}</h6>
-          </div>
+          {this.getSubjectInfo()}
         </div>
         {body}
       </>

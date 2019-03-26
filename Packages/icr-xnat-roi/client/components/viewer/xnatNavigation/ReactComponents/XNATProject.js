@@ -4,10 +4,12 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 export default class XNATProject extends React.Component {
   constructor(props = {}) {
     super(props);
+
     this.state = {
       subjects: [],
       expanded: false,
@@ -39,9 +41,25 @@ export default class XNATProject extends React.Component {
   }
 
   render() {
-    let body;
+    let projectInfo;
 
-    console.log(this.state.expanded);
+    if (this.props.ID === icrXnatRoiSession.get("projectId")) {
+      projectInfo = (
+        <div>
+          <h5 className="xnat-nav-active">{this.props.name}</h5>
+          <h6>{`ID: ${this.props.ID}`}</h6>
+        </div>
+      );
+    } else {
+      projectInfo = (
+        <div>
+          <h5>{this.props.name}</h5>
+          <h6>{`ID: ${this.props.ID}`}</h6>
+        </div>
+      );
+    }
+
+    let body;
 
     if (this.state.expanded) {
       if (this.state.fetched) {
@@ -52,6 +70,7 @@ export default class XNATProject extends React.Component {
                 <XNATSubject
                   label={subject.label}
                   ID={subject.ID}
+                  parentProjectId={subject.project}
                   getProjectId={this.getProjectId}
                 />
               </li>
@@ -78,10 +97,7 @@ export default class XNATProject extends React.Component {
           >
             <i className={this.getExpandIcon()} />
           </a>
-          <div>
-            <h5>{this.props.name}</h5>
-            <h6>{`ID: ${this.props.ID}`}</h6>
-          </div>
+          {projectInfo}
         </div>
         {body}
       </>

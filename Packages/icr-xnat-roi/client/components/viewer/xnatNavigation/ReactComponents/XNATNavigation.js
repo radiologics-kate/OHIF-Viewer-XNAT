@@ -46,6 +46,23 @@ export default class XNATNavigation extends React.Component {
   */
 
   render() {
+    // TODO: Only render "Other Projects" if other projects exist.
+
+    let otherProjectsList;
+
+    if (this.state.otherProjects.length) {
+      otherProjectsList = (
+        <>
+          <h4>Other Projects</h4>
+          {this.state.otherProjects.map(project => (
+            <li key={project.ID}>
+              <XNATProject ID={project.ID} name={project.name} />
+            </li>
+          ))}
+        </>
+      );
+    }
+
     return (
       <>
         <div className="xnat-navigation-tree">
@@ -56,12 +73,7 @@ export default class XNATNavigation extends React.Component {
                 <XNATProject ID={project.ID} name={project.name} />
               </li>
             ))}
-            <h4>Other Projects</h4>
-            {this.state.otherProjects.map(project => (
-              <li key={project.ID}>
-                <XNATProject ID={project.ID} name={project.name} />
-              </li>
-            ))}
+            {otherProjectsList}
           </ul>
         </div>
       </>
