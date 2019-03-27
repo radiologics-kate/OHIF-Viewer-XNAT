@@ -114,6 +114,9 @@ export const toolManager = {
       stackScrollMouseWheel: {
         className: "StackScrollMouseWheelTool"
       },
+      stackScrollMultiTouchTool: {
+        className: "StackScrollMultiTouchTool"
+      },
       referenceLines: {
         className: "ReferenceLinesTool"
       },
@@ -239,38 +242,53 @@ export const toolManager = {
       return;
     }
 
+    console.log(toolManager.getActiveTool(button));
+
     let options = {};
     const mouseButtonMask = toolManager.getMouseButtonMask(button);
     if (mouseButtonMask) {
       options = {
-        mouseButtonMask
+        mouseButtonMask,
+        isTouchActive: true
       };
     }
+
+    // Need to set it passive so that it doesn't keep touch control.
+    // TODO: This seems necessary for this to work, but should shouldn't
+    // `cornerstoneTools.setToolActive()`` with `isTouchActive = true` set
+    // the other tool passive automagically?
+    cornerstoneTools.setToolPassive(toolManager.getActiveTool(button));
 
     // Set active tools for the other buttons than this one
     switch (button) {
       case "left":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("right"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("right")
+          mouseButtonMask: toolManager.getMouseButtonMask("right"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("middle"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("middle")
+          mouseButtonMask: toolManager.getMouseButtonMask("middle"),
+          isTouchActive: true
         });
         break;
       case "right":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("left"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("left")
+          mouseButtonMask: toolManager.getMouseButtonMask("left"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("middle"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("middle")
+          mouseButtonMask: toolManager.getMouseButtonMask("middle"),
+          isTouchActive: true
         });
         break;
       case "middle":
         cornerstoneTools.setToolActive(toolManager.getActiveTool("left"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("left")
+          mouseButtonMask: toolManager.getMouseButtonMask("left"),
+          isTouchActive: true
         });
         cornerstoneTools.setToolActive(toolManager.getActiveTool("right"), {
-          mouseButtonMask: toolManager.getMouseButtonMask("right")
+          mouseButtonMask: toolManager.getMouseButtonMask("right"),
+          isTouchActive: true
         });
         break;
     }
@@ -349,6 +367,11 @@ export const toolManager = {
 
     // Activate mouse wheel and three (or more) finger stack scroll
     cornerstoneTools.setToolActive("stackScrollMouseWheel", {
+      mouseButtonMask: 0,
+      isTouchActive: true
+    });
+
+    cornerstoneTools.setToolActive("stackScrollMultiTouchTool", {
       mouseButtonMask: 0,
       isTouchActive: true
     });
