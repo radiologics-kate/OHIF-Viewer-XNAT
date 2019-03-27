@@ -1,6 +1,6 @@
 import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
-import { fetchCSRFToken } from "../IO/csrfToken.js";
 import { generateUID } from "meteor/icr:peppermint-tools";
+import { fetchCSRFToken } from "../IO/csrfToken.js";
 import getDateAndTime from "../util/getDateAndTime.js";
 
 const XMLWriter = require("xml-writer");
@@ -31,21 +31,55 @@ export class DICOMSEGExporter {
   }
 
   async exportToXNAT() {
+    const metaDataXml = this._generateResourceMetadata();
+
     const csrfToken = await fetchCSRFToken();
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
+    console.log(csrfTokenParameter);
+
     let putFailed = false;
 
+    /*
     // http://10.1.1.18/XNAT_JPETTS/xapi/roi/projects/ITCRdemo/sessions/XNAT_JPETTS_E00014/collections/mySegCollection?type=SEG&overwrite=false
-    const putSegUrl =
-      `${Session.get("rootUrl")}/xapi/roi/projects/${this._projectID}` +
-      `/sessions/${this._experimentID}/collections/${
-        this._label
-      }?type=SEG&overwrite=false&${csrfTokenParameter}`;
+    const putSegUrl = `${Session.get('rootUrl')}/xapi/roi/projects/${this._projectID}`
+      + `/sessions/${this._experimentID}/collections/${this._label}?type=SEG&overwrite=false&${csrfTokenParameter}`;
+    await this._PUT_uploadSeg(putSegUrl, this._payload)
+      .catch(error => {
+        putFailed = true;
+        console.log(error);
+      });
+    if (putFailed) {
+      throw Error('PUT failed, check logs above.');
+    }
+    */
 
-    console.log(putSegUrl);
+    // Upload resource metaData
+    const putResourceMetadataUrl = `${
+      this._assessorUrl
+    }?inbody=true&${csrfTokenParameter}`;
 
-    await this._PUT_uploadSeg(putSegUrl, this._payload).catch(error => {
+    console.log(`putResourceMetadataUrl: ${putResourceMetadataUrl}`);
+
+    await this._PUT_metadata(putResourceMetadataUrl, metaDataXml).catch(
+      error => {
+        putFailed = true;
+        console.log(error);
+      }
+    );
+
+    if (putFailed) {
+      throw Error("PUT failed, check logs above.");
+    }
+
+    // Create resource
+    const putCreateResourceUrl = `${
+      this._assessorUrl
+    }/resources/SEG?content=EXTERNAL&format=DICOM&description=SEG+instance+file&name=SEG&${csrfTokenParameter}`;
+
+    console.log(`putCreateResourceUrl: ${putCreateResourceUrl}`);
+
+    await this._PUT_createResource(putCreateResourceUrl).catch(error => {
       putFailed = true;
       console.log(error);
     });
@@ -53,6 +87,36 @@ export class DICOMSEGExporter {
     if (putFailed) {
       throw Error("PUT failed, check logs above.");
     }
+
+    // Upload resource (DICOM)
+    const putUploadSegUrl = `${this._assessorUrl}/resources/SEG/files/${
+      this._name
+    }.dcm?inbody=true&content=EXTERNAL&format=DICOM&${csrfTokenParameter}`;
+
+    console.log(`putUploadSegUrl: ${putUploadSegUrl}`);
+
+    await this._PUT_uploadSeg(putUploadSegUrl, this._payload).catch(error => {
+      putFailed = true;
+      console.log(error);
+    });
+
+    if (putFailed) {
+      throw Error("PUT failed, check logs above.");
+    }
+
+    console.log("wrote SEG");
+
+    console.log("PUT succesful, resolving");
+    return;
+  }
+
+  // Wrappers around _PUT. Note they return Promises.
+  _PUT_metadata(url, metaDataXml) {
+    return this._PUT(url, metaDataXml);
+  }
+
+  _PUT_createResource(url) {
+    return this._PUT(url, null);
   }
 
   _PUT_uploadSeg(url, seg) {
@@ -74,10 +138,91 @@ export class DICOMSEGExporter {
       };
 
       xhr.open("PUT", url);
-      //TEMP: xhr.setRequestHeader("Content-Type", "application/dicom");
-      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.setRequestHeader("Content-Type", "application/dicom");
       xhr.send(seg);
     });
+  }
+
+  _PUT(url, xml) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.onload = () => {
+        console.log(`Request returned, status: ${xhr.status}`);
+        if (xhr.status === 200 || xhr.status === 201) {
+          resolve();
+        } else {
+          reject(xhr.responseText);
+        }
+      };
+
+      xhr.onerror = () => {
+        console.log(`Request returned, status: ${xhr.status}`);
+        reject(xhr.responseText);
+      };
+
+      xhr.open("PUT", url);
+
+      if (xml) {
+        xhr.setRequestHeader("Content-Type", "text/xml");
+        xhr.send(xml);
+      } else {
+        xhr.send();
+      }
+    });
+  }
+
+  _GET(url) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.onload = () => {
+        console.log(`Request returned, status: ${xhr.status}`);
+        if (xhr.status === 200 || xhr.status === 201) {
+          resolve();
+        } else {
+          reject(xhr.responseText);
+        }
+      };
+
+      xhr.onerror = () => {
+        console.log(`Request returned, status: ${xhr.status}`);
+        reject(xhr.responseText);
+      };
+
+      xhr.open("GET", url);
+      xhr.send();
+    });
+  }
+
+  _generateResourceMetadata() {
+    const xw = new XMLWriter(true);
+    xw.startDocument("1.0", "UTF-8", false);
+    xw.startElement("RoiCollection")
+      .writeAttribute("xmlns:icr", "http://www.icr.ac.uk/icr")
+      .writeAttribute("xmlns:prov", "http://www.nbirn.net/prov")
+      .writeAttribute("xmlns:xnat", "http://nrg.wustl.edu/xnat")
+      .writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+      .writeAttribute("id", this._ID)
+      .writeAttribute("label", this._label)
+      .writeAttribute("project", this._projectID)
+      .writeAttribute("version", "1");
+    xw.writeElement("date", this._date);
+    xw.writeElement("time", this._time);
+    xw.writeElement("imageSession_ID", this._experimentID);
+    xw.writeElement("UID", this._UID);
+    xw.writeElement("collectionType", "SEG");
+    xw.writeElement("subjectID", this._subjectID);
+    xw.startElement("references");
+    xw.writeElement("seriesUID", this._seriesInstanceUID);
+    xw.endElement();
+    xw.writeElement("name", this._name);
+    xw.endElement();
+    xw.endDocument();
+
+    console.log(xw.toString());
+
+    return xw.toString();
   }
 
   _generateCollectionId() {

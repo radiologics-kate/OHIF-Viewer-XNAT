@@ -1,5 +1,6 @@
 import React from "react";
-import XNATProject from "./XNATProject.js";
+import XNATProjectList from "./XNATProjectList.js";
+import XNATProject from "./XNATProject/XNATProject.js";
 import fetchJSON from "./helpers/fetchJSON.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
@@ -11,8 +12,6 @@ export default class XNATNavigation extends React.Component {
       activeProjects: [],
       otherProjects: []
     };
-
-    this._getOtherProjectsList = this._getOtherProjectsList.bind(this);
   }
 
   componentDidMount() {
@@ -37,37 +36,20 @@ export default class XNATNavigation extends React.Component {
       .catch(err => console.log(err));
   }
 
-  _getOtherProjectsList() {
-    let otherProjectsList;
-
-    if (this.state.otherProjects.length) {
-      otherProjectsList = (
-        <>
-          <h4>Other Projects</h4>
-          {this.state.otherProjects.map(project => (
-            <li key={project.ID}>
-              <XNATProject ID={project.ID} name={project.name} />
-            </li>
-          ))}
-        </>
-      );
-    }
-
-    return otherProjectsList;
-  }
-
   render() {
+    const { activeProjects, otherProjects } = this.state;
+
     return (
       <>
         <div className="xnat-navigation-tree">
           <ul>
             <h4>This Project</h4>
-            {this.state.activeProjects.map(project => (
+            {activeProjects.map(project => (
               <li key={project.ID}>
                 <XNATProject ID={project.ID} name={project.name} />
               </li>
             ))}
-            {this._getOtherProjectsList()}
+            <XNATProjectList projects={otherProjects} />
           </ul>
         </div>
       </>
