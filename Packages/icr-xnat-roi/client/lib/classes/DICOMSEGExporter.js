@@ -54,61 +54,7 @@ export class DICOMSEGExporter {
       throw Error("PUT failed, check logs above.");
     }
 
-    /*
-
-    // Upload resource metaData
-    const putResourceMetadataUrl = `${
-      this._assessorUrl
-    }?inbody=true&${csrfTokenParameter}`;
-
-    console.log(`putResourceMetadataUrl: ${putResourceMetadataUrl}`);
-
-    await this._PUT_metadata(putResourceMetadataUrl, metaDataXml).catch(
-      error => {
-        putFailed = true;
-        console.log(error);
-      }
-    );
-
-    if (putFailed) {
-      throw Error("PUT failed, check logs above.");
-    }
-
-    // Create resource
-    const putCreateResourceUrl = `${
-      this._assessorUrl
-    }/resources/SEG?content=EXTERNAL&format=DICOM&description=SEG+instance+file&name=SEG&${csrfTokenParameter}`;
-
-    console.log(`putCreateResourceUrl: ${putCreateResourceUrl}`);
-
-    await this._PUT_createResource(putCreateResourceUrl).catch(error => {
-      putFailed = true;
-      console.log(error);
-    });
-
-    if (putFailed) {
-      throw Error("PUT failed, check logs above.");
-    }
-
-    // Upload resource (DICOM)
-    const putUploadSegUrl = `${this._assessorUrl}/resources/SEG/files/${
-      this._name
-    }.dcm?inbody=true&content=EXTERNAL&format=DICOM&${csrfTokenParameter}`;
-
-    console.log(`putUploadSegUrl: ${putUploadSegUrl}`);
-
-    await this._PUT_uploadSeg(putUploadSegUrl, this._payload).catch(error => {
-      putFailed = true;
-      console.log(error);
-    });
-
-    if (putFailed) {
-      throw Error("PUT failed, check logs above.");
-    }
-    */
-
     console.log("wrote SEG");
-
     console.log("PUT succesful, resolving");
     return;
   }
