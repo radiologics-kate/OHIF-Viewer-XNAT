@@ -34,9 +34,7 @@ export class DICOMSEGWriter {
 
       Promise.all(imagePromises)
         .then(images => {
-          console.log("Got all images. (images, brushData):");
-          console.log(images);
-          console.log(brushData);
+          const { date, time } = this._generateDateTime();
 
           const options = {
             includeSliceSpacing: true,
@@ -44,7 +42,11 @@ export class DICOMSEGWriter {
             Manufacturer: this._seriesInfo.equipment.manufacturerName,
             ManufacturerModelName: this._seriesInfo.equipment
               .manufacturerModelName,
-            SoftwareVersions: this._seriesInfo.equipment.softwareVersion
+            SoftwareVersions: this._seriesInfo.equipment.softwareVersion,
+            SeriesDate: date,
+            SeriesTime: time,
+            ContentDate: date,
+            ContentTime: time
           };
 
           const segBlob = dcmjs.adapters.Cornerstone.Segmentation.generateSegmentation(
@@ -59,5 +61,29 @@ export class DICOMSEGWriter {
         })
         .catch(err => console.log(err));
     });
+  }
+
+  _generateDateTime() {
+    const d = new Date();
+    const dateTime = {
+      year: d.getFullYear().toString(),
+      month: (d.getMonth() + 1).toString(),
+      date: d.getDate().toString(),
+      hours: d.getHours().toString(),
+      minutes: d.getMinutes().toString(),
+      seconds: d.getSeconds().toString()
+    };
+
+    // Pad with zeros e.g. March: 3 => 03
+    Object.keys(dateTime).forEach(element => {
+      if (dateTime[`${element}`].length < 2) {
+        dateTime[`${element}`] = "0" + dateTime[`${element}`];
+      }
+    });
+
+    return {
+      date: dateTime.year + dateTime.month + dateTime.date,
+      time: dateTime.hours + dateTime.minutes + dateTime.seconds
+    };
   }
 }
