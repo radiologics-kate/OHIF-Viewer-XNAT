@@ -64,33 +64,11 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
   }
 
   /**
-   * Event handler for MOUSE_DOWN.
-   *
-   * @param {Object} evt - The event.
-   */
-  preMouseDownCallback(evt) {
-    const eventData = evt.detail;
-    const config = this.configuration;
-
-    const imageNeedsUpdate = false;
-
-    if (config.currentTool === null) {
-      this._selectFreehandTool(eventData);
-    }
-
-    this._initialiseSculpting(evt);
-
-    cornerstone.updateImage(eventData.element);
-
-    return true;
-  }
-
-  /**
    * Event handler for MOUSE_UP during the active loop.
    *
    * @param {Object} evt - The event.
    */
-  activeMouseUpCallback(evt) {
+  _activeEnd(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
     const config = this.configuration;
