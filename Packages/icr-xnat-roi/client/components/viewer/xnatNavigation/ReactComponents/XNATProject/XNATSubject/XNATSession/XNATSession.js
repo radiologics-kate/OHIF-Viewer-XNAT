@@ -24,15 +24,25 @@ export default class XNATSession extends React.Component {
 
     this.onViewSessionClick = this.onViewSessionClick.bind(this);
 
+    this._cancelablePromises = [];
+
     this._fetchROICollectionInfo();
+  }
+
+  componentWillUnmount() {
+    const cancelablePromises = this._cancelablePromises;
+
+    for (let i = 0; i < cancelablePromises.length; i++) {
+      if (typeof cancelablePromises[i].cancel === "function") {
+        cancelablePromises[i].cancel();
+      }
+    }
   }
 
   render() {
     const { ID, label, parentProjectId } = this.props;
     const { active, shared, hasRois, maskCount, contourCount } = this.state;
     const sessionButtonClassNames = this._getSessionButtonClassNames();
-
-    // <i className="fa fa-circle xnat-nav-session-caret" />
 
     return (
       <>
@@ -91,12 +101,20 @@ export default class XNATSession extends React.Component {
   }
 
   _fetchROICollectionInfo() {
-    fetchJSON(
+    const cancelablePromise = fetchJSON(
       `/data/archive/projects/${this.props.projectId}/subjects/${
         this.props.subjectId
       }/experiments/${this.props.ID}/assessors?format=json`
-    )
+    );
+
+    this._cancelablePromises.push(cancelablePromise);
+
+    cancelablePromise.promise
       .then(result => {
+        if (!result) {
+          return;
+        }
+
         const assessors = result.ResultSet.Result;
 
         if (
@@ -118,15 +136,17 @@ export default class XNATSession extends React.Component {
 
     for (let i = 0; i < assessors.length; i++) {
       if (assessors[i].xsiType === "icr:roiCollectionData") {
-        promises.push(
-          fetchJSON(
-            `/data/archive/projects/${this.props.projectId}/subjects/${
-              this.props.subjectId
-            }/experiments/${this.props.ID}/assessors/${
-              assessors[i].ID
-            }?format=json`
-          )
+        const cancelablePromise = fetchJSON(
+          `/data/archive/projects/${this.props.projectId}/subjects/${
+            this.props.subjectId
+          }/experiments/${this.props.ID}/assessors/${
+            assessors[i].ID
+          }?format=json`
         );
+
+        this._cancelablePromises.push(cancelablePromise);
+
+        promises.push(cancelablePromise.promise);
       }
     }
 

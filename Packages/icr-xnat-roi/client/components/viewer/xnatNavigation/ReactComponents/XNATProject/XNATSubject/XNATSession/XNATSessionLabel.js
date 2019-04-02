@@ -54,7 +54,7 @@ export default class XNATSessionLabel extends React.Component {
     if (!contourCount && !maskCount) {
       return (
         <>
-          <i className="fa fa-sm fa-spin fa-circle-o-notch" />
+          <i className="fa fa-spin fa-circle-o-notch" />
         </>
       );
     }

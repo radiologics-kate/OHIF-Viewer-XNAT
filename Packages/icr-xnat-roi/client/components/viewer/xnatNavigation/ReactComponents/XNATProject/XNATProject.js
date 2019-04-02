@@ -24,9 +24,24 @@ export default class XNATProject extends React.Component {
     this.onExpandIconClick = onExpandIconClick.bind(this);
   }
 
+  componentWillUnmount() {
+    if (this._cancelablePromise) {
+      console.log("canceling promise");
+      this._cancelablePromise.cancel();
+    }
+  }
+
   fetchData() {
-    fetchJSON(`/data/archive/projects/${this.props.ID}/subjects?format=json`)
+    this._cancelablePromise = fetchJSON(
+      `/data/archive/projects/${this.props.ID}/subjects?format=json`
+    );
+
+    this._cancelablePromise.promise
       .then(result => {
+        if (!result) {
+          return;
+        }
+
         const subjects = result.ResultSet.Result;
         console.log(subjects);
 

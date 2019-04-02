@@ -16,7 +16,11 @@ export default class XNATNavigation extends React.Component {
 
   componentDidMount() {
     fetchJSON("/data/archive/projects/?format=json")
-      .then(result => {
+      .promise.then(result => {
+        if (!result) {
+          return;
+        }
+
         const otherProjects = result.ResultSet.Result;
 
         const activeProjectId = icrXnatRoiSession.get("projectId");

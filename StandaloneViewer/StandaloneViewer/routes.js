@@ -3,9 +3,9 @@ import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { icrXnatRoiSession, sessionMap } from 'meteor/icr:xnat-roi-namespace';
 
-const productionMode = false;
+console.log(Meteor.isDevelopment);
 
-if (Meteor.isClient && productionMode) {
+if (Meteor.isClient && !Meteor.isDevelopment) {
   // XNAT deployment mode.
   // Disconnect from the Meteor Server since we don't need it
   OHIF.log.info('Disconnecting from the Meteor server');

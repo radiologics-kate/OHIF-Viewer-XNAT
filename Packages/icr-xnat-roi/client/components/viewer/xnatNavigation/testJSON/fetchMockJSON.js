@@ -1,3 +1,5 @@
+import makeCancelable from "../../../../lib/util/makeCancelable.js";
+
 import { projects } from "./projects.js";
 import { ITCRdemo_subjects } from "./ITCRdemo/subjects.js";
 
@@ -27,9 +29,11 @@ const uriToJson = {
 };
 
 export default function(uri) {
-  return new Promise((resolve, reject) => {
-    setTimeout(function() {
-      resolve(uriToJson[uri]);
-    }, 500);
-  });
+  return makeCancelable(
+    new Promise((resolve, reject) => {
+      setTimeout(function() {
+        resolve(uriToJson[uri]);
+      }, 20);
+    })
+  );
 }
