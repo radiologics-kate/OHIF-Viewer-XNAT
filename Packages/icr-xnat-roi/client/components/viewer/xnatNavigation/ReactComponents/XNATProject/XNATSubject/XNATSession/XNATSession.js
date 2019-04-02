@@ -17,6 +17,7 @@ export default class XNATSession extends React.Component {
     this.state = {
       active,
       shared,
+      hasRois: false,
       maskCount: 0,
       contourCount: 0
     };
@@ -28,13 +29,14 @@ export default class XNATSession extends React.Component {
 
   render() {
     const { ID, label, parentProjectId } = this.props;
-    const { active, shared, maskCount, contourCount } = this.state;
+    const { active, shared, hasRois, maskCount, contourCount } = this.state;
     const sessionButtonClassNames = this._getSessionButtonClassNames();
+
+    // <i className="fa fa-circle xnat-nav-session-caret" />
 
     return (
       <>
         <div className="xnat-nav-horizontal-box">
-          <i className="fa fa-caret-right xnat-nav-session-caret" />
           <a
             className={sessionButtonClassNames}
             onClick={this.onViewSessionClick}
@@ -47,6 +49,7 @@ export default class XNATSession extends React.Component {
             active={active}
             shared={shared}
             parentProjectId={parentProjectId}
+            hasRois={hasRois}
             maskCount={maskCount}
             contourCount={contourCount}
           />
@@ -77,7 +80,8 @@ export default class XNATSession extends React.Component {
   }
 
   _getSessionButtonClassNames() {
-    let sessionButtonClassNames = "btn btn-sm btn-primary xnat-nav-button";
+    let sessionButtonClassNames =
+      "btn btn-sm btn-primary xnat-nav-button xnat-nav-session";
 
     if (this.state.active) {
       sessionButtonClassNames += " xnat-nav-button-disabled";
@@ -93,6 +97,17 @@ export default class XNATSession extends React.Component {
       }/experiments/${this.props.ID}/assessors?format=json`
     )
       .then(result => {
+        const assessors = result.ResultSet.Result;
+
+        if (
+          assessors.some(
+            assessor => assessor.xsiType === "icr:roiCollectionData"
+          )
+        ) {
+          console.log("has ROIs!");
+          this.setState({ hasRois: true });
+        }
+
         this._getRoiCollectionCounts(result.ResultSet.Result);
       })
       .catch(err => console.log(err));

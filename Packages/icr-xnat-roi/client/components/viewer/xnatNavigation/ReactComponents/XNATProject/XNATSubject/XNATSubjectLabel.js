@@ -7,33 +7,22 @@ export default class XNATSubjectLabel extends React.Component {
 
   render() {
     const { ID, label, active, shared, parentProjectId } = this.props;
-    let labelEntry;
 
-    if (active) {
-      labelEntry = (
-        <>
+    // <h6>{`ID: ${ID}`}</h6>
+
+    let sharedLabel = shared ? (
+      <h6 className="xnat-nav-shared">{`Shared from ${parentProjectId}`}</h6>
+    ) : null;
+
+    return (
+      <div>
+        {active ? (
           <h5 className="xnat-nav-active">{label}</h5>
-          <h6>{`ID: ${ID}`}</h6>
-        </>
-      );
-    } else {
-      labelEntry = (
-        <>
+        ) : (
           <h5>{label}</h5>
-          <h6>{`ID: ${ID}`}</h6>
-        </>
-      );
-    }
-
-    if (shared) {
-      return (
-        <div>
-          {labelEntry}
-          <h6 className="xnat-nav-shared">{`Shared from ${parentProjectId}`}</h6>
-        </div>
-      );
-    }
-
-    return <div>{labelEntry}</div>;
+        )}
+        {sharedLabel}
+      </div>
+    );
   }
 }

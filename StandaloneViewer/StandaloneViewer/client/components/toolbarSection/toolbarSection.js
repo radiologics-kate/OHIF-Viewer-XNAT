@@ -353,7 +353,7 @@ Template.toolbarSection.helpers({
           });
         }
 
-        //if (icrXnatRoiSession.get("writePermissions")) { TEMP TODO
+        if (icrXnatRoiSession.get("writePermissions")) {
           const exportMenu = [
             {
               id: 'exportROIs',
@@ -382,7 +382,7 @@ Template.toolbarSection.helpers({
             svgLink: 'packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export',
             subTools: exportMenu
           });
-        //}
+        }
 
 
 

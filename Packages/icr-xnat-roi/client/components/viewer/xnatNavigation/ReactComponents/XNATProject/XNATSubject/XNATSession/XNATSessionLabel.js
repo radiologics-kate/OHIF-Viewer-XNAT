@@ -23,56 +23,15 @@ export default class XNATSessionLabel extends React.Component {
     );
   }
 
-  _roiCollectionCountLabel() {
-    const { contourCount, maskCount } = this.props;
-
-    let roiCollectionCountLabel;
-
-    if (contourCount || maskCount) {
-      let contourCountLabel;
-      let maskCountLabel;
-
-      if (contourCount) {
-        contourCountLabel = (
-          <>
-            <svg stroke="#fff" width="16" height="16">
-              <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu" />
-            </svg>
-            {` ${contourCount}  `}
-          </>
-        );
-      }
-
-      if (maskCount) {
-        maskCountLabel = (
-          <>
-            <svg stroke="#fff" width="16" height="16">
-              <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu" />
-            </svg>
-            {` ${maskCount} `}
-          </>
-        );
-      }
-
-      return (
-        <>
-          <h6>
-            {contourCountLabel}
-            {maskCountLabel}
-          </h6>
-        </>
-      );
-    }
-  }
-
   _headerLabel() {
     const { label, ID, active } = this.props;
+
+    //<h6>{`ID: ${ID}`}</h6>
 
     if (active) {
       return (
         <>
           <h5 className="xnat-nav-active">{label}</h5>
-          <h6>{`ID: ${ID}`}</h6>
         </>
       );
     }
@@ -80,7 +39,46 @@ export default class XNATSessionLabel extends React.Component {
     return (
       <>
         <h5>{label}</h5>
-        <h6>{`ID: ${ID}`}</h6>
+      </>
+    );
+  }
+
+  _roiCollectionCountLabel() {
+    const { contourCount, maskCount, hasRois } = this.props;
+
+    if (!hasRois) {
+      return null;
+    }
+
+    // Render loading dialog.
+    if (!contourCount && !maskCount) {
+      return (
+        <>
+          <i className="fa fa-sm fa-spin fa-circle-o-notch" />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <h6>
+          {contourCount ? (
+            <>
+              <svg stroke="#fff" width="16" height="16">
+                <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu" />
+              </svg>
+              {` ${contourCount}  `}
+            </>
+          ) : null}
+          {maskCount ? (
+            <>
+              <svg stroke="#fff" width="16" height="16">
+                <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu" />
+              </svg>
+              {` ${maskCount} `}
+            </>
+          ) : null}
+        </h6>
       </>
     );
   }

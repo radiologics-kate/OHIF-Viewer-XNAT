@@ -1,23 +1,18 @@
 import React from "react";
 
-export default class XNATProjectINFO extends React.Component {
+export default class XNATProjectLabel extends React.Component {
   constructor(props = {}) {
     super(props);
   }
 
   render() {
-    let projectName;
+    const { active, name } = this.props;
 
-    if (this.props.active) {
-      projectName = <h5 className="xnat-nav-active">{this.props.name}</h5>;
-    } else {
-      projectName = <h5>{this.props.name}</h5>;
-    }
+    // <h6>{`ID: ${this.props.ID}`}</h6>
 
     return (
       <div>
-        {projectName}
-        <h6>{`ID: ${this.props.ID}`}</h6>
+        {active ? <h5 className="xnat-nav-active">{name}</h5> : <h5>{name}</h5>}
       </div>
     );
   }

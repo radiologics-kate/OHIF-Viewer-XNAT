@@ -30,6 +30,6 @@ export default function(uri) {
   return new Promise((resolve, reject) => {
     setTimeout(function() {
       resolve(uriToJson[uri]);
-    }, 20);
+    }, 500);
   });
 }
