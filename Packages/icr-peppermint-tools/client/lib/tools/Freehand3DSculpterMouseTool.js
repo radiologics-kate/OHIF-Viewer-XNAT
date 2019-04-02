@@ -78,7 +78,7 @@ export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTo
       this._selectFreehandTool(eventData);
     }
 
-    this._initialiseSculpting(eventData);
+    this._initialiseSculpting(evt);
 
     cornerstone.updateImage(eventData.element);
 

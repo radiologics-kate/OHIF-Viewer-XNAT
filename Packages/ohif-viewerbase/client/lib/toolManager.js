@@ -52,7 +52,7 @@ export const toolManager = {
 
     cornerstoneTools.register("module", "freehand3D", freehand3DModule);
 
-    cornerstoneTools.init();
+    cornerstoneTools.init({ showSVGCursors: true });
 
     // Define tools object with the corresponding class names in cornerstone tools,
     //  and support for setting different configuration per tool

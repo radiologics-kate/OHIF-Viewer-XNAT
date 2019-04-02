@@ -1,15 +1,11 @@
 import React from "react";
-import XNATLabel from "../../../XNATLabel.js";
+import XNATSessionLabel from "./XNATSessionLabel.js";
 import fetchJSON from "../../../helpers/fetchJSON.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 export default class XNATSession extends React.Component {
   constructor(props) {
     super(props);
-
-    console.log(this.props.projectId === icrXnatRoiSession.get("projectId"));
-    console.log(this.props.subjectId === icrXnatRoiSession.get("subjectId"));
-    console.log(this.props.ID === icrXnatRoiSession.get("experimentId"));
 
     const active =
       this.props.projectId === icrXnatRoiSession.get("projectId") &&
@@ -20,10 +16,43 @@ export default class XNATSession extends React.Component {
 
     this.state = {
       active,
-      shared
+      shared,
+      maskCount: 0,
+      contourCount: 0
     };
 
     this.onViewSessionClick = this.onViewSessionClick.bind(this);
+
+    this._fetchROICollectionInfo();
+  }
+
+  render() {
+    const { ID, label, parentProjectId } = this.props;
+    const { active, shared, maskCount, contourCount } = this.state;
+    const sessionButtonClassNames = this._getSessionButtonClassNames();
+
+    return (
+      <>
+        <div className="xnat-nav-horizontal-box">
+          <i className="fa fa-caret-right xnat-nav-session-caret" />
+          <a
+            className={sessionButtonClassNames}
+            onClick={this.onViewSessionClick}
+          >
+            <i className="fa fa-eye" />
+          </a>
+          <XNATSessionLabel
+            ID={ID}
+            label={label}
+            active={active}
+            shared={shared}
+            parentProjectId={parentProjectId}
+            maskCount={maskCount}
+            contourCount={contourCount}
+          />
+        </div>
+      </>
+    );
   }
 
   onViewSessionClick() {
@@ -57,32 +86,58 @@ export default class XNATSession extends React.Component {
     return sessionButtonClassNames;
   }
 
-  render() {
-    const { ID, label, parentProjectId } = this.props;
-    const { active, shared } = this.state;
-    const sessionButtonClassNames = this._getSessionButtonClassNames();
+  _fetchROICollectionInfo() {
+    fetchJSON(
+      `/data/archive/projects/${this.props.projectId}/subjects/${
+        this.props.subjectId
+      }/experiments/${this.props.ID}/assessors?format=json`
+    )
+      .then(result => {
+        this._getRoiCollectionCounts(result.ResultSet.Result);
+      })
+      .catch(err => console.log(err));
+  }
 
-    console.log(`xnatSession: active: ${active}`);
+  _getRoiCollectionCounts(assessors) {
+    const promises = [];
 
-    return (
-      <>
-        <div className="xnat-nav-horizontal-box">
-          <i className="fa fa-caret-right xnat-nav-session-caret" />
-          <a
-            className={sessionButtonClassNames}
-            onClick={this.onViewSessionClick}
-          >
-            <i className="fa fa-eye" />
-          </a>
-          <XNATLabel
-            ID={ID}
-            label={label}
-            active={active}
-            shared={shared}
-            parentProjectId={parentProjectId}
-          />
-        </div>
-      </>
-    );
+    for (let i = 0; i < assessors.length; i++) {
+      if (assessors[i].xsiType === "icr:roiCollectionData") {
+        promises.push(
+          fetchJSON(
+            `/data/archive/projects/${this.props.projectId}/subjects/${
+              this.props.subjectId
+            }/experiments/${this.props.ID}/assessors/${
+              assessors[i].ID
+            }?format=json`
+          )
+        );
+      }
+    }
+
+    let maskCount = 0;
+    let contourCount = 0;
+
+    Promise.all(promises).then(promisesJSON => {
+      promisesJSON.forEach(roiCollectionInfo => {
+        const type = roiCollectionInfo.items[0].data_fields.collectionType;
+
+        switch (type) {
+          case "RTSTRUCT":
+          case "AIM":
+            contourCount++;
+            break;
+          case "SEG":
+          case "NIFTI":
+            maskCount++;
+            break;
+        }
+      });
+
+      this.setState({
+        maskCount,
+        contourCount
+      });
+    });
   }
 }

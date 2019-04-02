@@ -1,7 +1,7 @@
 import fetchMockJSON from "../../testJSON/fetchMockJSON.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
-const productionMode = true;
+const productionMode = false;
 
 let fetchJSON;
 

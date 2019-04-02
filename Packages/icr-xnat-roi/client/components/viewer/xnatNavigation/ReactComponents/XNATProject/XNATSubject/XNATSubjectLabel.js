@@ -1,6 +1,6 @@
 import React from "react";
 
-export default class XNATLabel extends React.Component {
+export default class XNATSubjectLabel extends React.Component {
   constructor(props) {
     super(props);
   }

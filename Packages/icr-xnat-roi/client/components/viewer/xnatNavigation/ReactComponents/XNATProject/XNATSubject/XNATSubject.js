@@ -1,5 +1,5 @@
 import React from "react";
-import XNATLabel from "../../XNATLabel.js";
+import XNATSubjectLabel from "./XNATSubjectLabel.js";
 import XNATSessionList from "./XNATSession/XNATSessionList.js";
 import { Router } from "meteor/clinical:router";
 import fetchJSON from "../../helpers/fetchJSON.js";
@@ -108,7 +108,7 @@ export default class XNATSubject extends React.Component {
           >
             <i className="fa fa-eye" />
           </a>
-          <XNATLabel
+          <XNATSubjectLabel
             ID={ID}
             label={label}
             active={active}
