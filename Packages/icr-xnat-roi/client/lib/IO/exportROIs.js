@@ -49,6 +49,7 @@ async function beginExport() {
   const label = AIMWriter.generateLabel(dateTime);
 
   // Check if there are any unlocked ROIs with > 0 contours.
+  // TODO -> Could do this query with peppermint now?
   if (roiExtractor.hasVolumesToExtract() === false) {
     displayNoROIsToExportDialog();
     return;

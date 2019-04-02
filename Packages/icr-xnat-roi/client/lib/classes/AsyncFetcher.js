@@ -1,6 +1,7 @@
 import { RoiImporter } from "./RoiImporter.js";
 import closeIODialog from "../IO/closeIODialog.js";
-import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 /**
@@ -14,7 +15,10 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 export class AsyncFetcher {
   constructor(seriesInstanceUid, validTypes) {
     this._seriesInstanceUid = seriesInstanceUid;
-    this._experimentId = sessionMap[this._seriesInstanceUid].experimentId;
+    this._experimentId = sessionMap.get(
+      this._seriesInstanceUid,
+      "experimentId"
+    );
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = "";
     this._progressDialog = document.getElementById("importVolumes");

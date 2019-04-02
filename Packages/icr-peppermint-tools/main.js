@@ -30,7 +30,9 @@ export {
 export { default as segManagement } from "./client/lib/util/segManagement.js";
 export { getNextColor } from "./client/lib/modules/freehand3DModule.js";
 
-// Classes
 export {
-  Polygon
-} from "./client/lib/util/classes/Polygon.js";
+  default as getUnsavedRegions
+} from "./client/lib/util/getUnsavedRegions.js";
+
+// Classes
+export { Polygon } from "./client/lib/util/classes/Polygon.js";

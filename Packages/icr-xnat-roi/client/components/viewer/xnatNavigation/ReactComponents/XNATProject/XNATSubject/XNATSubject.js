@@ -7,6 +7,9 @@ import onExpandIconClick from "../../helpers/onExpandIconClick.js";
 import getExpandIcon from "../../helpers/getExpandIcon.js";
 import compareOnProperty from "../../helpers/compareOnProperty.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import navigateConfirmationContent from "../../helpers/navigateConfirmationContent.js";
+import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
+import awaitConfirmationDialog from "../../../../../../lib/IO/awaitConfirmationDialog.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
@@ -76,6 +79,27 @@ export default class XNATSubject extends React.Component {
       return;
     }
 
+    const unsavedRegions = getUnsavedRegions();
+
+    console.log(unsavedRegions);
+
+    if (unsavedRegions.hasUnsavedRegions) {
+      console.log(unsavedRegions);
+
+      const content = navigateConfirmationContent(unsavedRegions);
+
+      awaitConfirmationDialog(content).then(result => {
+        if (result === true) {
+          this._loadRoute();
+        }
+      });
+      return;
+    } else {
+      this._loadRoute();
+    }
+  }
+
+  _loadRoute() {
     const { ID, projectId, parentProjectId } = this.props;
     let params = `?subjectId=${ID}&projectId=${projectId}`;
 

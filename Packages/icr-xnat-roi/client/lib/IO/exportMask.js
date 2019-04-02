@@ -151,16 +151,11 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
   const exportInProgressDialog = document.getElementById("exportVolumes");
   exportInProgressDialog.showModal();
 
-  console.log("test1");
-
   // TODO DICOM or NIFTI will have different export channels here!
   // In the future we will check the metadata to check if the image is either NIFTI or DICOM.
 
   // DICOM-SEG
   const dicomSegWriter = new DICOMSEGWriter(seriesInfo);
-
-  console.log("test2");
-
   const DICOMSegPromise = dicomSegWriter.write(roiCollectionName);
 
   console.log(DICOMSegPromise);

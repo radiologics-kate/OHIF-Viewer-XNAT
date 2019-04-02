@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
-import { icrXnatRoiSession, sessionMap } from 'meteor/icr:xnat-roi-namespace';
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { sessionMap } from 'meteor/icr:series-info-provider';
 
 console.log(Meteor.isDevelopment);
 
@@ -110,7 +111,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   return;
               }
 
-              updateSessionMap(json, experimentId, experimentLabel);
+              sessionMap.set(json, experimentId, experimentLabel);
 
               let jsonString = JSON.stringify(json);
 
@@ -138,16 +139,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
             const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
 
-
             OHIF.RoiStateManagement.checkAndSetPermissions();
-
-
-
-            //
-            // TODO:
-            // ROICollection IO restructure.
-            // SeriesInstanceUID -> ExperimentId + projectId map.
-            // Update IO to deal with the new Schema.
 
             getJson(subjectExperimentListUrl).then(json => {
               // TODO -> Fetch each json.
@@ -178,7 +170,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   const experimentJsonI = jsonFiles[i];
                   const studiesI = experimentJsonI.studies;
 
-                  updateSessionMap(experimentJsonI, experimentList[i].ID, experimentList[i].label);
+                  sessionMap.set(experimentJsonI, experimentList[i].ID, experimentList[i].label);
 
                   console.log('Session Map:')
                   console.log(sessionMap);
@@ -278,7 +270,12 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   }
 
                   OHIF.log.info(JSON.stringify(oReq.responseText, null, 2));
-                  this.data = JSON.parse(oReq.responseText);
+
+                  const parsedJSON = JSON.parse(oReq.responseText);
+
+                  sessionMap.set(parsedJSON, 'TEST_EXPERIMENT_ID', 'TEST_EXPERIMENT_LABEL');
+
+                  this.data = parsedJSON
 
                   next();
               });
@@ -336,31 +333,6 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
         this.response.end();
       });
     }
-}
-
-
-function updateSessionMap(json, experimentId, experimentLabel) {
-  console.log(json);
-
-  const studies = json.studies;
-
-  for (let i = 0; i < studies.length; i++) {
-    const seriesList = studies[i].seriesList;
-
-    console.log(`seriesList ${i}`);
-
-    for (let j = 0; j < seriesList.length; j++) {
-      console.log(`series [${i}, ${j}]`);
-
-      sessionMap[seriesList[j].seriesInstanceUid] = {
-        experimentId,
-        experimentLabel
-      };
-    }
-  }
-
-  console.log(`end of updateSessionMap:`);
-  console.log(sessionMap);
 }
 
 

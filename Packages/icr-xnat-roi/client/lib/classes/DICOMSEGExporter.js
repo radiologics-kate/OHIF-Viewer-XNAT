@@ -1,4 +1,5 @@
-import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import { generateUID } from "meteor/icr:peppermint-tools";
 import { fetchCSRFToken } from "../IO/csrfToken.js";
 import getDateAndTime from "../util/getDateAndTime.js";
@@ -11,7 +12,10 @@ export class DICOMSEGExporter {
     this._projectID = icrXnatRoiSession.get("sourceProjectId");
     this._subjectID = icrXnatRoiSession.get("subjectId");
     this._seriesInstanceUID = seriesInstanceUid;
-    this._experimentID = sessionMap[this._seriesInstanceUID].experimentId;
+    this._experimentID = sessionMap.get(
+      this._seriesInstanceUID,
+      "experimentId"
+    );
     this._label = label;
     this._UID = generateUID();
     this._ID = this._generateCollectionId();

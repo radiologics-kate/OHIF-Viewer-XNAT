@@ -1,3 +1,0 @@
-const sessionMap = {};
-
-export { sessionMap };

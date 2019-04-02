@@ -1,5 +1,6 @@
 import messageDialog from "./messageDialog.js";
-import { icrXnatRoiSession, sessionMap } from "meteor/icr:xnat-roi-namespace";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
 /**
@@ -28,8 +29,10 @@ export function displayExportFailedDialog() {
 export function displayInsufficientPermissionsDialog() {
   const title = "Insufficient Permissions";
 
-  const experimentLabel =
-    sessionMap[SeriesInfoProvider.getActiveSeriesInstanceUid()].experimentLabel;
+  const experimentLabel = sessionMap.get(
+    SeriesInfoProvider.getActiveSeriesInstanceUid(),
+    "experimentLabel"
+  );
 
   const body =
     `You do not have the required permissions to write ROI Collections to ${icrXnatRoiSession.get(

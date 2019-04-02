@@ -1,7 +1,10 @@
 import React from "react";
 import XNATSessionLabel from "./XNATSessionLabel.js";
 import fetchJSON from "../../../helpers/fetchJSON.js";
+import navigateConfirmationContent from "../../../helpers/navigateConfirmationContent.js";
+import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import awaitConfirmationDialog from "../../../../../../../lib/IO/awaitConfirmationDialog.js";
 
 export default class XNATSession extends React.Component {
   constructor(props) {
@@ -68,11 +71,32 @@ export default class XNATSession extends React.Component {
     );
   }
 
-  onViewSessionClick() {
+  async onViewSessionClick() {
     if (this.state.active) {
       return;
     }
 
+    const unsavedRegions = getUnsavedRegions();
+
+    console.log(unsavedRegions);
+
+    if (unsavedRegions.hasUnsavedRegions) {
+      console.log(unsavedRegions);
+
+      const content = navigateConfirmationContent(unsavedRegions);
+
+      awaitConfirmationDialog(content).then(result => {
+        if (result === true) {
+          this._loadRoute();
+        }
+      });
+      return;
+    } else {
+      this._loadRoute();
+    }
+  }
+
+  _loadRoute() {
     const { projectId, subjectId, ID, label, parentProjectId } = this.props;
     let params = `?subjectId=${subjectId}&projectId=${projectId}&experimentId=${ID}&experimentLabel=${label}`;
 
