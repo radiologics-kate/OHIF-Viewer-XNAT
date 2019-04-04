@@ -25,7 +25,6 @@ export default class XNATSubject extends React.Component {
       this.props.ID === icrXnatRoiSession.get("subjectId") &&
       icrXnatRoiSession.get("experimentId") === undefined;
 
-    console.log(`subjectViewActive: ${subjectViewActive}`);
     const shared = this.props.parentProjectId !== this.props.projectId;
 
     this.state = {
@@ -71,7 +70,6 @@ export default class XNATSubject extends React.Component {
         }
 
         const sessions = result.ResultSet.Result;
-        console.log(sessions);
 
         sessions.sort((a, b) => compareOnProperty(a, b, "label"));
 
@@ -92,11 +90,7 @@ export default class XNATSubject extends React.Component {
 
     const unsavedRegions = getUnsavedRegions();
 
-    console.log(unsavedRegions);
-
     if (unsavedRegions.hasUnsavedRegions) {
-      console.log(unsavedRegions);
-
       const content = navigateConfirmationContent(unsavedRegions);
 
       awaitConfirmationDialog(content).then(result => {
@@ -109,7 +103,6 @@ export default class XNATSubject extends React.Component {
       if (this.state.fetched) {
         this._checkJSONandloadRoute();
       } else {
-        console.log("fetching sessions...");
         this.fetchData().then(() => this._checkJSONandloadRoute());
       }
     }
@@ -121,8 +114,6 @@ export default class XNATSubject extends React.Component {
 
     const promises = [];
 
-    console.log("_checkJSONandloadRoute...");
-
     for (let i = 0; i < sessions.length; i++) {
       const cancelablePromise = checkSessionJSONExists(
         projectId,
@@ -130,17 +121,11 @@ export default class XNATSubject extends React.Component {
         sessions[i].ID
       );
 
-      console.log(sessions[i].ID);
-
       this._cancelablePromises.push(cancelablePromise);
       promises.push(cancelablePromise.promise);
     }
 
-    console.log(promises);
-
     Promise.all(promises).then(results => {
-      console.log(results);
-
       if (results.some(result => !result)) {
         this._generateSessionMetadata(results);
       } else {
@@ -152,9 +137,6 @@ export default class XNATSubject extends React.Component {
   _generateSessionMetadata(sessionsWithMetadata) {
     const { projectId, label } = this.props;
     const { sessions } = this.state;
-
-    console.log("_generateSessionMetadata");
-
     const sessionJSONToGenerate = [];
 
     for (let i = 0; i < sessionsWithMetadata.length; i++) {
@@ -162,9 +144,6 @@ export default class XNATSubject extends React.Component {
         sessionJSONToGenerate.push(sessions[i].ID);
       }
     }
-
-    console.log("sessionJSONToGenerate:");
-    console.log(sessionJSONToGenerate);
 
     let jsonGenerated = 0;
 
@@ -179,8 +158,6 @@ export default class XNATSubject extends React.Component {
     const promises = [];
 
     for (let i = 0; i < sessionJSONToGenerate.length; i++) {
-      console.log(sessionJSONToGenerate[i]);
-
       const cancelablePromise = fetchJSON(
         `/xapi/viewer/projects/${projectId}/experiments/${
           sessionJSONToGenerate[i]
@@ -197,7 +174,6 @@ export default class XNATSubject extends React.Component {
             sessionJSONToGenerate.length
           } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
         });
-        console.log(jsonGenerated);
       });
     }
 
@@ -214,11 +190,7 @@ export default class XNATSubject extends React.Component {
       params += `&parentProjectId=${parentProjectId}`;
     }
 
-    const url = `${Session.get("rootUrl")}/VIEWER${params}`;
-
-    console.log(url);
-
-    window.location.href = url;
+    window.location.href = `${Session.get("rootUrl")}/VIEWER${params}`;
   }
 
   _getSubjectButtonClassNames() {

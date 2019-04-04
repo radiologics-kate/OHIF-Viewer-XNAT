@@ -80,11 +80,7 @@ export default class XNATSession extends React.Component {
 
     const unsavedRegions = getUnsavedRegions();
 
-    console.log(unsavedRegions);
-
     if (unsavedRegions.hasUnsavedRegions) {
-      console.log(unsavedRegions);
-
       const content = navigateConfirmationContent(unsavedRegions);
 
       awaitConfirmationDialog(content).then(result => {
@@ -125,11 +121,7 @@ export default class XNATSession extends React.Component {
       params += `&parentProjectId=${parentProjectId}`;
     }
 
-    const url = `${Session.get("rootUrl")}/VIEWER${params}`;
-
-    console.log(url);
-
-    window.location.href = url;
+    window.location.href = `${Session.get("rootUrl")}/VIEWER${params}`;
   }
 
   _generateSessionMetadata() {
@@ -149,9 +141,6 @@ export default class XNATSession extends React.Component {
 
     cancelablePromise.promise
       .then(result => {
-        console.log("generatedJSON:");
-        console.log(result);
-
         if (result) {
           this._loadRoute();
         } else {
@@ -194,7 +183,6 @@ export default class XNATSession extends React.Component {
             assessor => assessor.xsiType === "icr:roiCollectionData"
           )
         ) {
-          console.log("has ROIs!");
           this.setState({ hasRois: true });
         }
 
