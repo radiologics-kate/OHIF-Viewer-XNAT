@@ -64,16 +64,40 @@ export default class XNATSessionLabel extends React.Component {
         <h6>
           {contourCount ? (
             <>
-              <svg stroke="#fff" width="16" height="16">
-                <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu" />
+              <svg
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                stroke="#ffffff"
+                width="16"
+                height="16"
+                viewBox="0 0 18 18"
+                xmlSpace="preserve"
+                preserveAspectRatio="xMidYMid meet"
+                x="0px"
+                y="0px"
+              >
+                <use xlinkHref="packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu" />
               </svg>
               {` ${contourCount}  `}
             </>
           ) : null}
           {maskCount ? (
             <>
-              <svg stroke="#fff" width="16" height="16">
-                <use href="packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu" />
+              <svg
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                stroke="#ffffff"
+                width="16"
+                height="16"
+                viewBox="0 0 18 18"
+                xmlSpace="preserve"
+                preserveAspectRatio="xMidYMid meet"
+                x="0px"
+                y="0px"
+              >
+                <use xlinkHref="packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu" />
               </svg>
               {` ${maskCount} `}
             </>

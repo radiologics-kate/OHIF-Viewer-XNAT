@@ -1,8 +1,8 @@
 import { RoiImporter } from "./RoiImporter.js";
-import closeIODialog from "../IO/closeIODialog.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import progressDialog from "../util/progressDialog.js";
 
 /**
  * @abstract @class AsyncFetcher
@@ -21,7 +21,6 @@ export class AsyncFetcher {
     );
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = "";
-    this._progressDialog = document.getElementById("importVolumes");
     this._validTypes = validTypes;
   }
 
@@ -161,7 +160,7 @@ export class AsyncFetcher {
    */
   _openProgressDialog() {
     this._updateProgressDialog();
-    this._progressDialog.showModal();
+    progressDialog.show();
   }
 
   /**
@@ -239,7 +238,7 @@ export class AsyncFetcher {
     this._updateProgressDialog();
 
     if (this._numCollectionsParsed === this._numCollectionsToParse) {
-      this._progressDialog.close();
+      progressDialog.close();
     }
   }
 
@@ -358,16 +357,13 @@ export class AsyncFetcher {
    *
    */
   _updateProgressDialog() {
-    const ioNotificationText = `Importing ROI Collection: ${
-      this._roiCollectionLabel
-    }. This may take a while...`;
-    const ioProgressText = `${this._numCollectionsParsed}/${
-      this._numCollectionsToParse
-    } <i class="fa fa-spin fa-circle-o-notch fa-fw">`;
-
-    document.getElementById(
-      "ioNotificationText"
-    ).innerHTML = ioNotificationText;
-    document.getElementById("ioProgressText").innerHTML = ioProgressText;
+    progressDialog.update({
+      notificationText: `Importing ROI Collection: ${
+        this._roiCollectionLabel
+      }. This may take a while...`,
+      progressText: `${this._numCollectionsParsed}/${
+        this._numCollectionsToParse
+      } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
+    });
   }
 }

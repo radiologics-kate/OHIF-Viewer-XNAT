@@ -1,10 +1,12 @@
 import React from "react";
 import XNATSessionLabel from "./XNATSessionLabel.js";
 import fetchJSON from "../../../helpers/fetchJSON.js";
+import checkSessionJSONExists from "../../../helpers/checkSessionJSONExists.js";
 import navigateConfirmationContent from "../../../helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import awaitConfirmationDialog from "../../../../../../../lib/IO/awaitConfirmationDialog.js";
+import progressDialog from "../../../../../../../lib/util/progressDialog.js";
 
 export default class XNATSession extends React.Component {
   constructor(props) {
@@ -87,17 +89,36 @@ export default class XNATSession extends React.Component {
 
       awaitConfirmationDialog(content).then(result => {
         if (result === true) {
-          this._loadRoute();
+          this._checkJSONandloadRoute();
         }
       });
       return;
     } else {
-      this._loadRoute();
+      this._checkJSONandloadRoute();
     }
+  }
+
+  _checkJSONandloadRoute() {
+    const { projectId, subjectId, ID } = this.props;
+    const cancelablePromise = checkSessionJSONExists(projectId, subjectId, ID);
+
+    this._cancelablePromises.push(cancelablePromise);
+
+    cancelablePromise.promise
+      .then(result => {
+        if (result === true) {
+          this._loadRoute();
+        } else {
+          this._generateSessionMetadata();
+        }
+      })
+      .catch(err => console.log(err));
   }
 
   _loadRoute() {
     const { projectId, subjectId, ID, label, parentProjectId } = this.props;
+    const rootUrl = Session.get("rootUrl");
+
     let params = `?subjectId=${subjectId}&projectId=${projectId}&experimentId=${ID}&experimentLabel=${label}`;
 
     if (parentProjectId !== projectId) {
@@ -105,12 +126,40 @@ export default class XNATSession extends React.Component {
       params += `&parentProjectId=${parentProjectId}`;
     }
 
-    const rootUrl = Session.get("rootUrl");
     const url = `${rootUrl}/VIEWER${params}`;
 
     console.log(url);
 
     window.location.href = url;
+  }
+
+  _generateSessionMetadata() {
+    const { projectId, subjectId, ID, label } = this.props;
+    const rootUrl = Session.get("rootUrl");
+
+    // Generate metadata
+    progressDialog.show({
+      notificationText: `generating metadata for ${label}...`
+    });
+
+    const cancelablePromise = fetchJSON(
+      `/xapi/viewer/projects/${projectId}/experiments/${ID}`
+    );
+
+    this._cancelablePromises.push(cancelablePromise);
+
+    cancelablePromise.promise
+      .then(result => {
+        console.log("generatedJSON:");
+        console.log(result);
+
+        if (result) {
+          this._loadRoute();
+        } else {
+          progressDialog.close();
+        }
+      })
+      .catch(err => console.log(err));
   }
 
   _getSessionButtonClassNames() {
