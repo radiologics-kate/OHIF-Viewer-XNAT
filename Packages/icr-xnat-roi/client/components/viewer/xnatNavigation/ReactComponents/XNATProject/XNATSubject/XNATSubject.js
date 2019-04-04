@@ -3,6 +3,7 @@ import XNATSubjectLabel from "./XNATSubjectLabel.js";
 import XNATSessionList from "./XNATSession/XNATSessionList.js";
 import { Router } from "meteor/clinical:router";
 import fetchJSON from "../../helpers/fetchJSON.js";
+import checkSessionJSONExists from "../../helpers/checkSessionJSONExists.js";
 import onExpandIconClick from "../../helpers/onExpandIconClick.js";
 import getExpandIcon from "../../helpers/getExpandIcon.js";
 import compareOnProperty from "../../helpers/compareOnProperty.js";
@@ -10,6 +11,7 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import navigateConfirmationContent from "../../helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import awaitConfirmationDialog from "../../../../../../lib/IO/awaitConfirmationDialog.js";
+import progressDialog from "../../../../../../lib/util/progressDialog.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {
@@ -39,23 +41,30 @@ export default class XNATSubject extends React.Component {
 
     this.getExpandIcon = getExpandIcon.bind(this);
     this.onExpandIconClick = onExpandIconClick.bind(this);
+
+    this._cancelablePromises = [];
   }
 
   componentWillUnmount() {
-    if (this._cancelablePromise) {
-      console.log("canceling promise");
-      this._cancelablePromise.cancel();
+    const cancelablePromises = this._cancelablePromises;
+
+    for (let i = 0; i < cancelablePromises.length; i++) {
+      if (typeof cancelablePromises[i].cancel === "function") {
+        cancelablePromises[i].cancel();
+      }
     }
   }
 
   fetchData() {
-    this._cancelablePromise = fetchJSON(
+    const cancelablePromise = fetchJSON(
       `/data/archive/projects/${this.props.projectId}/subjects/${
         this.props.ID
       }/experiments?format=json`
     );
 
-    this._cancelablePromise.promise
+    this._cancelablePromises.push(cancelablePromise);
+
+    cancelablePromise.promise
       .then(result => {
         if (!result) {
           return;
@@ -72,6 +81,8 @@ export default class XNATSubject extends React.Component {
         });
       })
       .catch(err => console.log(err));
+
+    return cancelablePromise.promise;
   }
 
   onViewSubjectClick() {
@@ -90,13 +101,109 @@ export default class XNATSubject extends React.Component {
 
       awaitConfirmationDialog(content).then(result => {
         if (result === true) {
-          this._loadRoute();
+          this._checkJSONandloadRoute();
         }
       });
       return;
     } else {
-      this._loadRoute();
+      if (this.state.fetched) {
+        this._checkJSONandloadRoute();
+      } else {
+        console.log("fetching sessions...");
+        this.fetchData().then(() => this._checkJSONandloadRoute());
+      }
     }
+  }
+
+  _checkJSONandloadRoute() {
+    const { projectId, ID } = this.props;
+    const { sessions } = this.state;
+
+    const promises = [];
+
+    console.log("_checkJSONandloadRoute...");
+
+    for (let i = 0; i < sessions.length; i++) {
+      const cancelablePromise = checkSessionJSONExists(
+        projectId,
+        ID,
+        sessions[i].ID
+      );
+
+      console.log(sessions[i].ID);
+
+      this._cancelablePromises.push(cancelablePromise);
+      promises.push(cancelablePromise.promise);
+    }
+
+    console.log(promises);
+
+    Promise.all(promises).then(results => {
+      console.log(results);
+
+      if (results.some(result => !result)) {
+        this._generateSessionMetadata(results);
+      } else {
+        this._loadRoute();
+      }
+    });
+  }
+
+  _generateSessionMetadata(sessionsWithMetadata) {
+    const { projectId, label } = this.props;
+    const { sessions } = this.state;
+
+    console.log("_generateSessionMetadata");
+
+    const sessionJSONToGenerate = [];
+
+    for (let i = 0; i < sessionsWithMetadata.length; i++) {
+      if (!sessionsWithMetadata[i]) {
+        sessionJSONToGenerate.push(sessions[i].ID);
+      }
+    }
+
+    console.log("sessionJSONToGenerate:");
+    console.log(sessionJSONToGenerate);
+
+    let jsonGenerated = 0;
+
+    // Generate metadata
+    progressDialog.show({
+      notificationText: `generating metadata for ${label}...`,
+      progressText: `${jsonGenerated}/${
+        sessionJSONToGenerate.length
+      } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
+    });
+
+    const promises = [];
+
+    for (let i = 0; i < sessionJSONToGenerate.length; i++) {
+      console.log(sessionJSONToGenerate[i]);
+
+      const cancelablePromise = fetchJSON(
+        `/xapi/viewer/projects/${projectId}/experiments/${
+          sessionJSONToGenerate[i]
+        }`
+      );
+
+      promises.push(cancelablePromise.promise);
+
+      cancelablePromise.promise.then(() => {
+        jsonGenerated++;
+        progressDialog.update({
+          notificationText: `generating metadata for ${label}...`,
+          progressText: `${jsonGenerated}/${
+            sessionJSONToGenerate.length
+          } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
+        });
+        console.log(jsonGenerated);
+      });
+    }
+
+    Promise.all(promises).then(() => {
+      this._loadRoute();
+    });
   }
 
   _loadRoute() {
@@ -107,8 +214,7 @@ export default class XNATSubject extends React.Component {
       params += `&parentProjectId=${parentProjectId}`;
     }
 
-    const rootUrl = Session.get("rootUrl");
-    const url = `${rootUrl}/VIEWER${params}`;
+    const url = `${Session.get("rootUrl")}/VIEWER${params}`;
 
     console.log(url);
 

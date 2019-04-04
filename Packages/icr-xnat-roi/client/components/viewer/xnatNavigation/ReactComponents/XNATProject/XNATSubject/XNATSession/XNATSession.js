@@ -117,7 +117,6 @@ export default class XNATSession extends React.Component {
 
   _loadRoute() {
     const { projectId, subjectId, ID, label, parentProjectId } = this.props;
-    const rootUrl = Session.get("rootUrl");
 
     let params = `?subjectId=${subjectId}&projectId=${projectId}&experimentId=${ID}&experimentLabel=${label}`;
 
@@ -126,7 +125,7 @@ export default class XNATSession extends React.Component {
       params += `&parentProjectId=${parentProjectId}`;
     }
 
-    const url = `${rootUrl}/VIEWER${params}`;
+    const url = `${Session.get("rootUrl")}/VIEWER${params}`;
 
     console.log(url);
 
