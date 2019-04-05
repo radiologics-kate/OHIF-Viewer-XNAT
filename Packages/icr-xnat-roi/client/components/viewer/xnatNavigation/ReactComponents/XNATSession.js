@@ -1,12 +1,11 @@
 import React from "react";
 import XNATSessionLabel from "./XNATSessionLabel.js";
 import fetchJSON from "./helpers/fetchJSON.js";
-import checkSessionJSONExists from "./helpers/checkSessionJSONExists.js";
+import SessionRouter from "./helpers/SessionRouter.js";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import awaitConfirmationDialog from "../../../../lib/IO/awaitConfirmationDialog.js";
-import progressDialog from "../../../../lib/util/progressDialog.js";
 
 export default class XNATSession extends React.Component {
   constructor(props) {
@@ -31,9 +30,17 @@ export default class XNATSession extends React.Component {
 
     this._cancelablePromises = [];
 
+    console.log(this);
+
     this._fetchROICollectionInfo();
   }
 
+  /**
+   * componentWillUnmount - If any promises are active, cancel them to avoid
+   * memory leakage by referencing `this`.
+   *
+   * @returns {null}
+   */
   componentWillUnmount() {
     const cancelablePromises = this._cancelablePromises;
 
@@ -42,35 +49,6 @@ export default class XNATSession extends React.Component {
         cancelablePromises[i].cancel();
       }
     }
-  }
-
-  render() {
-    const { ID, label, parentProjectId } = this.props;
-    const { active, shared, hasRois, maskCount, contourCount } = this.state;
-    const sessionButtonClassNames = this._getSessionButtonClassNames();
-
-    return (
-      <>
-        <div className="xnat-nav-horizontal-box">
-          <a
-            className={sessionButtonClassNames}
-            onClick={this.onViewSessionClick}
-          >
-            <i className="fa fa-eye" />
-          </a>
-          <XNATSessionLabel
-            ID={ID}
-            label={label}
-            active={active}
-            shared={shared}
-            parentProjectId={parentProjectId}
-            hasRois={hasRois}
-            maskCount={maskCount}
-            contourCount={contourCount}
-          />
-        </div>
-      </>
-    );
   }
 
   async onViewSessionClick() {
@@ -85,71 +63,42 @@ export default class XNATSession extends React.Component {
 
       awaitConfirmationDialog(content).then(result => {
         if (result === true) {
-          this._checkJSONandloadRoute();
+          this._routeToSessionView();
         }
       });
       return;
     } else {
-      this._checkJSONandloadRoute();
+      this._routeToSessionView();
     }
   }
 
-  _checkJSONandloadRoute() {
-    const { projectId, subjectId, ID } = this.props;
-    const cancelablePromise = checkSessionJSONExists(projectId, subjectId, ID);
+  /**
+   * _routeToSessionView - Initialise Router and route to new session view.
+   *
+   * @returns {null}
+   */
+  _routeToSessionView() {
+    const { projectId, parentProjectId, subjectId, ID, label } = this.props;
 
-    this._cancelablePromises.push(cancelablePromise);
+    console.log(this.props);
+    console.log(subjectId);
 
-    cancelablePromise.promise
-      .then(result => {
-        if (result === true) {
-          this._loadRoute();
-        } else {
-          this._generateSessionMetadata();
-        }
-      })
-      .catch(err => console.log(err));
-  }
-
-  _loadRoute() {
-    const { projectId, subjectId, ID, label, parentProjectId } = this.props;
-
-    let params = `?subjectId=${subjectId}&projectId=${projectId}&experimentId=${ID}&experimentLabel=${label}`;
-
-    if (parentProjectId !== projectId) {
-      //Shared Project
-      params += `&parentProjectId=${parentProjectId}`;
-    }
-
-    window.location.href = `${Session.get("rootUrl")}/VIEWER${params}`;
-  }
-
-  _generateSessionMetadata() {
-    const { projectId, subjectId, ID, label } = this.props;
-    const rootUrl = Session.get("rootUrl");
-
-    // Generate metadata
-    progressDialog.show({
-      notificationText: `generating metadata for ${label}...`
-    });
-
-    const cancelablePromise = fetchJSON(
-      `/xapi/viewer/projects/${projectId}/experiments/${ID}`
+    subjectRouter = new SessionRouter(
+      projectId,
+      parentProjectId,
+      subjectId,
+      ID,
+      label
     );
-
-    this._cancelablePromises.push(cancelablePromise);
-
-    cancelablePromise.promise
-      .then(result => {
-        if (result) {
-          this._loadRoute();
-        } else {
-          progressDialog.close();
-        }
-      })
-      .catch(err => console.log(err));
+    subjectRouter.go();
   }
 
+  /**
+   * _getSessionButtonClassNames - Returns the class names for the subject
+   * button based on state.
+   *
+   * @returns {string}  A string of the classnames.
+   */
   _getSessionButtonClassNames() {
     let sessionButtonClassNames =
       "btn btn-sm btn-primary xnat-nav-button xnat-nav-session";
@@ -161,6 +110,12 @@ export default class XNATSession extends React.Component {
     return sessionButtonClassNames;
   }
 
+  /**
+   * _fetchROICollectionInfo - Fetches the list of ROICollections, and counts up
+   * the number of contour and mask based segmentations.
+   *
+   * @returns {null}
+   */
   _fetchROICollectionInfo() {
     const cancelablePromise = fetchJSON(
       `/data/archive/projects/${this.props.projectId}/subjects/${
@@ -234,5 +189,34 @@ export default class XNATSession extends React.Component {
         contourCount
       });
     });
+  }
+
+  render() {
+    const { ID, label, parentProjectId } = this.props;
+    const { active, shared, hasRois, maskCount, contourCount } = this.state;
+    const sessionButtonClassNames = this._getSessionButtonClassNames();
+
+    return (
+      <>
+        <div className="xnat-nav-horizontal-box">
+          <a
+            className={sessionButtonClassNames}
+            onClick={this.onViewSessionClick}
+          >
+            <i className="fa fa-eye" />
+          </a>
+          <XNATSessionLabel
+            ID={ID}
+            label={label}
+            active={active}
+            shared={shared}
+            parentProjectId={parentProjectId}
+            hasRois={hasRois}
+            maskCount={maskCount}
+            contourCount={contourCount}
+          />
+        </div>
+      </>
+    );
   }
 }

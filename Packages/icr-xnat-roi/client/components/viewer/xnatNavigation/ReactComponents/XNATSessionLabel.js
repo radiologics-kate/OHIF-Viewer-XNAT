@@ -5,24 +5,6 @@ export default class XNATSessionLabel extends React.Component {
     super(props);
   }
 
-  render() {
-    const { shared, parentProjectId } = this.props;
-
-    const sharedLabel = shared ? (
-      <>
-        <h6 className="xnat-nav-shared">{`Shared from ${parentProjectId}`}</h6>
-      </>
-    ) : null;
-
-    return (
-      <div>
-        {this._headerLabel()}
-        {this._roiCollectionCountLabel()}
-        {sharedLabel}
-      </div>
-    );
-  }
-
   _headerLabel() {
     const { label, ID, active } = this.props;
 
@@ -104,6 +86,24 @@ export default class XNATSessionLabel extends React.Component {
           ) : null}
         </h6>
       </>
+    );
+  }
+
+  render() {
+    const { shared, parentProjectId } = this.props;
+
+    const sharedLabel = shared ? (
+      <>
+        <h6 className="xnat-nav-shared">{`Shared from ${parentProjectId}`}</h6>
+      </>
+    ) : null;
+
+    return (
+      <div>
+        {this._headerLabel()}
+        {this._roiCollectionCountLabel()}
+        {sharedLabel}
+      </div>
     );
   }
 }

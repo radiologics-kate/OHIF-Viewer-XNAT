@@ -1,9 +1,8 @@
 import React from "react";
 import XNATSubjectLabel from "./XNATSubjectLabel.js";
-import XNATSessionList from "./XNATSession/XNATSessionList.js";
-import { Router } from "meteor/clinical:router";
-import fetchJSON from "../../helpers/fetchJSON.js";
-import checkSessionJSONExists from "./helpers/checkSessionJSONExists.js";
+import XNATSessionList from "./XNATSessionList.js";
+import SubjectRouter from "./helpers/SubjectRouter.js";
+import fetchJSON from "./helpers/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
@@ -42,6 +41,8 @@ export default class XNATSubject extends React.Component {
     this.onExpandIconClick = onExpandIconClick.bind(this);
 
     this._cancelablePromises = [];
+
+    console.log(this);
   }
 
   componentWillUnmount() {
@@ -54,6 +55,11 @@ export default class XNATSubject extends React.Component {
     }
   }
 
+  /**
+   * fetchData - Fetches the Subject's list of sessions.
+   *
+   * @returns {Object} A cancelablePromise.
+   */
   fetchData() {
     const cancelablePromise = fetchJSON(
       `/data/archive/projects/${this.props.projectId}/subjects/${
@@ -83,6 +89,12 @@ export default class XNATSubject extends React.Component {
     return cancelablePromise.promise;
   }
 
+  /**
+   * onViewSubjectClick - Check if there are any unsaved annotations and warn
+   * the user if there. Then route to subject view.
+   *
+   * @returns {type}  description
+   */
   onViewSubjectClick() {
     if (this.state.subjectViewActive) {
       return;
@@ -95,104 +107,44 @@ export default class XNATSubject extends React.Component {
 
       awaitConfirmationDialog(content).then(result => {
         if (result === true) {
-          this._checkJSONandloadRoute();
+          this._routeToSubjectView();
         }
       });
       return;
     } else {
       if (this.state.fetched) {
-        this._checkJSONandloadRoute();
+        this._routeToSubjectView();
       } else {
-        this.fetchData().then(() => this._checkJSONandloadRoute());
+        this.fetchData().then(() => this._routeToSubjectView());
       }
     }
   }
 
-  _checkJSONandloadRoute() {
-    const { projectId, ID } = this.props;
+  /**
+   * _routeToSubjectView - Initialise Router and route to new subject view.
+   *
+   * @returns {null}
+   */
+  _routeToSubjectView() {
+    const { projectId, parentProjectId, ID, label } = this.props;
     const { sessions } = this.state;
 
-    const promises = [];
-
-    for (let i = 0; i < sessions.length; i++) {
-      const cancelablePromise = checkSessionJSONExists(
-        projectId,
-        ID,
-        sessions[i].ID
-      );
-
-      this._cancelablePromises.push(cancelablePromise);
-      promises.push(cancelablePromise.promise);
-    }
-
-    Promise.all(promises).then(results => {
-      if (results.some(result => !result)) {
-        this._generateSessionMetadata(results);
-      } else {
-        this._loadRoute();
-      }
-    });
+    subjectRouter = new SubjectRouter(
+      projectId,
+      parentProjectId,
+      ID,
+      label,
+      sessions
+    );
+    subjectRouter.go();
   }
 
-  _generateSessionMetadata(sessionsWithMetadata) {
-    const { projectId, label } = this.props;
-    const { sessions } = this.state;
-    const sessionJSONToGenerate = [];
-
-    for (let i = 0; i < sessionsWithMetadata.length; i++) {
-      if (!sessionsWithMetadata[i]) {
-        sessionJSONToGenerate.push(sessions[i].ID);
-      }
-    }
-
-    let jsonGenerated = 0;
-
-    // Generate metadata
-    progressDialog.show({
-      notificationText: `generating metadata for ${label}...`,
-      progressText: `${jsonGenerated}/${
-        sessionJSONToGenerate.length
-      } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
-    });
-
-    const promises = [];
-
-    for (let i = 0; i < sessionJSONToGenerate.length; i++) {
-      const cancelablePromise = fetchJSON(
-        `/xapi/viewer/projects/${projectId}/experiments/${
-          sessionJSONToGenerate[i]
-        }`
-      );
-
-      promises.push(cancelablePromise.promise);
-
-      cancelablePromise.promise.then(() => {
-        jsonGenerated++;
-        progressDialog.update({
-          notificationText: `generating metadata for ${label}...`,
-          progressText: `${jsonGenerated}/${
-            sessionJSONToGenerate.length
-          } <i class="fa fa-spin fa-circle-o-notch fa-fw">`
-        });
-      });
-    }
-
-    Promise.all(promises).then(() => {
-      this._loadRoute();
-    });
-  }
-
-  _loadRoute() {
-    const { ID, projectId, parentProjectId } = this.props;
-    let params = `?subjectId=${ID}&projectId=${projectId}`;
-
-    if (parentProjectId !== projectId) {
-      params += `&parentProjectId=${parentProjectId}`;
-    }
-
-    window.location.href = `${Session.get("rootUrl")}/VIEWER${params}`;
-  }
-
+  /**
+   * _getSubjectButtonClassNames - Returns the class names for the subject
+   * button based on state.
+   *
+   * @returns {string}  A string of the classnames.
+   */
   _getSubjectButtonClassNames() {
     let subjectButtonClassNames = "btn btn-sm btn-primary xnat-nav-button";
 
