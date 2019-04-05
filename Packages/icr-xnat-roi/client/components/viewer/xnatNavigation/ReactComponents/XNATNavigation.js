@@ -1,6 +1,6 @@
 import React from "react";
 import XNATProjectList from "./XNATProjectList.js";
-import XNATProject from "./XNATProject/XNATProject.js";
+import XNATProject from "./XNATProject.js";
 import fetchJSON from "./helpers/fetchJSON.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
@@ -14,6 +14,11 @@ export default class XNATNavigation extends React.Component {
     };
   }
 
+  /**
+   * componentDidMount - On mounting, fetch a list of available projects from XNAT.
+   *
+   * @returns {type}  description
+   */
   componentDidMount() {
     fetchJSON("/data/archive/projects/?format=json")
       .promise.then(result => {

@@ -1,5 +1,5 @@
 import React from "react";
-import XNATProject from "./XNATProject/XNATProject.js";
+import XNATProject from "./XNATProject.js";
 
 export default class XNATProjectList extends React.Component {
   constructor(props = {}) {
