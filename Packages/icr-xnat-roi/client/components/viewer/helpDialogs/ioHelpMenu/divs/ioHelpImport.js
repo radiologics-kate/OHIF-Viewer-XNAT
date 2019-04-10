@@ -13,8 +13,5 @@ Template.ioHelpImport.helpers({
   },
   projectId: () => {
     return sessionMap.get("session", "projectId");
-  },
-  experimentLabel: () => {
-    return sessionMap.get("session", "experimentLabel");
   }
 });

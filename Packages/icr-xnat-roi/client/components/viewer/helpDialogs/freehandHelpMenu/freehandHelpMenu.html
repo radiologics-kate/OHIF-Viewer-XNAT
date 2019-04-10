@@ -20,6 +20,11 @@
           <a class="sub-help-button js-help-toggle-stats btn btn-sm btn-primary">
             <i id="fontAwesomeIcon" class="{{pressed 'Stats ON/OFF'}} fa fa-commenting fa-2x"></i>
           </a>
+          <a class="sub-help-button js-help-interpolate btn btn-sm btn-primary">
+            <svg class={{pressed 'Interpolate'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on"}}></use>
+            </svg>
+          </a>
         </div>
 
         <div class="sub-help-title">
@@ -36,6 +41,8 @@
           {{>freehandHelpVolumes}}
         {{else if showFreehandHelp 'Stats ON/OFF'}}
           {{>freehandHelpToggleStats}}
+        {{else if showFreehandHelp 'Interpolate'}}
+          {{>freehandHelpInterpolate}}
         {{/if}}
       </div>
 

@@ -174,6 +174,11 @@ Package.onUse(function(api) {
     "client"
   );
 
+  api.addFiles(
+    "client/components/viewer/helpDialogs/freehandHelpMenu/divs/freehandHelpInterpolate.html",
+    "client"
+  );
+
   // -- Brush
   api.addFiles(
     "client/components/viewer/helpDialogs/brushHelpMenu/brushHelpMenu.html",
