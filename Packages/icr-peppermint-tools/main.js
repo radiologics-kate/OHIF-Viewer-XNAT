@@ -28,8 +28,10 @@ export {
   default as volumeManagement
 } from "./client/lib/util/volumeManagement.js";
 export { default as segManagement } from "./client/lib/util/segManagement.js";
+export {
+  default as lockStructureSet
+} from "./client/lib/util/lockStructureSet.js";
 export { getNextColor } from "./client/lib/modules/freehand3DModule.js";
-
 export {
   default as getUnsavedRegions
 } from "./client/lib/util/getUnsavedRegions.js";

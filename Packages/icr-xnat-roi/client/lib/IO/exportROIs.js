@@ -8,6 +8,7 @@ import { AIMExporter } from "../classes/AIMExporter.js";
 import { roiCollectionBuilder } from "./roiCollectionBuilder.js";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { lockStructureSet } from "meteor/icr:peppermint-tools";
 import messageDialog from "../util/messageDialog.js";
 import {
   displayExportFailedDialog,
@@ -17,8 +18,8 @@ import localBackup from "./localBackup.js";
 
 const modules = cornerstoneTools.store.modules;
 const getToolState = cornerstoneTools.import("stateManagement/getToolState");
-const globalToolStateManager =
-  cornerstoneTools.globalImageIdSpecificToolStateManager;
+//const globalToolStateManager =
+//  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 /**
  * If the user has write permissions, begin export event. Otherwise notify the
@@ -81,7 +82,11 @@ async function beginExport() {
     .exportToXNAT()
     .then(success => {
       console.log("PUT successful.");
-      lockExportedROIs(
+      console.log(roiCollectionName);
+      console.log(lockStructureSet);
+
+      //lockExportedROIs(
+      lockStructureSet(
         exportMask,
         seriesInfo.seriesInstanceUid,
         roiCollectionName,
@@ -114,6 +119,7 @@ async function beginExport() {
  *                                    roiCollection.
  * @param {string} uid                The uid of the newly created roiCollection.
  */
+/*
 function lockExportedROIs(
   exportMask,
   seriesInstanceUid,
@@ -221,6 +227,7 @@ function lockExportedROIs(
     );
   }
 }
+*/
 
 /**
  * Extracts the seriesInstanceUid from an image, given the imageId.
@@ -229,10 +236,12 @@ function lockExportedROIs(
  * @author JamesAPetts
  * @param {String} imageId The ID of the image being queried.
  */
+/*
 function getSeriesInstanceUidFromImageId(imageId) {
   const metaData = OHIF.viewer.metadataProvider.getMetadata(imageId);
   return metaData.series.seriesInstanceUid;
 }
+*/
 
 /**
  * Moves the ROIs defined by the seriesInstanceUid, roiCollectionName
@@ -242,6 +251,7 @@ function getSeriesInstanceUidFromImageId(imageId) {
  * @param  {Object} exportData  An object containing the required information
  *                              to execute the move opperation.
  */
+/*
 function moveExportedPolygonsInInstance(exportData) {
   const freehand3DStore = modules.freehand3D;
 
@@ -277,6 +287,7 @@ function moveExportedPolygonsInInstance(exportData) {
     }
   }
 }
+*/
 
 /**
  * Opens dialog to notify the user there are no ROIs eligable for export.

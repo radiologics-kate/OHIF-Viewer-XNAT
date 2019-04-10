@@ -1,5 +1,5 @@
 Template.roiCollectionBuilderListItem.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 });
 
 Template.roiCollectionBuilderListItem.helpers({
@@ -29,7 +29,7 @@ Template.roiCollectionBuilderListItem.helpers({
     const checked = instance.data.checked.get();
 
     if (checked) {
-      return 'checked';
+      return "checked";
     }
 
     return;
@@ -37,14 +37,14 @@ Template.roiCollectionBuilderListItem.helpers({
 });
 
 Template.roiCollectionBuilderListItem.events({
-  'click .js-roi-check'(event) {
+  "click .js-roi-check"(event) {
     const instance = Template.instance();
     const data = instance.data;
     const checked = data.checked;
     const ROIContourIndex = data.index;
     const exportMask = data.exportMask;
 
-    checked.set(!checked.get());
+    checked.set(event.target.checked);
 
     exportMask[ROIContourIndex] = checked.get();
   }

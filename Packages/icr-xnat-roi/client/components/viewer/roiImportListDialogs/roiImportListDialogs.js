@@ -1,23 +1,22 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 Template.roiImportListDialogs.onRendered(() => {
-    const instance = Template.instance();
-    const id = 'roiImportListDialog';
+  const instance = Template.instance();
+  const id = "roiImportListDialog";
 
-    const dialog = instance.$('#' + id);
-    instance.data.dialog = dialog;
+  const dialog = instance.$("#" + id);
+  instance.data.dialog = dialog;
 
-    dialogPolyfill.registerDialog(dialog.get(0));
+  dialogPolyfill.registerDialog(dialog.get(0));
 });
 
 Template.roiImportListDialogs.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 
-    instance.data.selectAll = new ReactiveVar(true);
-    instance.data.importListReady = new ReactiveVar(false);
-    instance.data.importList = new ReactiveVar([]);
-    instance.data.importMask = [];
-
+  instance.data.selectAll = new ReactiveVar(true);
+  instance.data.importListReady = new ReactiveVar(false);
+  instance.data.importList = new ReactiveVar([]);
+  instance.data.importMask = [];
 });
 
 Template.roiImportListDialogs.helpers({
@@ -43,7 +42,7 @@ Template.roiImportListDialogs.helpers({
     const selectAll = instance.data.selectAll.get();
 
     if (selectAll) {
-      return 'checked';
+      return "checked";
     }
 
     return;
@@ -76,10 +75,11 @@ Template.roiImportListDialogs.helpers({
   }
 });
 
-
 Template.roiImportListDialogs.events({
-    'click .js-select-all-check'(event) {
-      const instance = Template.instance();
-      instance.data.selectAll.set(!instance.data.selectAll.get());
-    }
+  "click .js-select-all-check"(event) {
+    const instance = Template.instance();
+    const checked = event.target.checked;
+
+    instance.data.selectAll.set(checked);
+  }
 });

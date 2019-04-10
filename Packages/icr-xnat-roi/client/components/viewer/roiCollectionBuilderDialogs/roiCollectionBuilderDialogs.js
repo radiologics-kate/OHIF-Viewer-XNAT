@@ -1,16 +1,16 @@
-import { createNewVolume } from 'meteor/icr:peppermint-tools';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { createNewVolume } from "meteor/icr:peppermint-tools";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 const modules = cornerstoneTools.store.modules;
 
 Template.roiCollectionBuilderDialogs.onRendered(() => {
-    const instance = Template.instance();
-    const id = 'roiCollectionBuilderDialog';
+  const instance = Template.instance();
+  const id = "roiCollectionBuilderDialog";
 
-    const dialog = instance.$('#' + id);
-    instance.data.dialog = dialog;
+  const dialog = instance.$("#" + id);
+  instance.data.dialog = dialog;
 
-    dialogPolyfill.registerDialog(dialog.get(0));
+  dialogPolyfill.registerDialog(dialog.get(0));
 });
 
 Template.roiCollectionBuilderDialogs.onCreated(() => {
@@ -20,50 +20,55 @@ Template.roiCollectionBuilderDialogs.onCreated(() => {
 });
 
 Template.roiCollectionBuilderDialogs.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 
-    instance.data.selectAll = new ReactiveVar(true);
-    instance.data.exportMask = [];
+  instance.data.selectAll = new ReactiveVar(true);
+  instance.data.exportMask = [];
 
-    instance.data.getOrCreateStructureSetCollectionData = (seriesInstanceUid) => {
-      if (!seriesInstanceUid) {
-        return;
+  instance.data.getOrCreateStructureSetCollectionData = seriesInstanceUid => {
+    if (!seriesInstanceUid) {
+      return;
+    }
+
+    const freehand3DStore = modules.freehand3D;
+    let series = freehand3DStore.getters.series(seriesInstanceUid);
+
+    if (!series) {
+      freehand3DStore.setters.series(seriesInstanceUid);
+      series = freehand3DStore.getters.series(seriesInstanceUid);
+    }
+
+    const selectAll = instance.data.selectAll.get();
+
+    const defaultStructureSet = freehand3DStore.getters.structureSet(
+      seriesInstanceUid
+    );
+
+    const ROIContourCollection = defaultStructureSet.ROIContourCollection;
+
+    const dataArray = [];
+
+    for (let i = 0; i < ROIContourCollection.length; i++) {
+      if (
+        !ROIContourCollection[i] ||
+        ROIContourCollection[i].numPolygons === 0
+      ) {
+        continue;
       }
 
-      const freehand3DStore = modules.freehand3D;
-      let series = freehand3DStore.getters.series(seriesInstanceUid);
+      dataArray.push({
+        index: i,
+        ROIContourReference: ROIContourCollection[i],
+        structureSetReference: defaultStructureSet,
+        exportMask: instance.data.exportMask,
+        checked: new ReactiveVar(selectAll)
+      });
 
-      if (!series) {
-        freehand3DStore.setters.series(seriesInstanceUid);
-        series = freehand3DStore.getters.series(seriesInstanceUid);
-      }
+      instance.data.exportMask[i] = selectAll ? true : false;
+    }
 
-      const selectAll = instance.data.selectAll.get();
-
-      const defaultStructureSet = freehand3DStore.getters.structureSet(seriesInstanceUid);
-
-      const ROIContourCollection = defaultStructureSet.ROIContourCollection;
-
-      const dataArray = [];
-
-      for (let i = 0; i < ROIContourCollection.length; i++) {
-        if (!ROIContourCollection[i] || ROIContourCollection[i].numPolygons === 0) {
-          continue;
-        }
-
-        dataArray.push({
-          index: i,
-          ROIContourReference: ROIContourCollection[i],
-          structureSetReference: defaultStructureSet,
-          exportMask: instance.data.exportMask,
-          checked: new ReactiveVar(selectAll)
-        });
-
-        instance.data.exportMask[i] = selectAll ? true : false;
-      }
-
-      return dataArray;
-    };
+    return dataArray;
+  };
 });
 
 Template.roiCollectionBuilderDialogs.helpers({
@@ -72,7 +77,7 @@ Template.roiCollectionBuilderDialogs.helpers({
     const selectAll = instance.data.selectAll.get();
 
     if (selectAll) {
-      return 'checked';
+      return "checked";
     }
 
     return;
@@ -80,22 +85,25 @@ Template.roiCollectionBuilderDialogs.helpers({
   regions: () => {
     const instance = Template.instance();
 
-    console.log('regions recalc roiCollectionBuilder');
+    console.log("regions recalc roiCollectionBuilder");
 
     const seriesInstanceUid = instance.data.roiCollectionBuilderActiveSeries.get();
 
     // Reset the export Array
     instance.data.exportMask = [];
-    const volumeData = instance.data.getOrCreateStructureSetCollectionData(seriesInstanceUid);
+    const volumeData = instance.data.getOrCreateStructureSetCollectionData(
+      seriesInstanceUid
+    );
 
     return volumeData;
   }
 });
 
-
 Template.roiCollectionBuilderDialogs.events({
-    'click .js-select-all-check'(event) {
-      const instance = Template.instance();
-      instance.data.selectAll.set(!instance.data.selectAll.get());
-    }
+  "click .js-select-all-check"(event) {
+    const instance = Template.instance();
+    const checked = event.target.checked;
+
+    instance.data.selectAll.set(checked);
+  }
 });

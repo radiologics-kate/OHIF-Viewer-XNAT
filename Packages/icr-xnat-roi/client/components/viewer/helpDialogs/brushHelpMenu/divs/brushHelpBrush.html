@@ -1,10 +1,7 @@
 <template name="brushHelpBrush">
   <div>
     <p>
-      The brush tool allows you to draw pixel masks on images. If you are
-      drawing on a DICOM image segmentations you draw are allowed to overlap.
-      If you are drawing on a NIFTI image (not yet implemented), or editing an
-      imported NIFTI mask, then segmentations overwrite each other and my not overlap.
+      The brush tool allows you to draw pixel masks on images.
     </p>
 
     <h5>Painting with the brush</h5>
@@ -16,12 +13,5 @@
       <li>Ctrl + click with the brush to erase that mask color.</li>
       <li>Use the N key to quickly switch to the first unused segmentation color.</li>
     </ul>
-
-    <h5>Known issues</h5>
-    <p>
-      Masks do not render properly on rotated images. This is due to they way
-      the underlying library renders annotations. This should be possible to fix
-      in the future.
-    </p>
   </div>
 </template>

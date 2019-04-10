@@ -1,5 +1,5 @@
 Template.roiImportListItem.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 });
 
 Template.roiImportListItem.helpers({
@@ -27,7 +27,7 @@ Template.roiImportListItem.helpers({
     const checked = instance.data.checked.get();
 
     if (checked) {
-      return 'checked';
+      return "checked";
     }
 
     return;
@@ -35,15 +35,15 @@ Template.roiImportListItem.helpers({
 });
 
 Template.roiImportListItem.events({
-  'click .js-roi-check'(event) {
-    console.log('.js-roi-check');
+  "click .js-roi-check"(event) {
+    console.log(".js-roi-check");
     const instance = Template.instance();
     const data = instance.data;
     const checked = data.checked;
     const index = data.index;
     const importMask = data.importMask;
 
-    checked.set(!checked.get());
+    checked.set(event.target.checked);
 
     importMask[index] = checked.get();
   }

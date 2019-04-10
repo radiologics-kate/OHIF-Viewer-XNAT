@@ -257,6 +257,20 @@ function setStructureSetName(name, seriesInstanceUid, structureSetUid) {
   structureSet.name = name;
 }
 
+function setDeleteStructureSet(seriesInstanceUid, structureSetUid) {
+  const series = getSeries(seriesInstanceUid);
+
+  const structureSetCollection = series.structureSetCollection;
+
+  const structureSetIndex = structureSetCollection.findIndex(structureSet => {
+    return structureSet.uid === structureSetUid;
+  });
+
+  console.log(structureSetIndex);
+
+  structureSetCollection.splice(structureSetIndex, 1);
+}
+
 function setROIContourName(
   name,
   seriesInstanceUid,
@@ -369,6 +383,7 @@ const setters = {
   ROIContour: setROIContour,
   ROIContourAndSetIndexActive: setROIContourAndSetIndexActive,
   deleteROIFromStructureSet: setDeleteROIFromStructureSet,
+  deleteStructureSet: setDeleteStructureSet,
   structureSetName: setStructureSetName,
   ROIContourName: setROIContourName,
   activeStructureSetIndex: setActiveStructureSetIndex,
