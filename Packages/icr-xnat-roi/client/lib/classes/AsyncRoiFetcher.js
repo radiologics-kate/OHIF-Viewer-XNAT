@@ -1,6 +1,5 @@
 import { RoiImporter } from "./RoiImporter.js";
 import closeIODialog from "../IO/closeIODialog.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { AsyncFetcher } from "./AsyncFetcher.js";
 

@@ -11,23 +11,11 @@ export class AIMExporter {
       this._seriesInstanceUID,
       "parentProjectId"
     );
-    this._subjectID = sessionMap.get(this._seriesInstanceUID, "subjectId");
     this._experimentID = sessionMap.get(
       this._seriesInstanceUID,
       "experimentId"
     );
     this._label = aimWriter.label;
-    this._UID = aimWriter.imageAnnotationCollectionUUID;
-    this._ID = this._generateCollectionId();
-    this._date = aimWriter.date;
-    this._time = aimWriter.time;
-    this._name = aimWriter.name;
-
-    this._assessorUrl =
-      `${Session.get("rootUrl")}/data/archive/projects/${this._projectID}` +
-      `/subjects/${this._subjectID}/experiments/${
-        this._experimentID
-      }/assessors/${this._ID}`;
   }
 
   async exportToXNAT() {
@@ -91,18 +79,5 @@ export class AIMExporter {
       uint8View[i] = utf8AimString.charCodeAt(i);
     }
     return arraybuffer;
-  }
-
-  _generateCollectionId() {
-    const randomAlphaNumeric = [
-      Math.random()
-        .toString(36)
-        .slice(2, 10),
-      Math.random()
-        .toString(36)
-        .slice(2)
-    ];
-
-    return `RoiCollection_${randomAlphaNumeric[0]}_${randomAlphaNumeric[1]}`;
   }
 }

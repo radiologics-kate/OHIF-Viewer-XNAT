@@ -38,15 +38,7 @@ export class RoiExtractor {
   }
 
   extractVolumes(exportMask) {
-    console.log("==== extracting Volumes ====");
-    console.log("== export mask ==");
-    console.log(exportMask);
-    console.log("== seriesInstanceUid ==");
-    console.log(this._seriesInstanceUid);
-
     const toolStateManager = globalToolStateManager.saveToolState();
-
-    console.log(toolStateManager);
 
     Object.keys(toolStateManager).forEach(elementId => {
       // Only get polygons from this series
@@ -55,9 +47,6 @@ export class RoiExtractor {
         this._seriesInstanceUid
       ) {
         // grab the freehand tool for this DICOM instance
-        console.log("== elementId ==");
-        console.log(elementId);
-
         const freehandToolState = toolStateManager[elementId].freehandMouse;
 
         if (freehandToolState) {

@@ -87,7 +87,7 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
   let overwrite = false;
 
   if (roiCollectionInfo) {
-    // TODO -> Bring this code back to life once it is possible to do an overwrite.
+    // TODO -> Bring this code back to life once/if we choose to allow overwrites.
     /*
     if (icrXnatRoiSession.get('editPermissions')) {
       // Ask if user wants to Overwrite.

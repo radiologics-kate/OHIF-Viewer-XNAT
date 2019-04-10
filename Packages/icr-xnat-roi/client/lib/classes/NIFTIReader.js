@@ -1,15 +1,15 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import GPU from 'gpu.js';
-import Nifti from 'nifti-reader-js';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import Nifti from "nifti-reader-js";
 
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 const modules = cornerstoneTools.store.modules;
 const tolerance = 0.1;
 
-const gpu = new GPU();
-
 //TODO -> DO THIS PROPERLY. We need a label key in the ROICollection schema.
+// This is why there is currently no official uploader for NIFTI. This is
+// essentially hidden functionality for now.
 const THEO_NAMES = [
   "Skull",
   "Scapula Right",
@@ -32,19 +32,17 @@ const THEO_NAMES = [
 ];
 
 export class NIFTIReader {
-
   constructor(seriesInfo) {
-
     this._seriesInfo = seriesInfo;
     this._metadataProvider = OHIF.viewer.metadataProvider;
   }
 
-  read (niftiArrayBuffer, stackToolState, dimensions) {
+  read(niftiArrayBuffer, stackToolState, dimensions) {
     this._niftiArrayBuffer = niftiArrayBuffer;
 
-    console.log('_niftiArrayBuffer');
+    console.log("_niftiArrayBuffer");
 
-    console.log('decompressing if nifti is zipped...');
+    console.log("decompressing if nifti is zipped...");
 
     // Decompress if zipped
     this._decompressIfZipped();
@@ -55,15 +53,19 @@ export class NIFTIReader {
 
     this._extractHeaders();
 
-    console.log('valid nifti header:');
+    console.log("valid nifti header:");
     console.log(this._niftiHeader.toFormattedString());
 
-    if (this._isValidDimensionality()  === false) {
-      throw `Parser unsure how to parse ${this._dimensions.dimensionality} dimensional data`;
+    if (this._isValidDimensionality() === false) {
+      throw `Parser unsure how to parse ${
+        this._dimensions.dimensionality
+      } dimensional data`;
     }
 
     const imageIds = stackToolState.data[0].imageIds;
-    const metadataOfFirstImage = this._metadataProvider.getMetadata(imageIds[0]);
+    const metadataOfFirstImage = this._metadataProvider.getMetadata(
+      imageIds[0]
+    );
     const imagePlaneOfFirstImage = metadataOfFirstImage.imagePlane;
 
     const rowPixelSpacing = imagePlaneOfFirstImage.rowPixelSpacing;
@@ -71,20 +73,29 @@ export class NIFTIReader {
     const imagePositionPatient = imagePlaneOfFirstImage.imagePositionPatient;
 
     // Only using this to check if numbers are close, default to 1 if not present.
-    const orderOfSliceThickness = metadataOfFirstImage.instance.sliceThickness
-    || metadataOfFirstImage.instance.sliceThickness
-    || rowPixelSpacing;
+    const orderOfSliceThickness =
+      metadataOfFirstImage.instance.sliceThickness ||
+      metadataOfFirstImage.instance.sliceThickness ||
+      rowPixelSpacing;
 
     //console.log(this._niftiHeader);
 
     let firstVoxelInNeurologicalFrame;
 
     if (this._niftiHeader.sform_code > 0) {
-      console.log('Can do full affine transform!');
-      firstVoxelInNeurologicalFrame = this._fullAffineTransformToWorldSpace(0, 0, 0);
+      console.log("Can do full affine transform!");
+      firstVoxelInNeurologicalFrame = this._fullAffineTransformToWorldSpace(
+        0,
+        0,
+        0
+      );
     } else if (this._niftiHeader.qform_code > 0) {
-      console.log('Can do Quartenion transformation!');
-      firstVoxelInNeurologicalFrame = this._quarternionTransformToWorldSpace(0, 0, 0);
+      console.log("Can do Quartenion transformation!");
+      firstVoxelInNeurologicalFrame = this._quarternionTransformToWorldSpace(
+        0,
+        0,
+        0
+      );
     }
 
     // If mapping NIFTI to DICOM, we have to take the leap of faith that when converting
@@ -104,12 +115,12 @@ export class NIFTIReader {
     let sliceDirection = this._compareSliceDirection(
       imagePositionPatient,
       firstVoxelInDicomPCSFrame,
-      orderOfSliceThickness*tolerance
+      orderOfSliceThickness * tolerance
     );
     let sliceOrientation = this._compareSliceOrientation(
       imagePositionPatient,
       firstVoxelInDicomPCSFrame,
-      rowPixelSpacing*tolerance
+      rowPixelSpacing * tolerance
     );
 
     this._masks = this._extractMasks(sliceDirection, sliceOrientation);
@@ -119,7 +130,7 @@ export class NIFTIReader {
     return this._masks;
   }
 
-  _quarternionTransformToWorldSpace (i, j, k) {
+  _quarternionTransformToWorldSpace(i, j, k) {
     const niftiHeader = this._niftiHeader;
     const b = niftiHeader.quatern_b;
     const c = niftiHeader.quatern_c;
@@ -129,54 +140,45 @@ export class NIFTIReader {
     const qfac = niftiHeader.pixDims[0];
 
     const R = [
-      [ a*a + b*b - c*c - d*d , 2*(b*c - a*d)         , 2*(b*d + a*c) ],
-      [ 2*(b*c + a*d)         , a*a + c*c - b*b - d*d , 2*(c*d - a*b) ],
-      [ 2*(b*d - a*c)         , 2*(c*d + a*b)         , a*a + d*d - b*b - c*c ]
+      [a * a + b * b - c * c - d * d, 2 * (b * c - a * d), 2 * (b * d + a * c)],
+      [2 * (b * c + a * d), a * a + c * c - b * b - d * d, 2 * (c * d - a * b)],
+      [2 * (b * d - a * c), 2 * (c * d + a * b), a * a + d * d - b * b - c * c]
     ];
 
     // Here we modify k by the qfac value, which basically says if the slices
     // Are ascending/descending.
-    const voxel = [
-      i,
-      j,
-      qfac*k
-    ];
+    const voxel = [i, j, qfac * k];
 
     // Matrix multiplication of R on the voxel column vector.
     const RVoxel = [
-      R[0][0] * voxel[0] +   R[0][1] * voxel[1] +  R[0][2] * voxel[2],
-      R[1][0] * voxel[0] +   R[1][1] * voxel[1] +  R[1][2] * voxel[2],
-      R[2][0] * voxel[0] +   R[2][1] * voxel[1] +  R[2][2] * voxel[2],
+      R[0][0] * voxel[0] + R[0][1] * voxel[1] + R[0][2] * voxel[2],
+      R[1][0] * voxel[0] + R[1][1] * voxel[1] + R[1][2] * voxel[2],
+      R[2][0] * voxel[0] + R[2][1] * voxel[1] + R[2][2] * voxel[2]
     ];
 
     // Hardimad product of ROnVoxelCoords and pixel dimensions.
     const RVoxel_Hardamard_PixDims = [
       RVoxel[0] * niftiHeader.pixDims[1], // Note this isn't a typo, x is [1].
       RVoxel[1] * niftiHeader.pixDims[2],
-      RVoxel[2] * niftiHeader.pixDims[3],
+      RVoxel[2] * niftiHeader.pixDims[3]
     ];
 
     const resultAfterOffset = [
       RVoxel_Hardamard_PixDims[0] + niftiHeader.qoffset_x,
       RVoxel_Hardamard_PixDims[1] + niftiHeader.qoffset_y,
-      RVoxel_Hardamard_PixDims[2] + niftiHeader.qoffset_z,
+      RVoxel_Hardamard_PixDims[2] + niftiHeader.qoffset_z
     ];
 
     return resultAfterOffset;
   }
 
-  _fullAffineTransformToWorldSpace (i, j, k) {
+  _fullAffineTransformToWorldSpace(i, j, k) {
     const niftiHeader = this._niftiHeader;
     // Affine matrix.
     const a = niftiHeader.affine;
 
     // Voxel
-    const v = [
-      i,
-      j,
-      k,
-      1
-    ];
+    const v = [i, j, k, 1];
 
     // This result is the first 3 columns of the affine transform opperating on
     // the voxel column vector. The last element is not needed.
@@ -189,7 +191,7 @@ export class NIFTIReader {
     return result;
   }
 
-  _extractSegmentationCount (niftiLabelMap) {
+  _extractSegmentationCount(niftiLabelMap) {
     let len = niftiLabelMap.length;
     let max = -Infinity;
 
@@ -203,11 +205,11 @@ export class NIFTIReader {
   }
 
   //TODO -> DO THIS PROPERLY. We need a name in the ROICollection schema.
-  _getTheoNames (i) {
+  _getTheoNames(i) {
     return THEO_NAMES[i];
   }
 
-  _generateMetadata () {
+  _generateMetadata() {
     // Set segmentation metadata.
     // TODO -> Store the names somewhere on XNAT and retrieve them.
     for (let i = 0; i < this._segmentationCount; i++) {
@@ -215,34 +217,34 @@ export class NIFTIReader {
       const metadata = {
         RecommendedDisplayCIELabValue: [255, 0, 0],
         SegmentedPropertyCategoryCodeSequence: {
-          CodeValue: 'T-D0050',
-          CodingSchemeDesignator: 'SRT',
-          CodeMeaning: 'Tissue'
+          CodeValue: "T-D0050",
+          CodingSchemeDesignator: "SRT",
+          CodeMeaning: "Tissue"
         },
         SegmentLabel: `${this._getTheoNames(i)}`,
-        SegmentAlgorithmType: 'MANUAL',
+        SegmentAlgorithmType: "MANUAL",
 
         SegmentedPropertyTypeCodeSequence: {
-          CodeValue: 'T-D016E',
-          CodingSchemeDesignator: 'SRT',
-          CodeMeaning: 'Bone'
+          CodeValue: "T-D016E",
+          CodingSchemeDesignator: "SRT",
+          CodeMeaning: "Bone"
         }
       };
-      this._setSegMetadata(i, metadata)
+      this._setSegMetadata(i, metadata);
     }
   }
 
-  _compareSliceDirection (imagePositionPatient, firstVoxelInDicomPCSFrame, tol) {
+  _compareSliceDirection(imagePositionPatient, firstVoxelInDicomPCSFrame, tol) {
     if (Math.abs(imagePositionPatient.z - firstVoxelInDicomPCSFrame[2]) < tol) {
-      console.log('slice direction same as referenced image');
-      return 'ascending';
+      console.log("slice direction same as referenced image");
+      return "ascending";
     }
 
-    console.log('slice direction opposite of referenced image');
-    return 'descending';
+    console.log("slice direction opposite of referenced image");
+    return "descending";
   }
 
-  _setSegMetadata (segIndex, metadata) {
+  _setSegMetadata(segIndex, metadata) {
     modules.brush.setters.metadata(
       this._seriesInfo.seriesInstanceUid,
       segIndex,
@@ -250,21 +252,34 @@ export class NIFTIReader {
     );
   }
 
-  _compareSliceOrientation (imagePositionPatient, firstVoxelInDicomPCSFrame, tol) {
+  _compareSliceOrientation(
+    imagePositionPatient,
+    firstVoxelInDicomPCSFrame,
+    tol
+  ) {
     // TODO -> This isn't exhaustive yet, just the most common eventualities between NIFTI <--> DICOM.
-    if (Math.abs(imagePositionPatient.x) - Math.abs(firstVoxelInDicomPCSFrame[0]) < tol
-    && Math.abs(imagePositionPatient.y) - Math.abs(firstVoxelInDicomPCSFrame[1]) < tol) {
+    if (
+      Math.abs(imagePositionPatient.x) -
+        Math.abs(firstVoxelInDicomPCSFrame[0]) <
+        tol &&
+      Math.abs(imagePositionPatient.y) -
+        Math.abs(firstVoxelInDicomPCSFrame[1]) <
+        tol
+    ) {
       // Close, are the images flipped?
-      if (Math.sign(imagePositionPatient.x) === Math.sign(firstVoxelInDicomPCSFrame[0])) {
+      if (
+        Math.sign(imagePositionPatient.x) ===
+        Math.sign(firstVoxelInDicomPCSFrame[0])
+      ) {
         // Same direction, each slice has same X-Y mapping.
-        console.log('each slice same orientation as the DICOM.');
-        return 'same';
+        console.log("each slice same orientation as the DICOM.");
+        return "same";
       }
       //TODO -> Maybe only one is flipped? You'd assume either it was in Radialogical or
       // Neurological frame of reference, but perhaps we could get some ugly half way house?
       // Assume flipped in x and y per slice.
-      console.log('each slice same orientation as the DICOM.');
-      return 'reverse';
+      console.log("each slice same orientation as the DICOM.");
+      return "reverse";
     }
 
     throw new Error(
@@ -273,17 +288,17 @@ export class NIFTIReader {
     );
   }
 
-  _decompressIfZipped () {
+  _decompressIfZipped() {
     if (Nifti.isCompressed(this._niftiArrayBuffer)) {
       this._niftiArrayBuffer = Nifti.decompress(this._niftiArrayBuffer);
     }
   }
 
-  _isValidNifti () {
+  _isValidNifti() {
     return Nifti.isNIFTI(this._niftiArrayBuffer);
   }
 
-  _isValidDimensionality () {
+  _isValidDimensionality() {
     if (this._dimensions.dimensionality >= 3) {
       return true;
     }
@@ -291,7 +306,7 @@ export class NIFTIReader {
     return false;
   }
 
-  _extractHeaders () {
+  _extractHeaders() {
     this._niftiHeader = Nifti.readHeader(this._niftiArrayBuffer);
     this._niftiExtension = this._extractNiftiExtension();
 
@@ -304,7 +319,6 @@ export class NIFTIReader {
     };
   }
 
-
   /**
    * _extractMasks - description
    *
@@ -316,7 +330,7 @@ export class NIFTIReader {
    *    opposite: each slice has the voxels in reverse order (TODO: ?)
    * @return {number[][]} An array of masks formated in the correct order for the image.
    */
-  _extractMasks (sliceDirection = 'ascending', sliceOrientation = 'same') {
+  _extractMasks(sliceDirection = "ascending", sliceOrientation = "same") {
     const niftiLabelMap = this._getXyzPixelArray();
     const segmentationCount = this._extractSegmentationCount(niftiLabelMap);
 
@@ -330,19 +344,20 @@ export class NIFTIReader {
 
     // Generate arrays of zeros.
     for (let i = 0; i < segmentationCount; i++) {
-      masks.push(
-        new Uint8ClampedArray(niftiLabelMap.length)
-      );
+      masks.push(new Uint8ClampedArray(niftiLabelMap.length));
     }
 
-    if (sliceDirection === 'ascending' && sliceOrientation === 'same') {
+    if (sliceDirection === "ascending" && sliceOrientation === "same") {
       for (let i = 0; i < niftiLabelMap.length; i++) {
         if (niftiLabelMap[i]) {
           // Zero-index the masks, hence niftiLabelMap[i] - 1.
           masks[niftiLabelMap[i] - 1][i] = 1;
         }
       }
-    } else if (sliceDirection === 'ascending' && sliceOrientation === 'opposite') {
+    } else if (
+      sliceDirection === "ascending" &&
+      sliceOrientation === "opposite"
+    ) {
       for (let slice = 0; slice < numberOfSlices; slice++) {
         // Fill each slice in reverse order.
         for (let i = 0, p = sliceLength - 1; i < sliceLength; i++, p--) {
@@ -355,9 +370,13 @@ export class NIFTIReader {
           }
         }
       }
-    } else if (sliceDirection === 'descending' && sliceOrientation === 'same') {
+    } else if (sliceDirection === "descending" && sliceOrientation === "same") {
       // Fill slices in reverse order.
-      for (let slice = 0, sliceToFill = numberOfSlices - 1; slice < numberOfSlices; slice++, sliceToFill--) {
+      for (
+        let slice = 0, sliceToFill = numberOfSlices - 1;
+        slice < numberOfSlices;
+        slice++, sliceToFill--
+      ) {
         for (let i = 0; i < sliceLength; i++) {
           const niftiI = slice * sliceLength + i;
           const destinationI = sliceToFill * sliceLength + i;
@@ -368,8 +387,15 @@ export class NIFTIReader {
           }
         }
       }
-    } else if (sliceDirection === 'descending' && sliceOrientation === 'opposite') {
-      for (let i = 0, p = niftiLabelMap.length - 1; i < niftiLabelMap.length; i++, p--) {
+    } else if (
+      sliceDirection === "descending" &&
+      sliceOrientation === "opposite"
+    ) {
+      for (
+        let i = 0, p = niftiLabelMap.length - 1;
+        i < niftiLabelMap.length;
+        i++, p--
+      ) {
         if (niftiLabelMap[i]) {
           // Zero-index the masks, hence niftiLabelMap[i] - 1.
           masks[niftiLabelMap[i] - 1][p] = 1;
@@ -380,7 +406,7 @@ export class NIFTIReader {
     return masks;
   }
 
-  _extractNiftiExtension () {
+  _extractNiftiExtension() {
     if (Nifti.hasExtension(this._niftiHeader)) {
       return Nifti.readExtensionData(niftiHeader, niftiArrayBuffer);
     } else {
@@ -388,8 +414,11 @@ export class NIFTIReader {
     }
   }
 
-  _extractPixelData () {
-    const niftiImage = Nifti.readImage(this._niftiHeader, this._niftiArrayBuffer);
+  _extractPixelData() {
+    const niftiImage = Nifti.readImage(
+      this._niftiHeader,
+      this._niftiArrayBuffer
+    );
     const voxelByteLength = this._niftiHeader.numBitsPerVoxel;
 
     switch (voxelByteLength) {
@@ -400,39 +429,40 @@ export class NIFTIReader {
       case 32:
         return new Int32Array(niftiImage);
       default:
-        throw new Exception(`No method for parsing ArrayBuffer to ${voxelByteLength}-byte array`);
+        throw new Exception(
+          `No method for parsing ArrayBuffer to ${voxelByteLength}-byte array`
+        );
     }
 
     return null;
   }
 
-
-  _getXyzPixelArray () {
+  _getXyzPixelArray() {
     const dimensions = this._dimensions;
     const dimensionality = dimensions.dimensionality;
     const numberOfElements = dimensions.x * dimensions.y * dimensions.z;
 
     const pixelData = this._extractPixelData();
 
-    return pixelData.slice(0,numberOfElements);
+    return pixelData.slice(0, numberOfElements);
   }
 
-  get dimensions () {
+  get dimensions() {
     return this._dimensions;
   }
 
-  get int8PixelArray () {
+  get int8PixelArray() {
     return this._pixelArray;
   }
 
-  _debugInfo () {
-    console.log('niftiHeader:');
+  _debugInfo() {
+    console.log("niftiHeader:");
     console.log(this._niftiHeader.toFormattedString());
 
-    console.log('niftiExt:');
+    console.log("niftiExt:");
     console.log(this._niftiExtension);
 
-    console.log('int8PixelArray:');
+    console.log("int8PixelArray:");
     console.log(this._pixelArray);
   }
 
@@ -445,5 +475,4 @@ export class NIFTIReader {
 
     return imageIdList;
   }
-
 }

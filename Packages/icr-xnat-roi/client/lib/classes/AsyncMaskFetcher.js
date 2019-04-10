@@ -1,9 +1,7 @@
-import { MaskImporter } from './MaskImporter.js';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { $ } from 'meteor/jquery';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { AsyncFetcher } from './AsyncFetcher.js';
-import awaitConfirmationDialog from '../IO/awaitConfirmationDialog.js';
+import { MaskImporter } from "./MaskImporter.js";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { AsyncFetcher } from "./AsyncFetcher.js";
+import awaitConfirmationDialog from "../IO/awaitConfirmationDialog.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -24,21 +22,17 @@ const overwriteConfirmationContent = {
  *
  */
 export class AsyncMaskFetcher extends AsyncFetcher {
-  constructor (seriesInstanceUid) {
-    super(
-      seriesInstanceUid,
-      validTypes = [
-        'SEG',
-        'NIFTI'
-      ]
-    );
+  constructor(seriesInstanceUid) {
+    super(seriesInstanceUid, (validTypes = ["SEG", "NIFTI"]));
 
     this._maskImporter = new MaskImporter();
   }
 
   _openImportListDialog() {
     // Open the dialog and display a loading icon whilst data is fetched.
-    this._maskImportListDialog = document.getElementById('maskImportListDialog');
+    this._maskImportListDialog = document.getElementById(
+      "maskImportListDialog"
+    );
 
     const dialogData = Blaze.getData(this._maskImportListDialog);
 
@@ -51,7 +45,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * await user input, and download the selected roiCollections.
    */
   async _selectAndImportRois() {
-
     const dialog = this._maskImportListDialog;
     const dialogData = Blaze.getData(dialog);
 
@@ -63,7 +56,9 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
     // Await user input
     while (!confirmed) {
-      importMaskID = await this._awaitInputFromListUI(this._collectionInfoArray);
+      importMaskID = await this._awaitInputFromListUI(
+        this._collectionInfoArray
+      );
 
       if (importMaskID === undefined) {
         // Cancelled
@@ -74,7 +69,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
         console.log(hasExistingData);
 
         if (hasExistingData) {
-          console.log('Check confirmation first!');
+          console.log("Check confirmation first!");
 
           confirmed = await awaitConfirmationDialog(
             overwriteConfirmationContent
@@ -85,22 +80,21 @@ export class AsyncMaskFetcher extends AsyncFetcher {
           console.log(`confirmed: ${confirmed}`);
         }
       }
-
     }
 
     dialog.close();
 
     if (importMaskID === undefined) {
-      console.log('cancelled');
+      console.log("cancelled");
 
       return;
     }
 
-    console.log('confirmed');
+    console.log("confirmed");
 
     // Only 1 to parse for masks.
     if (importMaskID === undefined) {
-      console.log('numCollectionToParse = 0');
+      console.log("numCollectionToParse = 0");
       return;
     } else {
       this._numCollectionsToParse = 1;
@@ -111,7 +105,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     this._getFilesFromList(this._collectionInfoArray[importMaskID]);
   }
 
-
   /** @private @async
    * _awaitInputFromListUI - Awaits user input from the maskImportList UI.
    *
@@ -119,28 +112,30 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * @return {Promise}          A promise that resolves to give a true/false
    *                            array describing which roiCollections to import.
    */
-  async _awaitInputFromListUI (importList) {
+  async _awaitInputFromListUI(importList) {
+    function keyConfirmEventHandler(e) {
+      console.log("keyConfirmEventHandler");
 
-    function keyConfirmEventHandler (e) {
-      console.log('keyConfirmEventHandler');
-
-      if (e.which === 13) { // If Enter is pressed accept and close the dialog
+      if (e.which === 13) {
+        // If Enter is pressed accept and close the dialog
         confirmEventHandler();
       }
     }
 
-    function confirmEventHandler () {
-      const selection = document.querySelector(".mask-import-list-item-check:checked");
+    function confirmEventHandler() {
+      const selection = document.querySelector(
+        ".mask-import-list-item-check:checked"
+      );
       const importMaskID = selection.value;
 
       console.log(`importMaskID: ${importMaskID}`);
 
       removeEventListeners();
       resolveRef(importMaskID);
-    };
+    }
 
-    function cancelEventHandler (e) {
-      console.log('prevent default escape.');
+    function cancelEventHandler(e) {
+      console.log("prevent default escape.");
 
       e.preventDefault();
 
@@ -148,26 +143,28 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       resolveRef();
     }
 
-    function cancelClickEventHandler () {
+    function cancelClickEventHandler() {
       removeEventListeners();
       resolveRef();
     }
 
     function removeEventListeners() {
-      dialog.removeEventListener('cancel', cancelEventHandler);
-      cancel.removeEventListener('click', cancelClickEventHandler);
-      dialog.removeEventListener('keydown', keyConfirmEventHandler);
-      confirm.removeEventListener('click', confirmEventHandler);
+      dialog.removeEventListener("cancel", cancelEventHandler);
+      cancel.removeEventListener("click", cancelClickEventHandler);
+      dialog.removeEventListener("keydown", keyConfirmEventHandler);
+      confirm.removeEventListener("click", confirmEventHandler);
     }
 
     const dialog = this._maskImportListDialog;
-    const confirm = dialog.getElementsByClassName('mask-import-list-confirm')[0];
-    const cancel = dialog.getElementsByClassName('mask-import-list-cancel')[0];
+    const confirm = dialog.getElementsByClassName(
+      "mask-import-list-confirm"
+    )[0];
+    const cancel = dialog.getElementsByClassName("mask-import-list-cancel")[0];
 
-    dialog.addEventListener('cancel', cancelEventHandler);
-    cancel.addEventListener('click', cancelClickEventHandler);
-    dialog.addEventListener('keydown', keyConfirmEventHandler);
-    confirm.addEventListener('click', confirmEventHandler);
+    dialog.addEventListener("cancel", cancelEventHandler);
+    cancel.addEventListener("click", cancelClickEventHandler);
+    dialog.addEventListener("keydown", keyConfirmEventHandler);
+    confirm.addEventListener("click", confirmEventHandler);
 
     // Reference to promise.resolve, so that I can use external handlers.
     let resolveRef;
@@ -176,7 +173,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       resolveRef = resolve;
     });
   }
-
 
   /**
    * _hasExistingMaskData - Check if we either have an import
@@ -189,15 +185,14 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     if (brushModule.state.import && brushModule.state.import.label) {
       hasData = true;
     } else {
-      const metadata = brushModule.state.segmentationMetadata[this._seriesInstanceUid];
+      const metadata =
+        brushModule.state.segmentationMetadata[this._seriesInstanceUid];
 
       //const metadata = brushModule.getters.metadata(this._seriesInstanceUid);
-      console.log('metadata:');
+      console.log("metadata:");
       console.log(metadata);
       if (metadata) {
-        hasData = metadata.some(data =>
-          data !== undefined
-        );
+        hasData = metadata.some(data => data !== undefined);
       }
     }
 
@@ -213,7 +208,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * @return {Boolean}                    Whether the collection is eligible
    *                                      for import.
    */
-  _collectionEligibleForImport (collectionInfoJSON) {
+  _collectionEligibleForImport(collectionInfoJSON) {
     const item = collectionInfoJSON.items[0];
     const children = item.children;
 
@@ -225,11 +220,12 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
     // Check the collection references this seriesInstanceUid.
     for (let i = 0; i < children.length; i++) {
-      if (children[i].field === 'references/seriesUID') {
+      if (children[i].field === "references/seriesUID") {
         const referencedSeriesInstanceUidList = children[i].items;
 
         for (let j = 0; j < referencedSeriesInstanceUidList.length; j++) {
-          const seriesInstanceUid = referencedSeriesInstanceUidList[j].data_fields.seriesUID;
+          const seriesInstanceUid =
+            referencedSeriesInstanceUidList[j].data_fields.seriesUID;
 
           if (seriesInstanceUid === this._seriesInstanceUid) {
             return true;
@@ -249,9 +245,9 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * @param  {type} collectionInfo  An object describing the roiCollection to
    *                                import.
    */
-  async _getAndImportFile (url, collectionInfo) {
+  async _getAndImportFile(url, collectionInfo) {
     switch (collectionInfo.collectionType) {
-      case 'SEG':
+      case "SEG":
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
 
@@ -262,17 +258,23 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
         brushModule.state.import[this._seriesInstanceUid] = {
           label: collectionInfo.label,
-          type: 'SEG',
+          type: "SEG",
           name: collectionInfo.name,
           modified: false
         };
 
         console.log(`_getAndImportFile: Importing SEG, url: ${url}`);
-        const arrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
-        this._maskImporter.importDICOMSEG(arrayBuffer, collectionInfo.name, collectionInfo.label);
+        const arrayBuffer = await this._getArraybuffer(url).catch(error =>
+          console.log(error)
+        );
+        this._maskImporter.importDICOMSEG(
+          arrayBuffer,
+          collectionInfo.name,
+          collectionInfo.label
+        );
         break;
 
-      case 'NIFTI':
+      case "NIFTI":
         this._roiCollectionLabel = collectionInfo.label;
         this._updateProgressDialog();
 
@@ -283,18 +285,26 @@ export class AsyncMaskFetcher extends AsyncFetcher {
 
         brushModule.state.import[this._seriesInstanceUid] = {
           label: collectionInfo.label,
-          type: 'NIFTI',
+          type: "NIFTI",
           name: collectionInfo.name,
           modified: false
         };
 
         console.log(`_getAndImportFile: Importing NIFTI, url: ${url}`);
-        const niftiArrayBuffer = await this._getArraybuffer(url).catch(error => console.log(error));
-        this._maskImporter.importNIFTI(niftiArrayBuffer, collectionInfo.name, collectionInfo.label);
+        const niftiArrayBuffer = await this._getArraybuffer(url).catch(error =>
+          console.log(error)
+        );
+        this._maskImporter.importNIFTI(
+          niftiArrayBuffer,
+          collectionInfo.name,
+          collectionInfo.label
+        );
         break;
 
       default:
-        console.error(`asyncMaskFetcher._getAndImportFile not configured for filetype: ${fileType}.`);
+        console.error(
+          `asyncMaskFetcher._getAndImportFile not configured for filetype: ${fileType}.`
+        );
     }
 
     this._incrementNumCollectionsParsed();
