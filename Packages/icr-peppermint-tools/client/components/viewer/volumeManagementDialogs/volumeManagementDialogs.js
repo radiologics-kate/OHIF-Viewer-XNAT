@@ -1,21 +1,21 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { createNewVolume } from 'meteor/icr:peppermint-tools';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { createNewVolume } from "meteor/icr:peppermint-tools";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 const modules = cornerstoneTools.store.modules;
 
 Template.volumeManagementDialogs.onRendered(() => {
-    const instance = Template.instance();
-    const dialog = instance.$('#volumeManagementDialog');
+  const instance = Template.instance();
+  const dialog = instance.$("#volumeManagementDialog");
 
-    dialogPolyfill.registerDialog(dialog.get(0));
+  dialogPolyfill.registerDialog(dialog.get(0));
 });
 
 Template.volumeManagementDialogs.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 
-    instance.data.showLocked = new ReactiveVar(false);
-    instance.data.activeSeries = new ReactiveVar('');
+  instance.data.showLocked = new ReactiveVar(false);
+  instance.data.activeSeries = new ReactiveVar("");
 });
 
 Template.volumeManagementDialogs.helpers({
@@ -24,36 +24,35 @@ Template.volumeManagementDialogs.helpers({
     const showLocked = instance.data.showLocked.get();
 
     if (showLocked) {
-      return 'hide';
+      return "hide";
     }
 
-    return 'show';
+    return "show";
   },
   roiCollections: () => {
     const instance = Template.instance();
     const seriesInstanceUid = instance.data.activeSeries.get();
 
-    const structureSetCollectionData = getOrCreateStructureSetCollectionData(seriesInstanceUid);
+    const structureSetCollectionData = getOrCreateStructureSetCollectionData(
+      seriesInstanceUid
+    );
 
     return structureSetCollectionData;
   }
 });
 
-
 Template.volumeManagementDialogs.events({
-    'click .js-volume-management-cancel'(event) {
-
-      closeDialog();
-    },
-    'click .js-volume-management-new'(event) {
-      closeDialog();
-      createNewVolume();
-    }
+  "click .js-volume-management-cancel"(event) {
+    closeDialog();
+  },
+  "click .js-volume-management-new"(event) {
+    closeDialog();
+    createNewVolume();
+  }
 });
 
-
-function closeDialog () {
-  const dialog = $('#volumeManagementDialog');
+function closeDialog() {
+  const dialog = $("#volumeManagementDialog");
   dialog.get(0).close();
 
   // Reset the focus to the active viewport element
@@ -90,7 +89,8 @@ function getOrCreateStructureSetCollectionData(seriesInstanceUid) {
           index: j,
           ROIContourReference: ROIContourCollection[j],
           structureSetReference: structureSet,
-          structureSetName: structureSet.name
+          structureSetName: structureSet.name,
+          triggerNameRefresh: new ReactiveVar(Math.random())
         });
       }
     }
@@ -99,10 +99,9 @@ function getOrCreateStructureSetCollectionData(seriesInstanceUid) {
       structureSetName: structureSet.name,
       ROIContourArray,
       structureSetReference: structureSet,
-      showList: new ReactiveVar(structureSet.name === 'default' ? true : false),
+      showList: new ReactiveVar(structureSet.name === "default" ? true : false),
       display: new ReactiveVar(structureSet.visible ? true : false)
     });
-
   }
 
   return dataArray;

@@ -1,9 +1,12 @@
+import { setVolumeName } from "../../../../lib/util/freehandNameIO.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+
 Template.volumeListItem.onRendered(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 });
 
 Template.volumeListItem.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 });
 
 Template.volumeListItem.helpers({
@@ -11,7 +14,7 @@ Template.volumeListItem.helpers({
     const instance = Template.instance();
     const data = instance.data;
 
-    if (data.structureSetName === 'default') {
+    if (data.structureSetName === "default") {
       return true;
     }
 
@@ -22,12 +25,13 @@ Template.volumeListItem.helpers({
     const data = instance.data;
 
     const ROIContour = data.ROIContourReference;
-    const activeROIContourIndex = data.structureSetReference.activeROIContourIndex;
+    const activeROIContourIndex =
+      data.structureSetReference.activeROIContourIndex;
 
     const isActive = activeROIContourIndex === data.index;
 
     if (isActive) {
-      return 'checked';
+      return "checked";
     }
 
     return;
@@ -41,6 +45,12 @@ Template.volumeListItem.helpers({
   },
   volumeName: () => {
     const instance = Template.instance();
+    console.log(instance.data);
+
+    instance.data.triggerNameRefresh.get();
+
+    console.log("CALC VOLUME NAME");
+
     const data = instance.data;
     const ROIContour = data.ROIContourReference;
 
@@ -56,18 +66,21 @@ Template.volumeListItem.helpers({
 });
 
 Template.volumeListItem.events({
-  'click .js-switch-button'(event) {
+  "click .js-switch-button"(event) {
     const instance = Template.instance();
     const data = instance.data;
     const ROIContour = data.ROIContourReference;
     data.structureSetReference.activeROIContourIndex = data.index;
+  },
+  "click .js-volume-rename"(event) {
+    const instance = Template.instance();
+    const data = instance.data;
+    const ROIContour = data.ROIContourReference;
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-    const dialog = $('#volumeManagementDialog');
-    dialog.get(0).close();
-
-    // Reset the focus to the active viewport element
-    // This makes the mobile Safari keyboard close
-    const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
-    element.focus();
+    setVolumeName(seriesInstanceUid, "DEFAULT", ROIContour.uid).then(name => {
+      console.log(name);
+      instance.data.triggerNameRefresh.set(Math.random());
+    });
   }
 });
