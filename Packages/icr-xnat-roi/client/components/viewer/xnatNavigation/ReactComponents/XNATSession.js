@@ -4,7 +4,7 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import SessionRouter from "./helpers/SessionRouter.js";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import awaitConfirmationDialog from "../../../../lib/IO/awaitConfirmationDialog.js";
 
 export default class XNATSession extends React.Component {
@@ -12,9 +12,9 @@ export default class XNATSession extends React.Component {
     super(props);
 
     const active =
-      this.props.projectId === icrXnatRoiSession.get("projectId") &&
-      this.props.subjectId === icrXnatRoiSession.get("subjectId") &&
-      this.props.ID === icrXnatRoiSession.get("experimentId");
+      this.props.projectId === sessionMap.get("session", "projectId") &&
+      this.props.subjectId === sessionMap.get("session", "subjectId") &&
+      this.props.ID === sessionMap.get("session", "experimentId");
 
     const shared = this.props.parentProjectId !== this.props.projectId;
 

@@ -1,12 +1,13 @@
-import { AsyncRoiFetcher } from '../classes/AsyncRoiFetcher.js';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { displayInsufficientPermissionsDialog } from '../util/displayImportDialogs.js';
+import { AsyncRoiFetcher } from "../classes/AsyncRoiFetcher.js";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { displayInsufficientPermissionsDialog } from "../util/displayImportDialogs.js";
 
-export default function () {
-  if (icrXnatRoiSession.get('readPermissions') === false) {
+export default function() {
+  if (icrXnatRoiSession.get("readPermissions") === false) {
     // User does not have read access
-    displayInsufficientPermissionsDialog();
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    displayInsufficientPermissionsDialog(seriesInstanceUid);
     return;
   }
 
@@ -19,7 +20,7 @@ export default function () {
  *
  * @author JamesAPetts
  */
-function beginImport () {
+function beginImport() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   const asyncRoiFetcher = new AsyncRoiFetcher(seriesInstanceUid);

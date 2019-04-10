@@ -1,8 +1,9 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
+import { sessionMap } from "meteor/icr:series-info-provider";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 Template.ioHelpExport.helpers({
   canWrite: () => {
-    const canWrite = icrXnatRoiSession.get('writePermissions');
+    const canWrite = icrXnatRoiSession.get("writePermissions");
 
     if (canWrite) {
       return true;
@@ -11,9 +12,9 @@ Template.ioHelpExport.helpers({
     return false;
   },
   projectId: () => {
-    return icrXnatRoiSession.get("projectId");
+    return sessionMap.get("session", "projectId");
   },
   experimentLabel: () => {
-    return icrXnatRoiSession.get("experimentLabel");
+    return sessionMap.get("session", "experimentLabel");
   }
 });

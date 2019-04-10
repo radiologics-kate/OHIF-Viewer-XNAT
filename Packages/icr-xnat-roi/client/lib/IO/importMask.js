@@ -1,12 +1,12 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import { AsyncMaskFetcher } from '../classes/AsyncMaskFetcher.js';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { displayInsufficientPermissionsDialog } from '../util/displayImportDialogs.js';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { AsyncMaskFetcher } from "../classes/AsyncMaskFetcher.js";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { displayInsufficientPermissionsDialog } from "../util/displayImportDialogs.js";
 
 // TEMP
-import { MaskImporter } from '../classes/MaskImporter.js';
+import { MaskImporter } from "../classes/MaskImporter.js";
 // TEMP
 
 /**
@@ -15,26 +15,24 @@ import { MaskImporter } from '../classes/MaskImporter.js';
  *
  * @author JamesAPetts
  */
- export default function () {
-   if (icrXnatRoiSession.get('readPermissions') === false) {
-     // User does not have read access
-     displayInsufficientPermissionsDialog();
-     return;
-   }
+export default function() {
+  if (icrXnatRoiSession.get("readPermissions") === false) {
+    // User does not have read access
+    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    displayInsufficientPermissionsDialog(seriesInstanceUid);
+    return;
+  }
 
-   beginImport();
- }
+  beginImport();
+}
 
-async function beginImport () {
-  console.log('importMask');
+async function beginImport() {
+  console.log("importMask");
 
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-
   const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
   asyncMaskFetcher.fetch();
-
-
 
   /*
   // TEMP -> Grab a local file.
@@ -54,33 +52,33 @@ async function beginImport () {
     'exampleCollectionLabel'
   );
   */
-
 }
-
 
 function getTestFileFromLocalStorage() {
   return new Promise((resolve, reject) => {
-    url = 'http://localhost:8000';
+    url = "http://localhost:8000";
 
     const xhr = new XMLHttpRequest();
 
-    xhr.addEventListener('load', () => {
+    xhr.addEventListener("load", () => {
       console.log(xhr.response);
       //do something with the response
       resolve(xhr.response);
     });
 
-    xhr.addEventListener('error', () => {
+    xhr.addEventListener("error", () => {
       console.log(`Request returned, status: ${xhr.status}`);
       console.log(xhr.message);
-      reject(xhr.message)
+      reject(xhr.message);
     });
 
-    xhr.open('GET', url);
-    xhr.responseType = 'arraybuffer'; //Type of file
+    xhr.open("GET", url);
+    xhr.responseType = "arraybuffer"; //Type of file
     xhr.withCredentials = true;
-    xhr.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    xhr.setRequestHeader(
+      "Access-Control-Allow-Origin",
+      "http://localhost:3000"
+    );
     xhr.send();
   });
-
 }

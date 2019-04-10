@@ -1,4 +1,3 @@
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { fetchCSRFToken } from "../IO/csrfToken.js";
 
@@ -7,9 +6,12 @@ const XMLWriter = require("xml-writer");
 export class AIMExporter {
   constructor(aimWriter) {
     this._aimString = aimWriter.toString();
-    this._projectID = icrXnatRoiSession.get("sourceProjectId");
-    this._subjectID = icrXnatRoiSession.get("subjectId");
     this._seriesInstanceUID = aimWriter.seriesInfo.seriesInstanceUid;
+    this._projectID = sessionMap.get(
+      this._seriesInstanceUID,
+      "parentProjectId"
+    );
+    this._subjectID = sessionMap.get(this._seriesInstanceUID, "subjectId");
     this._experimentID = sessionMap.get(
       this._seriesInstanceUID,
       "experimentId"

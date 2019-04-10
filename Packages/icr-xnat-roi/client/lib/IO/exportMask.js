@@ -35,7 +35,7 @@ export default async function() {
 
   if (icrXnatRoiSession.get("writePermissions") === false) {
     // User does not have write access
-    displayInsufficientPermissionsDialog();
+    displayInsufficientPermissionsDialog(seriesInfo.seriesInstanceUid);
     return;
   }
 
@@ -131,7 +131,7 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
     // Confirm user wants to make a new ROI Collection.
     const content = {
       title: `Warning`,
-      body: `Save the edited collection as a new collection? It is not yet possible to overwrite collections.`
+      body: `The edited ROI Collection will be saved as a new ROI Collection. Continue?`
     };
 
     const confirmed = await awaitConfirmationDialog(content);
@@ -200,7 +200,7 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
         exportInProgressDialog.close();
         // TODO -> Work on backup mechanism, disabled for now.
         //localBackup.saveBackUpForActiveSeries();
-        displayExportFailedDialog();
+        displayExportFailedDialog(seriesInstanceUid);
       });
   });
 }

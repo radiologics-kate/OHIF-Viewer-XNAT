@@ -1,5 +1,4 @@
 import { RoiImporter } from "./RoiImporter.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import progressDialog from "../util/progressDialog.js";
@@ -19,6 +18,8 @@ export class AsyncFetcher {
       this._seriesInstanceUid,
       "experimentId"
     );
+    this._subjectId = sessionMap.get(this._seriesInstanceUid, "subjectId");
+    this._projectId = sessionMap.get(this._seriesInstanceUid, "projectId");
     this._numCollectionsParsed = 0;
     this._roiCollectionLabel = "";
     this._validTypes = validTypes;
@@ -116,11 +117,9 @@ export class AsyncFetcher {
     // Fetch list of assessors for the session.
     const sessionAssessorsUrl = `${Session.get(
       "rootUrl"
-    )}/data/archive/projects/${icrXnatRoiSession.get(
-      "projectId"
-    )}/subjects/${icrXnatRoiSession.get("subjectId")}/experiments/${
-      this._experimentId
-    }/assessors?format=json`;
+    )}/data/archive/projects/${this._projectId}/subjects/${
+      this._subjectId
+    }/experiments/${this._experimentId}/assessors?format=json`;
     const sessionAssessorList = await this._getJson(sessionAssessorsUrl).catch(
       error => console.log(error)
     );

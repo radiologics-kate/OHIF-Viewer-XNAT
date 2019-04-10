@@ -1,4 +1,5 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import closeIODialog from "../../../lib/IO/closeIODialog.js";
 
 Template.ioDialogs.onRendered(() => {
@@ -25,9 +26,10 @@ Template.ioDialogs.helpers({
       return "This command will export all new (unlocked) ROIs in this series as an ROI Collection. You will be prompted to give the ROI Collection a name before you may export";
     } else {
       return (
-        `This command is disabled as you do not have the required permissions to write to ${icrXnatRoiSession.get(
+        `This command is disabled as you do not have the required permissions to write to ${sessionMap.get(
+          "session",
           "projectId"
-        )}/${icrXnatRoiSession.get("experimentLabel")}.` +
+        )}/${sessionMap.get("session", "experimentLabel")}.` +
         " If you believe that you should, please contact the project owner."
       );
     }

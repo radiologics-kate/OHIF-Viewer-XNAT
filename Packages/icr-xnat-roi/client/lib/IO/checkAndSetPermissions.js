@@ -6,13 +6,10 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
  *
  * @author JamesAPetts
  */
-export async function checkAndSetPermissions() {
-  const parentProjectId = icrXnatRoiSession.get("parentProjectId");
-  const sourceProjectId = icrXnatRoiSession.get("sourceProjectId");
-
+export async function checkAndSetPermissions(projectId, parentProjectId) {
   const url = `${Session.get(
     "rootUrl"
-  )}/xapi/roi/projects/${sourceProjectId}/permissions/RoiCollection`;
+  )}/xapi/roi/projects/${parentProjectId}/permissions/RoiCollection`;
 
   console.log(`checkAndSetPermissions: ${url}`);
 
@@ -26,14 +23,14 @@ export async function checkAndSetPermissions() {
       if (status === 200) {
         console.log(
           `permissions: create: ${response.create},
-        read: ${response.read},
-        edit: ${response.edit}`
+          read: ${response.read},
+          edit: ${response.edit}`
         );
 
         icrXnatRoiSession.set("writePermissions", response.create);
         icrXnatRoiSession.set("readPermissions", response.read);
         icrXnatRoiSession.set("editPermissions", response.edit);
-      } else if (parentProjectId) {
+      } else if (parentProjectId !== projectId) {
         // Assume read only of parent  project.
         console.log("Can only read from parent project");
         icrXnatRoiSession.set("writePermissions", false);

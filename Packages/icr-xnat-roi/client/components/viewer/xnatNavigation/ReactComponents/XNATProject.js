@@ -5,13 +5,13 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 
 export default class XNATProject extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    const active = this.props.ID === icrXnatRoiSession.get("projectId");
+    const active = this.props.ID === sessionMap.get("session", "projectId");
 
     this.state = {
       subjects: [],

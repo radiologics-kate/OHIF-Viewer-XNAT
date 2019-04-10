@@ -33,7 +33,8 @@ export default async function() {
   }
 
   // User does not have write access
-  displayInsufficientPermissionsDialog();
+  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+  displayInsufficientPermissionsDialog(seriesInstanceUid);
 }
 
 /**
@@ -96,7 +97,7 @@ async function beginExport() {
       // TODO -> Work on backup mechanism, disabled for now.
       //localBackup.saveBackUpForActiveSeries();
       exportInProgressDialog.close();
-      displayExportFailedDialog();
+      displayExportFailedDialog(seriesInfo.seriesInstanceUid);
     });
 }
 

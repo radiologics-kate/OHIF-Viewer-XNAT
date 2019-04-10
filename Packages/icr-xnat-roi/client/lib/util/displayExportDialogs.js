@@ -1,5 +1,4 @@
 import messageDialog from "./messageDialog.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
@@ -8,12 +7,13 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
  *
  * @author JamesAPetts
  */
-export function displayExportFailedDialog() {
+export function displayExportFailedDialog(seriesInstanceUid) {
+  const projectId = sessionMap.get(seriesInstanceUid, "projectId");
+  const experimentLabel = sessionMap.get(seriesInstanceUid, "experimentLabel");
+
   const title = "Export Failed";
   const body =
-    `Export of ROIs to ${icrXnatRoiSession.get(
-      "projectId"
-    )}/${icrXnatRoiSession.get("experimentLabel")}` +
+    `Export of ROIs to ${projectId}/${experimentLabel}` +
     " failed. This may be due a bad internet connection. The ROIs have not been locked, if you want" +
     " to try again. If you have a good connection to XNAT and this problem persists, please contact" +
     " your XNAT administrator.";
@@ -26,18 +26,13 @@ export function displayExportFailedDialog() {
  *
  * @author JamesAPetts
  */
-export function displayInsufficientPermissionsDialog() {
+export function displayInsufficientPermissionsDialog(seriesInstanceUid) {
+  const projectId = sessionMap.get(seriesInstanceUid, "projectId");
+  const experimentLabel = sessionMap.get(seriesInstanceUid, "experimentLabel");
+
   const title = "Insufficient Permissions";
-
-  const experimentLabel = sessionMap.get(
-    SeriesInfoProvider.getActiveSeriesInstanceUid(),
-    "experimentLabel"
-  );
-
   const body =
-    `You do not have the required permissions to write ROI Collections to ${icrXnatRoiSession.get(
-      "projectId"
-    )}/${experimentLabel}.` +
+    `You do not have the required permissions to write ROI Collections to ${projectId}/${experimentLabel}.` +
     " If you believe that you should, please contact the project owner.";
 
   messageDialog(title, body);

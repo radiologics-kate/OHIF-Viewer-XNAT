@@ -3,7 +3,7 @@ import XNATProjectList from "./XNATProjectList.js";
 import XNATProject from "./XNATProject.js";
 import fetchJSON from "./helpers/fetchJSON.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 
 export default class XNATNavigation extends React.Component {
   constructor(props = {}) {
@@ -28,7 +28,12 @@ export default class XNATNavigation extends React.Component {
 
         const otherProjects = result.ResultSet.Result;
 
-        const activeProjectId = icrXnatRoiSession.get("projectId");
+        const activeProjectId = sessionMap.get("session", "projectId");
+
+        console.log("XNATNavigation::::");
+        console.log(activeProjectId);
+        console.log(sessionMap);
+
         const thisProjectIndex = otherProjects.findIndex(
           element => element.ID === activeProjectId
         );

@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { sessionMap } from 'meteor/icr:series-info-provider';
 
 console.log(Meteor.isDevelopment);
@@ -64,7 +63,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
           // Subject:
           //   projectId, subjectId
           //
-          // Subject in shared project (WIP):
+          // Subject in shared project:
           //  projectId, subjectId, parentProjectId
 
           let subjectId;
@@ -76,11 +75,11 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
           if (this.params.query) {
             const query = this.params.query;
 
-            experimentLabel = query.experimentLabel;
-            parentProjectId = query.parentProjectId;
-            subjectId = query.subjectId;
-            projectId = query.projectId;
             experimentId = query.experimentId;
+            experimentLabel = query.experimentLabel;
+            subjectId = query.subjectId;              //
+            projectId = query.projectId;              // = >  Check if they are still needed as session variables.
+            parentProjectId = query.parentProjectId ? query.parentProjectId : projectId; //
           } else {
             console.error('insufficient query parameters.');
           }
@@ -89,16 +88,17 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
             console.log(`This experiment is shared view of ${experimentId} from ${parentProjectId}`);
           }
 
+          sessionMap.setSession({
+            projectId,
+            subjectId,
+            experimentId,
+            experimentLabel
+          });
+
           if (experimentId) {
             // Single Session
             //
-            icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
-            icrXnatRoiSession.set('experimentId', experimentId);
-            icrXnatRoiSession.set('subjectId', subjectId);
-            icrXnatRoiSession.set('projectId', projectId);
-            icrXnatRoiSession.set('parentProjectId', parentProjectId);
-
-            OHIF.RoiStateManagement.checkAndSetPermissions();
+            OHIF.RoiStateManagement.checkAndSetPermissions(projectId, parentProjectId);
 
             // Build JSON GET url.
             const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
@@ -111,7 +111,13 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   return;
               }
 
-              sessionMap.set(json, experimentId, experimentLabel);
+              sessionMap.set(json, {
+                experimentId,
+                experimentLabel,
+                subjectId,
+                projectId,
+                parentProjectId
+              });
 
               let jsonString = JSON.stringify(json);
 
@@ -132,14 +138,9 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
             // Whole Subject.
             //
 
-            icrXnatRoiSession.set('sourceProjectId', parentProjectId ? parentProjectId : projectId);
-            icrXnatRoiSession.set('projectId', projectId);
-            icrXnatRoiSession.set('subjectId', subjectId);
-
-
             const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
 
-            OHIF.RoiStateManagement.checkAndSetPermissions();
+            OHIF.RoiStateManagement.checkAndSetPermissions(projectId, parentProjectId);
 
             getJson(subjectExperimentListUrl).then(json => {
               // TODO -> Fetch each json.
@@ -170,7 +171,13 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   const experimentJsonI = jsonFiles[i];
                   const studiesI = experimentJsonI.studies;
 
-                  sessionMap.set(experimentJsonI, experimentList[i].ID, experimentList[i].label);
+                  sessionMap.set(experimentJsonI, {
+                    experimentId: experimentList[i].ID,
+                    experimentLabel: experimentList[i].label,
+                    subjectId,
+                    projectId,
+                    parentProjectId
+                  });
 
                   console.log('Session Map:')
                   console.log(sessionMap);
@@ -273,7 +280,20 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
                   const parsedJSON = JSON.parse(oReq.responseText);
 
-                  sessionMap.set(parsedJSON, 'TEST_EXPERIMENT_ID', 'TEST_EXPERIMENT_LABEL');
+                  sessionMap.set(parsedJSON, {
+                    experimentId: 'XNAT_JPETTS_E00014',
+                    experimentLabel: 'Patient2',
+                    subjectId: 'XNAT_JPETTS_S00011',
+                    projectId: 'TEST_PROJECT_ID',
+                    parentProjectId: 'ITCRdemo'
+                  });
+
+                  sessionMap.setSession({
+                    projectId: 'ITCRdemo',
+                    subjectId: 'XNAT_JPETTS_S00011',
+                    experimentId: 'XNAT_JPETTS_E00014',
+                    experimentLabel: 'Patient2'
+                  });
 
                   this.data = parsedJSON
 

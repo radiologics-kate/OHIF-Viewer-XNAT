@@ -1,4 +1,3 @@
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { generateUID } from "meteor/icr:peppermint-tools";
 import { fetchCSRFToken } from "../IO/csrfToken.js";
@@ -9,9 +8,12 @@ const XMLWriter = require("xml-writer");
 export class DICOMSEGExporter {
   constructor(segBlob, seriesInstanceUid, label, name) {
     this._payload = segBlob;
-    this._projectID = icrXnatRoiSession.get("sourceProjectId");
-    this._subjectID = icrXnatRoiSession.get("subjectId");
     this._seriesInstanceUID = seriesInstanceUid;
+    this._projectID = sessionMap.get(
+      this._seriesInstanceUID,
+      "parentProjectId"
+    );
+    this._subjectID = sessionMap.get(this._seriesInstanceUID, "subjectId");
     this._experimentID = sessionMap.get(
       this._seriesInstanceUID,
       "experimentId"

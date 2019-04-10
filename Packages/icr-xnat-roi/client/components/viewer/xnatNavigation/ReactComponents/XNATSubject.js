@@ -6,7 +6,7 @@ import fetchJSON from "./helpers/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { sessionMap } from "meteor/icr:series-info-provider";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import awaitConfirmationDialog from "../../../../lib/IO/awaitConfirmationDialog.js";
@@ -17,12 +17,10 @@ export default class XNATSubject extends React.Component {
     super(props);
 
     const active =
-      this.props.projectId === icrXnatRoiSession.get("projectId") &&
-      this.props.ID === icrXnatRoiSession.get("subjectId");
+      this.props.projectId === sessionMap.get("session", "projectId") &&
+      this.props.ID === sessionMap.get("session", "subjectId");
     const subjectViewActive =
-      this.props.projectId === icrXnatRoiSession.get("projectId") &&
-      this.props.ID === icrXnatRoiSession.get("subjectId") &&
-      icrXnatRoiSession.get("experimentId") === undefined;
+      active && sessionMap.get("session", "experimentId") === undefined;
 
     const shared = this.props.parentProjectId !== this.props.projectId;
 
