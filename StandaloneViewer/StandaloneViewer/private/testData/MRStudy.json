@@ -10,9 +10,9 @@
       "patientId": "832040",
       "seriesList": [
         {
-          "seriesDescription": "3-PLANE LOC",
+          "seriesDescription": "3-PLANE_LOC_1_WITH_ADDED_STUFF_SO_THAT_ITS_SIXTYFOUR_CHARACTERS.",
           "seriesInstanceUid": "1.2.840.113619.2.5.1762583153.215519.978957063.79",
-          "seriesNumber": "1",
+          "seriesNumber": "1234567890",
           "seriesDate": "20010108",
           "seriesTime": "120022",
           "seriesModality": "MR",
@@ -514,9 +514,9 @@
           ]
         },
         {
-          "seriesDescription": "SAG T-1",
+          "seriesDescription": "SAG T-1 WITH ADDED SPACES&STUFF SO THAT ITS SIXTYFOUR CHARACTERS.",
           "seriesInstanceUid": "1.2.840.113619.2.5.1762583153.215519.978957063.121",
-          "seriesNumber": "2",
+          "seriesNumber": "123",
           "seriesDate": "20010108",
           "seriesTime": "120318",
           "seriesModality": "MR",
