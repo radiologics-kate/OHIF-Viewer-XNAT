@@ -32,22 +32,27 @@ Meteor.startup(function() {
     // Tool hotkeys
     defaultTool: "ESC",
     zoom: "Z",
-    wwwc: "W",
+    wwwc: "L",
+    wwwcRegion: "R",
     pan: "P",
-    angle: "A",
-    stackScroll: "S",
+    angle: "",
+    stackScroll: "",
     magnify: "M",
     length: "",
     annotate: "",
     dragProbe: "",
     ellipticalRoi: "",
     rectangleRoi: "",
+    freehandMouse: "D",
+    freehandSculpterMouse: "S",
+    eraser: "E",
+    brush: "B",
 
     // Viewport hotkeys
     flipH: "H",
     flipV: "V",
-    rotateR: "R",
-    rotateL: "L",
+    rotateR: ",",
+    rotateL: ".",
     invert: "I",
     zoomIn: "",
     zoomOut: "",
@@ -69,9 +74,10 @@ Meteor.startup(function() {
     toggleOverlayTags: "O",
     toggleCinePlay: "SPACE",
     toggleCineDialog: "",
-    toggleDownloadDialog: "",
+    toggleDownloadDialog: ""
 
     // Preset hotkeys
+    /*
     WLPreset0: "1",
     WLPreset1: "2",
     WLPreset2: "3",
@@ -82,6 +88,7 @@ Meteor.startup(function() {
     WLPreset7: "8",
     WLPreset8: "9",
     WLPreset9: "0"
+    */
   };
 
   // For now

@@ -53,7 +53,7 @@ Template.freehandHelpMenu.events({
     this.showFreehandHelp.set("ROI Management");
   },
   "click .js-help-toggle-stats"(event) {
-    this.showFreehandHelp.set("Stats ON/OFF");
+    this.showFreehandHelp.set("Stats");
   },
   "click .js-help-interpolate"(event) {
     this.showFreehandHelp.set("Interpolate");

@@ -56,14 +56,14 @@ Template.toolbarSection.helpers({
 
         extraTools.push({
             id: 'magnify',
-            title: 'Magnify',
+            title: 'Magnify (M)',
             classes: 'imageViewerTool toolbarSectionButton',
             iconClasses: 'fa fa-circle'
         });
 
         extraTools.push({
             id: 'wwwcRegion',
-            title: 'ROI Window',
+            title: 'ROI Window (R)',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-square'
         });
@@ -84,28 +84,35 @@ Template.toolbarSection.helpers({
 
         extraTools.push({
             id: 'invert',
-            title: 'Invert',
+            title: 'Invert (I)',
             classes: 'imageViewerCommand',
             iconClasses: 'fa fa-adjust'
         });
 
         extraTools.push({
+            id: 'rotateL',
+            title: 'Left (<)',
+            classes: 'imageViewerCommand',
+            svgLink: '/packages/ohif_viewerbase/assets/icons.svg#icon-tools-rotate-left'
+        });
+
+        extraTools.push({
             id: 'rotateR',
-            title: 'Rotate Right',
+            title: 'Right (>)',
             classes: 'imageViewerCommand',
             svgLink: '/packages/ohif_viewerbase/assets/icons.svg#icon-tools-rotate-right'
         });
 
         extraTools.push({
             id: 'flipH',
-            title: 'Flip H',
+            title: 'Flip H (H)',
             classes: 'imageViewerCommand',
             svgLink: '/packages/ohif_viewerbase/assets/icons.svg#icon-tools-flip-horizontal'
         });
 
         extraTools.push({
             id: 'flipV',
-            title: 'Flip V',
+            title: 'Flip V (V)',
             classes: 'imageViewerCommand',
             svgLink: '/packages/ohif_viewerbase/assets/icons.svg#icon-tools-flip-vertical'
         });
@@ -118,34 +125,6 @@ Template.toolbarSection.helpers({
         });
 
         const buttonData = [];
-
-        buttonData.push({
-            id: 'stackScroll',
-            title: 'Stack Scroll',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-bars'
-        });
-
-        buttonData.push({
-            id: 'zoom',
-            title: 'Zoom',
-            classes: 'imageViewerTool',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-zoom'
-        });
-
-        buttonData.push({
-            id: 'wwwc',
-            title: 'Levels',
-            classes: 'imageViewerTool',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-levels'
-        });
-
-        buttonData.push({
-            id: 'pan',
-            title: 'Pan',
-            classes: 'imageViewerTool',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-pan'
-        });
 
         if (!OHIF.uiSettings.displayEchoUltrasoundWorkflow) {
 
@@ -187,6 +166,41 @@ Template.toolbarSection.helpers({
             iconClasses: 'fa fa-th-large',
             buttonTemplateName: 'layoutButton'
         });
+
+        buttonData.push({
+            id: 'zoom',
+            title: 'Zoom (Z)',
+            classes: 'imageViewerTool',
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-zoom'
+        });
+
+        buttonData.push({
+            id: 'wwwc',
+            title: 'Levels (L)',
+            classes: 'imageViewerTool',
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-levels'
+        });
+
+        buttonData.push({
+            id: 'pan',
+            title: 'Pan (P)',
+            classes: 'imageViewerTool',
+            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-pan'
+        });
+
+        /*
+        const orientationTools = [
+
+        ];
+
+        buttonData.push({
+            id: 'Annotations',
+            title: 'Annotations',
+            classes: 'rp-x-1 rm-l-3',
+            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#annotations-menu',
+            subTools: annotationTools
+        });
+        */
 
         const annotationTools = [
           {
@@ -241,13 +255,13 @@ Template.toolbarSection.helpers({
         const freehandTools = [
           {
               id: 'freehandMouse',
-              title: 'Draw',
+              title: 'Draw (D)',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-draw'
           },
           {
               id: 'freehandSculpterMouse',
-              title: 'Sculpt',
+              title: 'Sculpt (S)',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-sculpt'
           },
@@ -256,28 +270,46 @@ Template.toolbarSection.helpers({
             title: 'ROI Management',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-switch-volume'
-          },
-          {
-            id: 'toggleFreehandStats',
-            title: showFreehandStats ? 'Stats ON' : 'Stats OFF',
-            classes: 'imageViewerCommand',
-            iconClasses: showFreehandStats ? 'fa fa-commenting' : 'fa fa-comment-o'
-          },
+          }
+        ];
+
+        if (showFreehandStats) {
+          freehandTools.push(
+            {
+              id: 'toggleFreehandStats',
+              title: 'Stats',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-on'
+            }
+          );
+        } else {
+          freehandTools.push(
+            {
+              id: 'toggleFreehandStats',
+              title: 'Stats',
+              classes: 'imageViewerCommand',
+              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-off'
+            }
+          );
+        }
+
+
+
+        freehandTools.push(
           {
             id: 'toggleFreehandInterpolate',
-            title: freehandInterpolate ? 'Interpolation ON' : 'Interpolation OFF',
+            title: freehandInterpolate ? 'Interpolation' : 'Interpolation',
             classes: 'imageViewerCommand',
             svgLink: freehandInterpolate
             ? 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on'
             : 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-off'
-            //iconClasses: freehandInterpolate ? 'fa fa-commenting' : 'fa fa-comment-o'
-          },
-        ];
+          }
+        );
 
         const deleteTools = [
           {
             id: 'eraser',
-            title: 'Eraser',
+            title: 'Eraser (E)',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-eraser'
           },
@@ -300,7 +332,7 @@ Template.toolbarSection.helpers({
         const brushTools = [
           {
             id: 'brush',
-            title: 'Paint',
+            title: 'Brush (B)',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
           },
@@ -384,21 +416,19 @@ Template.toolbarSection.helpers({
           });
         }
 
-
-
-        buttonData.push({
-          id: 'showHelp',
-          title: 'Help',
-          classes: 'imageViewerCommand',
-          iconClasses: 'fa fa-question'
-        });
-
         buttonData.push({
             id: 'toggleMore',
             title: 'More',
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-more',
             subTools: extraTools
+        });
+
+        buttonData.push({
+          id: 'showHelp',
+          title: 'Help',
+          classes: 'imageViewerCommand',
+          iconClasses: 'fa fa-question'
         });
 
         return buttonData;
