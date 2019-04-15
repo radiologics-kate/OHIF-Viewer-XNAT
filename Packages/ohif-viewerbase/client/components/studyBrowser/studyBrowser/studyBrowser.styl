@@ -1,5 +1,6 @@
 @import "{ohif:design}/app"
 
+
 .studyBrowser
   float: left
   height: 100%
@@ -16,12 +17,27 @@
     padding-bottom: 50px
     padding-right: 16px
     padding-left: 4px
-    margin-right: -16px
+
+    //JamesAPetts
+    theme('scrollbar-color', '$imageSliderColor black')
+
+
+
+
+    //JamesAPetts - OHIF defaults
+    /** margin-right: -16px */
+    /** &::-webkit-scrollbar */
+    /**  display: none */
 
     &::-webkit-scrollbar
-      display: none
+      background: black
+      width: 10px
 
-  // JamesAPetts
+    &::-webkit-scrollbar-thumb
+      theme('background', '$imageSliderColor')
+      border-radius: 10px
+      border-right: 2px solid black
+
   .scrollableStudyThumbnailsStudyDescription
     theme('color', '$textPrimaryColor')
     font-size: 20px
@@ -31,6 +47,7 @@
     max-width: 217px
     min-height: 36px
     position: relative
+    // JamesAPetts
     word-wrap: break-word
     display: inline-block
 
