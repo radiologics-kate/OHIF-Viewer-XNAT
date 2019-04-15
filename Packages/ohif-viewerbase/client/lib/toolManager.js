@@ -11,6 +11,7 @@ import {
   Freehand3DMouseTool,
   Freehand3DSculpterMouseTool,
   Brush3DTool,
+  Brush3DHUGatedTool,
   freehand3DModule
 } from "meteor/icr:peppermint-tools";
 
@@ -53,6 +54,10 @@ export const toolManager = {
     cornerstoneTools.register("module", "freehand3D", freehand3DModule);
 
     cornerstoneTools.init({ showSVGCursors: true });
+
+    console.log(cornerstoneTools.store.modules.brush.state);
+
+    cornerstoneTools.store.modules.brush.state.maxRadius = 512;
 
     // Define tools object with the corresponding class names in cornerstone tools,
     //  and support for setting different configuration per tool
@@ -131,7 +136,8 @@ export const toolManager = {
     pluginTools = {
       freehandMouse: Freehand3DMouseTool,
       freehandSculpterMouse: Freehand3DSculpterMouseTool,
-      brush: Brush3DTool
+      brush: Brush3DTool,
+      brushHUGated: Brush3DHUGatedTool
     };
 
     const { textStyle, toolStyle, toolColors } = cornerstoneTools;
@@ -346,6 +352,11 @@ export const toolManager = {
 
     const brushTool = pluginTools["brush"];
     cornerstoneTools.addToolForElement(element, brushTool, { name: "brush" });
+
+    const brushHUGatedTool = pluginTools["brushHUGated"];
+    cornerstoneTools.addToolForElement(element, brushHUGatedTool, {
+      name: "brushHUGated"
+    });
 
     const freehandSculpterMouseTool = pluginTools["freehandSculpterMouse"];
     cornerstoneTools.addToolForElement(element, freehandSculpterMouseTool, {

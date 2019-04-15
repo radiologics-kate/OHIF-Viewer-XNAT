@@ -6,6 +6,9 @@ export {
   default as Freehand3DSculpterMouseTool
 } from "./client/lib/tools/Freehand3DSculpterMouseTool.js";
 export { default as Brush3DTool } from "./client/lib/tools/Brush3DTool.js";
+export {
+  default as Brush3DHUGatedTool
+} from "./client/lib/tools/Brush3DHUGatedTool.js";
 
 // Modules
 export {

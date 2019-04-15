@@ -11,7 +11,7 @@ const MODES = {
 };
 
 const BrushTool = cornerstoneTools.BrushTool;
-const brushStore = cornerstoneTools.store.modules.brush;
+const brushModule = cornerstoneTools.store.modules.brush;
 
 export default class Brush3DTool extends BrushTool {
   constructor(configuration = {}) {
@@ -36,11 +36,11 @@ export default class Brush3DTool extends BrushTool {
   _startPainting(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
-    const segIndex = brushStore.state.drawColorId;
+    const segIndex = brushModule.state.drawColorId;
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     // Check if metadata exists,
-    const metaData = brushStore.getters.metadata(seriesInstanceUid, segIndex);
+    const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
 
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
@@ -51,7 +51,7 @@ export default class Brush3DTool extends BrushTool {
       this._lastImageCoords = eventData.currentPoints.image;
     } else if (!isModalOpen()) {
       // Open the UI and let the user input data!
-      brushMetadataIO(brushStore.state.drawColorId);
+      brushMetadataIO(brushModule.state.drawColorId);
     }
   }
 
@@ -65,11 +65,11 @@ export default class Brush3DTool extends BrushTool {
   _startPaintingTouch(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
-    const segIndex = brushStore.state.drawColorId;
+    const segIndex = brushModule.state.drawColorId;
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     // Check if metadata exists,
-    const metaData = brushStore.getters.metadata(seriesInstanceUid, segIndex);
+    const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
 
     if (metaData && metaData.SegmentLabel) {
       // Metadata assigned, start drawing.
@@ -77,18 +77,21 @@ export default class Brush3DTool extends BrushTool {
       this._paint(evt);
     } else if (!isModalOpen()) {
       // Open the UI and let the user input data!
-      brushMetadataIO(brushStore.state.drawColorId);
+      brushMetadataIO(brushModule.state.drawColorId);
     }
   }
 
   _setActiveStrategy(seriesInstanceUid) {
     this.activeStrategy = MODES.OVERLAPPING;
 
-    if (brushStore.state.import && brushStore.state.import[seriesInstanceUid]) {
+    if (
+      brushModule.state.import &&
+      brushModule.state.import[seriesInstanceUid]
+    ) {
       // Modified an imported mask.
-      brushStore.state.import[seriesInstanceUid].modified = true;
+      brushModule.state.import[seriesInstanceUid].modified = true;
 
-      if (brushStore.state.import[seriesInstanceUid].type === "NIFTI") {
+      if (brushModule.state.import[seriesInstanceUid].type === "NIFTI") {
         this.activeStrategy = MODES.NON_OVERLAPPING;
       }
     }
@@ -96,15 +99,15 @@ export default class Brush3DTool extends BrushTool {
 
   static checkIfAnyMetadataOnSeries() {
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-    const metaData = brushStore.getters.metadata(seriesInstanceUid);
+    const metaData = brushModule.getters.metadata(seriesInstanceUid);
 
     console.log(metaData);
 
     // If metadata doesn't exist, or all elements undefined (i.e. deleted), open UI.
     if (!metaData || !metaData.find(element => element)) {
       if (!isModalOpen()) {
-        brushStore.state.drawColorId = 0;
-        brushMetadataIO(brushStore.state.drawColorId);
+        brushModule.state.drawColorId = 0;
+        brushMetadataIO(brushModule.state.drawColorId);
       }
     }
   }

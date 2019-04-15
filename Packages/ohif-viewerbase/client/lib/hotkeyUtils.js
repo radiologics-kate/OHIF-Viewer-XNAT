@@ -9,7 +9,11 @@ import { switchToImageByIndex } from "./switchToImageByIndex";
 import { viewportUtils } from "./viewportUtils";
 import { panelNavigation } from "./panelNavigation";
 import { WLPresets } from "./WLPresets";
-import { Freehand3DMouseTool, Brush3DTool } from "meteor/icr:peppermint-tools";
+import {
+  Freehand3DMouseTool,
+  Brush3DTool,
+  Brush3DHUGatedTool
+} from "meteor/icr:peppermint-tools";
 
 // TODO: add this to namespace definitions
 Meteor.startup(function() {
@@ -142,6 +146,7 @@ Meteor.startup(function() {
     eraser: "Eraser"
   });
 
+  // JamesAPetts Hooks on tool activation.
   OHIF.commands.register(contextName, "freehandMouse", {
     name: "Freehand Mouse",
     action: toolManager.setActiveToolWithHook,
@@ -157,6 +162,15 @@ Meteor.startup(function() {
     params: {
       toolName: "brush",
       hook: Brush3DTool.checkIfAnyMetadataOnSeries
+    }
+  });
+
+  OHIF.commands.register(contextName, "brushHUGated", {
+    name: "HU Gated Brush",
+    action: toolManager.setActiveToolWithHook,
+    params: {
+      toolName: "brushHUGated",
+      hook: Brush3DHUGatedTool.checkIfAnyMetadataOnSeries
     }
   });
 
