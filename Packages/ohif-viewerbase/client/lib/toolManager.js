@@ -12,6 +12,7 @@ import {
   Freehand3DSculpterMouseTool,
   Brush3DTool,
   Brush3DHUGatedTool,
+  Brush3DAutoGatedTool,
   freehand3DModule
 } from "meteor/icr:peppermint-tools";
 
@@ -137,7 +138,8 @@ export const toolManager = {
       freehandMouse: Freehand3DMouseTool,
       freehandSculpterMouse: Freehand3DSculpterMouseTool,
       brush: Brush3DTool,
-      brushHUGated: Brush3DHUGatedTool
+      brushHUGated: Brush3DHUGatedTool,
+      brushAutoGated: Brush3DAutoGatedTool
     };
 
     const { textStyle, toolStyle, toolColors } = cornerstoneTools;
@@ -356,6 +358,11 @@ export const toolManager = {
     const brushHUGatedTool = pluginTools["brushHUGated"];
     cornerstoneTools.addToolForElement(element, brushHUGatedTool, {
       name: "brushHUGated"
+    });
+
+    const brushAutoGatedTool = pluginTools["brushAutoGated"];
+    cornerstoneTools.addToolForElement(element, brushAutoGatedTool, {
+      name: "brushAutoGated"
     });
 
     const freehandSculpterMouseTool = pluginTools["freehandSculpterMouse"];

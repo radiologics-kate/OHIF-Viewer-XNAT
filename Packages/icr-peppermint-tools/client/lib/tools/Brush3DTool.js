@@ -101,8 +101,6 @@ export default class Brush3DTool extends BrushTool {
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
     const metaData = brushModule.getters.metadata(seriesInstanceUid);
 
-    console.log(metaData);
-
     // If metadata doesn't exist, or all elements undefined (i.e. deleted), open UI.
     if (!metaData || !metaData.find(element => element)) {
       if (!isModalOpen()) {

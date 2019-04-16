@@ -343,6 +343,12 @@ Template.toolbarSection.helpers({
             iconClasses: 'fa fa-paint-brush'
           },
           {
+            id: 'brushAutoGated',
+            title: 'Auto Gated Brush',
+            classes: 'imageViewerTool',
+            iconClasses: 'fa fa-paint-brush'
+          },
+          {
             id: 'segManagement',
             title: 'Seg Management',
             classes: 'imageViewerCommand',

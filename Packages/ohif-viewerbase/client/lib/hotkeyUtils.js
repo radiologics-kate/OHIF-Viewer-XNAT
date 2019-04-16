@@ -12,7 +12,8 @@ import { WLPresets } from "./WLPresets";
 import {
   Freehand3DMouseTool,
   Brush3DTool,
-  Brush3DHUGatedTool
+  Brush3DHUGatedTool,
+  Brush3DAutoGatedTool
 } from "meteor/icr:peppermint-tools";
 
 // TODO: add this to namespace definitions
@@ -171,6 +172,15 @@ Meteor.startup(function() {
     params: {
       toolName: "brushHUGated",
       hook: Brush3DHUGatedTool.checkIfAnyMetadataOnSeries
+    }
+  });
+
+  OHIF.commands.register(contextName, "brushAutoGated", {
+    name: "Auto Gated Brush",
+    action: toolManager.setActiveToolWithHook,
+    params: {
+      toolName: "brushAutoGated",
+      hook: Brush3DAutoGatedTool.checkIfAnyMetadataOnSeries
     }
   });
 

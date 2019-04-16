@@ -9,6 +9,9 @@ export { default as Brush3DTool } from "./client/lib/tools/Brush3DTool.js";
 export {
   default as Brush3DHUGatedTool
 } from "./client/lib/tools/Brush3DHUGatedTool.js";
+export {
+  default as Brush3DAutoGatedTool
+} from "./client/lib/tools/Brush3DAutoGatedTool.js";
 
 // Modules
 export {
