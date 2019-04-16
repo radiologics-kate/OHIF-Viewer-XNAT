@@ -6,7 +6,7 @@ export default {
   //https://www.ncbi.nlm.nih.gov/pubmed/21932054
   //boneCortical: [500, 900],
 
-  boneCancellous: [150, 1900],
+  boneCancellous: [150, 1900], // ?
 
   custom: [0, 0]
 };

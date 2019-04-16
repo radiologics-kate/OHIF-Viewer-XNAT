@@ -17,6 +17,9 @@ const addToolState = cornerstoneTools.addToolState;
 const { getCircle, drawBrushPixels } = cornerstoneTools.import(
   "util/brushUtils"
 );
+
+const convexHull = require("graham-scan-convex-hull");
+
 const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 
 export default class Brush3DHUGatedTool extends Brush3DTool {
@@ -76,7 +79,9 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const circle = getCircle(radius, rows, columns, x, y);
 
     // Initialise hi and lo as the first pixelValue in the circle.
-    let lo = imagePixelData[circle[0][0] + circle[0][1] * rows];
+    let lo =
+      imagePixelData[circle[0][0] + circle[0][1] * rows] * rescaleSlope +
+      rescaleIntercept;
     let hi = lo;
 
     for (let i = 0; i < circle.length; i++) {
@@ -161,8 +166,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       return;
     }
 
-    const radius = brushModule.state.radius;
-
     const pointerArray = this._gateCircle(
       image,
       getCircle(radius, rows, columns, x, y),
@@ -207,7 +210,109 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
+    //const t0 = performance.now();
+
+    // TODO
+    //this._fillCircle(circle, gatedCircleArray);
+
+    //console.log(performance.now() - t0);
+
     return gatedCircleArray;
+  }
+
+  _fillCircle(circle, gatedCircleArray) {
+    const edgeVoxels = this._giftWrapCircle(circle);
+    const circleArray2D = [];
+
+    const max = [edgeVoxels[0][0], edgeVoxels[0][1]];
+    const min = [edgeVoxels[0][0], edgeVoxels[0][1]];
+
+    for (let p = 0; p < edgeVoxels.length; p++) {
+      const [i, j] = edgeVoxels[p];
+
+      if (i > max[0]) {
+        max[0] = i;
+      } else if (i < min[0]) {
+        min[0] = i;
+      }
+
+      if (j > max[1]) {
+        max[1] = j;
+      } else if (j < min[1]) {
+        min[1] = j;
+      }
+    }
+
+    //console.log(min, max);
+
+    const xSize = max[0] - min[0] + 1;
+    const ySize = max[1] - min[1] + 1;
+
+    //console.log(xSize, ySize);
+
+    const data = [];
+
+    // Fill in square as third color.
+    for (let i = 0; i < xSize; i++) {
+      data[i] = [];
+
+      for (let j = 0; j < ySize; j++) {
+        data[i][j] = 2;
+      }
+    }
+
+    // fill circle in as not colored.
+    for (let p = 0; p < circle.length; p++) {
+      const i = circle[p][0] - min[0];
+      const j = circle[p][1] - min[1];
+
+      data[i][j] = 0;
+    }
+
+    // fill gated region as color.
+    for (let p = 0; p < gatedCircleArray.length; p++) {
+      const i = gatedCircleArray[p][0] - min[0];
+      const j = gatedCircleArray[p][1] - min[1];
+
+      data[i][j] = 1;
+    }
+
+    //console.log(data);
+
+    // Now we have a filled square with a partially filled circle in the center.
+  }
+
+  _giftWrapCircle(circle) {
+    const radius = brushModule.state.radius;
+
+    if (radius < 5) {
+      return convexHull(circle);
+    }
+
+    // We know the collection of points is a circle, so remove most of them, then do a graham scan to get only the edge voxels.
+    const com = [0, 0];
+
+    for (let i = 0; i < circle.length; i++) {
+      com[0] += circle[i][0];
+      com[1] += circle[i][1];
+    }
+
+    com[0] = com[0] / circle.length;
+    com[1] = com[1] / circle.length;
+
+    const edgeFew = [];
+
+    // Ignore all central points for giftwrap.
+    const ignoreRadius = radius - 2;
+
+    for (let i = 0; i < circle.length; i++) {
+      const dist = (circle[i][0] - com[0]) ** 2 + (circle[i][1] - com[1]) ** 2;
+      if (dist > ignoreRadius ** 2) {
+        edgeFew.push(circle[i]);
+      }
+    }
+
+    return convexHull(edgeFew);
   }
 
   _drawMainColor(eventData, toolData, pointerArray) {

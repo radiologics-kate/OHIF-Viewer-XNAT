@@ -58,7 +58,7 @@ export const toolManager = {
 
     console.log(cornerstoneTools.store.modules.brush.state);
 
-    cornerstoneTools.store.modules.brush.state.maxRadius = 512;
+    cornerstoneTools.store.modules.brush.state.maxRadius = 128;
 
     // Define tools object with the corresponding class names in cornerstone tools,
     //  and support for setting different configuration per tool

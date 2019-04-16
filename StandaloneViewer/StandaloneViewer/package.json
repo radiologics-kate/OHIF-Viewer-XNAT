@@ -9,6 +9,7 @@
     "cornerstone-web-image-loader": "^2.1.0",
     "dcmjs": "^0.4.7",
     "gpu.js": "^1.10.4",
+    "graham-scan-convex-hull": "^0.4.0",
     "loglevel": "^1.6.1",
     "mousetrap": "^1.6.2",
     "nifti-reader-js": "^0.5.4",
