@@ -18,7 +18,7 @@ const { getCircle, drawBrushPixels } = cornerstoneTools.import(
   "util/brushUtils"
 );
 
-const convexHull = require("graham-scan-convex-hull");
+const floodFill = require("n-dimensional-flood-fill");
 
 const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 
@@ -27,7 +27,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const defaultConfig = {
       name: "Brush",
       configuration: {
-        gate: "adipose"
+        gate: "muscle"
       }
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
@@ -210,25 +210,59 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    //const t0 = performance.now();
+    const t0 = performance.now();
 
     // TODO
-    //this._fillCircle(circle, gatedCircleArray);
+    const filledGatedCircleArray = this._fillCircle(circle, gatedCircleArray);
 
-    //console.log(performance.now() - t0);
+    console.log(performance.now() - t0);
 
-    return gatedCircleArray;
+    return filledGatedCircleArray;
+
+    //return gatedCircleArray;
+  }
+
+  _getEdgePixels(data) {
+    const edgePixels = [];
+
+    //this._tempPrintData(data);
+
+    const xSize = data.length;
+    const ySize = data[0].length;
+
+    //first and last row add all of top and bottom.
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][0] === 0) {
+        edgePixels.push([i, 0]);
+        edgePixels.push([i, ySize - 1]);
+      }
+    }
+
+    // all other rows - Find first circle member, and use its position to add
+    // The first and last circle member of that row.
+    for (let j = 1; j < ySize - 1; j++) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i][j] === 0) {
+          edgePixels.push([i, j]);
+          edgePixels.push([xSize - 1 - i, j]);
+
+          break;
+        }
+      }
+    }
+
+    return edgePixels;
   }
 
   _fillCircle(circle, gatedCircleArray) {
-    const edgeVoxels = this._giftWrapCircle(circle);
+    //const edgeVoxels = this._giftWrapCircle(circle);
     const circleArray2D = [];
 
-    const max = [edgeVoxels[0][0], edgeVoxels[0][1]];
-    const min = [edgeVoxels[0][0], edgeVoxels[0][1]];
+    const max = [circle[0][0], circle[0][1]];
+    const min = [circle[0][0], circle[0][1]];
 
-    for (let p = 0; p < edgeVoxels.length; p++) {
-      const [i, j] = edgeVoxels[p];
+    for (let p = 0; p < circle.length; p++) {
+      const [i, j] = circle[p];
 
       if (i > max[0]) {
         max[0] = i;
@@ -269,6 +303,8 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i][j] = 0;
     }
 
+    const edgePixels = this._getEdgePixels(data);
+
     // fill gated region as color.
     for (let p = 0; p < gatedCircleArray.length; p++) {
       const i = gatedCircleArray[p][0] - min[0];
@@ -277,9 +313,75 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i][j] = 1;
     }
 
-    //console.log(data);
+    this._tempPrintData(data);
+
+    // Define our getter for accessing the data structure.
+    function getter(x, y) {
+      return data[x][y];
+    }
+
+    for (let p = 0; p < edgePixels.length; p++) {
+      const i = edgePixels[p][0];
+      const j = edgePixels[p][1];
+
+      if (data[i][j] === 0) {
+        const result = floodFill({
+          getter: getter,
+          seed: [i, j]
+        });
+
+        //console.log(result);
+
+        const flooded = result.flooded;
+
+        for (let k = 0; k < flooded.length; k++) {
+          data[flooded[k][0]][flooded[k][1]] = 3;
+        }
+
+        this._tempPrintData(data);
+      }
+    }
+
+    const filledGatedCircleArray = [];
+
+    for (let i = 0; i < xSize; i++) {
+      for (let j = 0; j < ySize; j++) {
+        if (data[i][j] === 0 || data[i][j] === 1) {
+          filledGatedCircleArray.push([i + min[0], j + min[1]]);
+        }
+      }
+    }
+
+    //console.log(filledGatedCircleArray);
+
+    return filledGatedCircleArray;
 
     // Now we have a filled square with a partially filled circle in the center.
+  }
+
+  // TEMP
+  _tempPrintData(data) {
+    for (let j = 0; j < data[0].length; j++) {
+      const line = [];
+
+      for (let i = 0; i < data.length; i++) {
+        line.push(data[i][j]);
+      }
+
+      console.log(
+        line
+          .join(" ")
+          .replace(/2/g, "_")
+          .replace(/3/g, "F") + `   ${j}`
+      );
+    }
+
+    /*
+    for (let i = 0; i < data.length; i++) {
+
+      console.log(data[i].join(" ").replace(/2/g, "_"));
+    }
+    */
   }
 
   _giftWrapCircle(circle) {

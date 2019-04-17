@@ -12,6 +12,7 @@
     "graham-scan-convex-hull": "^0.4.0",
     "loglevel": "^1.6.1",
     "mousetrap": "^1.6.2",
+    "n-dimensional-flood-fill": "^1.0.0",
     "nifti-reader-js": "^0.5.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
