@@ -27,7 +27,9 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const defaultConfig = {
       name: "Brush",
       configuration: {
-        gate: "muscle"
+        gate: "muscle",
+        holeFill: 0.02, // Fill voids when smaller than this fraction of host region.
+        strayRemove: 0.05 // Don't paint secondary objects smaller than this fraction of the primary.
       }
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
@@ -56,7 +58,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
    */
   preMouseDownCallback(evt) {
     if (evt.detail.event.shiftKey) {
-      console.log("SHIFT!");
       this._setCustomGate(evt);
       return true;
     }
@@ -97,8 +98,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
         hi = pixelValue;
       }
     }
-
-    console.log(lo, hi);
 
     this._configuration.gate = "custom";
     gatedHU.custom = [lo, hi];
@@ -255,7 +254,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
   }
 
   _fillCircle(circle, gatedCircleArray) {
-    //const edgeVoxels = this._giftWrapCircle(circle);
+    const config = this._configuration;
     const circleArray2D = [];
 
     const max = [circle[0][0], circle[0][1]];
@@ -291,7 +290,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i] = [];
 
       for (let j = 0; j < ySize; j++) {
-        data[i][j] = 2;
+        data[i][j] = -1;
       }
     }
 
@@ -313,7 +312,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i][j] = 1;
     }
 
-    this._tempPrintData(data);
+    //this._tempPrintData(data);
 
     // Define our getter for accessing the data structure.
     function getter(x, y) {
@@ -335,18 +334,98 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
         const flooded = result.flooded;
 
         for (let k = 0; k < flooded.length; k++) {
-          data[flooded[k][0]][flooded[k][1]] = 3;
+          data[flooded[k][0]][flooded[k][1]] = 2;
         }
 
-        this._tempPrintData(data);
+        //this._tempPrintData(data);
       }
     }
 
     const filledGatedCircleArray = [];
 
+    // TEMP
+
+    const holes = [];
+    const regions = [];
+
+    // Find each hole and paint them 3.
+    // Find contiguous volumes and paint them 4.
+    for (let p = 0; p < circle.length; p++) {
+      const i = circle[p][0] - min[0];
+      const j = circle[p][1] - min[1];
+
+      if (data[i][j] === 0) {
+        const result = floodFill({
+          getter: getter,
+          seed: [i, j]
+        });
+
+        const flooded = result.flooded;
+
+        for (let k = 0; k < flooded.length; k++) {
+          data[flooded[k][0]][flooded[k][1]] = 3;
+        }
+
+        holes.push(flooded);
+      } else if (data[i][j] === 1) {
+        const result = floodFill({
+          getter: getter,
+          seed: [i, j]
+        });
+
+        const flooded = result.flooded;
+
+        for (let k = 0; k < flooded.length; k++) {
+          data[flooded[k][0]][flooded[k][1]] = 4;
+        }
+
+        regions.push(flooded);
+      }
+    }
+
+    //this._tempPrintData(data);
+
+    //console.log(regions);
+    //console.log(holes);
+
+    // Get size of largest region
+    let largestRegionArea = 0;
+
+    for (let i = 0; i < regions.length; i++) {
+      if (regions[i].length > largestRegionArea) {
+        largestRegionArea = regions[i].length;
+      }
+    }
+
+    // Delete any region outside the `strayRemove` threshold.
+    for (let r = 0; r < regions.length; r++) {
+      const region = regions[r];
+      if (region.length <= config.strayRemove * largestRegionArea) {
+        for (let p = 0; p < region.length; p++) {
+          data[region[p][0]][region[p][1]] = 2;
+        }
+      }
+    }
+
+    //this._tempPrintData(data);
+
+    // Fill in any holes smaller than the `holeFill` threshold.
+    for (let r = 0; r < holes.length; r++) {
+      const hole = holes[r];
+      if (hole.length <= config.holeFill * largestRegionArea) {
+        for (let p = 0; p < hole.length; p++) {
+          data[hole[p][0]][hole[p][1]] = 4;
+        }
+      }
+    }
+
+    //this._tempPrintData(data);
+
+    //return gatedCircleArray;
+
     for (let i = 0; i < xSize; i++) {
       for (let j = 0; j < ySize; j++) {
-        if (data[i][j] === 0 || data[i][j] === 1) {
+        if (data[i][j] === 4) {
           filledGatedCircleArray.push([i + min[0], j + min[1]]);
         }
       }
@@ -371,8 +450,8 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       console.log(
         line
           .join(" ")
-          .replace(/2/g, "_")
-          .replace(/3/g, "F") + `   ${j}`
+          .replace(/-1/g, "_")
+          .replace(/2/g, "F") + `   ${j}`
       );
     }
 
