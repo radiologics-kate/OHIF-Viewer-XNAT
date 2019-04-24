@@ -25,20 +25,13 @@ const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 export default class Brush3DHUGatedTool extends Brush3DTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: "Brush",
-      configuration: {
-        gate: "muscle",
-        holeFill: 0.02, // Fill voids when smaller than this fraction of host region.
-        strayRemove: 0.05 // Don't paint secondary objects smaller than this fraction of the primary.
-      }
+      name: "Brush"
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
 
     super(initialConfiguration);
 
     this.initialConfiguration = initialConfiguration;
-
-    console.log(this);
 
     // Bind the strategies so that we can use `this`.
     this.strategies = {
@@ -47,6 +40,26 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     };
 
     this.touchDragCallback = this._startPaintingTouch.bind(this);
+
+    const brushState = brushModule.state;
+
+    // Set defaults if they are unset
+    // (TODO: Write a helper for peppermint initialisation that sets store variables and can override defaults?)
+    if (brushState.holeFill === undefined) {
+      brushState.holeFill = 0.02; // Fill voids when smaller than this fraction of host region.
+    }
+
+    if (brushState.strayRemove === undefined) {
+      brushState.strayRemove = 0.05; // Don't paint secondary objects smaller than this fraction of the primary.
+    }
+
+    // TODO -> Don't set this by default. Pop up UI for tissue type if not set.
+
+    // TEMP
+    if (brushState.gate === undefined) {
+      brushState.gate = "adipose";
+    }
+    // TEMP
   }
 
   /**
@@ -99,7 +112,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    this._configuration.gate = "custom";
+    brushModule.state.gate = "custom";
     gatedHU.custom = [lo, hi];
   }
 
@@ -131,7 +144,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const pointerArray = this._gateCircle(
       image,
       getCircle(radius, rows, columns, x, y),
-      this._configuration.gate,
+      brushModule.state.gate,
       rows,
       columns
     );
@@ -168,7 +181,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const pointerArray = this._gateCircle(
       image,
       getCircle(radius, rows, columns, x, y),
-      this._configuration.gate,
+      brushModule.state.gate,
       rows,
       columns
     );
@@ -209,27 +222,23 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    const t0 = performance.now();
-
-    // TODO
-    const filledGatedCircleArray = this._fillCircle(circle, gatedCircleArray);
-
-    console.log(performance.now() - t0);
-
-    return filledGatedCircleArray;
-
-    //return gatedCircleArray;
+    return this._cleanGatedCircle(circle, gatedCircleArray);
   }
 
+  /**
+   * _getEdgePixels - Returns the indicies of the edge pixels for the circular
+   * brush data.
+   *
+   * @param  {Number[][]} data The squared-circle data where all circle members are
+   *                     0, and values outside the circle are -1
+   * @returns {Number[][]} An array of positions of the circle edge pixels.
+   */
   _getEdgePixels(data) {
     const edgePixels = [];
-
-    //this._tempPrintData(data);
-
     const xSize = data.length;
     const ySize = data[0].length;
 
-    //first and last row add all of top and bottom.
+    //first and last row add all of top and bottom which are circle members.
     for (let i = 0; i < data.length; i++) {
       if (data[i][0] === 0) {
         edgePixels.push([i, 0]);
@@ -253,7 +262,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     return edgePixels;
   }
 
-  _fillCircle(circle, gatedCircleArray) {
+  _cleanGatedCircle(circle, gatedCircleArray) {
     const config = this._configuration;
     const circleArray2D = [];
 
@@ -400,7 +409,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // Delete any region outside the `strayRemove` threshold.
     for (let r = 0; r < regions.length; r++) {
       const region = regions[r];
-      if (region.length <= config.strayRemove * largestRegionArea) {
+      if (region.length <= brushModule.state.strayRemove * largestRegionArea) {
         for (let p = 0; p < region.length; p++) {
           data[region[p][0]][region[p][1]] = 2;
         }
@@ -412,7 +421,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // Fill in any holes smaller than the `holeFill` threshold.
     for (let r = 0; r < holes.length; r++) {
       const hole = holes[r];
-      if (hole.length <= config.holeFill * largestRegionArea) {
+      if (hole.length <= brushModule.state.holeFill * largestRegionArea) {
         for (let p = 0; p < hole.length; p++) {
           data[hole[p][0]][hole[p][1]] = 4;
         }
