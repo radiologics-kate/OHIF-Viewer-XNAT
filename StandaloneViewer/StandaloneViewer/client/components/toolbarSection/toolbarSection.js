@@ -338,13 +338,13 @@ Template.toolbarSection.helpers({
           },
           {
             id: 'brushHUGated',
-            title: 'HU Gated Brush',
+            title: 'CT Smart Brush',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
           },
           {
             id: 'brushAutoGated',
-            title: 'Auto Gated Brush',
+            title: 'Auto Smart Brush',
             classes: 'imageViewerTool',
             iconClasses: 'fa fa-paint-brush'
           },

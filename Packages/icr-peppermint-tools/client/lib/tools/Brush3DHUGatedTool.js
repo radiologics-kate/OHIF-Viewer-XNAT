@@ -46,7 +46,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // Set defaults if they are unset
     // (TODO: Write a helper for peppermint initialisation that sets store variables and can override defaults?)
     if (brushState.holeFill === undefined) {
-      brushState.holeFill = 0.02; // Fill voids when smaller than this fraction of host region.
+      brushState.holeFill = 0.1; // Fill voids when smaller than this fraction of host region.
     }
 
     if (brushState.strayRemove === undefined) {
@@ -80,6 +80,13 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     return true;
   }
 
+  /**
+   * _setCustomGate - Gets the minimum and maximum brush values within the image
+   * and sets the gate mode to "custom" with these values.
+   *
+   * @param  {object} evt The cornerstone event.
+   * @returns {null}
+   */
   _setCustomGate(evt) {
     const eventData = evt.detail;
     const { element, image } = eventData;
@@ -88,20 +95,17 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const radius = brushModule.state.radius;
     const imagePixelData = image.getPixelData();
     const rescaleSlope = image.slope || 1;
-    const rescaleIntercept = image.intercept || 1;
+    const rescaleIntercept = image.intercept || 0;
 
     const circle = getCircle(radius, rows, columns, x, y);
 
     // Initialise hi and lo as the first pixelValue in the circle.
-    let lo =
-      imagePixelData[circle[0][0] + circle[0][1] * rows] * rescaleSlope +
-      rescaleIntercept;
+    let lo = imagePixelData[circle[0][0] + circle[0][1] * rows];
     let hi = lo;
 
+    // Find the highest and lowest value.
     for (let i = 0; i < circle.length; i++) {
       let pixelValue = imagePixelData[circle[i][0] + circle[i][1] * rows];
-
-      pixelValue = pixelValue * rescaleSlope + rescaleIntercept;
 
       if (pixelValue < lo) {
         lo = pixelValue;
@@ -112,6 +116,9 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
+    lo = lo * rescaleSlope + rescaleIntercept;
+    hi = hi * rescaleSlope + rescaleIntercept;
+
     brushModule.state.gate = "custom";
     gatedHU.custom = [lo, hi];
   }
@@ -121,20 +128,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const { element, image } = eventData;
     const { rows, columns } = image;
     const { x, y } = eventData.currentPoints.image;
-    let toolState = getToolState(
-      element,
-      BaseBrushTool.getReferencedToolDataName()
-    );
-
-    if (!toolState) {
-      addToolState(element, BaseBrushTool.getReferencedToolDataName(), {});
-      toolState = getToolState(
-        element,
-        BaseBrushTool.getReferencedToolDataName()
-      );
-    }
-
-    const toolData = toolState.data;
 
     if (x < 0 || x > columns || y < 0 || y > rows) {
       return;
@@ -143,11 +136,10 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const radius = brushModule.state.radius;
     const pointerArray = this._gateCircle(
       image,
-      getCircle(radius, rows, columns, x, y),
-      brushModule.state.gate,
-      rows,
-      columns
+      getCircle(radius, rows, columns, x, y)
     );
+
+    const toolData = this._getToolData(element);
 
     this._drawMainColor(eventData, toolData, pointerArray);
   }
@@ -157,40 +149,24 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     const { element, image } = eventData;
     const { rows, columns } = image;
     const { x, y } = eventData.currentPoints.image;
-
-    let toolState = getToolState(
-      element,
-      BaseBrushTool.getReferencedToolDataName()
-    );
-
-    if (!toolState) {
-      addToolState(element, BaseBrushTool.getReferencedToolDataName(), {});
-      toolState = getToolState(
-        element,
-        BaseBrushTool.getReferencedToolDataName()
-      );
-    }
-
-    const toolData = toolState.data;
-    const segmentationIndex = brushModule.state.drawColorId;
+    const segIndex = brushModule.state.drawColorId;
 
     if (x < 0 || x > columns || y < 0 || y > rows) {
       return;
     }
 
+    const radius = brushModule.state.radius;
     const pointerArray = this._gateCircle(
       image,
-      getCircle(radius, rows, columns, x, y),
-      brushModule.state.gate,
-      rows,
-      columns
+      getCircle(radius, rows, columns, x, y)
     );
 
+    const toolData = this._getToolData(element);
     const numberOfColors = BaseBrushTool.getNumberOfColors();
 
     // If there is brush data in this region for other colors, delete it.
     for (let i = 0; i < numberOfColors; i++) {
-      if (i === segmentationIndex) {
+      if (i === segIndex) {
         continue;
       }
 
@@ -203,12 +179,46 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     this._drawMainColor(eventData, toolData, pointerArray);
   }
 
-  _gateCircle(image, circle, gate, rows, columns) {
-    const imagePixelData = image.getPixelData();
-    const gateValues = gatedHU[gate];
+  /**
+   * _getToolData - Get the brush toolData for the element, and create it if
+   * it doesn't exist.
+   *
+   * @param  {object} element The cornerstone enabled element.
+   * @returns {object}         The brush toolData.
+   */
+  _getToolData(element) {
+    let toolState = getToolState(
+      element,
+      BaseBrushTool.getReferencedToolDataName()
+    );
 
+    if (!toolState) {
+      addToolState(element, BaseBrushTool.getReferencedToolDataName(), {});
+      toolState = getToolState(
+        element,
+        BaseBrushTool.getReferencedToolDataName()
+      );
+    }
+
+    return toolState.data;
+  }
+
+  /**
+   * _gateCircle - Given an image and a brush circle, gate the circle between
+   * the set gate values, and then cleanup the resulting mask using the
+   * holeFill and strayRemove properties of the brush module.
+   *
+   * @param  {object} image   The cornerstone image.
+   * @param  {Number[][]} circle  An array of image pixels contained within the brush
+   *                        circle.
+   * @returns {Number[][]}  An array containing the gated/cleaned pixels to fill.
+   */
+  _gateCircle(image, circle) {
+    const { rows, columns } = image;
+    const imagePixelData = image.getPixelData();
+    const gateValues = gatedHU[brushModule.state.gate];
     const rescaleSlope = image.slope || 1;
-    const rescaleIntercept = image.intercept || 1;
+    const rescaleIntercept = image.intercept || 0;
 
     const gatedCircleArray = [];
 
@@ -240,7 +250,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
     //first and last row add all of top and bottom which are circle members.
     for (let i = 0; i < data.length; i++) {
-      if (data[i][0] === 0) {
+      if (data[i][0] !== -1) {
         edgePixels.push([i, 0]);
         edgePixels.push([i, ySize - 1]);
       }
@@ -250,7 +260,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // The first and last circle member of that row.
     for (let j = 1; j < ySize - 1; j++) {
       for (let i = 0; i < data.length; i++) {
-        if (data[i][j] === 0) {
+        if (data[i][j] !== -1) {
           edgePixels.push([i, j]);
           edgePixels.push([xSize - 1 - i, j]);
 
@@ -262,10 +272,90 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     return edgePixels;
   }
 
+  /**
+   * _cleanGatedCircle - Clean the HU gated circle using the holeFill and
+   * strayRemove properties of the brush module.
+   *
+   * @param  {Number[][]} circle     An array of the pixel indicies within the
+   *                                 brush circle.
+   * @param  {Number[][]} gatedCircleArray An array of the pixel indicies within
+   *                                       the gate range.
+   * @returns {Number[][]}                  The cleaned array of pixel indicies.
+   */
   _cleanGatedCircle(circle, gatedCircleArray) {
     const config = this._configuration;
     const circleArray2D = [];
 
+    const { max, min } = this._getBoundingBoxOfCircle(circle);
+
+    const xSize = max[0] - min[0] + 1;
+    const ySize = max[1] - min[1] + 1;
+
+    const data = this._boxGatedCircle(
+      circle,
+      gatedCircleArray,
+      min,
+      xSize,
+      ySize
+    );
+
+    // Define our getter for accessing the data structure.
+    function getter(x, y) {
+      return data[x][y];
+    }
+
+    this._floodFillEmptyRegionsFromEdges(data, getter);
+
+    const { holes, regions } = this._findHolesAndRegions(
+      circle,
+      data,
+      getter,
+      min
+    );
+
+    const largestRegionArea = this._getAreaOfLargestRegion(regions);
+
+    // Delete any region outside the `strayRemove` threshold.
+    for (let r = 0; r < regions.length; r++) {
+      const region = regions[r];
+      if (region.length <= brushModule.state.strayRemove * largestRegionArea) {
+        for (let p = 0; p < region.length; p++) {
+          data[region[p][0]][region[p][1]] = 2;
+        }
+      }
+    }
+
+    // Fill in any holes smaller than the `holeFill` threshold.
+    for (let r = 0; r < holes.length; r++) {
+      const hole = holes[r];
+
+      if (hole.length <= brushModule.state.holeFill * largestRegionArea) {
+        for (let p = 0; p < hole.length; p++) {
+          data[hole[p][0]][hole[p][1]] = 4;
+        }
+      }
+    }
+
+    const filledGatedCircleArray = [];
+
+    for (let i = 0; i < xSize; i++) {
+      for (let j = 0; j < ySize; j++) {
+        if (data[i][j] === 4) {
+          filledGatedCircleArray.push([i + min[0], j + min[1]]);
+        }
+      }
+    }
+
+    return filledGatedCircleArray;
+  }
+
+  /**
+   * _getBoundingBoxOfCircle - Returns two points defining the extent of the circle.
+   *
+   * @param  {number[][]} circle  An array of the pixel indicies within the brush circle.
+   * @returns {object}        The minimum and maximum of the extent.
+   */
+  _getBoundingBoxOfCircle(circle) {
     const max = [circle[0][0], circle[0][1]];
     const min = [circle[0][0], circle[0][1]];
 
@@ -285,16 +375,28 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    //console.log(min, max);
+    return { max, min };
+  }
 
-    const xSize = max[0] - min[0] + 1;
-    const ySize = max[1] - min[1] + 1;
-
-    //console.log(xSize, ySize);
-
+  /**
+   * _boxGatedCircle - Generates a rectangular dataset from the brush circle
+   *                   for efficient flood fill/cleaning.
+   *
+   * @param  {type} circle           An array of the pixel indicies within the brush circle.
+   * @param  {type} gatedCircleArray The circle array with the gate applied.
+   * @param  {type} min              The location of the top left pixel of the
+   *                                 generated dataset with respect to the
+   *                                 underlying image data.
+   * @param  {type} xSize            The x size of the generated box.
+   * @param  {type} ySize            The y size of the generated box.
+   * @returns {number[][]}           The data with pixel [0,0] centered on min,
+   *                                 the circle marked with 0 for unoccupied, 1
+   *                                 for occupied and -1 for outside of the circle bounds.
+   */
+  _boxGatedCircle(circle, gatedCircleArray, min, xSize, ySize) {
     const data = [];
 
-    // Fill in square as third color.
+    // Fill in square as -1 (out of bounds/ignore).
     for (let i = 0; i < xSize; i++) {
       data[i] = [];
 
@@ -303,7 +405,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    // fill circle in as not colored.
+    // fill circle in as zero.
     for (let p = 0; p < circle.length; p++) {
       const i = circle[p][0] - min[0];
       const j = circle[p][1] - min[1];
@@ -311,9 +413,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i][j] = 0;
     }
 
-    const edgePixels = this._getEdgePixels(data);
-
-    // fill gated region as color.
+    // fill gated region as 1.
     for (let p = 0; p < gatedCircleArray.length; p++) {
       const i = gatedCircleArray[p][0] - min[0];
       const j = gatedCircleArray[p][1] - min[1];
@@ -321,12 +421,21 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       data[i][j] = 1;
     }
 
-    //this._tempPrintData(data);
+    return data;
+  }
 
-    // Define our getter for accessing the data structure.
-    function getter(x, y) {
-      return data[x][y];
-    }
+  /**
+   * _floodFillEmptyRegionsFromEdges - Flood fills empty regions which touch the
+   *                                   edge of the circle with the value 2.
+   *
+   * @param  {number[][]} data The data to flood fill.
+   * @param {function} getter The getter function floodFill uses to access array
+   *                          elements.
+   * @modifies data
+   * @returns {null}
+   */
+  _floodFillEmptyRegionsFromEdges(data, getter) {
+    const edgePixels = this._getEdgePixels(data);
 
     for (let p = 0; p < edgePixels.length; p++) {
       const i = edgePixels[p][0];
@@ -338,27 +447,35 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
           seed: [i, j]
         });
 
-        //console.log(result);
-
         const flooded = result.flooded;
 
         for (let k = 0; k < flooded.length; k++) {
           data[flooded[k][0]][flooded[k][1]] = 2;
         }
-
-        //this._tempPrintData(data);
       }
     }
+  }
 
-    const filledGatedCircleArray = [];
-
-    // TEMP
-
+  /**
+   * _findHolesAndRegions - Finds all the holes and regions and returns their
+   *                        positions within the 2D data set. Sets the value of
+   *                        holes and regions to 3 and 4, respectively.
+   *
+   * @param  {number[][]} circle An array of the pixel indicies within the brush circle.
+   * @param  {number[][]} data   The data set.
+   * @param  {function}   getter The getter function floodFill uses to access array
+   *                       elements.
+   * @param  {number[]}   min    The location of the top left pixel of the dataset
+   *                       with respect to the underlying image data.
+   * @returns {object}    An object containing arrays of the occupation of all
+   *                      regions and holes in the dataset.
+   */
+  _findHolesAndRegions(circle, data, getter, min) {
     const holes = [];
     const regions = [];
 
     // Find each hole and paint them 3.
-    // Find contiguous volumes and paint them 4.
+    // Find contiguous regions and paint them 4.
     for (let p = 0; p < circle.length; p++) {
       const i = circle[p][0] - min[0];
       const j = circle[p][1] - min[1];
@@ -392,12 +509,17 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    //this._tempPrintData(data);
+    return { holes, regions };
+  }
 
-    //console.log(regions);
-    //console.log(holes);
-
-    // Get size of largest region
+  /**
+   * _getAreaOfLargestRegion - Returns the number of pixels in the largest
+   *                           region of a list of regions.
+   *
+   * @param  {number[][][]} regions An array of regions of 2D points.
+   * @returns {number}        The area of the largest region in pixels.
+   */
+  _getAreaOfLargestRegion(regions) {
     let largestRegionArea = 0;
 
     for (let i = 0; i < regions.length; i++) {
@@ -406,45 +528,52 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       }
     }
 
-    // Delete any region outside the `strayRemove` threshold.
-    for (let r = 0; r < regions.length; r++) {
-      const region = regions[r];
-      if (region.length <= brushModule.state.strayRemove * largestRegionArea) {
-        for (let p = 0; p < region.length; p++) {
-          data[region[p][0]][region[p][1]] = 2;
-        }
-      }
+    return largestRegionArea;
+  }
+
+  _drawMainColor(eventData, toolData, pointerArray) {
+    const shouldErase = this._isCtrlDown(eventData);
+    const columns = eventData.image.columns;
+    const segIndex = brushModule.state.drawColorId;
+
+    if (shouldErase && !toolData[segIndex]) {
+      // Erase command, yet no data yet, just return.
+      return;
     }
 
-    //this._tempPrintData(data);
-
-    // Fill in any holes smaller than the `holeFill` threshold.
-    for (let r = 0; r < holes.length; r++) {
-      const hole = holes[r];
-      if (hole.length <= brushModule.state.holeFill * largestRegionArea) {
-        for (let p = 0; p < hole.length; p++) {
-          data[hole[p][0]][hole[p][1]] = 4;
-        }
-      }
+    if (!toolData[segIndex]) {
+      toolData[segIndex] = {};
     }
 
-    //this._tempPrintData(data);
+    if (!toolData[segIndex].pixelData) {
+      const enabledElement = cornerstone.getEnabledElement(eventData.element);
+      const enabledElementUID = enabledElement.uuid;
 
-    //return gatedCircleArray;
+      // Clear cache for this color to avoid flickering.
+      const imageBitmapCacheForElement = brushModule.getters.imageBitmapCacheForElement(
+        enabledElementUID
+      );
 
-    for (let i = 0; i < xSize; i++) {
-      for (let j = 0; j < ySize; j++) {
-        if (data[i][j] === 4) {
-          filledGatedCircleArray.push([i + min[0], j + min[1]]);
-        }
+      if (imageBitmapCacheForElement) {
+        imageBitmapCacheForElement[segIndex] = null;
       }
+
+      // Add a new pixelData array.
+      toolData[segIndex].pixelData = new Uint8ClampedArray(
+        eventData.image.width * eventData.image.height
+      );
     }
 
-    //console.log(filledGatedCircleArray);
+    const toolDataI = toolData[segIndex];
 
-    return filledGatedCircleArray;
+    // Draw / Erase the active color.
+    drawBrushPixels(pointerArray, toolDataI, columns, shouldErase);
 
-    // Now we have a filled square with a partially filled circle in the center.
+    toolDataI.invalidated = true;
+  }
+
+  _isCtrlDown(eventData) {
+    return (eventData.event && eventData.event.ctrlKey) || eventData.ctrlKey;
   }
 
   // TEMP
@@ -463,90 +592,5 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
           .replace(/2/g, "F") + `   ${j}`
       );
     }
-
-    /*
-    for (let i = 0; i < data.length; i++) {
-
-      console.log(data[i].join(" ").replace(/2/g, "_"));
-    }
-    */
-  }
-
-  _giftWrapCircle(circle) {
-    const radius = brushModule.state.radius;
-
-    if (radius < 5) {
-      return convexHull(circle);
-    }
-
-    // We know the collection of points is a circle, so remove most of them, then do a graham scan to get only the edge voxels.
-    const com = [0, 0];
-
-    for (let i = 0; i < circle.length; i++) {
-      com[0] += circle[i][0];
-      com[1] += circle[i][1];
-    }
-
-    com[0] = com[0] / circle.length;
-    com[1] = com[1] / circle.length;
-
-    const edgeFew = [];
-
-    // Ignore all central points for giftwrap.
-    const ignoreRadius = radius - 2;
-
-    for (let i = 0; i < circle.length; i++) {
-      const dist = (circle[i][0] - com[0]) ** 2 + (circle[i][1] - com[1]) ** 2;
-      if (dist > ignoreRadius ** 2) {
-        edgeFew.push(circle[i]);
-      }
-    }
-
-    return convexHull(edgeFew);
-  }
-
-  _drawMainColor(eventData, toolData, pointerArray) {
-    const shouldErase = this._isCtrlDown(eventData);
-    const columns = eventData.image.columns;
-    const segmentationIndex = brushModule.state.drawColorId;
-
-    if (shouldErase && !toolData[segmentationIndex]) {
-      // Erase command, yet no data yet, just return.
-      return;
-    }
-
-    if (!toolData[segmentationIndex]) {
-      toolData[segmentationIndex] = {};
-    }
-
-    if (!toolData[segmentationIndex].pixelData) {
-      const enabledElement = cornerstone.getEnabledElement(eventData.element);
-      const enabledElementUID = enabledElement.uuid;
-
-      // Clear cache for this color to avoid flickering.
-      const imageBitmapCacheForElement = brushModule.getters.imageBitmapCacheForElement(
-        enabledElementUID
-      );
-
-      if (imageBitmapCacheForElement) {
-        imageBitmapCacheForElement[segmentationIndex] = null;
-      }
-
-      // Add a new pixelData array.
-      toolData[segmentationIndex].pixelData = new Uint8ClampedArray(
-        eventData.image.width * eventData.image.height
-      );
-    }
-
-    const toolDataI = toolData[segmentationIndex];
-
-    // Draw / Erase the active color.
-    drawBrushPixels(pointerArray, toolDataI, columns, shouldErase);
-
-    toolDataI.invalidated = true;
-  }
-
-  _isCtrlDown(eventData) {
-    return (eventData.event && eventData.event.ctrlKey) || eventData.ctrlKey;
   }
 }
