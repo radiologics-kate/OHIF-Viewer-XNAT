@@ -250,7 +250,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
     //first and last row add all of top and bottom which are circle members.
     for (let i = 0; i < data.length; i++) {
-      if (data[i][0] !== -1) {
+      if (data[i][0]) {
         edgePixels.push([i, 0]);
         edgePixels.push([i, ySize - 1]);
       }
@@ -260,7 +260,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // The first and last circle member of that row.
     for (let j = 1; j < ySize - 1; j++) {
       for (let i = 0; i < data.length; i++) {
-        if (data[i][j] !== -1) {
+        if (data[i][j]) {
           edgePixels.push([i, j]);
           edgePixels.push([xSize - 1 - i, j]);
 
@@ -320,7 +320,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       const region = regions[r];
       if (region.length <= brushModule.state.strayRemove * largestRegionArea) {
         for (let p = 0; p < region.length; p++) {
-          data[region[p][0]][region[p][1]] = 2;
+          data[region[p][0]][region[p][1]] = 3;
         }
       }
     }
@@ -331,7 +331,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
       if (hole.length <= brushModule.state.holeFill * largestRegionArea) {
         for (let p = 0; p < hole.length; p++) {
-          data[hole[p][0]][hole[p][1]] = 4;
+          data[hole[p][0]][hole[p][1]] = 5;
         }
       }
     }
@@ -340,7 +340,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
     for (let i = 0; i < xSize; i++) {
       for (let j = 0; j < ySize; j++) {
-        if (data[i][j] === 4) {
+        if (data[i][j] === 5) {
           filledGatedCircleArray.push([i + min[0], j + min[1]]);
         }
       }
@@ -390,35 +390,31 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
    * @param  {type} xSize            The x size of the generated box.
    * @param  {type} ySize            The y size of the generated box.
    * @returns {number[][]}           The data with pixel [0,0] centered on min,
-   *                                 the circle marked with 0 for unoccupied, 1
-   *                                 for occupied and -1 for outside of the circle bounds.
+   *                                 the circle marked with 1 for unoccupied, 2
+   *                                 for occupied and 0 for outside of the circle bounds.
    */
   _boxGatedCircle(circle, gatedCircleArray, min, xSize, ySize) {
     const data = [];
 
-    // Fill in square as -1 (out of bounds/ignore).
+    // Fill in square as 0 (out of bounds/ignore).
     for (let i = 0; i < xSize; i++) {
-      data[i] = [];
-
-      for (let j = 0; j < ySize; j++) {
-        data[i][j] = -1;
-      }
+      data[i] = new Uint8ClampedArray(ySize);
     }
 
-    // fill circle in as zero.
+    // fill circle in as 1.
     for (let p = 0; p < circle.length; p++) {
       const i = circle[p][0] - min[0];
       const j = circle[p][1] - min[1];
 
-      data[i][j] = 0;
+      data[i][j] = 1;
     }
 
-    // fill gated region as 1.
+    // fill gated region as 2.
     for (let p = 0; p < gatedCircleArray.length; p++) {
       const i = gatedCircleArray[p][0] - min[0];
       const j = gatedCircleArray[p][1] - min[1];
 
-      data[i][j] = 1;
+      data[i][j] = 2;
     }
 
     return data;
@@ -426,7 +422,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
   /**
    * _floodFillEmptyRegionsFromEdges - Flood fills empty regions which touch the
-   *                                   edge of the circle with the value 2.
+   *                                   edge of the circle with the value 3.
    *
    * @param  {number[][]} data The data to flood fill.
    * @param {function} getter The getter function floodFill uses to access array
@@ -441,7 +437,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       const i = edgePixels[p][0];
       const j = edgePixels[p][1];
 
-      if (data[i][j] === 0) {
+      if (data[i][j] === 1) {
         const result = floodFill({
           getter: getter,
           seed: [i, j]
@@ -450,7 +446,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
         const flooded = result.flooded;
 
         for (let k = 0; k < flooded.length; k++) {
-          data[flooded[k][0]][flooded[k][1]] = 2;
+          data[flooded[k][0]][flooded[k][1]] = 3;
         }
       }
     }
@@ -459,7 +455,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
   /**
    * _findHolesAndRegions - Finds all the holes and regions and returns their
    *                        positions within the 2D data set. Sets the value of
-   *                        holes and regions to 3 and 4, respectively.
+   *                        holes and regions to 4 and 5, respectively.
    *
    * @param  {number[][]} circle An array of the pixel indicies within the brush circle.
    * @param  {number[][]} data   The data set.
@@ -480,20 +476,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       const i = circle[p][0] - min[0];
       const j = circle[p][1] - min[1];
 
-      if (data[i][j] === 0) {
-        const result = floodFill({
-          getter: getter,
-          seed: [i, j]
-        });
-
-        const flooded = result.flooded;
-
-        for (let k = 0; k < flooded.length; k++) {
-          data[flooded[k][0]][flooded[k][1]] = 3;
-        }
-
-        holes.push(flooded);
-      } else if (data[i][j] === 1) {
+      if (data[i][j] === 1) {
         const result = floodFill({
           getter: getter,
           seed: [i, j]
@@ -503,6 +486,19 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
         for (let k = 0; k < flooded.length; k++) {
           data[flooded[k][0]][flooded[k][1]] = 4;
+        }
+
+        holes.push(flooded);
+      } else if (data[i][j] === 2) {
+        const result = floodFill({
+          getter: getter,
+          seed: [i, j]
+        });
+
+        const flooded = result.flooded;
+
+        for (let k = 0; k < flooded.length; k++) {
+          data[flooded[k][0]][flooded[k][1]] = 5;
         }
 
         regions.push(flooded);
