@@ -7,14 +7,7 @@ import { updateCrosshairsSynchronizer } from "./updateCrosshairsSynchronizer";
 import { crosshairsSynchronizers } from "./crosshairsSynchronizers";
 import { annotateTextUtils } from "./annotateTextUtils";
 
-import {
-  Freehand3DMouseTool,
-  Freehand3DSculpterMouseTool,
-  Brush3DTool,
-  Brush3DHUGatedTool,
-  Brush3DAutoGatedTool,
-  freehand3DModule
-} from "meteor/icr:peppermint-tools";
+import * as peppermintTools from "meteor/icr:peppermint-tools";
 
 let activeTool;
 let tools = {};
@@ -52,13 +45,12 @@ export const toolManager = {
       toolManager.setDefaultTool(OHIF.viewer.defaultTool.middle, "middle");
     }
 
-    cornerstoneTools.register("module", "freehand3D", freehand3DModule);
-
-    cornerstoneTools.init({ showSVGCursors: true });
-
-    console.log(cornerstoneTools.store.modules.brush.state);
-
-    cornerstoneTools.store.modules.brush.state.maxRadius = 128;
+    peppermintTools.init({
+      interpolate: true
+    });
+    cornerstoneTools.init({
+      showSVGCursors: true
+    });
 
     // Define tools object with the corresponding class names in cornerstone tools,
     //  and support for setting different configuration per tool
@@ -135,11 +127,11 @@ export const toolManager = {
     };
 
     pluginTools = {
-      freehandMouse: Freehand3DMouseTool,
-      freehandSculpterMouse: Freehand3DSculpterMouseTool,
-      brush: Brush3DTool,
-      brushHUGated: Brush3DHUGatedTool,
-      brushAutoGated: Brush3DAutoGatedTool
+      freehandMouse: peppermintTools.Freehand3DMouseTool,
+      freehandSculpterMouse: peppermintTools.Freehand3DSculpterMouseTool,
+      brush: peppermintTools.Brush3DTool,
+      brushHUGated: peppermintTools.Brush3DHUGatedTool,
+      brushAutoGated: peppermintTools.Brush3DAutoGatedTool
     };
 
     const { textStyle, toolStyle, toolColors } = cornerstoneTools;

@@ -44,3 +44,5 @@ export {
 
 // Classes
 export { Polygon } from "./client/lib/util/classes/Polygon.js";
+
+export { default as init } from "./client/init.js";

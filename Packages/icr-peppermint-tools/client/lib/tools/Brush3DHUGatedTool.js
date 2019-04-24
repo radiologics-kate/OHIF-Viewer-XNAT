@@ -40,26 +40,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     };
 
     this.touchDragCallback = this._startPaintingTouch.bind(this);
-
-    const brushState = brushModule.state;
-
-    // Set defaults if they are unset
-    // (TODO: Write a helper for peppermint initialisation that sets store variables and can override defaults?)
-    if (brushState.holeFill === undefined) {
-      brushState.holeFill = 0.1; // Fill voids when smaller than this fraction of host region.
-    }
-
-    if (brushState.strayRemove === undefined) {
-      brushState.strayRemove = 0.05; // Don't paint secondary objects smaller than this fraction of the primary.
-    }
-
-    // TODO -> Don't set this by default. Pop up UI for tissue type if not set.
-
-    // TEMP
-    if (brushState.gate === undefined) {
-      brushState.gate = "adipose";
-    }
-    // TEMP
   }
 
   /**
