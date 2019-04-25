@@ -209,6 +209,7 @@ Meteor.startup(function() {
     showSyncSettings: "Sync Settings",
     volumeManagement: "Volume Management",
     segManagement: "Seg Management",
+    brushSettings: "Brush Settings",
     toggleFreehandStats: "Toggle Freehand Stats",
     toggleFreehandInterpolate: "Toggle Freehand Interpolate",
     showHelp: "Show Help",

@@ -34,6 +34,7 @@ export {
   default as volumeManagement
 } from "./client/lib/util/volumeManagement.js";
 export { default as segManagement } from "./client/lib/util/segManagement.js";
+export { default as brushSettings } from "./client/lib/util/brushSettings.js";
 export {
   default as lockStructureSet
 } from "./client/lib/util/lockStructureSet.js";

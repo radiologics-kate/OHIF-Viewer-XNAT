@@ -9,7 +9,6 @@ import Brush3DTool from "./Brush3DTool.js";
 import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
 
 import brushMetadataIO from "../util/brushMetadataIO.js";
-import gatedHU from "../util/gatedHU.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 const getToolState = cornerstoneTools.getToolState;
@@ -25,7 +24,7 @@ const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 export default class Brush3DHUGatedTool extends Brush3DTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: "Brush"
+      name: "Brush3DHUGatedTool"
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);
 
@@ -50,57 +49,11 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
    * @param {Object} evt - The event.
    */
   preMouseDownCallback(evt) {
-    if (evt.detail.event.shiftKey) {
-      this._setCustomGate(evt);
-      return true;
-    }
+    this.activeGateRange = brushModule.getters.activeGateRange();
 
     this._startPainting(evt);
 
     return true;
-  }
-
-  /**
-   * _setCustomGate - Gets the minimum and maximum brush values within the image
-   * and sets the gate mode to "custom" with these values.
-   *
-   * @param  {object} evt The cornerstone event.
-   * @returns {null}
-   */
-  _setCustomGate(evt) {
-    const eventData = evt.detail;
-    const { element, image } = eventData;
-    const { rows, columns } = image;
-    const { x, y } = eventData.currentPoints.image;
-    const radius = brushModule.state.radius;
-    const imagePixelData = image.getPixelData();
-    const rescaleSlope = image.slope || 1;
-    const rescaleIntercept = image.intercept || 0;
-
-    const circle = getCircle(radius, rows, columns, x, y);
-
-    // Initialise hi and lo as the first pixelValue in the circle.
-    let lo = imagePixelData[circle[0][0] + circle[0][1] * rows];
-    let hi = lo;
-
-    // Find the highest and lowest value.
-    for (let i = 0; i < circle.length; i++) {
-      let pixelValue = imagePixelData[circle[i][0] + circle[i][1] * rows];
-
-      if (pixelValue < lo) {
-        lo = pixelValue;
-      }
-
-      if (pixelValue > hi) {
-        hi = pixelValue;
-      }
-    }
-
-    lo = lo * rescaleSlope + rescaleIntercept;
-    hi = hi * rescaleSlope + rescaleIntercept;
-
-    brushModule.state.gate = "custom";
-    gatedHU.custom = [lo, hi];
   }
 
   _overlappingStrategy(evt) {
@@ -196,7 +149,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
   _gateCircle(image, circle) {
     const { rows, columns } = image;
     const imagePixelData = image.getPixelData();
-    const gateValues = gatedHU[brushModule.state.gate];
+    const gateRange = this.activeGateRange;
     const rescaleSlope = image.slope || 1;
     const rescaleIntercept = image.intercept || 0;
 
@@ -207,7 +160,7 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
 
       pixelValue = pixelValue * rescaleSlope + rescaleIntercept;
 
-      if (pixelValue >= gateValues[0] && pixelValue <= gateValues[1]) {
+      if (pixelValue >= gateRange[0] && pixelValue <= gateRange[1]) {
         gatedCircleArray.push(circle[i]);
       }
     }
@@ -298,7 +251,10 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     // Delete any region outside the `strayRemove` threshold.
     for (let r = 0; r < regions.length; r++) {
       const region = regions[r];
-      if (region.length <= brushModule.state.strayRemove * largestRegionArea) {
+      if (
+        region.length <=
+        (brushModule.state.strayRemove / 100.0) * largestRegionArea
+      ) {
         for (let p = 0; p < region.length; p++) {
           data[region[p][0]][region[p][1]] = 3;
         }
@@ -309,7 +265,10 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     for (let r = 0; r < holes.length; r++) {
       const hole = holes[r];
 
-      if (hole.length <= brushModule.state.holeFill * largestRegionArea) {
+      if (
+        hole.length <=
+        (brushModule.state.holeFill / 100.0) * largestRegionArea
+      ) {
         for (let p = 0; p < hole.length; p++) {
           data[hole[p][0]][hole[p][1]] = 5;
         }

@@ -8,7 +8,8 @@ import {
   toggleFreehandStats,
   toggleFreehandInterpolate,
   volumeManagement,
-  segManagement
+  segManagement,
+  brushSettings
 } from "meteor/icr:peppermint-tools";
 
 import { $ } from "meteor/jquery";
@@ -26,12 +27,10 @@ OHIF.viewerbase.viewportUtils.showHelp = () => {
 };
 
 OHIF.viewerbase.viewportUtils.exportMask = function() {
-  console.log("exportMask");
   exportMask();
 };
 
 OHIF.viewerbase.viewportUtils.importMask = function() {
-  console.log("importMask");
   importMask();
 };
 
@@ -49,4 +48,9 @@ OHIF.viewerbase.viewportUtils.volumeManagement = () => {
 
 OHIF.viewerbase.viewportUtils.segManagement = () => {
   segManagement();
+};
+
+OHIF.viewerbase.viewportUtils.brushSettings = () => {
+  console.log("brushSettings");
+  brushSettings();
 };

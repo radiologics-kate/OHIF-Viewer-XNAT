@@ -332,21 +332,27 @@ Template.toolbarSection.helpers({
         const brushTools = [
           {
             id: 'brush',
-            title: 'Brush (B)',
+            title: 'Manual (B)',
             classes: 'imageViewerTool',
-            iconClasses: 'fa fa-paint-brush'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-regular'
           },
           {
             id: 'brushHUGated',
-            title: 'CT Smart Brush',
+            title: 'Smart CT',
             classes: 'imageViewerTool',
-            iconClasses: 'fa fa-paint-brush'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-smart'
           },
           {
             id: 'brushAutoGated',
-            title: 'Auto Smart Brush',
+            title: 'Auto',
             classes: 'imageViewerTool',
-            iconClasses: 'fa fa-paint-brush'
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-auto'
+          },
+          {
+            id: 'brushSettings',
+            title: 'Settings',
+            classes: 'imageViewerCommand',
+            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-settings'
           },
           {
             id: 'segManagement',
@@ -358,7 +364,7 @@ Template.toolbarSection.helpers({
 
         buttonData.push({
             id: 'Brush',
-            title: 'Mask',
+            title: 'Brush',
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu',
             subTools: brushTools

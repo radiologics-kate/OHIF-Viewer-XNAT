@@ -1,5 +1,6 @@
 import { OHIF } from "meteor/ohif:core";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 const modules = cornerstoneTools.store.modules;
 
