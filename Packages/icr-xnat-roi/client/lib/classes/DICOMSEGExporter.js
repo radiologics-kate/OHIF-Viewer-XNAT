@@ -3,6 +3,9 @@ import { fetchCSRFToken } from "../IO/csrfToken.js";
 
 const XMLWriter = require("xml-writer");
 
+/**
+ * @class DICOMSEGExporter - Exports a DICOM seg file to an XNAT ROICollection.
+ */
 export class DICOMSEGExporter {
   constructor(segBlob, seriesInstanceUid, label, name) {
     this._payload = segBlob;
@@ -18,13 +21,17 @@ export class DICOMSEGExporter {
     this._label = label;
   }
 
+  /**
+   * exportToXNAT - Exports the DICOMSEG to XNAT.
+   *
+   * @returns {null}
+   */
   async exportToXNAT() {
     const csrfToken = await fetchCSRFToken();
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
 
     let putFailed = false;
 
-    // http://10.1.1.18/XNAT_JPETTS/xapi/roi/projects/ITCRdemo/sessions/XNAT_JPETTS_E00014/collections/mySegCollection?type=SEG&overwrite=false
     const putSegUrl =
       `${Session.get("rootUrl")}/xapi/roi/projects/${this._projectID}` +
       `/sessions/${this._experimentID}/collections/${
@@ -43,6 +50,14 @@ export class DICOMSEGExporter {
     return;
   }
 
+  /**
+   * _PUT_uploadSeg - PUTs the DICOM SEG object to the given url.
+   *
+   * @param  {string} url The url to PUT the DICOM SEG.
+   * @param  {Blob} seg A Blob containing the DICOM SEG.
+   * @returns {Promise} A promise that resolves on a successful PUT, and rejects
+   *                    otherwise.
+   */
   _PUT_uploadSeg(url, seg) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();

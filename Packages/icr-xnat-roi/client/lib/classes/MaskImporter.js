@@ -11,9 +11,6 @@ const brushModule = cornerstoneTools.store.modules.brush;
 
 export class MaskImporter {
   constructor() {
-    // Get stackToolState // TODO -> Make this into a function somewhere else as
-    // Both import and export use it.
-    //
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
     const stackToolState = cornerstoneTools.getToolState(element, "stack");
@@ -39,6 +36,14 @@ export class MaskImporter {
     this._numberOfColors = colormap.getNumberOfColors();
   }
 
+  /**
+   * importDICOMSEG - Imports a DICOM SEG file to CornerstoneTools.
+   *
+   * @param  {ArrayBuffer} dicomSegArrayBuffer An arraybuffer of the DICOM SEG object.
+   * @param  {string} collectionName      The name of the ROICollection.
+   * @param  {string} collectionLabel     The label of the ROICollection.
+   * @returns {null}                     description
+   */
   importDICOMSEG(dicomSegArrayBuffer, collectionName, collectionLabel) {
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
@@ -70,6 +75,13 @@ export class MaskImporter {
     }
   }
 
+  /**
+   * _addBrushToolStateToGlobalToolState - Merges the imported toolstate to the
+   * global tool state.
+   *
+   * @param  {object} brushToolState The imported toolState.
+   * @returns {null}
+   */
   _addBrushToolStateToGlobalToolState(brushToolState) {
     const globalToolState = globalToolStateManager.saveToolState();
 
@@ -85,6 +97,14 @@ export class MaskImporter {
     });
   }
 
+  /**
+   * importNIFTI - Imports a NIFTI file to CornerstoneTools.
+   *
+   * @param  {ArrayBuffer} niftyArrayBuffer An arraybuffer of the NIFTI object.
+   * @param  {string} collectionName      The name of the ROICollection.
+   * @param  {string} collectionLabel     The label of the ROICollection.
+   * @returns {null}                     description
+   */
   importNIFTI(niftyArrayBuffer, collectionName, collectionLabel) {
     this._clearMaskMetadata();
 
@@ -96,9 +116,14 @@ export class MaskImporter {
       this._dimensions
     );
 
-    this._import(masks);
+    this._addNIFTIMasksToCornerstone(masks);
   }
 
+  /**
+   * _clearMaskMetadata - Clears existing mask metadata for this series.
+   *
+   * @returns {null}
+   */
   _clearMaskMetadata() {
     for (let i = 0; i < this._numberOfColors; i++) {
       brushModule.setters.metadata(
@@ -109,13 +134,34 @@ export class MaskImporter {
     }
   }
 
-  _import(masks) {
+  /**
+   * _clearGlobalBrushToolState - Clears existing mask data from the toolState.
+   *
+   * @param  {object} toolState The toolState to clear brush tool state from.
+   * @param  {string[]} imageIds  An array of imageIds.
+   * @returns {null}
+   */
+  _clearGlobalBrushToolState(toolState, imageIds) {
+    for (let i = 0; i < imageIds.length; i++) {
+      const imageId = imageIds[i];
+
+      if (toolState[imageId] && toolState[imageId].brush) {
+        delete toolState[imageId].brush;
+      }
+    }
+  }
+
+  /**
+   * _addNIFTIMasksToCornerstone -  Cycles through masks and imports pixelData
+   *  of each image to the cornerstoneTools brush toolState.
+   *
+   * @param  {object[]} masks The masks extracted by the NIFTIReader.
+   * @returns {null}
+   */
+  _addNIFTIMasksToCornerstone(masks) {
     const stackToolState = this._stackToolState;
     const dimensions = this._dimensions;
     const sliceLength = dimensions.sliceLength;
-
-    // Cycle through masks and import pixelData of each image to
-    // The cornerstoneTools brush toolState.
 
     const imageIds = stackToolState.data[0].imageIds;
     const toolState = globalToolStateManager.saveToolState();
@@ -131,8 +177,6 @@ export class MaskImporter {
         for (let k = 0; k < pixelData.length; k++) {
           pixelData[k] = mask[j * sliceLength + k] ? 1 : 0;
         }
-
-        //mask.slice(j * sliceLength, (j+1) * sliceLength)
 
         const imageId = imageIds[j];
 
@@ -151,16 +195,13 @@ export class MaskImporter {
     cornerstone.updateImage(element);
   }
 
-  _clearGlobalBrushToolState(toolState, imageIds) {
-    for (let i = 0; i < imageIds.length; i++) {
-      const imageId = imageIds[i];
-
-      if (toolState[imageId] && toolState[imageId].brush) {
-        delete toolState[imageId].brush;
-      }
-    }
-  }
-
+  /**
+   * _initialiseBrushStateNifti - Initialises the brush state for NIFTI import.
+   *
+   * @param  {object} toolState The toolState.
+   * @param  {string[]} imageIds  An array of imageIds.
+   * @returns {null}
+   */
   _initialiseBrushStateNifti(toolState, imageIds) {
     for (let i = 0; i < imageIds.length; i++) {
       const imageId = imageIds[i];

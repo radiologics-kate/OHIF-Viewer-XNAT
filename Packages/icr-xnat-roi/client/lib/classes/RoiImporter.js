@@ -1,81 +1,124 @@
-import { OHIF } from 'meteor/ohif:core';
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { Polygon } from 'meteor/icr:peppermint-tools';
-import { AIMReader } from '../classes/AIMReader.js';
-import { RTStructReader } from '../classes/RTStructReader.js';
+import { OHIF } from "meteor/ohif:core";
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { Polygon } from "meteor/icr:peppermint-tools";
+import { AIMReader } from "../classes/AIMReader.js";
+import { RTStructReader } from "../classes/RTStructReader.js";
 
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
-
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 const modules = cornerstoneTools.store.modules;
+const freehandToolDataType = "freehandMouse";
 
-const freehandToolDataType = 'freehandMouse';
-
+/**
+ * @class RoiImporter - Imports contour-based ROI formats to
+ * peppermintTools ROIContours.
+ */
 export class RoiImporter {
-
-  constructor (seriesInstanceUid) {
+  constructor(seriesInstanceUid) {
     this._seriesInstanceUid = seriesInstanceUid;
-    this._sopInstanceUidToImageIdMap = this._setSopInstanceUidToImageIdMap();
+    this._sopInstanceUidToImageIdMap = this._getSopInstanceUidToImageIdMap();
 
     this._freehand3DStore = modules.freehand3D;
   }
 
-  importAIMfile (aimDoc, roiCollectionName, roiCollectionLabel) {
+  /**
+   * importAIMfile -  Imports ImageAnnotations from an AIM
+   *                  ImageAnnotationCollection as peppermintTools ROIContours.
+   *
+   * @param  {HTMLElement} aimDoc        The AIM ImageAnnotationCollection file.
+   * @param  {string} roiCollectionName  The name of the ROICollection.
+   * @param  {string} roiCollectionLabel The label of the ROICollection.
+   * @returns {null}
+   */
+  importAIMfile(aimDoc, roiCollectionName, roiCollectionLabel) {
     const aimReader = new AIMReader(
       aimDoc,
       this._seriesInstanceUid,
       roiCollectionName,
       roiCollectionLabel
     );
-    this._addPolygonsToToolStateManager(aimReader.polygons, 'AIM');
+    this._addPolygonsToToolStateManager(aimReader.polygons, "AIM");
   }
 
-  importRTStruct (rtStructArrayBuffer, roiCollectionName, roiCollectionLabel) {
+  /**
+   * importRTStruct - Imports ROIContours from an RTSTRUCT as
+   * peppermintTools ROIContours.
+   *
+   * @param  {ArrayBuffer} rtStructArrayBuffer The RTSTRUCT file.
+   * @param  {string} roiCollectionName  The name of the ROICollection.
+   * @param  {string} roiCollectionLabel The label of the ROICollection.
+   * @returns {null}
+   */
+  importRTStruct(rtStructArrayBuffer, roiCollectionName, roiCollectionLabel) {
     const rtStructReader = new RTStructReader(
       rtStructArrayBuffer,
       this._seriesInstanceUid,
       roiCollectionName,
       roiCollectionLabel
     );
-    this._addPolygonsToToolStateManager(rtStructReader.polygons, 'RTSTRUCT');
+    this._addPolygonsToToolStateManager(rtStructReader.polygons, "RTSTRUCT");
   }
 
-  _addPolygonsToToolStateManager (polygons, importType) {
+  /**
+   * _addPolygonsToToolStateManager - Adds polygons to the cornerstoneTools
+   *                                  toolState.
+   *
+   * @param  {Polygon[]} polygons   The polygons to add to cornerstoneTools.
+   * @param  {string} importType The source file type (used for scaling).
+   * @returns {null}
+   */
+  _addPolygonsToToolStateManager(polygons, importType) {
     const toolStateManager = globalToolStateManager.saveToolState();
 
-    for ( let i = 0; i < polygons.length; i++ ) {
+    for (let i = 0; i < polygons.length; i++) {
       const polygon = polygons[i];
       const sopInstanceUid = polygon.sopInstanceUid;
-      const correspondingImageId = this._sopInstanceUidToImageIdMap[sopInstanceUid];
+      const correspondingImageId = this._sopInstanceUidToImageIdMap[
+        sopInstanceUid
+      ];
 
-      this._addOnePolygonToToolStateManager(polygon, toolStateManager, correspondingImageId, importType);
+      this._addOnePolygonToToolStateManager(
+        polygon,
+        toolStateManager,
+        correspondingImageId,
+        importType
+      );
     }
 
     this._refreshToolStateManager(toolStateManager);
   }
 
-  _polygonNotAlreadyPresent (freehandToolData, newPolygonUuid) {
-
-    for ( let i = 0; i < freehandToolData.length; i++ ) {
-      if ( freehandToolData[i].uuid === newPolygonUuid ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  _addOnePolygonToToolStateManager (polygon, toolStateManager, correspondingImageId, importType) {
+  /**
+   * _addOnePolygonToToolStateManager - Adds a single polygon to the
+   *                                    cornerstoneTools toolState.
+   *
+   * @param  {Polygon} polygon            The polygon to add.
+   * @param  {object} toolStateManager    The toolStateManager object.
+   * @param  {string} correspondingImageId The imageId the polygon should be added to.
+   * @param  {type} importType           The source file type (used for scaling).
+   * @returns {null}
+   */
+  _addOnePolygonToToolStateManager(
+    polygon,
+    toolStateManager,
+    correspondingImageId,
+    importType
+  ) {
     if (!correspondingImageId) {
       // ROI for image which is not loaded
       return;
     }
 
     // Point to correct imageId if multiframe Image
-    correspondingImageId = this._modifyImageIdIfMultiframe(correspondingImageId, polygon);
+    correspondingImageId = this._modifyImageIdIfMultiframe(
+      correspondingImageId,
+      polygon
+    );
 
-    this._addImageToolIfNotPresent(toolStateManager, correspondingImageId);
+    this._addImageToolStateIfNotPresent(toolStateManager, correspondingImageId);
 
-    const freehandToolData = toolStateManager[correspondingImageId][freehandToolDataType].data;
+    const freehandToolData =
+      toolStateManager[correspondingImageId][freehandToolDataType].data;
     if (this._polygonNotAlreadyPresent(freehandToolData, polygon.uid)) {
       const data = polygon.getFreehandToolData(importType);
 
@@ -88,7 +131,32 @@ export class RoiImporter {
     }
   }
 
-  _addImageToolIfNotPresent (toolStateManager, imageId) {
+  /**
+   * _polygonNotAlreadyPresent - Returns true if the polygon is not already on
+   *                             the image.
+   *
+   * @param  {object} freehandToolData The freehandToolData for an image.
+   * @param  {string} newPolygonUuid   The uuid of the polygon being checked.
+   * @returns {boolean} True if the polygon is not already on the image.
+   */
+  _polygonNotAlreadyPresent(freehandToolData, newPolygonUuid) {
+    for (let i = 0; i < freehandToolData.length; i++) {
+      if (freehandToolData[i].uuid === newPolygonUuid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * _addImageToolStateIfNotPresent - Adds freehand toolState to imageId if its not present.
+   *
+   * @param  {object} toolStateManager The toolStateManager object.
+   * @param  {string} imageId          The imageId of the Cornerstone image.
+   * @returns {null}
+   */
+  _addImageToolStateIfNotPresent(toolStateManager, imageId) {
     // Add freehand tools to toolStateManager if no toolState for imageId
     if (!toolStateManager[imageId]) {
       toolStateManager[imageId] = {};
@@ -100,9 +168,12 @@ export class RoiImporter {
     }
   }
 
-  _refreshToolStateManager (toolStateManager) {
-    // Load the updated toolStateManager
-
+  /**
+   * _refreshToolStateManager - restores the toolStateManager.
+   *
+   * @param  {object} toolStateManager The toolStateManager
+   */
+  _refreshToolStateManager(toolStateManager) {
     globalToolStateManager.restoreToolState(toolStateManager);
 
     // Refresh the visible element
@@ -111,18 +182,23 @@ export class RoiImporter {
     cornerstone.updateImage(element);
   }
 
-  _setSopInstanceUidToImageIdMap () {
+  /**
+   * _getSopInstanceUidToImageIdMap - Generates and returns a map of
+   *                                  sop instance UID to imageId.
+   *
+   * @returns {object}  The sop instance UID to image Id map.
+   */
+  _getSopInstanceUidToImageIdMap() {
     const sopInstanceUidToImageIdMap = {};
     // Get the imageId of each sopInstance in the series
     const studies = OHIF.viewer.StudyMetadataList.all();
 
-    for ( let i = 0; i < studies.length; i++ ) {
-
+    for (let i = 0; i < studies.length; i++) {
       const series = studies[i].getSeriesByUID(this._seriesInstanceUid);
-      if ( series !== undefined ) {
+      if (series !== undefined) {
         const instanceCount = series.getInstanceCount();
 
-        for ( let j = 0; j < instanceCount; j++ ) {
+        for (let j = 0; j < instanceCount; j++) {
           const instance = series.getInstanceByIndex(j);
           const imageId = instance.getImageId();
           const sopInstanceUid = instance.sopInstanceUID;
@@ -134,9 +210,15 @@ export class RoiImporter {
     return sopInstanceUidToImageIdMap;
   }
 
-
-  _modifyImageIdIfMultiframe (correspondingImageId, polygon) {
-
+  /**
+   * _modifyImageIdIfMultiframe - Modifies the imageId for multiframe images,
+   *                              so that the polygons are indexed correctly.
+   *
+   * @param  {string} correspondingImageId The imageid
+   * @param  {Polygon} polygon The polygon being added.
+   * @returns {string} The
+   */
+  _modifyImageIdIfMultiframe(correspondingImageId, polygon) {
     if (!correspondingImageId.includes("frame=")) {
       //single frame, return unchanged Id
       return correspondingImageId;
@@ -147,6 +229,4 @@ export class RoiImporter {
 
     return `${frameArray[0]}frame=${correctedFrameNumber}`;
   }
-
-
 }

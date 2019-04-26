@@ -5,12 +5,8 @@ import { AsyncFetcher } from "./AsyncFetcher.js";
 const modules = cornerstoneTools.store.modules;
 
 /**
- * @class AsyncRoiFetcher
- * @author JamesAPetts
- *
- * Asynchronusly fetches roiCollections that contain contours, allows the user to select which to
- * import, and parses them using an instance of RoiImporter.
- *
+ * @class AsyncRoiFetcher - Asynchronusly fetches roiCollections that contain contours, allows the user to select which to
+ * import, and parses them using an RoiImporter.
  */
 export class AsyncRoiFetcher extends AsyncFetcher {
   constructor(seriesInstanceUid) {
@@ -24,7 +20,7 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    * _getVolumeManagementLabels - Construct a list of roiCollections
    *                               already imported.
    *
-   * @return {string[]} An array of the labels of roiCollections already imported.
+   * @returns {string[]} An array of the labels of roiCollections already imported.
    */
   _getVolumeManagementLabels() {
     const freehand3DStore = modules.freehand3D;
@@ -49,6 +45,12 @@ export class AsyncRoiFetcher extends AsyncFetcher {
     return structureSetUids;
   }
 
+  /**
+   * _openImportListDialog - Open the dialog and display a loading icon
+   * whilst data is fetched.
+   *
+   * @returns {null}
+   */
   _openImportListDialog() {
     // Open the dialog and display a loading icon whilst data is fetched.
     this._roiImportListDialog = document.getElementById("roiImportListDialog");
@@ -62,6 +64,8 @@ export class AsyncRoiFetcher extends AsyncFetcher {
   /** @private @async
    * _selectAndImportRois - Display list of roiCollections eligible for import,
    * await user input, and download the selected roiCollections.
+   *
+   * @returns {null}
    */
   async _selectAndImportRois() {
     // Await user input
@@ -100,8 +104,8 @@ export class AsyncRoiFetcher extends AsyncFetcher {
   /** @private @async
    * _awaitInputFromListUI - Awaits user input from the roiImportList UI.
    *
-   * @param  {Array} importList The list of roiCollections eligible for import.
-   * @return {Promise}          A promise that resolves to give a true/false
+   * @param  {object[]} importList The list of roiCollections eligible for import.
+   * @returns {Promise}         A promise that resolves to give a true/false
    *                            array describing which roiCollections to import.
    */
   async _awaitInputFromListUI(importList) {
@@ -170,9 +174,9 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    * _collectionEligibleForImport - Returns true if the roiCollection references
    * the active series, and hasn't already been imported.
    *
-   * @param  {Object} collectionInfoJSON  An object containing information about
+   * @param  {object} collectionInfoJSON  An object containing information about
    *                                      the collection.
-   * @return {Boolean}                    Whether the collection is eligible
+   * @returns {boolean}                    Whether the collection is eligible
    *                                      for import.
    */
   _collectionEligibleForImport(collectionInfoJSON) {
@@ -219,9 +223,10 @@ export class AsyncRoiFetcher extends AsyncFetcher {
    * _getAndImportFile - Imports the file from the REST url and loads it into
    *                     cornerstoneTools toolData.
    *
-   * @param  {type} url             The REST URL of the file.
-   * @param  {type} collectionInfo  An object describing the roiCollection to
-   *                                import.
+   * @param  {string} url             The REST URL of the file.
+   * @param  {object} collectionInfo  An object describing the roiCollection to
+   *                                  import.
+   * @returns {null}
    */
   async _getAndImportFile(url, collectionInfo) {
     switch (collectionInfo.collectionType) {

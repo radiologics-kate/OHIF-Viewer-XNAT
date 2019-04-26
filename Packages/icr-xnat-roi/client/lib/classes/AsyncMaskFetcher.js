@@ -14,12 +14,8 @@ const overwriteConfirmationContent = {
 };
 
 /**
- * @class AsyncMaskFetcher
- * @author JamesAPetts
- *
- * Asynchronusly fetches roiCollections that contain masks, allows the user to select which to
- * import, and parses them using an instance of MaskImporter.
- *
+ * @class AsyncMaskFetcher - Asynchronusly fetches roiCollections that contain masks, allows the user to select which to
+ * import, and parses them using a MaskImporter.
  */
 export class AsyncMaskFetcher extends AsyncFetcher {
   constructor(seriesInstanceUid) {
@@ -28,8 +24,13 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     this._maskImporter = new MaskImporter();
   }
 
+  /**
+   * _openImportListDialog - Open the dialog and display a loading icon
+   * whilst data is fetched.
+   *
+   * @returns {null}
+   */
   _openImportListDialog() {
-    // Open the dialog and display a loading icon whilst data is fetched.
     this._maskImportListDialog = document.getElementById(
       "maskImportListDialog"
     );
@@ -43,6 +44,8 @@ export class AsyncMaskFetcher extends AsyncFetcher {
   /** @private @async
    * _selectAndImportRois - Display list of roiCollections eligible for import,
    * await user input, and download the selected roiCollections.
+   *
+   * @returns {null}
    */
   async _selectAndImportRois() {
     const dialog = this._maskImportListDialog;
@@ -66,18 +69,12 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       } else {
         const hasExistingData = this._hasExistingMaskData();
 
-        console.log(hasExistingData);
-
         if (hasExistingData) {
-          console.log("Check confirmation first!");
-
           confirmed = await awaitConfirmationDialog(
             overwriteConfirmationContent
           );
-          console.log(`confirmed: ${confirmed}`);
         } else {
           confirmed = true;
-          console.log(`confirmed: ${confirmed}`);
         }
       }
     }
@@ -85,16 +82,11 @@ export class AsyncMaskFetcher extends AsyncFetcher {
     dialog.close();
 
     if (importMaskID === undefined) {
-      console.log("cancelled");
-
       return;
     }
 
-    console.log("confirmed");
-
     // Only 1 to parse for masks.
     if (importMaskID === undefined) {
-      console.log("numCollectionToParse = 0");
       return;
     } else {
       this._numCollectionsToParse = 1;
@@ -109,13 +101,11 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * _awaitInputFromListUI - Awaits user input from the maskImportList UI.
    *
    * @param  {Array} importList The list of roiCollections eligible for import.
-   * @return {Promise}          A promise that resolves to give a true/false
+   * @returns {Promise}          A promise that resolves to give a true/false
    *                            array describing which roiCollections to import.
    */
   async _awaitInputFromListUI(importList) {
     function keyConfirmEventHandler(e) {
-      console.log("keyConfirmEventHandler");
-
       if (e.which === 13) {
         // If Enter is pressed accept and close the dialog
         confirmEventHandler();
@@ -128,15 +118,11 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       );
       const importMaskID = selection.value;
 
-      console.log(`importMaskID: ${importMaskID}`);
-
       removeEventListeners();
       resolveRef(importMaskID);
     }
 
     function cancelEventHandler(e) {
-      console.log("prevent default escape.");
-
       e.preventDefault();
 
       removeEventListeners();
@@ -178,7 +164,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * _hasExistingMaskData - Check if we either have an import
    *                        (quicker to check), or we have some data.
    *
-   * @return {boolean}  Whether mask data exists.
+   * @returns {boolean}  Whether mask data exists.
    */
   _hasExistingMaskData() {
     let hasData = false;
@@ -188,9 +174,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
       const metadata =
         brushModule.state.segmentationMetadata[this._seriesInstanceUid];
 
-      //const metadata = brushModule.getters.metadata(this._seriesInstanceUid);
-      console.log("metadata:");
-      console.log(metadata);
       if (metadata) {
         hasData = metadata.some(data => data !== undefined);
       }
@@ -205,7 +188,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    *
    * @param  {Object} collectionInfoJSON  An object containing information about
    *                                      the collection.
-   * @return {Boolean}                    Whether the collection is eligible
+   * @returns {Boolean}                    Whether the collection is eligible
    *                                      for import.
    */
   _collectionEligibleForImport(collectionInfoJSON) {
@@ -244,6 +227,7 @@ export class AsyncMaskFetcher extends AsyncFetcher {
    * @param  {type} url             The REST URL of the file.
    * @param  {type} collectionInfo  An object describing the roiCollection to
    *                                import.
+   * @returns {null}
    */
   async _getAndImportFile(url, collectionInfo) {
     switch (collectionInfo.collectionType) {
@@ -263,7 +247,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
           modified: false
         };
 
-        console.log(`_getAndImportFile: Importing SEG, url: ${url}`);
         const arrayBuffer = await this._getArraybuffer(url).catch(error =>
           console.log(error)
         );
@@ -290,7 +273,6 @@ export class AsyncMaskFetcher extends AsyncFetcher {
           modified: false
         };
 
-        console.log(`_getAndImportFile: Importing NIFTI, url: ${url}`);
         const niftiArrayBuffer = await this._getArraybuffer(url).catch(error =>
           console.log(error)
         );

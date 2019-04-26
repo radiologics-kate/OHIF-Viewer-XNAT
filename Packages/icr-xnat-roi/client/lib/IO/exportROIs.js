@@ -43,7 +43,7 @@ async function beginExport() {
   const label = AIMWriter.generateLabel(dateTime);
 
   // Check if there are any unlocked ROIs with > 0 contours.
-  if (roiExtractor.hasVolumesToExtract() === false) {
+  if (roiExtractor.hasROIContoursToExtract() === false) {
     displayNothingToExportDialog("ROI");
     return;
   }
@@ -62,7 +62,7 @@ async function beginExport() {
   const exportInProgressDialog = document.getElementById("exportVolumes");
   exportInProgressDialog.showModal();
 
-  const volumes = roiExtractor.extractVolumes(exportMask);
+  const volumes = roiExtractor.extractROIContours(exportMask);
 
   const aw = new AIMWriter(roiCollectionName, label, dateTime);
   aw.writeImageAnnotationCollection(volumes, seriesInfo);

@@ -1,10 +1,12 @@
-import { OHIF } from "meteor/ohif:core";
 import { Polygon } from "meteor/icr:peppermint-tools";
 import { dicomParser } from "meteor/ohif:cornerstone";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
 const modules = cornerstoneTools.store.modules;
 
+/**
+ * @class RTStructReader - Reads an RTSTRUCT using dicomParser and extracts any ROIContours.
+ */
 export class RTStructReader {
   constructor(
     rtStructArrayBuffer,
@@ -32,10 +34,16 @@ export class RTStructReader {
     this._freehand3DStore = modules.freehand3D;
 
     if (this._sopInstancesInSeries.length > 0) {
-      this._extractVolumes();
+      this._extractROIContours();
     }
   }
 
+  /**
+   * _getdataSet - Gets the dataSet from the RTSTRUCT file.
+   *
+   * @param  {ArrayBuffer} rtStructArrayBuffer The RTSTRUCT file.
+   * @returns {object}  The dataset.
+   */
   _getdataSet(rtStructArrayBuffer) {
     let byteArray = new Uint8Array(rtStructArrayBuffer);
 
@@ -43,13 +51,18 @@ export class RTStructReader {
     try {
       dataSet = dicomParser.parseDicom(byteArray);
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
       console.log("File is not a valid DICOM file!");
     }
 
     return dataSet;
   }
 
+  /**
+   * _isRTStruct - checks if the DICOM is an RTSTRUCT
+   *
+   * @returns {boolean} True if the DICOM is an RTSTRUCT.
+   */
   _isRTStruct() {
     const SOPClassUID = this._dataSet.string(RTStructTag["SOPClassUID"]);
     if (SOPClassUID !== RadiationTherapyStructureSetStorage) {
@@ -59,6 +72,11 @@ export class RTStructReader {
     return;
   }
 
+  /**
+   * _getSopInstancesInSeries - gets the referenced sop instance UIDs in the series.
+   *
+   * @returns {string[]} An array of sop instance UIDs.
+   */
   _getSopInstancesInSeries() {
     let sopInstanceUids = [];
     const RTReferencedSeries = this._getRTReferenceSeries();
@@ -80,6 +98,12 @@ export class RTStructReader {
     return sopInstanceUids;
   }
 
+  /**
+   * _getRTReferenceSeries -  gets the RTReferencedSeries that corresponds to
+   *                          the active series.
+   *
+   * @returns {object||null}  The referenced series node of the DICOM dataset.
+   */
   _getRTReferenceSeries() {
     const ReferencedFrameofReferenceSequenceItems = this._dataSet.elements[
       RTStructTag["ReferencedFrameofReferenceSequence"]
@@ -115,30 +139,49 @@ export class RTStructReader {
     return null;
   }
 
-  _extractVolumes() {
+  /**
+   * _extractROIContours - extracts the contours from the RTSTRUCT.
+   *
+   * @returns {null}
+   */
+  _extractROIContours() {
     const ROIContourSequence = this._dataSet.elements[
       RTStructTag["ROIContourSequence"]
     ];
-    const volumes = ROIContourSequence.items;
-    for (let i = 0; i < volumes.length; i++) {
-      this._extractOneVolume(volumes[i].dataSet);
+    const ROIContours = ROIContourSequence.items;
+    for (let i = 0; i < ROIContours.length; i++) {
+      this._extractOneROIContour(ROIContours[i].dataSet);
     }
   }
 
-  _extractOneVolume(volumeDataSet) {
-    const ROINumber = volumeDataSet.string(RTStructTag["ReferencedROINumber"]);
+  /**
+   * _extractOneROIContour - extracts one ROIContour from the dataset.
+   *
+   * @param  {type} ROIContourDataSet The dataset of the ROIContour.
+   * @returns {null}
+   */
+  _extractOneROIContour(ROIContourDataSet) {
+    const ROINumber = ROIContourDataSet.string(
+      RTStructTag["ReferencedROINumber"]
+    );
 
-    const ROIContourUid = this._createNewVolumeAndGetUid(ROINumber);
+    const ROIContourUid = this._createNewROIContourAndGetUid(ROINumber);
 
     const contourSequence =
-      volumeDataSet.elements[RTStructTag["ContourSequence"]];
-    const contours = contourSequence.items;
-    for (let i = 0; i < contours.length; i++) {
-      this._extractOneContour(contours[i].dataSet, ROIContourUid, ROINumber);
+      ROIContourDataSet.elements[RTStructTag["ContourSequence"]];
+    const polygon = contourSequence.items;
+    for (let i = 0; i < polygon.length; i++) {
+      this._extractOnePolygon(polygon[i].dataSet, ROIContourUid, ROINumber);
     }
   }
 
-  _createNewVolumeAndGetUid(ROINumber) {
+  /**
+   * _createNewROIContourAndGetUid - Creates a new ROIContour and returns its UID.
+   *
+   * @param  {number} ROINumber The index of the ROIContour.
+   * @returns {string}  The ROICOntourUid.
+   */
+  _createNewROIContourAndGetUid(ROINumber) {
     const freehand3DStore = this._freehand3DStore;
     let name;
     let uid;
@@ -167,6 +210,12 @@ export class RTStructReader {
     return ROIContourUid;
   }
 
+  /**
+   * _addStructureSetIfNotPresent - Adds a structureSet to the series if it
+   *                                doesn't exist yet.
+   *
+   * @returns {null}
+   */
   _addStructureSetIfNotPresent() {
     const freehand3DStore = this._freehand3DStore;
 
@@ -188,7 +237,15 @@ export class RTStructReader {
     }
   }
 
-  _extractOneContour(contourSequenceItemData, ROIContourUid, ROINumber) {
+  /**
+   * _extractOnePolygon - Extracts one polygon from the ROIContour.
+   *
+   * @param  {object} contourSequenceItemData The dataset for the polygon.
+   * @param  {string} ROIContourUid           The UID of the ROIContour.
+   * @param  {number} ROINumber               The index of the ROIContour.
+   * @returns {null}
+   */
+  _extractOnePolygon(contourSequenceItemData, ROIContourUid, ROINumber) {
     // Only parse closed polygons
     const contourGeometricType = contourSequenceItemData.string(
       RTStructTag["ContourGeometricType"]
@@ -237,6 +294,14 @@ export class RTStructReader {
     this._polygons.push(polygon);
   }
 
+  /**
+   * _extractPoints - Extracts the points of a polygon.
+   *
+   * @param  {object} contourSequenceItemData  The dataset for the polygon.
+   * @param  {string} referencedSopInstanceUid  The sop instance UID referenced
+   *                                            by the polygon.
+   * @returns {number[]} An array of points.
+   */
   _extractPoints(contourSequenceItemData, referencedSopInstanceUid) {
     const points = [];
     const numPoints = contourSequenceItemData.intString(

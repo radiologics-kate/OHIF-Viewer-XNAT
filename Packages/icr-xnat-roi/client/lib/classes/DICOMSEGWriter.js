@@ -6,11 +6,21 @@ const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 const dcmjs = require("dcmjs");
 
+/**
+ * @class DICOMSEGWriter - Utilises dcmjs to extract a peppermintTools brush
+ *                         mask drawn on the given series.
+ */
 export class DICOMSEGWriter {
   constructor(seriesInfo) {
     this._seriesInfo = seriesInfo;
   }
 
+  /**
+   * write - Writes the DICOM SEG.
+   *
+   * @param  {string} name The name/series description of the DICOM SEG.
+   * @returns {Promise} A promise that resolves to a Blob containing the DICOM SEG.
+   */
   async write(name) {
     return new Promise(resolve => {
       // Grab the base image DICOM.
@@ -63,6 +73,11 @@ export class DICOMSEGWriter {
     });
   }
 
+  /**
+   * _generateDateTime - Generates a datestamp and timestamp.
+   *
+   * @returns {object} An object with formatted date and time properties.
+   */
   _generateDateTime() {
     const d = new Date();
     const dateTime = {

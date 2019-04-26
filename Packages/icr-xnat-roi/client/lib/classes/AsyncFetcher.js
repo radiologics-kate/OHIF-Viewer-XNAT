@@ -1,15 +1,11 @@
 import { RoiImporter } from "./RoiImporter.js";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import progressDialog from "../util/progressDialog.js";
 
 /**
- * @abstract @class AsyncFetcher
- * @author JamesAPetts
- *
- * Asynchronusly fetches roiCollections that contain contours, allows the user to select which to
- * import, and parses them using an instance of RoiImporter.
- *
+ * @abstract @class AsyncFetcher - Asynchronusly fetches roiCollections that
+ * contain contours, allows the user to select which to import, and imports them
+ * using an RoiImporter.
  */
 export class AsyncFetcher {
   constructor(seriesInstanceUid, validTypes) {
@@ -28,6 +24,7 @@ export class AsyncFetcher {
   /**
    * _openImportListDialog - Opens the import list dialog.
    * @private @abstract
+   * @returns {null}
    */
   _openImportListDialog() {
     throw new Error("Must implement abstract method _openImportListDialog");
@@ -36,6 +33,7 @@ export class AsyncFetcher {
   /**
    * async _selectAndImportRois - Calls UI to allow user input for imports.
    * @private @abstract
+   * @returns {null}
    */
   async _selectAndImportRois() {
     throw new Error("Must implement abstract method _selectAndImportRois");
@@ -46,9 +44,9 @@ export class AsyncFetcher {
    * the active series, and hasn't already been imported.
    * @private @abstract
    *
-   * @param  {Object} collectionInfoJSON  An object containing information about
+   * @param  {object} collectionInfoJSON  An object containing information about
    *                                      the collection.
-   * @return {Boolean}                    Whether the collection is eligible
+   * @returns {boolean}                    Whether the collection is eligible
    *                                      for import.
    */
   _collectionEligibleForImport(collectionInfoJSON) {
@@ -61,9 +59,10 @@ export class AsyncFetcher {
    * _getAndImportFile - Imports the file from the REST url and loads it into
    *                     cornerstoneTools toolData.
    *
-   * @param  {type} url             The REST URL of the file.
-   * @param  {type} collectionInfo  An object describing the roiCollection to
-   *                                import.
+   * @param  {string} url             The REST URL of the file.
+   * @param  {object} collectionInfo  An object describing the roiCollection to
+   *                                  import.
+   * @returns {null}
    */
   async _getAndImportFile(url, collectionInfo) {
     throw new Error(
@@ -76,8 +75,9 @@ export class AsyncFetcher {
    * and adds it to the _collectionInfoArray if the collection references the
    * active series and has not already been imported.
    *
-   * @param  {String} getCollectionUrl The REST URL to GET the collectionInfo.
-   * @param  {type} roiCollectionId  The ID of the roiCollection.
+   * @param  {string} getCollectionUrl The REST URL to GET the collectionInfo.
+   * @param  {string} roiCollectionId  The ID of the roiCollection.
+   * @returns {null}
    */
   async _addCollectionToListIfCanImport(getCollectionUrl, roiCollectionId) {
     console.log(`_addCollectionToListIfCanImport ${getCollectionUrl}`);
@@ -110,6 +110,8 @@ export class AsyncFetcher {
 
   /** @public @async
    * fetchMasks - Asynchronusly fetch and process ROI Collections.
+   *
+   * @returns {null}
    */
   async fetch() {
     this._openImportListDialog();
@@ -156,6 +158,7 @@ export class AsyncFetcher {
   /** @private
    * _openProgressDialog - Opens the progress dialog.
    *
+   * @returns {null}
    */
   _openProgressDialog() {
     this._updateProgressDialog();
@@ -163,10 +166,10 @@ export class AsyncFetcher {
   }
 
   /**
-   * _isValidCollectionType - Returns true if the collection is a contour type.
+   * _isValidCollectionType - Checks if the collection is a valid type.
    *
-   * @param  {type} collectionType description
-   * @return {type}                description
+   * @param  {type} collectionType The collection type.
+   * @returns {boolean} True if the collection type is valid.
    */
   _isValidCollectionType(collectionType) {
     return this._validTypes.some(type => type === collectionType);
@@ -177,9 +180,9 @@ export class AsyncFetcher {
    *                      collectionInfoJSON.
    * @private
    *
-   * @param  {Object} collectionInfoJSON  The POJO created from the JSON
+   * @param  {object} collectionInfoJSON  The POJO created from the JSON
    *                                      retrieved via REST.
-   * @return {Object}                     The collectionInfo.
+   * @return {object}                     The collectionInfo.
    */
   _getCollectionInfo(roiCollectionId, collectionInfoJSON) {
     const data_fields = collectionInfoJSON.items[0].data_fields;
@@ -200,6 +203,7 @@ export class AsyncFetcher {
    *
    * @param  {type} collectionInfo  An object describing the roiCollection to
    *                                import.
+   * @returns {null}
    */
   async _getFilesFromList(collectionInfo) {
     const getFilesUrl = collectionInfo.getFilesUrl;
@@ -230,7 +234,7 @@ export class AsyncFetcher {
    * parsed, and closes the progress dialog if the collections have all been
    * imported.
    *
-   * @return {type}  description
+   * @returns {null}
    */
   _incrementNumCollectionsParsed() {
     this._numCollectionsParsed++;
@@ -245,8 +249,8 @@ export class AsyncFetcher {
    * _filterRoiCollections - Filters out roiCollections from an assessor list
    * and set the number of roiCollections that need to be parsed.
    *
-   * @param  {Array} assessors The assessor list that needs to be filtered.
-   * @return {Array}           The filtered list containing only roiCollections.
+   * @param  {object[]} assessors The assessor list that needs to be filtered.
+   * @return {object[]}           The filtered list containing only roiCollections.
    */
   _filterRoiCollections(assessors) {
     const roiCollections = [];
@@ -266,8 +270,8 @@ export class AsyncFetcher {
   /** @private
    * _getJson - GETs JSON from a REST URL.
    *
-   * @param  {String}   url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
+   * @param  {string}   url The REST URL to request data from.
+   * @returns {Promise}  A promise that will resolve to the requested file.
    */
   _getJson(url) {
     return this._GET_file(url, "json");
@@ -276,8 +280,8 @@ export class AsyncFetcher {
   /** @private
    * _getXml - GETs XML from a REST URL.
    *
-   * @param  {String} url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
+   * @param  {string} url The REST URL to request data from.
+   * @returns {Promise}  A promise that will resolve to the requested file.
    */
   _getXml(url) {
     return this._GET_file(url, "xml");
@@ -286,8 +290,8 @@ export class AsyncFetcher {
   /** @private
    * _getArraybuffer - GETs and arraybuffer from a REST URL.
    *
-   * @param  {type} url The REST URL to request data from.
-   * @return {Promise}  A promise that will resolve to the requested file.
+   * @param  {string} url The REST URL to request data from.
+   * @returns {Promise}  A promise that will resolve to the requested file.
    */
   _getArraybuffer(url) {
     return this._GET_file(url, "arraybuffer");
@@ -296,9 +300,9 @@ export class AsyncFetcher {
   /** @private
    * _GET_file - GETs a file of the requested filetype from a REST URL.
    *
-   * @param  {String} url      The REST URL to request data from.
-   * @param  {String} fileType The requested filetype of the data.
-   * @return {Promise}         A promise that will resolve to the requested file.
+   * @param  {string} url      The REST URL to request data from.
+   * @param  {string} fileType The requested filetype of the data.
+   * @returns {Promise}         A promise that will resolve to the requested file.
    */
   _GET_file(url, fileType) {
     return new Promise((resolve, reject) => {
@@ -329,7 +333,8 @@ export class AsyncFetcher {
    * fileType supplied.
    *
    * @param  {XMLHttpRequest} xhr       The rest client.
-   * @param  {String}         fileType  The filetype being requested.
+   * @param  {string}         fileType  The filetype being requested.
+   * @returns {null}
    */
   _setXhrHeaders(xhr, fileType) {
     switch (fileType) {
@@ -354,6 +359,7 @@ export class AsyncFetcher {
   /** @private
    * _updateProgressDialog - Updates the progress dialog.
    *
+   * @returns {null}
    */
   _updateProgressDialog() {
     progressDialog.update({

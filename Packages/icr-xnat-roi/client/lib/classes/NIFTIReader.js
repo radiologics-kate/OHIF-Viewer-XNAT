@@ -2,8 +2,6 @@ import { OHIF } from "meteor/ohif:core";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import Nifti from "nifti-reader-js";
 
-const globalToolStateManager =
-  cornerstoneTools.globalImageIdSpecificToolStateManager;
 const modules = cornerstoneTools.store.modules;
 const tolerance = 0.1;
 
@@ -31,12 +29,23 @@ const THEO_NAMES = [
   "Humerus Left"
 ];
 
+/**
+ * @class NIFTIReader - Reads a NIFTI file and returns a set of masks.
+ */
 export class NIFTIReader {
   constructor(seriesInfo) {
     this._seriesInfo = seriesInfo;
     this._metadataProvider = OHIF.viewer.metadataProvider;
   }
 
+  /**
+   * read - Reads the given NIFTI file.
+   *
+   * @param  {ArrayBuffer} niftiArrayBuffer The NIFTI file as an array buffer.
+   * @param  {object} stackToolState  The toolstate for the image stack.
+   * @param  {object} dimensions The dimensions of the NIFTI volume.
+   * @returns {object[]}  An array of masks.
+   */
   read(niftiArrayBuffer, stackToolState, dimensions) {
     this._niftiArrayBuffer = niftiArrayBuffer;
 
@@ -99,7 +108,7 @@ export class NIFTIReader {
     }
 
     // If mapping NIFTI to DICOM, we have to take the leap of faith that when converting
-    // To the DICOM PCS that the frame of reference is the same .... Which is why DICOM is superior.
+    // To the DICOM PCS that the frame of reference is the same... which is why DICOM is superior.
     // TODO -> Actually grab the data from the other corresponding image...? There may be
     // Orientations I have not considered.
 
@@ -108,9 +117,6 @@ export class NIFTIReader {
       -firstVoxelInNeurologicalFrame[1],
       firstVoxelInNeurologicalFrame[2]
     ];
-
-    //console.log(firstVoxelInNeurologicalFrame);
-    //console.log(firstVoxelInDicomPCSFrame);
 
     let sliceDirection = this._compareSliceDirection(
       imagePositionPatient,
@@ -130,6 +136,15 @@ export class NIFTIReader {
     return this._masks;
   }
 
+  /**
+   * _quarternionTransformToWorldSpace - Transforms voxel (1,j,k) to the PCS
+   *                                     using the quarternion information.
+   *
+   * @param  {type} i The x index of the voxel.
+   * @param  {type} j The y index of the voxel.
+   * @param  {type} k The z index of the voxel.
+   * @returns {number[3]}   The tranformed coordinate.
+   */
   _quarternionTransformToWorldSpace(i, j, k) {
     const niftiHeader = this._niftiHeader;
     const b = niftiHeader.quatern_b;
@@ -172,6 +187,15 @@ export class NIFTIReader {
     return resultAfterOffset;
   }
 
+  /**
+   * _fullAffineTransformToWorldSpace - Transforms voxel (1,j,k) to the PCS
+   *                                    using an affine transform.
+   *
+   * @param  {type} i The x index of the voxel.
+   * @param  {type} j The y index of the voxel.
+   * @param  {type} k The z index of the voxel.
+   * @returns {number[3]}   The tranformed coordinate.
+   */
   _fullAffineTransformToWorldSpace(i, j, k) {
     const niftiHeader = this._niftiHeader;
     // Affine matrix.
@@ -191,7 +215,13 @@ export class NIFTIReader {
     return result;
   }
 
-  _extractSegmentationCount(niftiLabelMap) {
+  /**
+   * _extractSegmentCount - gets the segment count from the voxel data.
+   *
+   * @param  {type} niftiLabelMap The extracted label map data.
+   * @returns {number} The segmentat count.
+   */
+  _extractSegmentCount(niftiLabelMap) {
     let len = niftiLabelMap.length;
     let max = -Infinity;
 
@@ -204,16 +234,28 @@ export class NIFTIReader {
     return max;
   }
 
-  //TODO -> DO THIS PROPERLY. We need a name in the ROICollection schema.
-  _getTheoNames(i) {
-    return THEO_NAMES[i];
+  //
+
+  /**
+   * _getTheoNames - TEMP - Get the bone name for Theo's work.
+   *
+   * TODO -> DO THIS PROPERLY. We need a name in the ROICollection schema.
+   *
+   * @param  {number} segmentIndex The index of the segment.
+   * @returns {string} The name of the segment.
+   */
+  _getTheoNames(segmentIndex) {
+    return THEO_NAMES[segmentIndex];
   }
 
+  /**
+   * _generateMetadata - generates and set the segment metadata in cornerstoneTools.
+   *
+   * @returns {null}
+   */
   _generateMetadata() {
-    // Set segmentation metadata.
-    // TODO -> Store the names somewhere on XNAT and retrieve them.
     for (let i = 0; i < this._segmentationCount; i++) {
-      // TEMP -> Generate random metadata since NIFTI has none ¯\_(ツ)_/¯.
+      // TEMP -> Generate appropriate metadata since NIFTI has none ¯\_(ツ)_/¯.
       const metadata = {
         RecommendedDisplayCIELabValue: [255, 0, 0],
         SegmentedPropertyCategoryCodeSequence: {
@@ -234,6 +276,18 @@ export class NIFTIReader {
     }
   }
 
+  /**
+   * _compareSliceDirection - Checks which direction the NIFTI slices are in
+   *                          relation to the scan data.
+   *
+   * @param  {object} imagePositionPatient  The imagePositionPatient of the
+   *                                        first image in the series.
+   * @param  {object} firstVoxelInDicomPCSFrame The position of the the first
+   *                                            voxel of the NIFTI in the PCS.
+   * @param  {number} tol                       The tolerance.
+   * @returns {string}  A string that indicates if the NIFTI slices are ascending
+   *                    or descending the scan.
+   */
   _compareSliceDirection(imagePositionPatient, firstVoxelInDicomPCSFrame, tol) {
     if (Math.abs(imagePositionPatient.z - firstVoxelInDicomPCSFrame[2]) < tol) {
       console.log("slice direction same as referenced image");
@@ -244,6 +298,13 @@ export class NIFTIReader {
     return "descending";
   }
 
+  /**
+   * _setSegMetadata - Sets the cornerstoneTools metadata for the segment.
+   *
+   * @param  {number} segIndex The index of the segment.
+   * @param  {object} metadata The metadata.
+   * @returns {null}
+   */
   _setSegMetadata(segIndex, metadata) {
     modules.brush.setters.metadata(
       this._seriesInfo.seriesInstanceUid,
@@ -252,6 +313,18 @@ export class NIFTIReader {
     );
   }
 
+  /**
+   * _compareSliceOrientation - Checks the orientation of the NIFTI slices in
+   *                            relation to the scan data.
+   *
+   * @param  {object} imagePositionPatient  The imagePositionPatient of the
+   *                                        first image in the series.
+   * @param  {object} firstVoxelInDicomPCSFrame The position of the the first
+   *                                            voxel of the NIFTI in the PCS.
+   * @param  {number} tol                       The tolerance.
+   * @returns {string}  A string that indicates if the NIFTI slices are in the
+   *                    same orienation as the DICOM or if they are flipped.
+   */
   _compareSliceOrientation(
     imagePositionPatient,
     firstVoxelInDicomPCSFrame,
@@ -288,16 +361,31 @@ export class NIFTIReader {
     );
   }
 
+  /**
+   * _decompressIfZipped - If the NIFTI file is compressed, decompress it.
+   *
+   * @returns {null}
+   */
   _decompressIfZipped() {
     if (Nifti.isCompressed(this._niftiArrayBuffer)) {
       this._niftiArrayBuffer = Nifti.decompress(this._niftiArrayBuffer);
     }
   }
 
+  /**
+   * _isValidNifti - Checks if the ArrayBuffer is a NIFTI file.
+   *
+   * @returns {boolean} True if the arraybuffer is a NIFTI.
+   */
   _isValidNifti() {
     return Nifti.isNIFTI(this._niftiArrayBuffer);
   }
 
+  /**
+   * _isValidDimensionality - Checks that the NIFTI has at least 3 dimensions.
+   *
+   * @returns {boolean} True if the dimensionality is >= 3.
+   */
   _isValidDimensionality() {
     if (this._dimensions.dimensionality >= 3) {
       return true;
@@ -306,13 +394,18 @@ export class NIFTIReader {
     return false;
   }
 
+  /**
+   * _extractHeaders - Extracts what little header info NIFTI files have.
+   *
+   * @returns {null}
+   */
   _extractHeaders() {
     this._niftiHeader = Nifti.readHeader(this._niftiArrayBuffer);
     this._niftiExtension = this._extractNiftiExtension();
 
     this._dimensions = {
       dimensionality: this._niftiHeader.dims[0],
-      x: this._niftiHeader.dims[1], // This isn't an error, [0] contains the dimensionality.
+      x: this._niftiHeader.dims[1], // This isn't an off-by-one error, [0] contains the dimensionality.
       y: this._niftiHeader.dims[2],
       z: this._niftiHeader.dims[3],
       sliceLength: this._niftiHeader.dims[1] * this._niftiHeader.dims[2]
@@ -327,12 +420,12 @@ export class NIFTIReader {
    *    descending: each (x * y) elements correspond to slices [N, N-1, ..., 0].
    * @param  {type} [sliceOrientation = 'same']
    *    same: each slice has the voxels in the same order as the source image.
-   *    opposite: each slice has the voxels in reverse order (TODO: ?)
+   *    opposite: each slice has the voxels in reverse order.
    * @return {number[][]} An array of masks formated in the correct order for the image.
    */
   _extractMasks(sliceDirection = "ascending", sliceOrientation = "same") {
     const niftiLabelMap = this._getXyzPixelArray();
-    const segmentationCount = this._extractSegmentationCount(niftiLabelMap);
+    const segmentationCount = this._extractSegmentCount(niftiLabelMap);
 
     const dimensions = this._dimensions;
     const sliceLength = dimensions.sliceLength;
@@ -406,6 +499,11 @@ export class NIFTIReader {
     return masks;
   }
 
+  /**
+   * _extractNiftiExtension - If the NIFTI has extended metadata, extract it.
+   *
+   * @returns {object||null}  The extention data, or null if it doesn't exist.
+   */
   _extractNiftiExtension() {
     if (Nifti.hasExtension(this._niftiHeader)) {
       return Nifti.readExtensionData(niftiHeader, niftiArrayBuffer);
@@ -414,6 +512,11 @@ export class NIFTIReader {
     }
   }
 
+  /**
+   * _extractPixelData - Extracts the pixelData from the NIFTI file.
+   *
+   * @returns {Int8Array||Int16Array||Int32Array||null} The pixelData.
+   */
   _extractPixelData() {
     const niftiImage = Nifti.readImage(
       this._niftiHeader,
@@ -437,6 +540,11 @@ export class NIFTIReader {
     return null;
   }
 
+  /**
+   * _getXyzPixelArray - gets a datacube from the NIFTI file.
+   *
+   * @returns {Int8Array||Int16Array||Int32Array} The datacube.
+   */
   _getXyzPixelArray() {
     const dimensions = this._dimensions;
     const dimensionality = dimensions.dimensionality;
@@ -453,26 +561,5 @@ export class NIFTIReader {
 
   get int8PixelArray() {
     return this._pixelArray;
-  }
-
-  _debugInfo() {
-    console.log("niftiHeader:");
-    console.log(this._niftiHeader.toFormattedString());
-
-    console.log("niftiExt:");
-    console.log(this._niftiExtension);
-
-    console.log("int8PixelArray:");
-    console.log(this._pixelArray);
-  }
-
-  _getTestImageIdList(length) {
-    const imageIdList = [];
-
-    for (let i = 0; i < length; i++) {
-      imageIdList[i] = `thisIsAnImageId_${i}`;
-    }
-
-    return imageIdList;
   }
 }
