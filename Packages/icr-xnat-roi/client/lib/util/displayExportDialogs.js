@@ -3,9 +3,12 @@ import { sessionMap } from "meteor/icr:series-info-provider";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
 /**
- * Opens dialog to notify the user when an export was unsuccessful.
+ * displayExportFailedDialog - Opens dialog to notify the user when an
+ * export was unsuccessful.
  *
- * @author JamesAPetts
+ * @param  {string} seriesInstanceUid The series instance UID of the image
+ *                                    referenced by the annotations.
+ * @returns {null}
  */
 export function displayExportFailedDialog(seriesInstanceUid) {
   const projectId = sessionMap.get(seriesInstanceUid, "projectId");
@@ -21,48 +24,31 @@ export function displayExportFailedDialog(seriesInstanceUid) {
 }
 
 /**
- * Opens dialog to notify the user that they do not have the
- * required permissions.
+ * displayMaskNotModifiedDialog - Opens dialog to notify the user that the
+ * Mask ROI Collection they are trying to export has not been modified from
+ * the XNAT version.
  *
- * @author JamesAPetts
+ * @param  {string} roiCollectionName The name off the roiCollection.
+ * @returns {null}
  */
-export function displayInsufficientPermissionsDialog(seriesInstanceUid) {
-  const projectId = sessionMap.get(seriesInstanceUid, "projectId");
-  const experimentLabel = sessionMap.get(seriesInstanceUid, "experimentLabel");
-
-  const title = "Insufficient Permissions";
-  const body =
-    `You do not have the required permissions to write ROI Collections to ${projectId}/${experimentLabel}.` +
-    " If you believe that you should, please contact the project owner.";
-
-  messageDialog(title, body);
-}
-
-/**
- * Opens dialog to notify the user that the Mask ROI Collection they are trying
- * to export has not been modified from the XNAT version.
- *
- * @author JamesAPetts
- */
-export function displayMaskNotModifiedDialog(roiCollection) {
+export function displayMaskNotModifiedDialog(roiCollectionName) {
   const title = "ROI Collection Not Modified";
-  const body = `The segmentations in the ROI Collection "${
-    roiCollection.name
-  }" have not been modified, aborting export.`;
+  const body = `The segmentations in the ROI Collection "${roiCollectionName}" have not been modified, aborting export.`;
 
   messageDialog(title, body);
 }
 
 /**
- * Opens dialog to notify the user that NIFTI exports are not possible yet.
+ * displayNothingToExportDialog - Opens dialog to notify the user there are no
+ *                                annotations of the specified type eligible
+ *                                for export.
  *
- * @author JamesAPetts
+ * @param  {string} type The annotation type.
+ * @returns {null}
  */
-export function displayCantExportNIFTIDialog(roiCollection) {
-  const title = "Cannot export NIFTI.";
-  const body = `NIFTI export has not yet been implemented. The modified segmentations in ROI Collection "${
-    roiCollection.name
-  }" have not been saved.`;
+export function displayNothingToExportDialog(type) {
+  const title = "Nothing to Export";
+  const body = `There are no unlocked ${type}s to export. Please refer to the More/Help/${type} menu for more information.`;
 
   messageDialog(title, body);
 }

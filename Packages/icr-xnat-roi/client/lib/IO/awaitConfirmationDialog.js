@@ -1,9 +1,10 @@
-/** @export @public @async
- * awaitConfirmationDialog - Awaits user input for confirmation.
+/**
+ * awaitConfirmationDialog - Opens a dialog asking the user for confirmation.
  *
- * @return {Promise} A promise that resolves to true or false.
+ * @param  {type} content An object containing the tile and body of the dialog.
+ * @returns {Promise} A promise that resolves to true or false.
  */
-export default async function(content) {
+export default async function awaitConfirmationDialog(content) {
   function keyConfirmEventHandler(e) {
     console.log("keyConfirmEventHandler");
 
@@ -62,7 +63,7 @@ export default async function(content) {
 
   dialog.showModal();
 
-  // Reference to promise.resolve, so that I can use external handlers.
+  // Reference to promise.resolve, so that we can use external handlers.
   let resolveRef;
 
   return new Promise(resolve => {

@@ -5,14 +5,13 @@ setInterval(function() {
 }, 60000);
 
 /**
- * Queries the buildInfo
+ * getBuildInfo - Queries the buildInfo (only used to maintain a connection open to XNAT).
  *
- * @author JamesAPetts
+ * @returns {null}
  */
 function getBuildInfo() {
   const xhr = new XMLHttpRequest();
 
   xhr.open("GET", `${Session.get("rootUrl")}/xapi/siteConfig/buildInfo`);
-  //xhr.responseType = "json";
   xhr.send();
 }

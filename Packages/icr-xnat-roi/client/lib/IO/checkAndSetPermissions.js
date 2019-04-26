@@ -1,10 +1,15 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 /**
- * Queries the XNAT REST API for write permissions to the roiCollection schema
- * element, and stores the result in the Session variables.
+ * checkAndSetPermissions - Queries the XNAT-ROI XAPI for the permissions the
+ * user has for the roiCollection schema element, and stores the result in
+ * Session variables.
  *
- * @author JamesAPetts
+ * @param  {type} projectId       The XNAT projectId.
+ * @param  {type} parentProjectId The ID of the parent project. If the session
+ *                                is not shared into another project, it will
+ *                                be the same as the projectId.
+ * @returns {null}
  */
 export async function checkAndSetPermissions(projectId, parentProjectId) {
   const url = `${Session.get(
@@ -51,9 +56,8 @@ export async function checkAndSetPermissions(projectId, parentProjectId) {
  * Queries the XNAT REST API for write permissions to the roiCollection schema
  * element.
  *
- * @author JamesAPetts
- * @param {String} url - The REST call to be made.
- * @returns {JSON} A JSON representation of the permissions.
+ * @param {string} url - The REST call to be made.
+ * @returns {object} A parsed JSON representation of the permissions.
  */
 function getPermissionsJson(url) {
   return new Promise((resolve, reject) => {

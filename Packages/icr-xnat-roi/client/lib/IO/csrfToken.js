@@ -1,10 +1,10 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 /**
- * Queries the XNAT REST API for write permissions to the roiCollection schema
- * element, and stores the result in the Session variables.
+ * fetchCSRFToken - Fetches the users CSRFToken from the XNAT backend. Required
+ * for PUT events.
  *
- * @author JamesAPetts
+ * @returns {Promise} A promise that resolves to the token.
  */
 export function fetchCSRFToken() {
   return new Promise((resolve, reject) => {

@@ -3,6 +3,9 @@ import { fetchCSRFToken } from "../IO/csrfToken.js";
 
 const XMLWriter = require("xml-writer");
 
+/**
+ * @class AIMExporter - Exports an AIM ImageAnnotationCollection to XNAT.
+ */
 export class AIMExporter {
   constructor(aimWriter) {
     this._aimString = aimWriter.toString();
@@ -18,6 +21,11 @@ export class AIMExporter {
     this._label = aimWriter.label;
   }
 
+  /**
+   * exportToXNAT - Exports the AIMExporter's AIM file to XNAT.
+   *
+   * @returns {null}
+   */
   async exportToXNAT() {
     const csrfToken = await fetchCSRFToken();
     const csrfTokenParameter = `XNAT_CSRF=${csrfToken}`;
@@ -44,6 +52,13 @@ export class AIMExporter {
     return;
   }
 
+  /**
+   * _PUTAIM - PUTs an the AIMExporter's AIM file to XNAT.
+   *
+   * @param  {string} url The destination url.
+   * @returns {Promise}   A promise that resolves on a successful PUT and
+   * rejects otherwise.
+   */
   _PUTAIM(url) {
     const arraybuffer = this._getArraybuffer();
 
@@ -70,6 +85,11 @@ export class AIMExporter {
     });
   }
 
+  /**
+   * _getArraybuffer - Packs the AIMExporter's AIM file to an ArrayBuffer.
+   *
+   * @returns {ArrayBuffer} The Binarised AIM file.
+   */
   _getArraybuffer() {
     const utf8AimString = unescape(encodeURIComponent(this._aimString));
 

@@ -1,6 +1,6 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import closeIODialog from "../../../lib/IO/closeIODialog.js";
+import { OHIF } from "meteor/ohif:core";
 
 Template.ioDialogs.onRendered(() => {
   const instance = Template.instance();
@@ -40,6 +40,11 @@ Template.ioDialogs.events({
   "click .io-dialog-cancel-js"(event) {
     const dialog = $("#ioMessage");
 
-    closeIODialog(dialog);
+    dialog.get(0).close();
+
+    // Reset the focus to the active viewport element
+    // This makes the mobile Safari keyboard close
+    const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
+    element.focus();
   }
 });

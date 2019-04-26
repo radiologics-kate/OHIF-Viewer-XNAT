@@ -157,7 +157,7 @@ export default class BrushSettings extends React.Component {
             class="brush-settings-cancel btn btn-sm btn-secondary"
             onClick={this.onCloseButtonClick}
           >
-            <i class="fa fa-times-circle fa-2x" />
+            <i className="fa fa-times-circle fa-2x" />
           </a>
         </div>
         <select onChange={this.onGateChange}>

@@ -1,10 +1,12 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { OHIF } from "meteor/ohif:core";
 import { Polygon } from "meteor/icr:peppermint-tools";
 
 const modules = cornerstoneTools.store.modules;
 
-//Parses aim files and extracts individual ROIs
+/**
+ * @class AIMReader - Parses AIM ImageAnnotationCollections and extracts the
+ *                    polygons for use in Cornerstone.
+ */
 export class AIMReader {
   constructor(
     xmlDocument,
@@ -31,6 +33,12 @@ export class AIMReader {
     console.log(this._polygons);
   }
 
+  /**
+   * _checkXML - Checks if this._doc is a Document, and whether it is an AIM 4.0
+   *             file.
+   *
+   * @returns {null}
+   */
   _checkXML() {
     if (!(this._doc instanceof Document)) {
       throw "Input is not of type Document!";
@@ -41,6 +49,11 @@ export class AIMReader {
     }
   }
 
+  /**
+   * _checkIfAIMv4_0 - Checks if this._doc is an AIM 4.0 file.
+   *
+   * @returns {boolean} True if the file is a valid AIM 4.0 file.
+   */
   _checkIfAIMv4_0() {
     const imageAnnotationCollections = this._doc.getElementsByTagName(
       "ImageAnnotationCollection"
@@ -56,6 +69,13 @@ export class AIMReader {
     return true;
   }
 
+  /**
+   * _getSopInstancesInSeries - Extracts all the sopInstanceUids referenced in
+   *                            the file that are associated with the active
+   *                            series.
+   *
+   * @returns {string[]}  An array of the sopInstanceUids.
+   */
   _getSopInstancesInSeries() {
     let sopInstancesInSeries = [];
     const imageSeriesList = this._doc.getElementsByTagName("imageSeries");
@@ -75,6 +95,13 @@ export class AIMReader {
     return sopInstancesInSeries;
   }
 
+  /**
+   * _getSeriesInstanceUid - Returns the series instance UID for a given
+   *                         AIM imageSeries.
+   *
+   * @param  {HTMLElement} imageSeries The imageSeries node.
+   * @returns {string}  The series instance UID.
+   */
   _getSeriesInstanceUid(imageSeries) {
     const seriesInstanceUidElement = imageSeries.getElementsByTagName(
       "instanceUid"
@@ -84,6 +111,15 @@ export class AIMReader {
     return seriesInstanceUid;
   }
 
+  /**
+   * _appendSopInstances - Add all the sop instance UIDs in the AIM imageSeries
+   *                       to the sopInstancesInSeries array.
+   *
+   * @param  {string[]} sopInstancesInSeries The array of sop instance UIDs.
+   * @param  {HTMLElement} imageSeries          The AIM imageSeries to parse.
+   * @modifies sopInstancesInSeries
+   * @returns {null}
+   */
   _appendSopInstances(sopInstancesInSeries, imageSeries) {
     sopInstanceUidElements = imageSeries.getElementsByTagName("sopInstanceUid");
     for (let i = 0; i < sopInstanceUidElements.length; i++) {
@@ -94,6 +130,11 @@ export class AIMReader {
     }
   }
 
+  /**
+   * _extractAnnotations - Extracts each annotation from the AIM file.
+   *
+   * @returns {null}
+   */
   _extractAnnotations() {
     const annotations = this._doc.getElementsByTagName("ImageAnnotation");
 
@@ -102,6 +143,12 @@ export class AIMReader {
     }
   }
 
+  /**
+   * _extractPolygons - Extracts each polygon from a particular annotation.
+   *
+   * @param  {HTMLElement} annotation An AIM ImageAnnotation.
+   * @returns {null}
+   */
   _extractPolygons(annotation) {
     const children = annotation.children;
     const ROIContourUid = this._createNewVolumeAndGetUid(children);
@@ -113,12 +160,27 @@ export class AIMReader {
     }
   }
 
+  /**
+   * _addMarkupEntityIfPolygon - Adds a MarkupEntity to the polygon list if
+   * is of the xsi:type "TwoDimensionPolyline"
+   *
+   * @param  {HTMLElement} markupEntity  The AIM MarkupEntity
+   * @param  {string} ROIContourUid The UID of the new ROIContour.
+   * @returns {null}
+   */
   _addMarkupEntityIfPolygon(markupEntity, ROIContourUid) {
     if (markupEntity.getAttribute("xsi:type") === "TwoDimensionPolyline") {
       this._addPolygon(markupEntity, ROIContourUid);
     }
   }
 
+  /**
+   * _addPolygon - Adds a polygon to the list of polygons.
+   *
+   * @param  {HTMLElement} markupEntity  The AIM MarkupEntity
+   * @param  {string} ROIContourUid The UID of the new ROIContour.
+   * @returns {null}
+   */
   _addPolygon(markupEntity, ROIContourUid) {
     const sopInstanceUid = markupEntity
       .getElementsByTagName("imageReferenceUid")[0]
@@ -174,19 +236,26 @@ export class AIMReader {
     this._polygons.push(polygon);
   }
 
-  _createNewVolumeAndGetUid(element) {
+  /**
+   * _createNewVolumeAndGetUid - Creates a new ROIContour and returns the UID.
+   *
+   * @param  {HTMLElement} childElementsOfAnnotation The child elements of an AIM
+   *                                          ImageAnnotation.
+   * @returns {string}  The ROIContourUid of the new contour.
+   */
+  _createNewVolumeAndGetUid(childElementsOfAnnotation) {
     const freehand3DStore = this._freehand3DStore;
     let name;
     let uid;
     let comment;
 
-    for (let i = 0; i < element.length; i++) {
-      if (element[i].tagName === "uniqueIdentifier") {
-        uid = element[i].getAttribute("root");
-      } else if (element[i].tagName === "name") {
-        name = element[i].getAttribute("value");
-      } else if (element[i].tagName === "comment") {
-        comment = element[i].getAttribute("value");
+    for (let i = 0; i < childElementsOfAnnotation.length; i++) {
+      if (childElementsOfAnnotation[i].tagName === "uniqueIdentifier") {
+        uid = childElementsOfAnnotation[i].getAttribute("root");
+      } else if (childElementsOfAnnotation[i].tagName === "name") {
+        name = childElementsOfAnnotation[i].getAttribute("value");
+      } else if (childElementsOfAnnotation[i].tagName === "comment") {
+        comment = childElementsOfAnnotation[i].getAttribute("value");
       }
     }
 
@@ -231,15 +300,6 @@ export class AIMReader {
     );
 
     return ROIContourUid;
-  }
-
-  _isIncluded(includeElement) {
-    if (includeElement.getAttribute("root") === "true") {
-      return true;
-    }
-
-    throw "Holes (i.e. includeFlag === false) are currently unsupported!";
-    return false;
   }
 
   get polygons() {

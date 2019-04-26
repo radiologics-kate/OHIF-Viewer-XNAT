@@ -1,5 +1,4 @@
 import { RoiImporter } from "./RoiImporter.js";
-import closeIODialog from "../IO/closeIODialog.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { AsyncFetcher } from "./AsyncFetcher.js";
 

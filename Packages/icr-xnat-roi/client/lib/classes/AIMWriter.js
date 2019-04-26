@@ -1,12 +1,14 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { OHIF } from "meteor/ohif:core";
 import XMLWriter from "xml-writer";
 
 const modules = cornerstoneTools.store.modules;
 const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 
-// Class which extends the XMLWriter with some abstracted AIM specific functionality.
+/**
+ * @class AIMWriter - Extends the XMLWriter with some abstracted
+ *                    AIM ImageAnnotationCollection writing functionality.
+ */
 export class AIMWriter extends XMLWriter {
   constructor(name, label, dateTime) {
     super(true); // The argument 'true' just formats the XML with indentation such that it is human readable.
@@ -19,13 +21,16 @@ export class AIMWriter extends XMLWriter {
     this._freehand3DStore = modules.freehand3D;
   }
 
+  /**
+   * writeImageAnnotationCollection - Write an ImageAnnotationCollection
+   *                                  containing the given volumes.
+   *
+   * @param  {object[]} volumes   An array of the volumes.
+   * @param  {object} seriesInfo Metadata regarding the series the annotations
+   *                                    were drawn on.
+   * @returns {null}
+   */
   writeImageAnnotationCollection(volumes, seriesInfo) {
-    console.log(`volumes`);
-    console.log(volumes);
-
-    console.log("seriesInfo");
-    console.log(seriesInfo);
-
     this._seriesInfo = seriesInfo;
     this._referencedSopInstanceUids = [];
     this._startImageAnnotationCollection();
@@ -33,6 +38,12 @@ export class AIMWriter extends XMLWriter {
     this._endImageAnnotationCollection();
   }
 
+  /**
+   * _startImageAnnotationCollection - Build the metadata header for the AIM
+   *                                   ImageAnnotationCollection.
+   *
+   * @returns {null}
+   */
   _startImageAnnotationCollection() {
     this.startDocument("1.0", "UTF-8", false);
     this.startElement("ImageAnnotationCollection")
@@ -63,11 +74,22 @@ export class AIMWriter extends XMLWriter {
     this.startElement("imageAnnotations");
   }
 
+  /**
+   * _endImageAnnotationCollection - Finishes the AIM ImageAnnotationCollection
+   *                                 document.
+   *
+   * @returns {null}
+   */
   _endImageAnnotationCollection() {
     this.endElement("imageAnnotations");
     this.endElement("ImageAnnotationCollection");
   }
 
+  /**
+   * _addUser - Adds user metadata to the header.
+   *
+   * @returns {null}
+   */
   _addUser() {
     const username = window.top.username;
 
@@ -78,6 +100,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addEquipment - Adds equipment metadata to the header.
+   *
+   * @returns {null}
+   */
   _addEquipment() {
     this.startElement("equipment");
     this._addProperty(
@@ -98,6 +125,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addPerson - Adds person metadata to the header.
+   *
+   * @returns {null}
+   */
   _addPerson() {
     this.startElement("person");
     this._addProperty("name", "value", this._seriesInfo.person.name);
@@ -112,6 +144,12 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addImageAnnotations - Add a list of volumes as ImageAnnotations.
+   *
+   * @param  {object[]} volumes An array of the volumes.
+   * @returns {null}
+   */
   _addImageAnnotations(volumes) {
     for (let i = 0; i < volumes.length; i++) {
       if (volumes[i] && volumes[i].length > 0) {
@@ -120,20 +158,32 @@ export class AIMWriter extends XMLWriter {
     }
   }
 
-  _addImageAnnotation(polygons, i) {
-    console.log(`imageAnnotation: ${i}`);
-
+  /**
+   * _addImageAnnotation - Adds an array of polygons as a single ImageAnnotation.
+   *
+   * @param  {Polygon[]} polygons An array of polygons.
+   * @param  {number} ROIContourIndex The index of the annoation.
+   * @returns {null}
+   */
+  _addImageAnnotation(polygons, ROIContourIndex) {
     this._referencedSopInstanceUids = [];
 
-    this._startImageAnnotation(polygons, i);
-    this._addMarkupEntityCollection(polygons, i);
+    this._startImageAnnotation(polygons, ROIContourIndex);
+    this._addMarkupEntityCollection(polygons, ROIContourIndex);
     this._addImageReferenceEntityCollection();
     this._endImageAnnotation();
   }
 
+  /**
+   * _startImageAnnotation - Begin an AIM ImageAnnotation.
+   *
+   * @param  {Polygon[]} polygons An array of polygons.
+   * @param  {number} ROIContourIndex The index of the annoation.
+   * @returns {null}
+   */
   _startImageAnnotation(polygons, ROIContourIndex) {
     this.startElement("ImageAnnotation");
-    this._imageAnnotationUniqueIdentifier(ROIContourIndex);
+    this._addImageAnnotationUniqueIdentifier(ROIContourIndex);
     this._addMultiProperty("typeCode", [
       { name: "code", value: "AnyClosedShape" },
       { name: "codeSystem", value: " " },
@@ -141,14 +191,24 @@ export class AIMWriter extends XMLWriter {
       { name: "codeSystemVersion", value: " " }
     ]);
     this._addDateTime();
-    const imageAnnotationName = this._imageAnnotationName(ROIContourIndex);
-    this._addProperty("name", "value", imageAnnotationName);
+    this._addImageAnnotationName(ROIContourIndex);
   }
 
+  /**
+   * _endImageAnnotation - Ends an AIM ImageAnnotation.
+   *
+   * @returns {null}
+   */
   _endImageAnnotation() {
     this.endElement("ImageAnnotation");
   }
 
+  /**
+   * _addMarkupEntityCollection - Adds an AIM markupEntityCollection.
+   *
+   * @param  {Polygon[]} polygons An array of polygons.
+   * @returns {null}
+   */
   _addMarkupEntityCollection(polygons) {
     this.startElement("markupEntityCollection");
     for (let i = 0; i < polygons.length; i++) {
@@ -157,6 +217,12 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addMarkupEntity - Adds a single polygon as an AIM MarkupEntity.
+   *
+   * @param  {Polygon} polygon The polygon being added.
+   * @returns {null}
+   */
   _addMarkupEntity(polygon) {
     this.startElement("MarkupEntity").writeAttribute(
       "xsi:type",
@@ -167,7 +233,7 @@ export class AIMWriter extends XMLWriter {
     this._addProperty("includeFlag", "value", "true"); //Note: no support for lesions with holes (.e.g. donuts) for now.
     this._addProperty("imageReferenceUid", "root", polygon.sopInstanceUid);
     this._addProperty("referencedFrameNumber", "value", polygon.frameNumber);
-    this._twoDimensionSpatialCoordinateCollection(
+    this._addTwoDimensionSpatialCoordinateCollection(
       polygon.polyPoints,
       polygon.sopInstanceUid
     );
@@ -177,15 +243,25 @@ export class AIMWriter extends XMLWriter {
     this._addReferencedImage(polygon.sopInstanceUid);
   }
 
+  /**
+   * _addReferencedImage - Adds a referenced image to the list of referenced sop
+   *                       instance UIDs.
+   *
+   * @param  {string} sopInstanceUid The sop instance UID.
+   * @returns {null}
+   */
   _addReferencedImage(sopInstanceUid) {
     if (this._referencedSopInstanceUids.includes(sopInstanceUid)) {
       return;
     }
     this._referencedSopInstanceUids.push(sopInstanceUid);
-
-    return;
   }
 
+  /**
+   * _addImageReferenceEntityCollection - Adds an AIM Image imageReferenceEntityCollection.
+   *
+   * @returns {null}
+   */
   _addImageReferenceEntityCollection() {
     this.startElement("imageReferenceEntityCollection");
     this.startElement("ImageReferenceEntity").writeAttribute(
@@ -198,6 +274,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement("imageReferenceEntityCollection");
   }
 
+  /**
+   * _addImageStudy - Adds an AIM imageStudy.
+   *
+   * @returns {null}
+   */
   _addImageStudy() {
     this.startElement("imageStudy");
     this._addProperty("instanceUid", "root", this._seriesInfo.studyInstanceUid);
@@ -207,6 +288,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addImageSeries - Adds an AIM imageSeries.
+   *
+   * @returns {null}
+   */
   _addImageSeries() {
     this.startElement("imageSeries");
     this._addProperty(
@@ -224,6 +310,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement("imageSeries");
   }
 
+  /**
+   * _addImageCollection - adds and AIM imageCollection.
+   *
+   * @returns {null}
+   */
   _addImageCollection() {
     this.startElement("imageCollection");
     for (let i = 0; i < this._referencedSopInstanceUids.length; i++) {
@@ -235,6 +326,13 @@ export class AIMWriter extends XMLWriter {
     this.endElement("");
   }
 
+  /**
+   * _addImage - Adds an AIM Image to the AIM imageCollection.
+   *
+   * @param  {string} sopClassUid    The sop class UID of the image.
+   * @param  {string} sopInstanceUid The sop instance UID of the image.
+   * @returns {null}
+   */
   _addImage(sopClassUid, sopInstanceUid) {
     this.startElement("Image");
     this._addProperty("sopClassUid", "root", sopClassUid);
@@ -242,13 +340,23 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _addDateTime - Adds a date/time field to the AIM file.
+   *
+   * @returns {null}
+   */
   _addDateTime() {
     this._addProperty("dateTime", "value", this._dateTime);
   }
 
-  _imageAnnotationUniqueIdentifier(ROIContourIndex) {
-    //saves the unique identifier of the annotation for later use in child MarkupEntitys
-    console.log(`ROIContourIndex: ${ROIContourIndex}`);
+  /**
+   * _addImageAnnotationUniqueIdentifier - Adds the ROIContourUid as the AIM
+   *                                    uniqueIdentifier of an AIM ImageAnnotation.
+   *
+   * @param  {number} ROIContourIndex The index of the ROIContour within the series.
+   * @returns {null}
+   */
+  _addImageAnnotationUniqueIdentifier(ROIContourIndex) {
     const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
     const structureSet = this._freehand3DStore.getters.structureSet(
       seriesInstanceUid
@@ -256,11 +364,17 @@ export class AIMWriter extends XMLWriter {
     const ROIContourUid =
       structureSet.ROIContourCollection[ROIContourIndex].uid;
 
-    console.log(`uuidString: ${ROIContourUid}`);
     this._addProperty("uniqueIdentifier", "root", ROIContourUid);
   }
 
-  _imageAnnotationName(ROIContourIndex) {
+  /**
+   * _addImageAnnotationName - Adds the name of the ROIContour to the AIM name
+   *                           of an AIM ImageAnnotation.
+   *
+   * @param  {number} ROIContourIndex The index of the ROIContour within the series.
+   * @returns {null}
+   */
+  _addImageAnnotationName(ROIContourIndex) {
     const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
     const structureSet = this._freehand3DStore.getters.structureSet(
       seriesInstanceUid
@@ -269,34 +383,65 @@ export class AIMWriter extends XMLWriter {
 
     console.log(`name: ${name}`);
 
-    return name;
+    this._addProperty("name", "value", name);
   }
 
-  _twoDimensionSpatialCoordinateCollection(polyPoints, sopInstanceUid) {
+  /**
+   * _addTwoDimensionSpatialCoordinateCollection - Adds an AIM
+   *            twoDimensionSpatialCoordinateCollection to an AIM MarkupEntity.
+   *
+   * @param  {object[]} polyPoints  The verticies of the polygon.
+   * @param  {string} sopInstanceUid The sop instance uid the polygon references.
+   * @returns {null}
+   */
+  _addTwoDimensionSpatialCoordinateCollection(polyPoints, sopInstanceUid) {
     this.startElement("twoDimensionSpatialCoordinateCollection");
     for (let i = 0; i < polyPoints.length; i++) {
-      this._twoDimensionSpatialCoordinate(polyPoints[i], i);
+      this._addTwoDimensionSpatialCoordinate(polyPoints[i], i);
     }
     // For a closed polygon the AIM 4.0 specification requires that the first
     // Coordinate appear again at the end:
-    this._twoDimensionSpatialCoordinate(polyPoints[0], 0);
+    this._addTwoDimensionSpatialCoordinate(polyPoints[0], 0);
     this.endElement();
   }
 
-  _twoDimensionSpatialCoordinate(point, i) {
+  /**
+   * _addTwoDimensionSpatialCoordinate - Adds an AIM TwoDimensionSpatialCoordinate
+   *            to an AIM twoDimensionSpatialCoordinateCollection
+   *
+   * @param  {object} point The point.
+   * @param  {number} coordinateIndex The coordinateIndex.
+   * @returns {null}
+   */
+  _addTwoDimensionSpatialCoordinate(point, coordinateIndex) {
     this.startElement("TwoDimensionSpatialCoordinate");
-    this._addProperty("coordinateIndex", "value", `${i}`);
+    this._addProperty("coordinateIndex", "value", `${coordinateIndex}`);
     this._addProperty("x", "value", `${point.x}`);
     this._addProperty("y", "value", `${point.y}`);
     this.endElement();
   }
 
+  /**
+   * _addProperty - Adds a property to the AIM document.
+   *
+   * @param  {string} elementName    THe number of the element.
+   * @param  {string} attributeName  THe name of the attribute.
+   * @param  {string} attributeValue The value of the attribute.
+   * @returns {null}
+   */
   _addProperty(elementName, attributeName, attributeValue) {
     this.startElement(elementName)
       .writeAttribute(attributeName, attributeValue)
       .endElement();
   }
 
+  /**
+   * _addMultiProperty -  Adds a property with multiple attributes to the
+   *                      AIM document.
+   *
+   * @param  {string} elementName The name of the element
+   * @param  {object[]} attributes  the list of attributes.
+   */
   _addMultiProperty(elementName, attributes) {
     this.startElement(elementName);
     for (let i = 0; i < attributes.length; i++) {
@@ -305,6 +450,11 @@ export class AIMWriter extends XMLWriter {
     this.endElement();
   }
 
+  /**
+   * _generateUUID - generates a UUID.
+   *
+   * @returns {string} The generated UUID.
+   */
   _generateUUID() {
     // https://stackoverflow.com/a/8809472/9208320 Public Domain/MIT
     let d = new Date().getTime();
@@ -328,6 +478,11 @@ export class AIMWriter extends XMLWriter {
     );
   }
 
+  /**
+   * generateDateTime - Generates a timestamp.
+   * @static
+   * @returns {string} A formatted timestamp.
+   */
   static generateDateTime() {
     const d = new Date();
     const dateTime = {
@@ -357,6 +512,12 @@ export class AIMWriter extends XMLWriter {
     return dateTimeFormated;
   }
 
+  /**
+   * @static generateLabel - generates an ROICollection label given a timestamp.
+   *
+   * @param  {string} dateTime A timestamp string.
+   * @returns {string} The label.
+   */
   static generateLabel(dateTime) {
     return `AIM_${dateTime.slice(0, 8)}_${dateTime.slice(8, 14)}`;
   }

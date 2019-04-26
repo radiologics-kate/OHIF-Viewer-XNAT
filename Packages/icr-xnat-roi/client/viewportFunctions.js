@@ -12,8 +12,6 @@ import {
   brushSettings
 } from "meteor/icr:peppermint-tools";
 
-import { $ } from "meteor/jquery";
-
 OHIF.viewerbase.viewportUtils.exportROIs = () => {
   exportROIs();
 };
@@ -21,9 +19,9 @@ OHIF.viewerbase.viewportUtils.importROIs = () => {
   importROIs();
 };
 OHIF.viewerbase.viewportUtils.showHelp = () => {
-  const showHelpDialog = $("#showHelpDialog");
+  const dialog = document.getElementById("showHelpDialog");
 
-  showHelpDialog.get(0).showModal();
+  dialog.show();
 };
 
 OHIF.viewerbase.viewportUtils.exportMask = function() {
@@ -51,6 +49,5 @@ OHIF.viewerbase.viewportUtils.segManagement = () => {
 };
 
 OHIF.viewerbase.viewportUtils.brushSettings = () => {
-  console.log("brushSettings");
   brushSettings();
 };
