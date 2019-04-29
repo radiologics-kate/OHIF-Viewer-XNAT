@@ -190,12 +190,27 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpBrush.html",
+    "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpManual.html",
     "client"
   );
 
   api.addFiles(
     "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpSegManagement.html",
+    "client"
+  );
+
+  api.addFiles(
+    "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpSmartCT.html",
+    "client"
+  );
+
+  api.addFiles(
+    "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpAuto.html",
+    "client"
+  );
+
+  api.addFiles(
+    "client/components/viewer/helpDialogs/brushHelpMenu/divs/brushHelpSettings.html",
     "client"
   );
 

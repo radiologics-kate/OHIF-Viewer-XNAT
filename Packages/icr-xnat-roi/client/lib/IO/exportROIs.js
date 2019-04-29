@@ -1,16 +1,16 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { AIMWriter } from "../classes/AIMWriter.js";
-import { RoiExtractor } from "../classes/RoiExtractor.js";
-import { AIMExporter } from "../classes/AIMExporter.js";
-import displayROICollectionBuilderDialog from "../util/displayROICollectionBuilderDialog.js";
+import AIMWriter from "./classes/AIMWriter.js";
+import RoiExtractor from "./classes/RoiExtractor.js";
+import AIMExporter from "./classes/AIMExporter.js";
+import displayROICollectionBuilderDialog from "../dialogUtils/displayROICollectionBuilderDialog.js";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { lockStructureSet } from "meteor/icr:peppermint-tools";
 import {
   displayExportFailedDialog,
   displayNothingToExportDialog
-} from "../util/displayExportDialogs.js";
-import { displayInsufficientPermissionsDialog } from "../util/displayInsufficientPermissionsDialog.js";
+} from "../dialogUtils/displayExportDialogs.js";
+import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
 //import localBackup from "./localBackup.js";
 

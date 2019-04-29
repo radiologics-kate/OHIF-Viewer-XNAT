@@ -9,8 +9,8 @@ import compareOnProperty from "./helpers/compareOnProperty.js";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
-import awaitConfirmationDialog from "../../../../lib/IO/awaitConfirmationDialog.js";
-import progressDialog from "../../../../lib/util/progressDialog.js";
+import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
+import progressDialog from "../../../../lib/dialogUtils/progressDialog.js";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {

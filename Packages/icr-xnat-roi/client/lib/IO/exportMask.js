@@ -1,17 +1,17 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import { DICOMSEGWriter } from "../classes/DICOMSEGWriter.js";
-import { DICOMSEGExporter } from "../classes/DICOMSEGExporter.js";
-import displayMaskCollectionBuilderDialog from "../util/displayMaskCollectionBuilderDialog.js";
+import DICOMSEGWriter from "./classes/DICOMSEGWriter.js";
+import DICOMSEGExporter from "./classes/DICOMSEGExporter.js";
+import displayMaskCollectionBuilderDialog from "../dialogUtils/displayMaskCollectionBuilderDialog.js";
 import getDateTimeAndLabel from "../util/getDateTimeAndLabel.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
-import { displayNothingToExportDialog } from "../util/displayExportDialogs.js";
-import awaitConfirmationDialog from "./awaitConfirmationDialog.js";
+import { displayNothingToExportDialog } from "../dialogUtils/displayExportDialogs.js";
+import awaitConfirmationDialog from "../dialogUtils/awaitConfirmationDialog.js";
 import {
   displayExportFailedDialog,
   displayMaskNotModifiedDialog
-} from "../util/displayExportDialogs.js";
-import { displayInsufficientPermissionsDialog } from "../util/displayInsufficientPermissionsDialog.js";
+} from "../dialogUtils/displayExportDialogs.js";
+import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 //import localBackup from "./localBackup.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;

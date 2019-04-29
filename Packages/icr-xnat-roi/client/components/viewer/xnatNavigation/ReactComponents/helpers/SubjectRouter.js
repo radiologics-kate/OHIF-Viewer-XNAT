@@ -1,6 +1,6 @@
 import checkSessionJSONExists from "./checkSessionJSONExists.js";
 import fetchJSON from "./fetchJSON.js";
-import progressDialog from "../../../../../lib/util/progressDialog.js";
+import progressDialog from "../../../../../lib/dialogUtils/progressDialog.js";
 
 /**
  * @class SubjectRouter - Routes to the desired subject view, generating

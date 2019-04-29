@@ -1,7 +1,7 @@
-import { AsyncRoiFetcher } from "../classes/AsyncRoiFetcher.js";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import AsyncRoiFetcher from "./classes/AsyncRoiFetcher.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
-import { displayInsufficientPermissionsDialog } from "../util/displayInsufficientPermissionsDialog.js";
+import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
 /**
  * importROIs - If the user has the correct permissions, begin import event.
@@ -9,7 +9,7 @@ import { displayInsufficientPermissionsDialog } from "../util/displayInsufficien
  *
  * @returns {null}
  */
-export default function() {
+export default function importROIs() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   if (icrXnatRoiSession.get("readPermissions") === false) {

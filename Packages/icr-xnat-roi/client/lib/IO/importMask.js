@@ -1,7 +1,7 @@
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import { AsyncMaskFetcher } from "../classes/AsyncMaskFetcher.js";
+import AsyncMaskFetcher from "./classes/AsyncMaskFetcher.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
-import { displayInsufficientPermissionsDialog } from "../util/displayInsufficientPermissionsDialog.js";
+import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
 /**
  * importMask - If the user has the correct permissions, begin import event.

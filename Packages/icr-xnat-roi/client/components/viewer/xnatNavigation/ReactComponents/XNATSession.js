@@ -5,7 +5,7 @@ import SessionRouter from "./helpers/SessionRouter.js";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import awaitConfirmationDialog from "../../../../lib/IO/awaitConfirmationDialog.js";
+import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
 
 export default class XNATSession extends React.Component {
   constructor(props) {

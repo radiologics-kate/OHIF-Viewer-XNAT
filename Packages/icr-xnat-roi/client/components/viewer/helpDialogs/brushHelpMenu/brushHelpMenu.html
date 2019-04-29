@@ -2,8 +2,25 @@
   <div>
       <div>
         <div class="sub-help-nav-bar">
-          <a class="sub-help-button js-help-paint btn btn-sm btn-primary">
-            <i id="fontAwesomeIcon" class="{{pressed 'Paint'}} fa fa fa-paint-brush fa-2x"></i>
+          <a class="sub-help-button js-help-manual btn btn-sm btn-primary">
+            <svg class={{pressed 'Manual'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-brush-regular"}}></use>
+            </svg>
+          </a>
+          <a class="sub-help-button js-help-smart-ct btn btn-sm btn-primary">
+            <svg class={{pressed 'Smart CT'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-brush-smart"}}></use>
+            </svg>
+          </a>
+          <a class="sub-help-button js-help-auto btn btn-sm btn-primary">
+            <svg class={{pressed 'Auto'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-brush-auto"}}></use>
+            </svg>
+          </a>
+          <a class="sub-help-button js-help-settings btn btn-sm btn-primary">
+            <svg class={{pressed 'Settings'}}>
+              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-brush-settings"}}></use>
+            </svg>
           </a>
           <a class="sub-help-button js-help-seg-management btn btn-sm btn-primary">
             <svg class={{pressed 'Seg Management'}}>
@@ -11,15 +28,20 @@
             </svg>
           </a>
         </div>
-
         <div class="sub-help-title">
           <h3>{{ioTitle}}</h3>
         </div>
       </div>
 
       <div class="sub-help-body">
-        {{#if showBrushHelp 'Paint'}}
-          {{>brushHelpBrush}}
+        {{#if showBrushHelp 'Manual'}}
+          {{>brushHelpManual}}
+        {{else if showBrushHelp 'Smart CT'}}
+          {{>brushHelpSmartCT}}
+        {{else if showBrushHelp 'Auto'}}
+          {{>brushHelpAuto}}
+        {{else if showBrushHelp 'Settings'}}
+          {{>brushHelpSettings}}
         {{else if showBrushHelp 'Seg Management'}}
           {{>brushHelpSegManagement}}
         {{/if}}
