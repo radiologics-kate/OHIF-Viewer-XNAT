@@ -122,7 +122,7 @@ export default class BrushSettings extends React.Component {
           <div className="brush-settings-horizontal-box">
             <label htmlFor="customGateMin">Min:</label>
             <input
-              classNames="form-themed form-control"
+              className="form-themed form-control"
               type="range"
               id="start"
               name="customGateMin"
@@ -135,7 +135,7 @@ export default class BrushSettings extends React.Component {
           <div className="brush-settings-horizontal-box">
             <label htmlFor="customGateMax">Max:</label>
             <input
-              classNames="form-themed form-control"
+              className="form-themed form-control"
               type="range"
               id="start"
               name="customGateMax"
@@ -154,7 +154,7 @@ export default class BrushSettings extends React.Component {
         <div className="brush-settings-horizontal-box">
           <h3> Smart CT Gate Selection</h3>
           <a
-            class="brush-settings-cancel btn btn-sm btn-secondary"
+            className="brush-settings-cancel btn btn-sm btn-secondary"
             onClick={this.onCloseButtonClick}
           >
             <i className="fa fa-times-circle fa-2x" />
@@ -173,7 +173,7 @@ export default class BrushSettings extends React.Component {
         <h3> Smart/Auto Gate Settings </h3>
         <label htmlFor="holeFill">{holeFillLabel}</label>
         <input
-          classNames="form-themed form-control"
+          className="form-themed form-control"
           type="range"
           id="start"
           name="holeFill"
@@ -184,7 +184,7 @@ export default class BrushSettings extends React.Component {
         />
         <label htmlFor="strayRemove">{strayRemoveLabel}</label>
         <input
-          classNames="form-themed form-control"
+          className="form-themed form-control"
           type="range"
           id="start"
           name="strayRemove"

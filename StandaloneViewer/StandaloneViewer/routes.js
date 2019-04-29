@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
+import { checkAndSetPermissions } from "meteor/icr:xnat-roi";
 import { sessionMap } from 'meteor/icr:series-info-provider';
 
 console.log(Meteor.isDevelopment);
@@ -98,7 +99,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
           if (experimentId) {
             // Single Session
             //
-            OHIF.RoiStateManagement.checkAndSetPermissions(projectId, parentProjectId);
+            checkAndSetPermissions(projectId, parentProjectId);
 
             // Build JSON GET url.
             const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
@@ -140,7 +141,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
             const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
 
-            OHIF.RoiStateManagement.checkAndSetPermissions(projectId, parentProjectId);
+            checkAndSetPermissions(projectId, parentProjectId);
 
             getJson(subjectExperimentListUrl).then(json => {
               // TODO -> Fetch each json.
