@@ -71,8 +71,19 @@
     width: 100%
     overflow-y: auto
     overflow-x: hidden
+    theme('scrollbar-color', '$textSecondaryColor $uiGrayDarkest')
     display: inline-block
     float: left
+
+
+    &::-webkit-scrollbar
+      them('background', '$uiGrayDarkest')
+      width: 10px
+
+    &::-webkit-scrollbar-thumb
+      theme('background', '$textSecondaryColor')
+      border-radius: 10px
+      theme('border-right', '2px solid $uiGrayDarkest')
 
   .sub-help-body p
     float:left

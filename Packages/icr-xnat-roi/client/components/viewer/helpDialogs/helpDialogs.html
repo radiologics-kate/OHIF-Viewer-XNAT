@@ -2,44 +2,6 @@
   <dialog id="showHelpDialog"
       class="help-dialog noselect"
       oncontextmenu="return false">
-
-      <div>
-        <div class="help-nav-bar">
-          <a class="help-button js-help-roi btn btn-sm btn-primary">
-              <svg class={{pressed 'ROI'}}>
-                <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-menu"}}></use>
-              </svg>
-          </a>
-          <a class="help-button js-help-brush btn btn-sm btn-primary">
-            <svg class={{pressed 'Mask'}}>
-              <use xlink:href={{absoluteUrl "packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu"}}></use>
-            </svg>
-          </a>
-          <a class="help-button js-help-file btn btn-sm btn-primary">
-              <svg class={{pressed 'XNAT'}}>
-                <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-logo"}}></use>
-              </svg>
-          </a>
-        </div>
-
-        <div class="help-title">
-          <h3>{{title}}</h3>
-        </div>
-
-        <a class="help-dialog-cancel js-help-cancel btn btn-sm btn-secondary">
-          <i class="fa fa-times-circle fa-2x"></i>
-        </a>
-      </div>
-
-      <br/>
-
-      {{#if showHelp 'ROI'}}
-        {{>freehandHelpMenu}}
-      {{else if showHelp 'Mask'}}
-        {{>brushHelpMenu}}
-      {{else if showHelp 'XNAT'}}
-        {{>ioHelpMenu}}
-      {{/if}}
-
+      {{> React component=HelpDialog}}
   </dialog>
 </template>
