@@ -5,7 +5,7 @@ Template.roiImportListDialogs.onCreated(() => {
   const instance = Template.instance();
 
   // Used to remount component.
-  instance.data.key = new ReactiveVar(Math.Random().toString());
+  instance.data.id = new ReactiveVar("NOT_ACTIVE");
 });
 
 Template.roiImportListDialogs.onRendered(() => {
@@ -22,9 +22,12 @@ Template.roiImportListDialogs.helpers({
   RoiImportListDialog() {
     return RoiImportListDialog;
   },
-  key() {
+  id() {
     const instance = Template.instance();
 
-    return instance.data.key.get();
+    console.log(`RECALCULATING ID`);
+    console.log(instance.data.id.get());
+
+    return instance.data.id.get();
   }
 });
