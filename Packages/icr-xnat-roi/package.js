@@ -62,15 +62,6 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/roiImportListDialogs/roiImportListItem/roiImportListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiImportListDialogs/roiImportListItem/roiImportListItem.js",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/maskImportListDialogs/maskImportListDialogs.html",
     "client"
   );

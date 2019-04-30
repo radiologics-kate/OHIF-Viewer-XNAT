@@ -378,6 +378,9 @@ Template.toolbarSection.helpers({
           subTools: deleteTools
         });
 
+        console.log('READ PERMISSIONS:');
+        console.log(icrXnatRoiSession.get("readPermissions"))
+
         if (icrXnatRoiSession.get("readPermissions")) {
           const importMenu = [
             {

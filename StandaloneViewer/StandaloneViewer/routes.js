@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
 import { checkAndSetPermissions } from "meteor/icr:xnat-roi";
+import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { sessionMap } from 'meteor/icr:series-info-provider';
 
 console.log(Meteor.isDevelopment);
@@ -238,6 +239,10 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
       Router.configure({
           loadingTemplate: 'loading'
       });
+
+      icrXnatRoiSession.set("writePermissions", true);
+      icrXnatRoiSession.set("readPermissions", true);
+      icrXnatRoiSession.set("editPermissions", true);
 
       Router.onBeforeAction('loading');
 

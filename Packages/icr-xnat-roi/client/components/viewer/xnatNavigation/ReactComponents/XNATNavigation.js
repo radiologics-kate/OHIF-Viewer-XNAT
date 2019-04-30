@@ -1,7 +1,7 @@
 import React from "react";
 import XNATProjectList from "./XNATProjectList.js";
 import XNATProject from "./XNATProject.js";
-import fetchJSON from "./helpers/fetchJSON.js";
+import fetchJSON from "../../../../lib/IO/fetchJSON.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { sessionMap } from "meteor/icr:series-info-provider";
 

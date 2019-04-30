@@ -153,13 +153,25 @@ export default class AsyncRoiFetcher extends AsyncFetcher {
     const cancel = dialog.getElementsByClassName("roi-import-list-cancel")[0];
     const dialogData = Blaze.getData(dialog);
 
+    console.log("dialogData:");
+    console.log(dialogData);
+
     // Add event listeners.
     dialog.addEventListener("cancel", cancelEventHandler);
     cancel.addEventListener("click", cancelClickEventHandler);
     dialog.addEventListener("keydown", keyConfirmEventHandler);
     confirm.addEventListener("click", confirmEventHandler);
 
+    console.log("setting data:");
+
+    console.log(importList);
+
+    console.log(dialogData);
+
     dialogData.importListReady.set(true);
+
+    console.log("====");
+
     dialogData.importList.set(importList);
 
     // Reference to promise.resolve, so that I can use external handlers.

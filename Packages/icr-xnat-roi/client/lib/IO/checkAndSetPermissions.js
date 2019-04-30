@@ -18,6 +18,10 @@ export async function checkAndSetPermissions(projectId, parentProjectId) {
 
   console.log(`checkAndSetPermissions: ${url}`);
 
+  icrXnatRoiSession.set("writePermissions", true);
+  icrXnatRoiSession.set("readPermissions", true);
+  icrXnatRoiSession.set("editPermissions", true);
+
   getPermissionsJson(url)
     .then(result => {
       console.log("checkAndSetPermissions GET result:");

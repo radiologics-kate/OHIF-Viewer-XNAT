@@ -2,7 +2,7 @@ import React from "react";
 import XNATSubjectLabel from "./XNATSubjectLabel.js";
 import XNATSessionList from "./XNATSessionList.js";
 import SubjectRouter from "./helpers/SubjectRouter.js";
-import fetchJSON from "./helpers/fetchJSON.js";
+import fetchJSON from "../../../../lib/IO/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
