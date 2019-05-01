@@ -80,6 +80,7 @@ function hasROIContoursToExtract(seriesInstanceUid) {
  *
  * @returns {null}
  */
+/*
 async function beginExport() {
   const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
   const roiExtractor = new RoiExtractor(seriesInfo.seriesInstanceUid);
@@ -140,3 +141,4 @@ async function beginExport() {
       displayExportFailedDialog(seriesInfo.seriesInstanceUid);
     });
 }
+*/

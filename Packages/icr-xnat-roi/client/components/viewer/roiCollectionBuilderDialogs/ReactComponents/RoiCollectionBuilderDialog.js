@@ -1,5 +1,8 @@
 import React from "react";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import AIMWriter from "../../../../lib/IO/classes/AIMWriter.js";
+import AIMExporter from "../../../../lib/IO/classes/AIMExporter.js";
+import RoiExtractor from "../../../../lib/IO/classes/RoiExtractor.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import generateDateTimeAndLabel from "../../../../lib/util/generateDateTimeAndLabel.js";
@@ -19,7 +22,8 @@ export default class RoiCollectionBuilderDialog extends React.Component {
       selectedCheckboxes: [],
       selectAllChecked: true,
       label,
-      dateTime
+      dateTime,
+      exporting: false
     };
 
     this.onChangeSelectAllCheckbox = this.onChangeSelectAllCheckbox.bind(this);
@@ -36,8 +40,8 @@ export default class RoiCollectionBuilderDialog extends React.Component {
     this._roiCollectionName = evt.target.value;
   }
 
-  onExportButtonClick() {
-    const { roiContourList, selectedCheckboxes } = this.state;
+  async onExportButtonClick() {
+    const { roiContourList, selectedCheckboxes, label, dateTime } = this.state;
 
     const exportMask = [];
 
@@ -49,7 +53,49 @@ export default class RoiCollectionBuilderDialog extends React.Component {
 
     console.log(exportMask);
 
-    // TODO -> use expot mask to fulfill old exportROIs.js functionality.
+    // TODO -> Check that exportMask contains at least one value.
+    // TODO -> Check that the label input is something reasonable.
+    // TODO: Update UI to show export.
+
+    this.setState({ exporting: true });
+
+    const roiExtractor = new RoiExtractor(seriesInfo.seriesInstanceUid);
+
+    const roiContours = roiExtractor.extractROIContours(exportMask);
+
+    const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
+
+    const aw = new AIMWriter(this._roiCollectionName, label, dateTime);
+    aw.writeImageAnnotationCollection(roiContours, seriesInfo);
+
+    // Attempt export to XNAT. Lock ROIs for editing if the export is successful.
+    const aimExporter = new AIMExporter(aw);
+    await aimExporter
+      .exportToXNAT()
+      .then(success => {
+        console.log("PUT successful.");
+        console.log(roiCollectionName);
+        console.log(lockStructureSet);
+
+        //lockExportedROIs(
+        lockStructureSet(
+          exportMask,
+          seriesInfo.seriesInstanceUid,
+          roiCollectionName,
+          label
+        );
+        //console.log('=====checking backup:=====');
+        //localBackup.checkBackupOnExport();
+        //console.log('=====checking backup DONE=====');
+        exportInProgressDialog.close();
+      })
+      .catch(error => {
+        console.log(error);
+        // TODO -> Work on backup mechanism, disabled for now.
+        //localBackup.saveBackUpForActiveSeries();
+        exportInProgressDialog.close();
+        displayExportFailedDialog(seriesInfo.seriesInstanceUid);
+      });
   }
 
   onCloseButtonClick() {
