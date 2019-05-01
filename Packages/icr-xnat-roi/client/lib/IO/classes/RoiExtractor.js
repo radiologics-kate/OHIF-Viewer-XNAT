@@ -19,34 +19,6 @@ export default class RoiExtractor {
   }
 
   /**
-   * hasROIContoursToExtract - checks if any contours exist on the series.
-   *
-   * @returns {type}  True if the series has contours.
-   */
-  hasROIContoursToExtract() {
-    const workingStructureSet = this._freehand3DStore.getters.structureSet(
-      this._seriesInstanceUid
-    );
-
-    if (!workingStructureSet) {
-      return false;
-    }
-
-    const ROIContourCollection = workingStructureSet.ROIContourCollection;
-
-    let hasContours = false;
-
-    for (let i = 0; i < ROIContourCollection.length; i++) {
-      if (ROIContourCollection[i] && ROIContourCollection[i].polygonCount > 0) {
-        this._ROIContours[i] = [];
-        hasContours = true;
-      }
-    }
-
-    return hasContours;
-  }
-
-  /**
    * extractROIContours - extracts the contours given by the exportMask.
    *
    * @param  {boolean[]} exportMask  A true/false array dictating which ROIContours
@@ -54,6 +26,13 @@ export default class RoiExtractor {
    * @returns {object[]}  An array of extraced ROIContours.
    */
   extractROIContours(exportMask) {
+    for (let i = 0; i < ROIContourCollection.length; i++) {
+      if (ROIContourCollection[i] && ROIContourCollection[i].polygonCount > 0) {
+        this._ROIContours[i] = [];
+        hasContours = true;
+      }
+    }
+
     const toolStateManager = globalToolStateManager.saveToolState();
 
     Object.keys(toolStateManager).forEach(imageId => {

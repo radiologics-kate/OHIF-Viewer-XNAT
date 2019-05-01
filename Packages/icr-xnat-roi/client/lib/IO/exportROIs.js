@@ -12,6 +12,8 @@ import {
 } from "../dialogUtils/displayExportDialogs.js";
 import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
+const modules = cornerstoneTools.store.modules;
+
 //import localBackup from "./localBackup.js";
 
 /**
@@ -21,14 +23,56 @@ import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsuffic
  * @returns {null}
  */
 export default async function exportROIs() {
+  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
   if (icrXnatRoiSession.get("writePermissions") === true) {
-    beginExport();
-    return;
+    // Check if there are any unlocked ROIs with > 0 contours.
+    if (hasROIContoursToExtract(seriesInstanceUid)) {
+      const roiCollectionBuilderDialog = document.getElementById(
+        "roiCollectionBuilderDialog"
+      );
+      const dialogData = Blaze.getData(roiCollectionBuilderDialog);
+
+      dialogData.roiCollectionBuilderDialogId.set(Math.random().toString());
+      roiCollectionBuilderDialog.showModal();
+    } else {
+      displayNothingToExportDialog("ROI");
+    }
+  } else {
+    // User does not have write access
+    displayInsufficientPermissionsDialog(seriesInstanceUid, "write");
+  }
+}
+
+/**
+ * hasROIContoursToExtract - checks if any contours exist on the series.
+ *
+ * @param  {type} seriesInstanceUid The series instance UID to check.
+ * @returns {type}                   description
+ */
+function hasROIContoursToExtract(seriesInstanceUid) {
+  const freehand3DModule = modules.freehand3D;
+
+  const workingStructureSet = freehand3DModule.getters.structureSet(
+    seriesInstanceUid
+  );
+
+  if (!workingStructureSet) {
+    return false;
   }
 
-  // User does not have write access
-  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-  displayInsufficientPermissionsDialog(seriesInstanceUid, "write");
+  const ROIContourCollection = workingStructureSet.ROIContourCollection;
+
+  let hasContours = false;
+
+  for (let i = 0; i < ROIContourCollection.length; i++) {
+    if (ROIContourCollection[i] && ROIContourCollection[i].polygonCount > 0) {
+      hasContours = true;
+      break;
+    }
+  }
+
+  return hasContours;
 }
 
 /**

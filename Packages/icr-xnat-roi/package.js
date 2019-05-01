@@ -88,15 +88,6 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderListItem/roiCollectionBuilderListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderListItem/roiCollectionBuilderListItem.js",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/segBuilderDialogs/segBuilderDialogs.html",
     "client"
   );

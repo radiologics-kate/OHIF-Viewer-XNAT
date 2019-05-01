@@ -1,0 +1,45 @@
+<template name="roiCollectionBuilderDialogs">
+  <dialog id="roiCollectionBuilderDialog"
+      class="roi-collection-builder-dialog noselect"
+      oncontextmenu="return false">
+      <div class="roi-collection-builder-header">
+        <h3>Export Contours</h3>
+        <a class="roi-collection-builder-cancel js-roi-collection-cancel btn btn-sm btn-secondary">
+          <i class="fa fa-times-circle fa-2x"></i>
+        </a>
+      </div>
+
+      <hr />
+
+      <div class="roi-collection-builder-list-body">
+        <table>
+        <tr>
+          <th nowrap class="left-aligned-cell">Name</th>
+          <th>Export <input class="js-select-all-check" type="checkbox" {{selectAllChecked}} name="sync" value=""></th>
+          <th>Contours</th>
+        </tr>
+        {{#each region in regions}}
+            {{>roiCollectionBuilderListItem region}}
+        {{/each}}
+        </table>
+      </div>
+
+      <hr/>
+
+      <div class="roi-collection-builder-footer">
+        <label>Name</label>
+        <input name="roiCollectionBuilderTextInput"
+              class="roi-collection-builder-text-input form-themed form-control"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+              onfocus="this.select()"/>
+        <a class="roi-collection-builder-export-button btn btn-sm btn-primary">
+            <svg stroke='#fff'>
+              <use xlink:href={{absoluteUrl "packages/icr_xnat-roi/assets/icons.svg#icon-xnat-export"}}></use>
+            </svg>
+        </a>
+      </div>
+
+  </dialog>
+</template>

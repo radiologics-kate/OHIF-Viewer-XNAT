@@ -18,12 +18,7 @@ export default function importROIs() {
   }
 
   const roiImportListDialog = document.getElementById("roiImportListDialog");
-
-  console.log(roiImportListDialog);
-
   const dialogData = Blaze.getData(roiImportListDialog);
-
-  console.log(dialogData);
 
   dialogData.roiImportListDialogId.set(Math.random().toString());
   roiImportListDialog.showModal();

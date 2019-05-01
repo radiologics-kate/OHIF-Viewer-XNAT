@@ -478,50 +478,6 @@ export default class AIMWriter extends XMLWriter {
     );
   }
 
-  /**
-   * generateDateTime - Generates a timestamp.
-   * @static
-   * @returns {string} A formatted timestamp.
-   */
-  static generateDateTime() {
-    const d = new Date();
-    const dateTime = {
-      year: d.getFullYear().toString(),
-      month: (d.getMonth() + 1).toString(),
-      date: d.getDate().toString(),
-      hours: d.getHours().toString(),
-      minutes: d.getMinutes().toString(),
-      seconds: d.getSeconds().toString()
-    };
-
-    // Pad with zeros e.g. March: 3 => 03
-    Object.keys(dateTime).forEach(element => {
-      if (dateTime[`${element}`].length < 2) {
-        dateTime[`${element}`] = "0" + dateTime[`${element}`];
-      }
-    });
-
-    dateTimeFormated =
-      dateTime.year +
-      dateTime.month +
-      dateTime.date +
-      dateTime.hours +
-      dateTime.minutes +
-      dateTime.seconds;
-
-    return dateTimeFormated;
-  }
-
-  /**
-   * @static generateLabel - generates an ROICollection label given a timestamp.
-   *
-   * @param  {string} dateTime A timestamp string.
-   * @returns {string} The label.
-   */
-  static generateLabel(dateTime) {
-    return `AIM_${dateTime.slice(0, 8)}_${dateTime.slice(8, 14)}`;
-  }
-
   get seriesInfo() {
     return this._seriesInfo;
   }
