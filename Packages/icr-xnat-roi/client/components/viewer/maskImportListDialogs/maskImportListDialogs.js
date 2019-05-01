@@ -1,54 +1,33 @@
-Template.maskImportListDialogs.onRendered(() => {
-    const instance = Template.instance();
-    const id = 'maskImportListDialog';
-
-    const dialog = instance.$('#' + id);
-    instance.data.dialog = dialog;
-
-    dialogPolyfill.registerDialog(dialog.get(0));
-});
+import "./maskImportListDialogs.html";
+import MaskImportListDialog from "./ReactComponents/MaskImportListDialog.js";
 
 Template.maskImportListDialogs.onCreated(() => {
-    const instance = Template.instance();
+  const instance = Template.instance();
 
-    instance.data.maskImportListReady = new ReactiveVar(false);
-    instance.data.maskImportList = new ReactiveVar([]);
+  // Used to remount component.
+  instance.data.maskImportListDialogId = new ReactiveVar("NOT_ACTIVE");
+});
+
+Template.maskImportListDialogs.onRendered(() => {
+  const instance = Template.instance();
+  const id = "maskImportListDialog";
+
+  const dialog = instance.$("#" + id);
+  instance.data.dialog = dialog;
+
+  dialogPolyfill.registerDialog(dialog.get(0));
 });
 
 Template.maskImportListDialogs.helpers({
-  importListReady: () => {
-    const instance = Template.instance();
-
-    return instance.data.maskImportListReady.get();
+  MaskImportListDialog() {
+    return MaskImportListDialog;
   },
-  listHasData: () => {
+  id() {
     const instance = Template.instance();
-    const importList = instance.data.maskImportList.get();
 
-    if (importList.length > 0) {
-      return true;
-    }
+    console.log(`RECALCULATING maskImportListDialogId`);
+    console.log(instance.data.maskImportListDialogId.get());
 
-    return false;
-  },
-  roiCollections: () => {
-    const instance = Template.instance();
-    const importList = instance.data.maskImportList.get();
-    const roiCollections = [];
-
-    const selectAll = instance.data.selectAll.get();
-
-    if (!importList) {
-      return []; // Blank array, i.e. no list items.
-    }
-
-    for (let i = 0; i < importList.length; i++) {
-      roiCollections.push({
-        collectionInfo: importList[i],
-        index: i
-      });
-    }
-
-    return roiCollections;
+    return instance.data.maskImportListDialogId.get();
   }
 });

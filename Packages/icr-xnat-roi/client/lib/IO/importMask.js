@@ -1,5 +1,4 @@
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import AsyncMaskFetcher from "./classes/AsyncMaskFetcher.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
@@ -18,6 +17,9 @@ export default function importMask() {
     return;
   }
 
-  const asyncMaskFetcher = new AsyncMaskFetcher(seriesInstanceUid);
-  asyncMaskFetcher.fetch();
+  const maskImportListDialog = document.getElementById("maskImportListDialog");
+
+  const dialogData = Blaze.getData(maskImportListDialog);
+  dialogData.maskImportListDialogId.set(Math.random().toString());
+  maskImportListDialog.showModal();
 }

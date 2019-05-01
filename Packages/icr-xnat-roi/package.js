@@ -75,15 +75,6 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/maskImportListDialogs/maskImportListItem/maskImportListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/maskImportListDialogs/maskImportListItem/maskImportListItem.js",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderDialogs.html",
     "client"
   );

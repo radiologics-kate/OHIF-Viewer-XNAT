@@ -1,5 +1,4 @@
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-//import AsyncRoiFetcher from "./classes/AsyncRoiFetcher.js";
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsufficientPermissionsDialog.js";
 
@@ -20,10 +19,12 @@ export default function importROIs() {
 
   const roiImportListDialog = document.getElementById("roiImportListDialog");
 
-  const dialogData = Blaze.getData(roiImportListDialog);
-  dialogData.id.set(Math.random().toString());
-  roiImportListDialog.showModal();
+  console.log(roiImportListDialog);
 
-  //const asyncRoiFetcher = new AsyncRoiFetcher(seriesInstanceUid);
-  //asyncRoiFetcher.fetch();
+  const dialogData = Blaze.getData(roiImportListDialog);
+
+  console.log(dialogData);
+
+  dialogData.roiImportListDialogId.set(Math.random().toString());
+  roiImportListDialog.showModal();
 }

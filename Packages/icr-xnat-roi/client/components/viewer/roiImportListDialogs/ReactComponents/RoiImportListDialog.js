@@ -13,9 +13,9 @@ export default class RoiImportListDialog extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    console.log("IN CONSTRUCTOR");
-
     selectedCheckboxes = [];
+
+    console.log("RoiImportListDialog");
 
     this.state = {
       selectAllChecked: true,
@@ -51,24 +51,15 @@ export default class RoiImportListDialog extends React.Component {
   }
 
   onChangeCheckbox(evt, index) {
-    console.log(`onChangeCheckbox:`);
-    console.log(index);
-    console.log(evt);
-
-    console.log(evt.target.checked);
-
     const selectedCheckboxes = this.state.selectedCheckboxes;
 
     selectedCheckboxes[index] = evt.target.checked;
-
     this.setState({ selectedCheckboxes });
   }
 
   onChangeSelectAllCheckbox(evt) {
     const selectedCheckboxes = this.state.selectedCheckboxes;
     const checked = evt.target.checked;
-
-    console.log(checked);
 
     for (let i = 0; i < selectedCheckboxes.length; i++) {
       selectedCheckboxes[i] = checked;
@@ -80,10 +71,6 @@ export default class RoiImportListDialog extends React.Component {
   onExportButtonClick() {
     const { importList, selectedCheckboxes } = this.state;
 
-    console.log(`selectedCheckboxes, importList:`);
-    console.log(selectedCheckboxes);
-    console.log(importList);
-
     this._numCollectionsParsed = 0;
     this._numCollectionsToParse = 0;
 
@@ -92,8 +79,6 @@ export default class RoiImportListDialog extends React.Component {
         this._numCollectionsToParse++;
       }
     }
-
-    console.log(`_numCollectionsToParse: ${this._numCollectionsToParse}`);
 
     if (this._numCollectionsToParse === 0) {
       return;
@@ -137,9 +122,8 @@ export default class RoiImportListDialog extends React.Component {
       return;
     }
 
-    console.log(`RoiImportListDialog.. GO!`);
-
     this._seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    this._roiImporter = new RoiImporter(this._seriesInstanceUid);
     this._volumeManagementLabels = this._getVolumeManagementLabels();
     this._experimentId = sessionMap.get(
       this._seriesInstanceUid,
@@ -165,9 +149,6 @@ export default class RoiImportListDialog extends React.Component {
         }
 
         const assessors = sessionAssessorList.ResultSet.Result;
-
-        console.log("assessors");
-        console.log(assessors);
 
         if (
           !assessors.some(
@@ -198,14 +179,9 @@ export default class RoiImportListDialog extends React.Component {
           }
         }
 
-        console.log(promises);
-
         const importList = [];
 
         Promise.all(promises).then(promisesJSON => {
-          console.log(`promisesJSON:`);
-          console.log(promisesJSON);
-
           promisesJSON.forEach(roiCollectionInfo => {
             const data_fields = roiCollectionInfo.items[0].data_fields;
 
@@ -221,14 +197,13 @@ export default class RoiImportListDialog extends React.Component {
             }
           });
 
-          console.log(`setting state to this importList:`);
-          console.log(importList);
-
           const selectedCheckboxes = [];
 
           for (let i = 0; i < importList.length; i++) {
             selectedCheckboxes.push(true);
           }
+
+          console.log(importList);
 
           this.setState({
             importList,
@@ -246,8 +221,6 @@ export default class RoiImportListDialog extends React.Component {
   }
 
   _updateImportingText(roiCollectionLabel) {
-    console.log(`_updateImportingText: ${roiCollectionLabel}`);
-
     this.setState({
       progressText: `${roiCollectionLabel} ${this._numCollectionsParsed}/${
         this._numCollectionsToParse
@@ -256,13 +229,8 @@ export default class RoiImportListDialog extends React.Component {
   }
 
   async _importRoiCollection(roiCollectionInfo) {
-    console.log(roiCollectionInfo);
     const roiList = await fetchJSON(roiCollectionInfo.getFilesUri).promise;
-
     const result = roiList.ResultSet.Result;
-
-    console.log(`_importRoiCollection ${roiCollectionInfo.name} result:`);
-    console.log(result);
 
     // Reduce count if no associated file is found (nothing to import, badly deleted roiCollection).
     if (result.length === 0) {
@@ -271,14 +239,12 @@ export default class RoiImportListDialog extends React.Component {
       return;
     }
 
-    const roiImporter = new RoiImporter(this._seriesInstanceUid);
-
     // Retrieve each ROI from the list that has the same collectionType as the collection.
     // In an ideal world this should always be 1, and any other resources -- if any -- are differently formated representations of the same data, but things happen.
     for (let i = 0; i < result.length; i++) {
       const fileType = result[i].collection;
       if (fileType === roiCollectionInfo.collectionType) {
-        this._getAndImportFile(result[i].URI, roiCollectionInfo, roiImporter);
+        this._getAndImportFile(result[i].URI, roiCollectionInfo);
       }
     }
   }
@@ -292,13 +258,9 @@ export default class RoiImportListDialog extends React.Component {
    *                                  import.
    * @returns {null}
    */
-  async _getAndImportFile(uri, roiCollectionInfo, roiImporter) {
-    console.log(`_getAndImportFile: ${roiCollectionInfo.name}`);
-    console.log(roiCollectionInfo);
-
+  async _getAndImportFile(uri, roiCollectionInfo) {
     switch (roiCollectionInfo.collectionType) {
       case "AIM":
-        console.log(`fetching AIM: ${roiCollectionInfo.label}`);
         this._updateImportingText(roiCollectionInfo.name);
         const aimFile = await fetchXML(uri).promise;
 
@@ -306,14 +268,13 @@ export default class RoiImportListDialog extends React.Component {
           break;
         }
 
-        roiImporter.importAIMfile(
+        this._roiImporter.importAIMfile(
           aimFile,
           roiCollectionInfo.name,
           roiCollectionInfo.label
         );
         break;
       case "RTSTRUCT":
-        console.log(`fetching RTSTRUCT: ${roiCollectionInfo.name}`);
         this._updateImportingText(roiCollectionInfo.name);
         const rtStructFile = await fetchArrayBuffer(uri).promise;
 
@@ -321,7 +282,7 @@ export default class RoiImportListDialog extends React.Component {
           break;
         }
 
-        roiImporter.importRTStruct(
+        this._roiImporter.importRTStruct(
           rtStructFile,
           roiCollectionInfo.name,
           roiCollectionInfo.label
@@ -329,7 +290,7 @@ export default class RoiImportListDialog extends React.Component {
         break;
       default:
         console.error(
-          `asyncRoiFetcher._getAndImportFile not configured for filetype: ${fileType}.`
+          `RoiImportListDialog._getAndImportFile not configured for filetype: ${fileType}.`
         );
     }
 
@@ -440,14 +401,6 @@ export default class RoiImportListDialog extends React.Component {
       importing,
       progressText
     } = this.state;
-
-    console.log("importList:");
-    console.log(importList);
-
-    console.log(importList.length);
-    console.log(importListReady);
-
-    console.log(selectedCheckboxes);
 
     let importBody;
 
