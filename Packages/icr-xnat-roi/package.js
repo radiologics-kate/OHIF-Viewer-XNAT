@@ -75,15 +75,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderDialogs.html",
+    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderDialogs.js",
+    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/roiCollectionBuilderDialogs/roiCollectionBuilderDialogs.styl",
+    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.styl",
     "client"
   );
 

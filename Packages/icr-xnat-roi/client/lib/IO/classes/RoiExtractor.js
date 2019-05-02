@@ -26,6 +26,19 @@ export default class RoiExtractor {
    * @returns {object[]}  An array of extraced ROIContours.
    */
   extractROIContours(exportMask) {
+    const freehand3DModule = modules.freehand3D;
+    const seriesInstanceUid = this._seriesInstanceUid;
+
+    const workingStructureSet = freehand3DModule.getters.structureSet(
+      seriesInstanceUid
+    );
+
+    if (!seriesInstanceUid) {
+      return false;
+    }
+
+    const ROIContourCollection = workingStructureSet.ROIContourCollection;
+
     for (let i = 0; i < ROIContourCollection.length; i++) {
       if (ROIContourCollection[i] && ROIContourCollection[i].polygonCount > 0) {
         this._ROIContours[i] = [];

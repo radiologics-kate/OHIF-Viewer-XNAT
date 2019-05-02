@@ -29,9 +29,11 @@ export default function(
   const workingRoiCollection = structureSet.ROIContourCollection;
   const activeROIContourIndex = structureSet.activeROIContourIndex;
 
-  let activeROIContourUid = freehand3DStore.getters.activeROIContour(
+  const activeROIContour = freehand3DStore.getters.activeROIContour(
     seriesInstanceUid
-  ).uid;
+  );
+
+  let activeROIContourUid = activeROIContour ? activeROIContour.uid : null;
 
   // Create copies of ROIContours inside the new structureSet
   const newIndicies = [];
@@ -113,7 +115,10 @@ export default function(
   if (shouldLockArray[activeROIContourIndex]) {
     // If active volume has been exported, set active volume to null.
     structureSet.activeROIContourIndex = null;
-  } else {
+  } else if (
+    activeROIContourUid !== null &&
+    activeROIContourUid !== undefined
+  ) {
     console.log(`didnt export active contour..`);
     // Make sure we are pointing to the right contour now.
     freehand3DStore.setters.activeROIContour(
