@@ -88,15 +88,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/segExportListDialogs/segExportListDialogs.html",
+    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segExportListDialogs/segExportListDialogs.js",
+    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segExportListDialogs/segExportListDialogs.styl",
+    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.styl",
     "client"
   );
   // Help Menu
