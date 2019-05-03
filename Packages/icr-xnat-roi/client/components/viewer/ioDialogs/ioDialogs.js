@@ -1,11 +1,17 @@
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
-import { sessionMap } from "meteor/icr:series-info-provider";
-import { OHIF } from "meteor/ohif:core";
+import "./ioDialogs.html";
+import MessageDialog from "./ReactComponents/MessageDialog.js";
+
+Template.ioDialogs.onCreated(() => {
+  const instance = Template.instance();
+
+  // Emulate props for now.
+  instance.data.messageDialogTitle = new ReactiveVar("Title");
+  instance.data.messageDialogBody = new ReactiveVar("Body");
+});
 
 Template.ioDialogs.onRendered(() => {
   const instance = Template.instance();
   const dialogIds = [
-    "exportVolumes",
     "ioProgress",
     "ioMessage",
     "ioConfirmationDialog",
@@ -19,32 +25,21 @@ Template.ioDialogs.onRendered(() => {
 });
 
 Template.ioDialogs.helpers({
-  exportROIsText: () => {
-    const canWrite = icrXnatRoiSession.get("writePermissions");
+  MessageDialog() {
+    return MessageDialog;
+  },
+  messageDialogTitle() {
+    const instance = Template.instance();
 
-    if (canWrite) {
-      return "This command will export all new (unlocked) ROIs in this series as an ROI Collection. You will be prompted to give the ROI Collection a name before you may export";
-    } else {
-      return (
-        `This command is disabled as you do not have the required permissions to write to ${sessionMap.get(
-          "session",
-          "projectId"
-        )}/${sessionMap.get("session", "experimentLabel")}.` +
-        " If you believe that you should, please contact the project owner."
-      );
-    }
-  }
-});
+    console.log(instance.data.messageDialogTitle.get());
 
-Template.ioDialogs.events({
-  "click .io-dialog-cancel-js"(event) {
-    const dialog = $("#ioMessage");
+    return instance.data.messageDialogTitle.get();
+  },
+  messageDialogBody() {
+    const instance = Template.instance();
 
-    dialog.get(0).close();
+    console.log(instance.data.messageDialogBody.get());
 
-    // Reset the focus to the active viewport element
-    // This makes the mobile Safari keyboard close
-    const element = OHIF.viewerbase.viewportUtils.getActiveViewportElement();
-    element.focus();
+    return instance.data.messageDialogBody.get();
   }
 });

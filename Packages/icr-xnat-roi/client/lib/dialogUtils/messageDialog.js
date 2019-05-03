@@ -6,12 +6,12 @@
  */
 export default function(title, body) {
   // Find components
-  const dialog = document.getElementById("ioMessage");
-  const descriptionText = dialog.getElementsByClassName("io-description")[0];
-  const bodyText = dialog.getElementsByClassName("io-body")[0];
+  const ioMessageDialog = document.getElementById("ioMessage");
 
-  descriptionText.textContent = title;
-  bodyText.textContent = body;
+  const dialogData = Blaze.getData(ioMessageDialog);
 
-  dialog.showModal();
+  dialogData.messageDialogTitle.set(title);
+  dialogData.messageDialogBody.set(body);
+
+  ioMessageDialog.showModal();
 }
