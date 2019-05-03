@@ -23,12 +23,35 @@ const brushModule = cornerstoneTools.store.modules.brush;
  * @returns {null}
  */
 export default async function exportMask() {
-  const seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
+  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+  if (icrXnatRoiSession.get("writePermissions") === true) {
+    // Check if there are any Masks with metadata.
+    if (hasMasksToExtract(seriesInstanceUid)) {
+      const segExportListDialog = document.getElementById(
+        "segExportListDialog"
+      );
+
+      const dialogData = Blaze.getData(segExportListDialog);
+
+      dialogData.segExportListDialogId.set(Math.random().toString());
+      segExportListDialog.showModal();
+    } else {
+      displayNothingToExportDialog("Mask");
+      return;
+    }
+  } else {
+    // User does not have write access
+    displayInsufficientPermissionsDialog(seriesInstanceUid, "write");
+  }
+
+  /*
 
   if (icrXnatRoiSession.get("writePermissions") === false) {
     displayInsufficientPermissionsDialog(seriesInfo.seriesInstanceUid, "write");
     return;
   }
+
 
   let roiCollectionInfo;
 
@@ -45,6 +68,24 @@ export default async function exportMask() {
   }
 
   beginExport(seriesInfo, roiCollectionInfo);
+  */
+}
+
+/**
+ * hasMasksToExtract - Checks whether any mask metadata exists on a series.
+ *
+ * @param  {type} seriesInstanceUid The series instance UID of the series to check.
+ * @returns {boolean} true if the series has at least one mask.
+ */
+function hasMasksToExtract(seriesInstanceUid) {
+  const metadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
+  let hasMasks = false;
+
+  if (metadata) {
+    hasMasks = metadata.some(data => data !== undefined);
+  }
+
+  return hasMasks;
 }
 
 /**
@@ -146,21 +187,4 @@ async function beginExport(seriesInfo, roiCollectionInfo) {
         displayExportFailedDialog(seriesInstanceUid);
       });
   });
-}
-
-/**
- * hasMasksToExtract - Checks whether any mask metadata exists on a series.
- *
- * @param  {type} seriesInstanceUid The series instance UID of the series to check.
- * @returns {boolean} true if the series has at least one mask.
- */
-function hasMasksToExtract(seriesInstanceUid) {
-  const metadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
-  let hasMasks = false;
-
-  if (metadata) {
-    hasMasks = metadata.some(data => data !== undefined);
-  }
-
-  return hasMasks;
 }

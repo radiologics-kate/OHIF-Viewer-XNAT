@@ -88,27 +88,17 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/segBuilderDialogs/segBuilderDialogs.html",
+    "client/components/viewer/segExportListDialogs/segExportListDialogs.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segBuilderDialogs/segBuilderDialogs.js",
+    "client/components/viewer/segExportListDialogs/segExportListDialogs.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segBuilderDialogs/segBuilderDialogs.styl",
+    "client/components/viewer/segExportListDialogs/segExportListDialogs.styl",
     "client"
   );
-
-  api.addFiles(
-    "client/components/viewer/segBuilderDialogs/segBuilderListItem/segBuilderListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/segBuilderDialogs/segBuilderListItem/segBuilderListItem.js",
-    "client"
-  );
-
   // Help Menu
   api.addFiles(
     "client/components/viewer/helpDialogs/helpDialogs.html",
