@@ -5,31 +5,36 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 
 const modules = cornerstoneTools.store.modules;
 
+function createNewVolumeCallback(name) {
+  // Create and activate new ROIContour
+  const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+
+  //Check if default structureSet exists for this series.
+  if (!modules.freehand3D.getters.series(activeSeriesInstanceUid)) {
+    modules.freehand3D.setters.series(activeSeriesInstanceUid);
+  }
+
+  modules.freehand3D.setters.ROIContourAndSetIndexActive(
+    activeSeriesInstanceUid,
+    "DEFAULT",
+    name
+  );
+}
+
 /**
  * Opens UI that allows user to chose a name for a new volume, and processes
  * the response.
  *
- * @author JamesAPetts
- *
  */
-export async function createNewVolume() {
-  const name = await imageAnnotationNameInput("Unnamed Lesion");
+export function createNewVolume() {
+  const freehandSetNameDialog = document.getElementById(
+    "freehandSetNameDialog"
+  );
+  const dialogData = Blaze.getData(freehandSetNameDialog);
 
-  if (name) {
-    // Create and activate new ROIContour
-    const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-
-    //Check if default structureSet exists for this series.
-    if (!modules.freehand3D.getters.series(activeSeriesInstanceUid)) {
-      modules.freehand3D.setters.series(activeSeriesInstanceUid);
-    }
-
-    modules.freehand3D.setters.ROIContourAndSetIndexActive(
-      activeSeriesInstanceUid,
-      "DEFAULT",
-      name
-    );
-  }
+  dialogData.freehandSetNameDialogDefaultName.set("");
+  dialogData.freehandSetNameDialogCallback.set(createNewVolumeCallback);
+  freehandSetNameDialog.showModal();
 }
 
 /**
@@ -42,7 +47,7 @@ export async function createNewVolume() {
  * @param {String} ROIContourUid      The UID of the ROIContourUid.
  *
  */
-export async function setVolumeName(
+export function setVolumeName(
   seriesInstanceUid,
   structureSetUid,
   ROIContourUid
@@ -58,17 +63,21 @@ export async function setVolumeName(
   if (ROIContour.name) {
     oldName = ROIContour.name;
   } else {
-    oldName = "Unnamed Lesion";
+    oldName = "";
   }
 
-  // Await new name input.
-  const name = await imageAnnotationNameInput(oldName);
-
-  if (name) {
+  function setVolumeNameCallback(name) {
     ROIContour.name = name;
   }
 
-  return name;
+  const freehandSetNameDialog = document.getElementById(
+    "freehandSetNameDialog"
+  );
+  const dialogData = Blaze.getData(freehandSetNameDialog);
+
+  dialogData.freehandSetNameDialogDefaultName.set(oldName);
+  dialogData.freehandSetNameDialogCallback.set(setVolumeNameCallback);
+  freehandSetNameDialog.showModal();
 }
 
 /**
@@ -81,6 +90,7 @@ export async function setVolumeName(
  * @return {Promise}            A promise that resolves to return the name given
  *                              by the user.
  */
+/*
 function imageAnnotationNameInput(defaultName) {
   function keyConfirmEventHandler(e) {
     if (e.which === 13) {
@@ -143,3 +153,4 @@ function imageAnnotationNameInput(defaultName) {
     resolveRef = resolve;
   });
 }
+*/
