@@ -21,10 +21,10 @@ const json = `{
             "CodeMeaning": "Tissue",
             "CodingSchemeDesignator": "SRT",
             "3dSlicerLabel": "tissue",
-            "cid": "7165",
+            "cid": "7166",
             "UMLSConceptUID": "C0040300",
             "CodeValue": "T-D0050",
-            "contextGroupName": "Abstract Segmentation Types",
+            "contextGroupName": "Common Tissue Segmentation Types",
             "SNOMEDCTConceptID": "85756007"
           },
           {
@@ -251,21 +251,6 @@ const json = `{
             "CodeValue": "T-17010",
             "contextGroupName": "Common Tissue Segmentation Types",
             "SNOMEDCTConceptID": "13024002"
-          },
-          {
-            "recommendedDisplayRGBValue": [
-              128,
-              174,
-              128
-            ],
-            "CodeMeaning": "Tissue",
-            "CodingSchemeDesignator": "SRT",
-            "3dSlicerLabel": "tissue",
-            "cid": "7166",
-            "UMLSConceptUID": "C0040300",
-            "CodeValue": "T-D0050",
-            "contextGroupName": "Common Tissue Segmentation Types",
-            "SNOMEDCTConceptID": "85756007"
           },
           {
             "recommendedDisplayRGBValue": [
@@ -828,21 +813,6 @@ const json = `{
             "CodeMeaning": "Cervical spine",
             "contextGroupName": "Common Anatomic Regions",
             "SNOMEDCTConceptID": "122494005"
-          },
-          {
-            "recommendedDisplayRGBValue": [
-              177,
-              122,
-              101
-            ],
-            "cid": "4040",
-            "CodingSchemeDesignator": "SRT",
-            "3dSlicerLabel": "thorax",
-            "CodeValue": "T-D3000",
-            "UMLSConceptUID": "C0817096",
-            "CodeMeaning": "Chest",
-            "contextGroupName": "Endoscopy Anatomic Regions",
-            "SNOMEDCTConceptID": "51185008"
           },
           {
             "recommendedDisplayRGBValue": [
@@ -3621,21 +3591,6 @@ const json = `{
           },
           {
             "recommendedDisplayRGBValue": [
-              47,
-              150,
-              103
-            ],
-            "cid": "6113",
-            "CodingSchemeDesignator": "SRT",
-            "3dSlicerLabel": "thymus",
-            "CodeValue": "T-C8000",
-            "UMLSConceptUID": "C0040113",
-            "CodeMeaning": "Thymus Gland",
-            "contextGroupName": "Mediastinum Anatomy Finding or Feature",
-            "SNOMEDCTConceptID": "9875009"
-          },
-          {
-            "recommendedDisplayRGBValue": [
               62,
               162,
               114
@@ -4209,8 +4164,7 @@ const json = `{
       }
     ]
   }
-}`
-
+}`;
 
 const parsedJson = JSON.parse(json);
 

@@ -1,3 +1,5 @@
+/*
+
 import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
 import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
@@ -389,3 +391,5 @@ function generateMetadata (label, segmentationType, modifier) {
 
   return metadata;
 }
+
+*/

@@ -7,9 +7,8 @@ Template.brushMetadataSearchListItem.helpers({
   }
 });
 
-
 Template.brushMetadataSearchListItem.events({
-  'click .brush-metadata-search-select-js'(event) {
+  "click .brush-metadata-search-select-js"(event) {
     const instance = Template.instance();
     const data = instance.data;
 

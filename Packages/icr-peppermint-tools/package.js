@@ -59,31 +59,6 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/brushMetadataDialogs/brushMetadataSearchList/brushMetadataSearchList.html",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/brushMetadataDialogs/brushMetadataSearchList/brushMetadataSearchList.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/brushMetadataDialogs/brushMetadataSearchListItem/brushMetadataSearchListItem.html",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/brushMetadataDialogs/brushMetadataSearchListItem/brushMetadataSearchListItem.js",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/brushMetadataDialogs/brushMetadataModifiers/brushMetadataModifiers.html",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/segManagementDialogs/segManagementDialogs.html",
     "client"
   );

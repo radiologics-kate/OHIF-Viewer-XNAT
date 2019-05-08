@@ -5,10 +5,11 @@ Template.brushMetadataDialogs.onCreated(() => {
   const instance = Template.instance();
 
   // Used to remount component.
-  instance.data.brushMetadataDialogDefaultName = new ReactiveVar("");
+  instance.data.brushMetadataDialogSegIndex = new ReactiveVar();
   instance.data.brushMetadataDialogCallback = new ReactiveVar(() => {
     return;
   });
+  instance.data.brushMetadataDialogMetadata = new ReactiveVar();
 });
 
 Template.brushMetadataDialogs.onRendered(() => {
@@ -25,16 +26,28 @@ Template.brushMetadataDialogs.helpers({
   BrushMetadataDialog() {
     return BrushMetadataDialog;
   },
-  defaultName() {
+  segIndex() {
     const instance = Template.instance();
 
-    return instance.data.brushMetadataDialogDefaultName.get();
+    return instance.data.brushMetadataDialogSegIndex.get();
+  },
+  metadata() {
+    const instance = Template.instance();
+
+    return instance.data.brushMetadataDialogMetadata.get();
   },
   callback() {
     const instance = Template.instance();
 
-    console.log(instance.data.brushMetadataDialogCallback.get());
-
     return instance.data.brushMetadataDialogCallback.get();
+  },
+  id() {
+    const instance = Template.instance();
+
+    instance.data.brushMetadataDialogSegIndex.get();
+    instance.data.brushMetadataDialogMetadata.get();
+    instance.data.brushMetadataDialogCallback.get();
+
+    return Math.random().toString();
   }
 });

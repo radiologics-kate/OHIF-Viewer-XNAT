@@ -4,7 +4,9 @@
     class="brush-metadata-dialog noselect"
     oncontextmenu="return false"
   >
-    {{> React component=brushMetadataDialog defaultName=defaultName
-    callback=callback}}
+    <div>
+    {{> React component=BrushMetadataDialog segIndex=segIndex metadata=metadata
+    callback=callback key=id}}
+    </div>
   </dialog>
 </template>
