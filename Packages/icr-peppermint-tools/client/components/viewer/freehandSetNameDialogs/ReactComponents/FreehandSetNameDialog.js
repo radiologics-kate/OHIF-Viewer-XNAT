@@ -1,9 +1,4 @@
 import React from "react";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { sessionMap } from "meteor/icr:series-info-provider";
-
-const modules = cornerstoneTools.store.modules;
 
 export default class FreehandSetNameDialog extends React.Component {
   constructor(props = {}) {
