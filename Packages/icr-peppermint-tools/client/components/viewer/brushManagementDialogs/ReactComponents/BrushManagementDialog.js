@@ -1,4 +1,5 @@
 import React from "react";
+import BrushManagementListItem from "./BrushManagementListItem.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
@@ -6,6 +7,8 @@ import {
   newSegmentInput,
   editSegmentInput
 } from "../../../../lib/util/brushMetadataIO.js";
+import deleteSegment from "../../../../lib/util/deleteSegment.js";
+import getBrushSegmentColor from "../../../../lib/util/getBrushSegmentColor.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -17,7 +20,10 @@ export default class BrushManagementDialog extends React.Component {
     this.onCancelButtonClick = this.onCancelButtonClick.bind(this);
     this.onSegmentChange = this.onSegmentChange.bind(this);
     this.onShowHideClick = this.onShowHideClick.bind(this);
+    this.onEditClick = this.onEditClick.bind(this);
     this.onDeleteClick = this.onDeleteClick.bind(this);
+    this.onDeleteCancelClick = this.onDeleteCancelClick.bind(this);
+    this.onDeleteConfirmClick = this.onDeleteConfirmClick.bind(this);
     this._roiCollectionInfo = this._roiCollectionInfo.bind(this);
     this._visableSegmentsForElement = this._visableSegmentsForElement.bind(
       this
@@ -27,7 +33,9 @@ export default class BrushManagementDialog extends React.Component {
     this.state = {
       roiCollectionInfo: { name: "", label: "" },
       segments: [],
-      visibleSegments: []
+      visibleSegments: [],
+      deleteConfirmationOpen: false,
+      segmentToDelete: 0
     };
 
     console.log(`TEST:`);
@@ -120,27 +128,37 @@ export default class BrushManagementDialog extends React.Component {
   onDeleteClick(segmentIndex) {
     //TODO !
     console.log("TODO: Delete");
+    this.setState({
+      deleteConfirmationOpen: true,
+      segmentToDelete: segmentIndex
+    });
+  }
+
+  onDeleteConfirmClick() {
+    const { segmentToDelete } = this.state;
+
+    deleteSegment(this._seriesInstanceUid, segmentToDelete);
+
+    const segments = this._segments();
+    const visibleSegments = this._visableSegmentsForElement();
+
+    this.setState({
+      deleteConfirmationOpen: false,
+      segments,
+      visibleSegments
+    });
+  }
+
+  onDeleteCancelClick() {
+    this.setState({
+      deleteConfirmationOpen: false
+    });
   }
 
   _closeDialog() {
     const dialog = document.getElementById("brushManagementDialog");
 
     dialog.close();
-  }
-
-  _segmentColor(segIndex) {
-    const colormap = cornerstone.colors.getColormap(
-      brushModule.state.colorMapId
-    );
-
-    if (!colormap) {
-      return;
-    }
-    const colorArray = colormap.getColor(segIndex);
-
-    return `rgba(
-      ${colorArray[[0]]}, ${colorArray[[1]]}, ${colorArray[[2]]}, 1.0
-    )`;
   }
 
   _roiCollectionInfo() {
@@ -220,89 +238,64 @@ export default class BrushManagementDialog extends React.Component {
   }
 
   render() {
-    const { roiCollectionInfo, segments, visibleSegments } = this.state;
+    const {
+      roiCollectionInfo,
+      segments,
+      visibleSegments,
+      deleteConfirmationOpen,
+      segmentToDelete
+    } = this.state;
 
     console.log("BurshManagementDialog render:");
     console.log(segments);
 
-    const activeBrushIndex = brushModule.state.drawColorId;
+    const segmentRows = segments.map(segment => (
+      <BrushManagementListItem
+        key={`${segment.metadata.SegmentLabel}_${segment.index}`}
+        segmentIndex={segment.index}
+        metadata={segment.metadata}
+        visible={visibleSegments[segment.index]}
+        onSegmentChange={this.onSegmentChange}
+        onShowHideClick={this.onShowHideClick}
+        onEditClick={this.onEditClick}
+        onDeleteClick={this.onDeleteClick}
+      />
+    ));
 
-    const segmentRows = segments.map(segment => {
-      const metadata = segment.metadata;
-      const segmentLabel = metadata.SegmentLabel;
-      const segmentColor = this._segmentColor(segment.index);
-      const segmentCategory =
-        metadata.SegmentedPropertyCategoryCodeSequence.CodeMeaning;
+    let brushManagementDialogBody;
 
-      let typeWithModifier =
-        metadata.SegmentedPropertyTypeCodeSequence.CodeMeaning;
-
-      const modifier =
-        metadata.SegmentedPropertyTypeCodeSequence
-          .SegmentedPropertyTypeModifierCodeSequence;
-
-      if (modifier) {
-        typeWithModifier += ` (${modifier.CodeMeaning})`;
-      }
-
-      const checked = activeBrushIndex === segment.index ? "checked" : null;
-
-      const showHideIcon = visibleSegments[segment.index]
-        ? "fa fa-eye"
-        : "fa fa-eye-slash";
+    if (deleteConfirmationOpen) {
+      const segmentColor = getBrushSegmentColor(segmentToDelete);
+      const segmentLabel = segments.find(
+        segment => segment.index === segmentToDelete
+      ).metadata.SegmentLabel;
 
       return (
-        <tr key={`${segmentLabel}_${segment.index}`}>
-          <td className="left-aligned-cell">
-            <i className="fa fa-square" style={{ color: segmentColor }} />{" "}
-            {segmentLabel}
-          </td>
-          <td>{segmentCategory}</td>
-          <td>{typeWithModifier}</td>
-          <td className="centered-cell">
-            <input
-              type="radio"
-              checked={checked}
-              name="sync"
-              value=""
-              onChange={() => {
-                this.onSegmentChange(segment.index);
-              }}
-            />
-          </td>
-          <td className="centered-cell">
+        <>
+          <div>
+            <h5>Warning!</h5>
+            <p>
+              Are you sure you want to delete {segmentLabel}? This cannot be
+              undone.
+            </p>
+          </div>
+          <div className="seg-delete-horizontal-box">
             <a
-              className="btn btn-sm btn-secondary"
-              onClick={() => {
-                this.onShowHideClick(segment.index);
-              }}
+              className="btn btn-sm btn-primary"
+              onClick={this.onDeleteConfirmClick}
             >
-              <i className={showHideIcon} />
+              <i className="fa fa fa-check-circle fa-2x" />
             </a>
-          </td>
-          <td className="centered-cell">
             <a
-              className="btn btn-sm btn-secondary"
-              onClick={() => {
-                this.onEditClick(segment.index, metadata);
-              }}
+              className="btn btn-sm btn-primary"
+              onClick={this.onDeleteCancelClick}
             >
-              <i className="fa fa-wrench" />
+              <i className="fa fa fa-times-circle fa-2x" />
             </a>
-          </td>
-          <td className="centered-cell">
-            <a
-              className="btn btn-sm btn-secondary"
-              onClick={() => {
-                this.onDeleteClick(segment.index);
-              }}
-            >
-              <i className="fa fa-times" />
-            </a>
-          </td>
-        </tr>
+          </div>
+        </>
       );
-    });
+    }
 
     return (
       <div>
