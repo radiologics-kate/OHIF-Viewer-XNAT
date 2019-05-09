@@ -59,15 +59,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementDialogs.html",
+    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementDialogs.js",
+    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementDialogs.styl",
+    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.styl",
     "client"
   );
 
@@ -81,25 +81,6 @@ Package.onUse(function(api) {
   );
   api.addFiles(
     "client/components/viewer/brushSettingsDialogs/brushSettingsDialogs.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementList/segManagementList.html",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementList/segManagementList.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementListItem/segManagementListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/segManagementDialogs/segManagementListItem/segManagementListItem.js",
     "client"
   );
 

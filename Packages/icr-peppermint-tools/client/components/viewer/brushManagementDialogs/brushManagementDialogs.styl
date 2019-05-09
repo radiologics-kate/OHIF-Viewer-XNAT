@@ -1,0 +1,89 @@
+@import "{ohif:design}/app"
+@import "../peppermint-table.styl"
+
+.brush-management-dialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 50px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  .brush-management-header
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-wrap: nowrap
+    justify-content: space-between
+
+  h3
+    font-weight: 400
+    text-align: left
+
+  .brush-management-cancel
+    text-align: right
+    margin-top: 16px
+
+  .brushManagementTableButton
+    width: 100%
+
+  .brush-management-list-bordered
+    theme('border-top', '1px solid $textSecondaryColor')
+    theme('border-bottom', '1px solid $textSecondaryColor')
+
+  .brush-management-vert-box
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: column
+    justify-context: flex-start
+
+  .brush-management-vert-box label
+    margin-top: 20px
+    text-align: left
+
+  .brush-management-horizontal-box
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    align-items: baseline
+    justify-context: space-between
+
+  .brush-management-new-button
+    float: center
+    width: 100%
+
+
+.brush-delete-dialog
+  theme('border', '1px solid $uiBorderColor', 0.95)
+  theme('background', '$uiGrayDarkest', 0.95)
+  theme('color', '$textSecondaryColor')
+  z-index: 1000
+
+  max-height: calc(100% - 50px)
+  max-width: calc(100% - 100px)
+  position: absolute
+  margin: auto
+
+  padding-right: 10px
+  padding-left: 10px
+  padding-bottom: 10px
+  border-radius: 8px
+  text-align: center
+
+  h3
+    font-weight: 400
+    text-align: left
+    border-radius: 8px
+    padding: 2px
