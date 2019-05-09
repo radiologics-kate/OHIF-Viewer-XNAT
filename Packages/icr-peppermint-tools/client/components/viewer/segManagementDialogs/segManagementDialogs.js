@@ -1,25 +1,26 @@
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { cornerstone, cornerstoneTools } from 'meteor/ohif:cornerstone';
-import { OHIF } from 'meteor/ohif:core';
-import { SeriesInfoProvider } from 'meteor/icr:series-info-provider';
-import brushMetadataIO from '../../../lib/util/brushMetadataIO.js';
+import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
+import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
+import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { newSegmentInput } from "../../../lib/util/brushMetadataIO.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
-const globalToolStateManager = cornerstoneTools.globalImageIdSpecificToolStateManager;
+const globalToolStateManager =
+  cornerstoneTools.globalImageIdSpecificToolStateManager;
 
 Template.segManagementDialogs.onRendered(() => {
-    const instance = Template.instance();
-    const dialog = instance.$('#segManagementDialog');
-    const deleteDialog = instance.$('#segDeleteDialog');
+  const instance = Template.instance();
+  const dialog = instance.$("#segManagementDialog");
+  const deleteDialog = instance.$("#segDeleteDialog");
 
-    dialogPolyfill.registerDialog(dialog.get(0));
-    dialogPolyfill.registerDialog(deleteDialog.get(0));
+  dialogPolyfill.registerDialog(dialog.get(0));
+  dialogPolyfill.registerDialog(deleteDialog.get(0));
 });
 
 Template.segManagementDialogs.onCreated(() => {
   const instance = Template.instance();
 
-  instance.data.recalcSegmentations = new ReactiveVar('false');
+  instance.data.recalcSegmentations = new ReactiveVar("false");
   instance.data.segToBeDeleted = new ReactiveVar();
 });
 
@@ -35,11 +36,14 @@ Template.segManagementDialogs.helpers({
       return;
     }
 
-    const segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
+    const segMetadata =
+      brushModule.state.segmentationMetadata[seriesInstanceUid];
 
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const enabledElementUID = activeEnabledElement.uuid;
-    const visibleSegmentationsForElement = brushModule.getters.visibleSegmentationsForElement(enabledElementUID);
+    const visibleSegmentationsForElement = brushModule.getters.visibleSegmentationsForElement(
+      enabledElementUID
+    );
 
     if (!segMetadata) {
       return;
@@ -52,9 +56,7 @@ Template.segManagementDialogs.helpers({
         segmentationData.push({
           index: i,
           metadata: segMetadata[i],
-          visible: new ReactiveVar(
-            visibleSegmentationsForElement[i]
-          )
+          visible: new ReactiveVar(visibleSegmentationsForElement[i])
         });
       }
     }
@@ -70,18 +72,18 @@ Template.segManagementDialogs.helpers({
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
     if (importInfo && importInfo[seriesInstanceUid]) {
-      const roiCollection =  importInfo[seriesInstanceUid];
+      const roiCollection = importInfo[seriesInstanceUid];
       return {
         label: roiCollection.label,
         type: roiCollection.type,
         name: roiCollection.name,
-        modified: roiCollection.modified ? 'true' : ' false'
+        modified: roiCollection.modified ? "true" : " false"
       };
-    };
+    }
 
     return {
-      name: 'New SEG ROI Collection',
-      label: ''
+      name: "New SEG ROI Collection",
+      label: ""
     };
   },
   segmentationToDelete: () => {
@@ -107,7 +109,9 @@ Template.segManagementDialogs.helpers({
       return;
     }
 
-    const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
+    const colormap = cornerstone.colors.getColormap(
+      brushModule.state.colorMapId
+    );
 
     if (!colormap) {
       return;
@@ -121,38 +125,38 @@ Template.segManagementDialogs.helpers({
 });
 
 Template.segManagementDialogs.events({
-  'click .js-seg-management-cancel'(event) {
-
+  "click .js-seg-management-cancel"(event) {
     closeDialog();
   },
-  'click .js-seg-management-new'(event) {
+  "click .js-seg-management-new"(event) {
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-
-    closeDialog();
 
     let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
 
     if (!segMetadata) {
       brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
-      segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid]
+      segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
     }
 
-    const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
+    const colormap = cornerstone.colors.getColormap(
+      brushModule.state.colorMapId
+    );
     const numberOfColors = colormap.getNumberOfColors();
 
     for (let i = 0; i < numberOfColors; i++) {
       if (!segMetadata[i]) {
         brushModule.state.drawColorId = i;
-        brushMetadataIO(i);
+        closeDialog();
+        newSegmentInput(i);
         break;
       }
     }
   },
-  'click .js-seg-delete-cancel'(event) {
-    const dialog = $('#segDeleteDialog');
+  "click .js-seg-delete-cancel"(event) {
+    const dialog = $("#segDeleteDialog");
     dialog.get(0).close();
   },
-  'click .js-seg-delete-confirm'(event) {
+  "click .js-seg-delete-confirm"(event) {
     const instance = Template.instance();
     const segIndex = instance.data.segToBeDeleted.get();
     const toolStateManager = globalToolStateManager.saveToolState();
@@ -164,17 +168,18 @@ Template.segManagementDialogs.events({
     // Delete pixeldata
     const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
     const element = activeEnabledElement.element;
-    const stackToolState = cornerstoneTools.getToolState(element, 'stack');
+    const stackToolState = cornerstoneTools.getToolState(element, "stack");
     const imageIds = stackToolState.data[0].imageIds;
 
     for (let i = 0; i < imageIds.length; i++) {
       const imageToolState = toolStateManager[imageIds[i]];
 
-      if (imageToolState &&
+      if (
+        imageToolState &&
         imageToolState.brush &&
         imageToolState.brush.data[segIndex] &&
         imageToolState.brush.data[segIndex].pixelData
-       ) {
+      ) {
         const brushData = imageToolState.brush.data[segIndex];
 
         const length = brushData.pixelData.length;
@@ -183,17 +188,19 @@ Template.segManagementDialogs.events({
       }
     }
 
-    instance.data.recalcSegmentations.set(!instance.data.recalcSegmentations.get());
+    instance.data.recalcSegmentations.set(
+      !instance.data.recalcSegmentations.get()
+    );
 
     cornerstone.updateImage(activeEnabledElement.element);
 
-    const dialog = $('#segDeleteDialog');
+    const dialog = $("#segDeleteDialog");
     dialog.get(0).close();
   }
 });
 
-function closeDialog () {
-  const dialog = $('#segManagementDialog');
+function closeDialog() {
+  const dialog = $("#segManagementDialog");
   dialog.get(0).close();
 
   // Reset the focus to the active viewport element

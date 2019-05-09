@@ -1,6 +1,6 @@
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import brushMetadataIO from "../../../../lib/util/brushMetadataIO.js";
+import { editSegmentInput } from "../../../../lib/util/brushMetadataIO.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -100,7 +100,7 @@ Template.segManagementListItem.events({
     */
 
     closeDialog();
-    brushMetadataIO(segIndex, metadata);
+    editSegmentInput(segIndex, metadata);
   },
   "click .js-switch-seg"(event) {
     const instance = Template.instance();

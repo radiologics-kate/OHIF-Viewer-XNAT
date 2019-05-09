@@ -8,8 +8,6 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import Brush3DTool from "./Brush3DTool.js";
 import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
 
-import brushMetadataIO from "../util/brushMetadataIO.js";
-
 const brushModule = cornerstoneTools.store.modules.brush;
 const getToolState = cornerstoneTools.getToolState;
 const addToolState = cornerstoneTools.addToolState;

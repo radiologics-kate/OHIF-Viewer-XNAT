@@ -3,7 +3,7 @@ import { OHIF } from "meteor/ohif:core";
 import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import getActiveBrushToolsForElement from "../util/getActiveBrushToolsForElement.js";
-import brushMetadataIO from "../util/brushMetadataIO.js";
+import { newSegmentInput } from "../util/brushMetadataIO.js";
 
 const getKeyFromKeyCode = cornerstoneTools.import("util/getKeyFromKeyCode");
 const Mousetrap = require("mousetrap");
@@ -73,7 +73,7 @@ function newSegmentation() {
   for (let i = 0; i < numberOfColors; i++) {
     if (!segMetadata[i]) {
       brushModule.state.drawColorId = i;
-      brushMetadataIO(i);
+      newSegmentInput(i);
       break;
     }
   }

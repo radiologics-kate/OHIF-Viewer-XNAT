@@ -150,6 +150,7 @@ export default class BrushMetadataDialog extends React.Component {
 
   onConfirmButtonClick() {
     const { categoryUID, typeUID, modifierUID } = this.state;
+    const { segIndex } = this.props;
 
     console.log(`onConfirmButtonClick`);
 
@@ -157,7 +158,8 @@ export default class BrushMetadataDialog extends React.Component {
       label: this._maskName,
       categoryUID,
       typeUID,
-      modifierUID
+      modifierUID,
+      segIndex
     };
 
     this.props.callback(data);
@@ -214,8 +216,9 @@ export default class BrushMetadataDialog extends React.Component {
   }
 
   render() {
-    const { segIndex, defaultName } = this.props;
+    const { segIndex } = this.props;
     const { categoryUID, typeUID, modifierUID } = this.state;
+    const defaultName = this._maskName;
 
     const segmentIndexText = `Segment ${segIndex}`; // TODO write segIndex + 1 once working.
 

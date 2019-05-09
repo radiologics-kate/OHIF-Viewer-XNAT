@@ -3,7 +3,7 @@ import { OHIF } from "meteor/ohif:core";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
 
-import brushMetadataIO from "../util/brushMetadataIO.js";
+import { newSegmentInput } from "../util/brushMetadataIO.js";
 
 const MODES = {
   OVERLAPPING: "overlapping",
@@ -51,7 +51,7 @@ export default class Brush3DTool extends BrushTool {
       this._lastImageCoords = eventData.currentPoints.image;
     } else if (!isModalOpen()) {
       // Open the UI and let the user input data!
-      brushMetadataIO(brushModule.state.drawColorId);
+      newSegmentInput(brushModule.state.drawColorId);
     }
   }
 
@@ -77,7 +77,7 @@ export default class Brush3DTool extends BrushTool {
       this._paint(evt);
     } else if (!isModalOpen()) {
       // Open the UI and let the user input data!
-      brushMetadataIO(brushModule.state.drawColorId);
+      newSegmentInput(brushModule.state.drawColorId);
     }
   }
 
@@ -105,7 +105,7 @@ export default class Brush3DTool extends BrushTool {
     if (!metaData || !metaData.find(element => element)) {
       if (!isModalOpen()) {
         brushModule.state.drawColorId = 0;
-        brushMetadataIO(brushModule.state.drawColorId);
+        newSegmentInput(brushModule.state.drawColorId);
       }
     }
   }
