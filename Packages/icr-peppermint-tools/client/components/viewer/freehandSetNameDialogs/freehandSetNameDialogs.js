@@ -6,6 +6,7 @@ Template.freehandSetNameDialogs.onCreated(() => {
 
   // Used to remount component.
   instance.data.freehandSetNameDialogDefaultName = new ReactiveVar("");
+  instance.data.freehandSetNameDialogId = new ReactiveVar("");
   instance.data.freehandSetNameDialogCallback = new ReactiveVar(() => {
     return;
   });
@@ -24,6 +25,11 @@ Template.freehandSetNameDialogs.onRendered(() => {
 Template.freehandSetNameDialogs.helpers({
   FreehandSetNameDialog() {
     return FreehandSetNameDialog;
+  },
+  id() {
+    const instance = Template.instance();
+
+    return instance.data.freehandSetNameDialogId.get();
   },
   defaultName() {
     const instance = Template.instance();

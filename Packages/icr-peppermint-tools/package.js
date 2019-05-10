@@ -85,43 +85,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.html",
+    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.js",
+    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeManagementDialogs.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/roiCollectionList/roiCollectionList.html",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/roiCollectionList/roiCollectionList.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeList/volumeList.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeList/volumeList.js",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeListItem/volumeListItem.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/volumeManagementDialogs/volumeListItem/volumeListItem.js",
+    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.styl",
     "client"
   );
 

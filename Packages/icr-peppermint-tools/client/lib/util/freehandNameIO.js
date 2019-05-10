@@ -31,6 +31,7 @@ export function createNewVolume() {
   const dialogData = Blaze.getData(freehandSetNameDialog);
 
   dialogData.freehandSetNameDialogDefaultName.set("");
+  dialogData.freehandSetNameDialogId.set(Math.random().toString());
   dialogData.freehandSetNameDialogCallback.set(createNewVolumeCallback);
   freehandSetNameDialog.showModal();
 }
@@ -47,7 +48,8 @@ export function createNewVolume() {
 export function setVolumeName(
   seriesInstanceUid,
   structureSetUid,
-  ROIContourUid
+  ROIContourUid,
+  callback
 ) {
   const ROIContour = modules.freehand3D.getters.ROIContour(
     seriesInstanceUid,
@@ -65,6 +67,10 @@ export function setVolumeName(
 
   function setVolumeNameCallback(name) {
     ROIContour.name = name;
+
+    if (typeof callback === "function") {
+      callback(name);
+    }
   }
 
   const freehandSetNameDialog = document.getElementById(
@@ -73,6 +79,7 @@ export function setVolumeName(
   const dialogData = Blaze.getData(freehandSetNameDialog);
 
   dialogData.freehandSetNameDialogDefaultName.set(oldName);
+  dialogData.freehandSetNameDialogId.set(Math.random().toString());
   dialogData.freehandSetNameDialogCallback.set(setVolumeNameCallback);
   freehandSetNameDialog.showModal();
 }

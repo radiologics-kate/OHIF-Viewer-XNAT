@@ -64,8 +64,6 @@ export default class BrushManagementListItem extends React.Component {
           <input
             type="radio"
             checked={checked}
-            name="sync"
-            value=""
             onChange={() => {
               onSegmentChange(segmentIndex);
             }}

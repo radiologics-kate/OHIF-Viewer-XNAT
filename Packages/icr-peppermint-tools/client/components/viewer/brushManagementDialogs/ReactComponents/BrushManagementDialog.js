@@ -309,7 +309,6 @@ export default class BrushManagementDialog extends React.Component {
             <i className="fa fa-times-circle fa-2x" />
           </a>
         </div>
-        <hr />
         <div className="brush-management-list">
           <table className="peppermint-table">
             <tbody>
@@ -346,7 +345,6 @@ export default class BrushManagementDialog extends React.Component {
             </tbody>
           </table>
         </div>
-        <hr />
         <div>
           <a
             className="brush-management-new-button btn btn-sm btn-primary"
