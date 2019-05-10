@@ -160,7 +160,10 @@ export default class BrushSettings extends React.Component {
             <i className="fa fa-times-circle fa-2x" />
           </a>
         </div>
-        <select onChange={this.onGateChange}>
+        <select
+          className="form-themed form-control"
+          onChange={this.onGateChange}
+        >
           {gates.map(gate => (
             <option key={gate.name} value={gate.name}>{`${gate.name} [${
               gate.range[0]

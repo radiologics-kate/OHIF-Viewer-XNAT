@@ -99,7 +99,7 @@ export default class LockedCollectionsListItem extends React.Component {
             {ROIContourArray.map(roiContour => (
               <tr key={roiContour.metadata.uid}>
                 <td />
-                <td>
+                <td className="left-aligned-cell">
                   <i
                     className="fa fa-square"
                     style={{ color: getBrushSegmentColor(roiContour.index) }}

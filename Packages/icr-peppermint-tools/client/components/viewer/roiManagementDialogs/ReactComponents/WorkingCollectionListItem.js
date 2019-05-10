@@ -22,19 +22,19 @@ export default class WorkingCollectionListItem extends React.Component {
     return (
       <tr>
         <td />
-        <td>
+        <td className="left-aligned-cell">
           <i className="fa fa-square" style={{ color: roiContourColor }} />{" "}
           {name}
         </td>
-        <td className="centered-cell">{polygonCount}</td>
-        <td className="centered-cell">
+        <td>{polygonCount}</td>
+        <td>
           <input
             type="radio"
             checked={checked}
             onChange={() => onRoiChange(roiContourIndex)}
           />
         </td>
-        <td className="centered-cell">
+        <td>
           <a
             className="btn btn-sm btn-secondary"
             onClick={() => {

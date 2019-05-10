@@ -65,7 +65,7 @@ export default class FreehandSetNameDialog extends React.Component {
             className="form-themed form-control"
             type="text"
             defaultValue={defaultName}
-            placeHolder="Enter ROI name.."
+            placeholder="Enter ROI name.."
             onChange={this.onTextInputChange}
           />
           <a

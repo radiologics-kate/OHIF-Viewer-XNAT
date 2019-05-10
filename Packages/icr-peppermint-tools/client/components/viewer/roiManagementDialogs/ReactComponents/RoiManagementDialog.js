@@ -280,7 +280,7 @@ export default class RoiManagementDialog extends React.Component {
             <i className="fa fa-times-circle fa-2x" />
           </a>
         </div>
-        <div className="roi-collection-list-body">
+        <div className="roi-management-collection-list-body">
           <table className="peppermint-table">
             <tbody>
               {workingCollectionList}

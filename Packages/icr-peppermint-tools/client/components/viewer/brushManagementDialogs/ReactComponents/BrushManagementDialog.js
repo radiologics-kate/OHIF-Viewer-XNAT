@@ -312,7 +312,7 @@ export default class BrushManagementDialog extends React.Component {
         <div className="brush-management-list">
           <table className="peppermint-table">
             <tbody>
-              <tr className="brush-management-list-collection-info">
+              <tr>
                 <th colSpan="3" className="left-aligned-cell">
                   {roiCollectionInfo.name}
                 </th>
@@ -321,7 +321,7 @@ export default class BrushManagementDialog extends React.Component {
                 </th>
               </tr>
               {roiCollectionInfo.type && (
-                <tr className="brush-management-list-collection-info">
+                <tr>
                   <th colSpan="3" className="left-aligned-cell">
                     Type: {roiCollectionInfo.type}
                   </th>

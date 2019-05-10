@@ -45,10 +45,21 @@
     fill: white
 
   .roi-export-list-body
-    max-height: calc(80vh - 300px);
+    max-height: 300px
+    padding-right: 18px
     overflow-y: auto
     overflow-x: hidden
     display: inline-block
+    theme('scrollbar-color', '$textSecondaryColor $uiGrayDarkest')
+
+    &::-webkit-scrollbar
+      them('background', '$uiGrayDarkest')
+      width: 10px
+
+    &::-webkit-scrollbar-thumb
+      theme('background', '$textSecondaryColor')
+      border-radius: 10px
+      theme('border-right', '2px solid $uiGrayDarkest')
 
     .left-aligned-cell
       text-align: left

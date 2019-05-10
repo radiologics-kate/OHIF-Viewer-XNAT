@@ -11,12 +11,7 @@ Template.ioDialogs.onCreated(() => {
 
 Template.ioDialogs.onRendered(() => {
   const instance = Template.instance();
-  const dialogIds = [
-    "ioProgress",
-    "ioMessage",
-    "ioConfirmationDialog",
-    "ioOverwriteConfirmationDialog"
-  ];
+  const dialogIds = ["ioProgress", "ioMessage", "ioConfirmationDialog"];
 
   dialogIds.forEach(id => {
     const dialog = instance.$("#" + id);
