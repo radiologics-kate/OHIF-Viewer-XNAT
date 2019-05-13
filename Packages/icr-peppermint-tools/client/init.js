@@ -2,6 +2,8 @@ import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import freehand3DModule from "./lib/modules/freehand3DModule.js";
 
+const modules = cornerstoneTools.store.modules;
+
 export default function initialise(configuration = {}) {
   const brushModule = cornerstoneTools.store.modules.brush;
   const brushState = brushModule.state;
@@ -20,8 +22,14 @@ export default function initialise(configuration = {}) {
   brushState.activeGate = brushState.gates[0].name;
   brushState.maxRadius = config.maxRadius;
   cornerstoneTools.register("module", "freehand3D", freehand3DModule);
+
+  const freehand3DStore = modules.freehand3D;
+
   icrXnatRoiSession.set("freehandInterpolate", config.interpolate);
+  freehand3DStore.setters.interpolate(config.interpolate);
+
   icrXnatRoiSession.set("showFreehandStats", config.showFreehandStats);
+  freehand3DStore.setters.displayStats(config.showFreehandStats);
 
   brushModule.getters.activeGateRange = () => {
     const activeGate = brushState.activeGate;

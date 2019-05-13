@@ -67,7 +67,8 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 
 const state = {
   seriesCollection: [],
-  interpolate: false
+  interpolate: false,
+  displayStats: false
 };
 
 function check(object, name) {
@@ -374,6 +375,9 @@ const getters = {
   activeROIContour: getActiveROIContour,
   interpolate: () => {
     return state.interpolate;
+  },
+  displayStats: () => {
+    return state.displayStats;
   }
 };
 
@@ -393,6 +397,9 @@ const setters = {
   decrementPolygonCount,
   interpolate: value => {
     state.interpolate = value;
+  },
+  displayStats: value => {
+    state.displayStats = value;
   }
 };
 

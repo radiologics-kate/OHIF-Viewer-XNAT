@@ -270,6 +270,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
    */
   _pointNearHandle(element, data, coords) {
     const config = this.configuration;
+    const freehand3DStore = this._freehand3DStore;
 
     if (!data.handles || data.handles.points === undefined) {
       return;
@@ -290,7 +291,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     // Check to see if mouse in bounding box of textbox
-    if (config.alwaysShowTextBox && data.handles.textBox) {
+    if (freehand3DStore.getters.displayStats() && data.handles.textBox) {
       if (pointInsideBoundingBox(data.handles.textBox, coords)) {
         return data.handles.textBox;
       }
@@ -371,7 +372,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    if (handle.hasBoundingBox && this.configuration.alwaysShowTextBox) {
+    if (handle.hasBoundingBox && freehand3DStore.getters.displayStats()) {
       // Use default move handler - Can move textbox of locked ROIContours.
       moveHandleNearImagePoint(evt, this, data, handle, interactionType);
       return;
@@ -670,7 +671,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         // Or config is set to show the textBox all the time
         if (
           data.polyBoundingBox &&
-          (this.configuration.alwaysShowTextBox || data.active)
+          (freehand3DStore.getters.displayStats() || data.active)
         ) {
           // If the textbox has not been moved by the user, it should be displayed on the right-most
           // Side of the tool.
