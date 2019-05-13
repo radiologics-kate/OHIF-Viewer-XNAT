@@ -20,6 +20,8 @@ export default class XNATNavigation extends React.Component {
    * @returns {type}  description
    */
   componentDidMount() {
+    console.log(`XNAT Navigation componentDidMount`);
+
     fetchJSON("/data/archive/projects/?format=json")
       .promise.then(result => {
         if (!result) {
@@ -27,6 +29,8 @@ export default class XNATNavigation extends React.Component {
         }
 
         const otherProjects = result.ResultSet.Result;
+
+        console.log(otherProjects);
 
         const activeProjectId = sessionMap.get("session", "projectId");
 

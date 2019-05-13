@@ -1,6 +1,6 @@
 // /data/archive/projects/TEST_Viewer/subjects/XNAT_JPETTS_S00032/experiments?format=json
 
-export const TEST_Viewer_XNAT_JPETTS_S00021_experiments = JSON.parse(`{
+export const TEST_Viewer_XNAT_JPETTS_S00021_experiments = `{
   "ResultSet": {
     "Result": [
       {
@@ -26,4 +26,4 @@ export const TEST_Viewer_XNAT_JPETTS_S00021_experiments = JSON.parse(`{
     ],
     "totalRecords": "2"
   }
-}`);
+}`;

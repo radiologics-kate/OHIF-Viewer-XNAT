@@ -1,6 +1,6 @@
 // /data/archive/projects/TEST_Viewer/subjects?format=json
 
-export const TESTViewer_subjects = JSON.parse(`{
+export const TESTViewer_subjects = `{
   "ResultSet": {
     "Result": [
       {
@@ -14,4 +14,4 @@ export const TESTViewer_subjects = JSON.parse(`{
     ],
     "totalRecords": "1"
   }
-}`);
+}`;

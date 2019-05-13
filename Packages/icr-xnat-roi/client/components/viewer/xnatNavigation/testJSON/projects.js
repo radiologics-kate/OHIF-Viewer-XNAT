@@ -1,6 +1,6 @@
 // /data/archive/projects/?format=json
 
-export const projects = JSON.parse(`{
+export const projects = `{
   "ResultSet": {
     "Result": [
       {
@@ -24,4 +24,4 @@ export const projects = JSON.parse(`{
     ],
     "totalRecords": "2"
   }
-}`);
+}`;

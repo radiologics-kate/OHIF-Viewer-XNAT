@@ -7,27 +7,34 @@ Template.toolbarSection.onCreated(() => {
     const instance = Template.instance();
 
     if (OHIF.uiSettings.leftSidebarOpen) {
-        instance.data.state.set('leftSidebar', 'studies');
+        instance.data.state.set('leftSidebar', 'scanList');
     }
 });
 
 Template.toolbarSection.helpers({
     leftSidebarToggleButtonData() {
         const instance = Template.instance();
+        // JamesAPetts - Return two things
         return {
-            toggleable: true,
-            key: 'leftSidebar',
-            value: instance.data.state,
-            options: [{
-                value: 'studies',
-                svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-studies',
-                svgWidth: 15,
-                svgHeight: 13,
-                bottomLabel: 'Series'
-            }]
-        };
+              toggleable: true,
+              key: 'leftSidebar',
+              value: instance.data.state,
+              options: [{
+                  value: 'scanList',
+                  svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-studies',
+                  svgWidth: 15,
+                  svgHeight: 13,
+                  bottomLabel: 'Scans'
+              },
+              {
+                  value: 'changeSession',
+                  svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-measurements-lesions',
+                  svgWidth: 15,
+                  svgHeight: 13,
+                  bottomLabel: 'XNAT Nav'
+              }]
+          };
     },
-
     rightSidebarToggleButtonData() {
         const instance = Template.instance();
         return {
@@ -36,14 +43,13 @@ Template.toolbarSection.helpers({
             value: instance.data.state,
             options: [{
                 value: 'sessions',
-                svgLink: '/packages/ohif_viewerbase/assets/icons.svg#icon-measurements-lesions',
+                svgLink: '',
                 svgWidth: 18,
                 svgHeight: 10,
                 bottomLabel: 'Change Session'
             }]
         };
     },
-
     toolbarButtons() {
         const extraTools = [];
 

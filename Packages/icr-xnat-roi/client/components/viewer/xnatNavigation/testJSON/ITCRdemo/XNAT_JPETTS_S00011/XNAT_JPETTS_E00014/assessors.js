@@ -1,6 +1,6 @@
 // /data/archive/projects/ITCRdemo/subjects/XNAT_JPETTS_S00011/experiments/XNAT_JPETTS_E00014/assessors?format=json
 
-export const ITCRdemo_XNAT_JPETTS_S00012_experiments_XNAT_JPETTS_E00014_assessors = JSON.parse(`
+export const ITCRdemo_XNAT_JPETTS_S00012_experiments_XNAT_JPETTS_E00014_assessors = `
   {
   "ResultSet": {
     "Result": [
@@ -31,11 +31,11 @@ export const ITCRdemo_XNAT_JPETTS_S00012_experiments_XNAT_JPETTS_E00014_assessor
     ],
     "totalRecords": "2"
   }
-}`);
+}`;
 
 // /data/archive/projects/ITCRdemo/subjects/XNAT_JPETTS_S00011/experiments/XNAT_JPETTS_E00014/assessors/RoiCollection_hjVJT41_AhToh2NyqZN?format=json
 
-export const RoiCollection_hjVJT41_AhToh2NyqZN = JSON.parse(`
+export const RoiCollection_hjVJT41_AhToh2NyqZN = `
   {
   "items": [
     {
@@ -54,11 +54,11 @@ export const RoiCollection_hjVJT41_AhToh2NyqZN = JSON.parse(`
       }
     }
   ]
-}`);
+}`;
 
 // /data/archive/projects/ITCRdemo/subjects/XNAT_JPETTS_S00011/experiments/XNAT_JPETTS_E00014/assessors/RoiCollection_hjVJT41_804wDCwJDLv?format=json
 
-export const RoiCollection_hjVJT41_804wDCwJDLv = JSON.parse(`
+export const RoiCollection_hjVJT41_804wDCwJDLv = `
   {
     "items": [
       {
@@ -78,4 +78,4 @@ export const RoiCollection_hjVJT41_804wDCwJDLv = JSON.parse(`
       }
     ]
   }
-  `);
+  `;

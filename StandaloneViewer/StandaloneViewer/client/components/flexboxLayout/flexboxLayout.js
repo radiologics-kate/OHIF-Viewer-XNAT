@@ -11,10 +11,35 @@ Template.flexboxLayout.events({
 });
 
 Template.flexboxLayout.helpers({
-    leftSidebarOpen() {
-        return Template.instance().data.state.get('leftSidebar');
-    },
-    rightSidebarOpen() {
-        return Template.instance().data.state.get('rightSidebar');
+  leftSidebarOpen() {
+    return Template.instance().data.state.get('leftSidebar') && true;
+  },
+  leftSidebarScanList() {
+      const leftSidebarValue = Template.instance().data.state.get('leftSidebar');
+
+      console.log(leftSidebarValue);
+
+      if (leftSidebarValue === "scanList") {
+
+        console.log(true);
+        return true;
+      }
+
+      console.log(false);
+
+      return;
+  },
+  leftSidebarChangeSession() {
+    const leftSidebarValue = Template.instance().data.state.get('leftSidebar');
+
+    if (leftSidebarValue === "changeSession") {
+      return true;
     }
+
+    return;
+    //return Template.instance().data.state.get('leftSidebarChangeSession');
+  },
+  rightSidebarOpen() {
+      return Template.instance().data.state.get('rightSidebar');
+  }
 });

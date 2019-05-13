@@ -1,6 +1,6 @@
 // /data/archive/projects/ITCRdemo/subjects?format=json
 
-export const ITCRdemo_subjects = JSON.parse(`{
+export const ITCRdemo_subjects = `{
   "ResultSet": {
     "Result": [
       {
@@ -22,4 +22,4 @@ export const ITCRdemo_subjects = JSON.parse(`{
     ],
     "totalRecords": "2"
   }
-}`);
+}`;

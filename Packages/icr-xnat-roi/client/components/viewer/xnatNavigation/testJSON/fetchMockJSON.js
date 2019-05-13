@@ -32,7 +32,7 @@ export default function(uri) {
   return makeCancelable(
     new Promise((resolve, reject) => {
       setTimeout(function() {
-        resolve(uriToJson[uri]);
+        resolve(JSON.parse(uriToJson[uri]));
       }, 20);
     })
   );

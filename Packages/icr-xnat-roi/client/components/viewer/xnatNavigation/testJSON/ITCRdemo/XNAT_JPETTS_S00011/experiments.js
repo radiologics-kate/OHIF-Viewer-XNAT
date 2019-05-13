@@ -1,6 +1,6 @@
 // /data/archive/projects/ITCRdemo/subjects/XNAT_JPETTS_S00011/experiments?format=json
 
-export const ITCRdemo_XNAT_JPETTS_S00011_experiments = JSON.parse(`{
+export const ITCRdemo_XNAT_JPETTS_S00011_experiments = `{
   "ResultSet": {
     "Result": [
       {
@@ -16,4 +16,4 @@ export const ITCRdemo_XNAT_JPETTS_S00011_experiments = JSON.parse(`{
     ],
     "totalRecords": "1"
   }
-}`);
+}`;
