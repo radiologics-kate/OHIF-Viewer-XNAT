@@ -35,7 +35,7 @@ export default class HelpMenuXNAT extends React.Component {
 
   insertHelpSection() {
     const { selected } = this.state;
-    const projectId = sessionMap.get("session", "projectId");
+    const projectId = sessionMap.getProject();
 
     switch (selected) {
       case "Export":

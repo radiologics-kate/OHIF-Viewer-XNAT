@@ -12,9 +12,9 @@ export default class XNATSession extends React.Component {
     super(props);
 
     const active =
-      this.props.projectId === sessionMap.get("session", "projectId") &&
-      this.props.subjectId === sessionMap.get("session", "subjectId") &&
-      this.props.ID === sessionMap.get("session", "experimentId");
+      this.props.projectId === sessionMap.getProject() &&
+      this.props.subjectId === sessionMap.getSubject() &&
+      this.props.ID === sessionMap.getExperiment();
 
     const shared = this.props.parentProjectId !== this.props.projectId;
 
@@ -29,8 +29,6 @@ export default class XNATSession extends React.Component {
     this.onViewSessionClick = this.onViewSessionClick.bind(this);
 
     this._cancelablePromises = [];
-
-    console.log(this);
 
     this._fetchROICollectionInfo();
   }

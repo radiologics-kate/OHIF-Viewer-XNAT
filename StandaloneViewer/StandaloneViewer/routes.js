@@ -79,9 +79,9 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
             experimentId = query.experimentId;
             experimentLabel = query.experimentLabel;
-            subjectId = query.subjectId;              //
-            projectId = query.projectId;              // = >  Check if they are still needed as session variables.
-            parentProjectId = query.parentProjectId ? query.parentProjectId : projectId; //
+            subjectId = query.subjectId;
+            projectId = query.projectId;
+            parentProjectId = query.parentProjectId ? query.parentProjectId : projectId;
           } else {
             console.error('insufficient query parameters.');
           }
@@ -90,17 +90,23 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
             console.log(`This experiment is shared view of ${experimentId} from ${parentProjectId}`);
           }
 
-          sessionMap.setSession({
-            projectId,
-            subjectId,
-            experimentId,
-            experimentLabel
-          });
+          sessionMap.setProject(projectId);
+          sessionMap.setParentProject(parentProjectId);
+          sessionMap.setSubject(subjectId);
+
 
           if (experimentId) {
             // Single Session
-            //
             checkAndSetPermissions(projectId, parentProjectId);
+
+            sessionMap.setSession({
+              projectId,
+              subjectId,
+              experimentId,
+              experimentLabel
+            });
+
+            sessionMap.setExperiment(experimentId);
 
             // Build JSON GET url.
             const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
@@ -113,7 +119,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   return;
               }
 
-              sessionMap.set(json, {
+              sessionMap.setScan(json, {
                 experimentId,
                 experimentLabel,
                 subjectId,
@@ -155,6 +161,14 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
               for (let i = 0; i < experimentList.length; i++) {
                 const experimentIdI = experimentList[i].ID;
+                const experimentLabelI = experimentList[i].label;
+
+                sessionMap.setSession({
+                  projectId,
+                  subjectId,
+                  experimentId: experimentIdI,
+                  experimentLabel: experimentLabelI
+                });
 
                 const experimentJSONFetchUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentIdI}`;
 
@@ -173,7 +187,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   const experimentJsonI = jsonFiles[i];
                   const studiesI = experimentJsonI.studies;
 
-                  sessionMap.set(experimentJsonI, {
+                  sessionMap.setScan(experimentJsonI, {
                     experimentId: experimentList[i].ID,
                     experimentLabel: experimentList[i].label,
                     subjectId,
@@ -286,11 +300,11 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
                   const parsedJSON = JSON.parse(oReq.responseText);
 
-                  sessionMap.set(parsedJSON, {
+                  sessionMap.setScan(parsedJSON, {
                     experimentId: 'XNAT_JPETTS_E00014',
                     experimentLabel: 'Patient2',
                     subjectId: 'XNAT_JPETTS_S00011',
-                    projectId: 'TEST_PROJECT_ID',
+                    projectId: 'ITCRdemo',
                     parentProjectId: 'ITCRdemo'
                   });
 
@@ -300,6 +314,11 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                     experimentId: 'XNAT_JPETTS_E00014',
                     experimentLabel: 'Patient2'
                   });
+
+                  sessionMap.setProject('ITCRdemo');
+                  sessionMap.setParentProject('ITCRdemo');
+                  sessionMap.setSubject('XNAT_JPETTS_S00011');
+                  sessionMap.setExperiment('XNAT_JPETTS_E00014')
 
                   this.data = parsedJSON
 

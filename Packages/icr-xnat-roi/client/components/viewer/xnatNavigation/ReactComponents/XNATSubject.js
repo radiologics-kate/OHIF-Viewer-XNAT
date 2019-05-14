@@ -17,10 +17,9 @@ export default class XNATSubject extends React.Component {
     super(props);
 
     const active =
-      this.props.projectId === sessionMap.get("session", "projectId") &&
-      this.props.ID === sessionMap.get("session", "subjectId");
-    const subjectViewActive =
-      active && sessionMap.get("session", "experimentId") === undefined;
+      this.props.projectId === sessionMap.getProject() &&
+      this.props.ID === sessionMap.getSubject();
+    const subjectViewActive = active && !sessionMap.getExperiment();
 
     const shared = this.props.parentProjectId !== this.props.projectId;
 

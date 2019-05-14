@@ -111,7 +111,7 @@ export default class RoiImportListDialog extends React.Component {
   }
 
   /**
-   * componentDidMount - On mounting, fetch a list of available projects from XNAT.
+   * componentDidMount - On mounting, fetch a list of available ROICollections from XNAT.
    *
    * @returns {type}  description
    */
@@ -122,31 +122,38 @@ export default class RoiImportListDialog extends React.Component {
       return;
     }
 
-    this._seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-    this._roiImporter = new RoiImporter(this._seriesInstanceUid);
+    const sessions = sessionMap.getSession();
+
+    console.log(`sessions:`);
+    console.log(sessions);
+
+    this._subjectId = sessionMap.getSubject();
+    this._projectId = sessionMap.getProject();
+
+    const promises = [];
+
+    for (let i = 0; i < sessions.length; i++) {
+      const experimentId = sessions[i].experimentId;
+
+      const cancelablePromise = fetchJSON(
+        `/data/archive/projects/${this._projectId}/subjects/${
+          this._subjectId
+        }/experiments/${experimentId}/assessors?format=json`
+      );
+      promises.push(cancelablePromise.promise);
+      this._cancelablePromises.push(cancelablePromise);
+    }
+
     this._volumeManagementLabels = this._getVolumeManagementLabels();
-    this._experimentId = sessionMap.get(
-      this._seriesInstanceUid,
-      "experimentId"
-    );
-    this._subjectId = sessionMap.get(this._seriesInstanceUid, "subjectId");
-    this._projectId = sessionMap.get(this._seriesInstanceUid, "projectId");
 
-    const cancelablePromise = fetchJSON(
-      `/data/archive/projects/${this._projectId}/subjects/${
-        this._subjectId
-      }/experiments/${this._experimentId}/assessors?format=json`
-    );
+    Promise.all(promises).then(sessionAssessorLists => {
+      const roiCollectionPromises = [];
 
-    this._cancelablePromises.push(cancelablePromise);
+      console.log(`sessionAssessorLists:`);
+      console.log(sessionAssessorLists);
 
-    cancelablePromise.promise
-      .then(sessionAssessorList => {
-        if (!sessionAssessorList) {
-          this.setState({ importListReady: true });
-
-          return;
-        }
+      for (let i = 0; i < sessionAssessorLists.length; i++) {
+        const sessionAssessorList = sessionAssessorLists[i];
 
         const assessors = sessionAssessorList.ResultSet.Result;
 
@@ -155,64 +162,78 @@ export default class RoiImportListDialog extends React.Component {
             assessor => assessor.xsiType === "icr:roiCollectionData"
           )
         ) {
-          // No ROICollections
-          this.setState({ importListReady: true });
-
-          return;
+          continue;
         }
 
-        const promises = [];
+        const experimentId = assessors[0].session_ID;
 
         for (let i = 0; i < assessors.length; i++) {
           if (assessors[i].xsiType === "icr:roiCollectionData") {
             const cancelablePromise = fetchJSON(
               `/data/archive/projects/${this._projectId}/subjects/${
                 this._subjectId
-              }/experiments/${this._experimentId}/assessors/${
+              }/experiments/${experimentId}/assessors/${
                 assessors[i].ID
               }?format=json`
             );
 
             this._cancelablePromises.push(cancelablePromise);
 
-            promises.push(cancelablePromise.promise);
+            roiCollectionPromises.push(cancelablePromise.promise);
           }
         }
+      }
 
-        const importList = [];
+      console.log(`roiCollectionPromises:`);
+      console.log(roiCollectionPromises);
 
-        Promise.all(promises).then(promisesJSON => {
-          promisesJSON.forEach(roiCollectionInfo => {
-            const data_fields = roiCollectionInfo.items[0].data_fields;
+      if (!roiCollectionPromises.length) {
+        this.setState({ importListReady: true });
 
-            if (this._collectionEligibleForImport(roiCollectionInfo)) {
-              importList.push({
-                collectionType: data_fields.collectionType,
-                label: data_fields.label,
-                name: data_fields.name,
-                getFilesUri: `/data/archive/experiments/${
-                  this._experimentId
-                }/assessors/${data_fields.ID}/files?format=json`
-              });
-            }
-          });
+        return;
+      }
 
-          const selectedCheckboxes = [];
+      const importList = [];
 
-          for (let i = 0; i < importList.length; i++) {
-            selectedCheckboxes.push(true);
+      Promise.all(roiCollectionPromises).then(promisesJSON => {
+        promisesJSON.forEach(roiCollectionInfo => {
+          const data_fields = roiCollectionInfo.items[0].data_fields;
+
+          const referencedScan = this._getReferencedScan(roiCollectionInfo);
+
+          if (
+            referencedScan &&
+            this._collectionEligibleForImport(roiCollectionInfo)
+          ) {
+            importList.push({
+              collectionType: data_fields.collectionType,
+              label: data_fields.label,
+              experimentId: data_fields.imageSession_ID,
+              referencedSeriesInstanceUid: referencedScan.seriesInstanceUid,
+              referencedSeriesNumber: referencedScan.seriesNumber,
+              name: data_fields.name,
+              getFilesUri: `/data/archive/experiments/${
+                data_fields.imageSession_ID
+              }/assessors/${data_fields.ID}/files?format=json`
+            });
           }
-
-          console.log(importList);
-
-          this.setState({
-            importList,
-            importListReady: true,
-            selectedCheckboxes
-          });
         });
-      })
-      .catch(err => console.log(err));
+
+        const selectedCheckboxes = [];
+
+        for (let i = 0; i < importList.length; i++) {
+          selectedCheckboxes.push(true);
+        }
+
+        console.log(importList);
+
+        this.setState({
+          importList,
+          importListReady: true,
+          selectedCheckboxes
+        });
+      });
+    });
   }
 
   _closeDialog() {
@@ -259,6 +280,10 @@ export default class RoiImportListDialog extends React.Component {
    * @returns {null}
    */
   async _getAndImportFile(uri, roiCollectionInfo) {
+    const roiImporter = new RoiImporter(
+      roiCollectionInfo.referencedSeriesInstanceUid
+    );
+
     switch (roiCollectionInfo.collectionType) {
       case "AIM":
         this._updateImportingText(roiCollectionInfo.name);
@@ -268,7 +293,7 @@ export default class RoiImportListDialog extends React.Component {
           break;
         }
 
-        this._roiImporter.importAIMfile(
+        roiImporter.importAIMfile(
           aimFile,
           roiCollectionInfo.name,
           roiCollectionInfo.label
@@ -282,7 +307,7 @@ export default class RoiImportListDialog extends React.Component {
           break;
         }
 
-        this._roiImporter.importRTStruct(
+        roiImporter.importRTStruct(
           rtStructFile,
           roiCollectionInfo.name,
           roiCollectionInfo.label
@@ -344,6 +369,13 @@ export default class RoiImportListDialog extends React.Component {
       return false;
     }
 
+    return true;
+  }
+
+  _getReferencedScan(collectionInfoJSON) {
+    const item = collectionInfoJSON.items[0];
+    const children = item.children;
+
     // Check the collection references this seriesInstanceUid.
     for (let i = 0; i < children.length; i++) {
       if (children[i].field === "references/seriesUID") {
@@ -353,14 +385,14 @@ export default class RoiImportListDialog extends React.Component {
           const seriesInstanceUid =
             referencedSeriesInstanceUidList[j].data_fields.seriesUID;
 
-          if (seriesInstanceUid === this._seriesInstanceUid) {
-            return true;
+          const scan = sessionMap.getScan(seriesInstanceUid);
+
+          if (scan) {
+            return scan;
           }
         }
       }
     }
-
-    return false;
   }
 
   /** @private
@@ -373,21 +405,19 @@ export default class RoiImportListDialog extends React.Component {
     const freehand3DStore = modules.freehand3D;
     const structureSetUids = [];
 
-    const series = freehand3DStore.getters.series(this._seriesInstanceUid);
+    const seriesCollection = freehand3DStore.state.seriesCollection;
 
-    if (!series) {
-      return structureSetUids;
-    }
+    seriesCollection.forEach(series => {
+      const structureSetCollection = series.structureSetCollection;
 
-    const structureSetCollection = series.structureSetCollection;
+      for (let i = 0; i < structureSetCollection.length; i++) {
+        const label = structureSetCollection[i].uid;
 
-    for (let i = 0; i < structureSetCollection.length; i++) {
-      const label = structureSetCollection[i].uid;
-
-      if (label !== "DEFAULT") {
-        structureSetUids.push(label);
+        if (label !== "DEFAULT") {
+          structureSetUids.push(label);
+        }
       }
-    }
+    });
 
     return structureSetUids;
   }
@@ -421,9 +451,7 @@ export default class RoiImportListDialog extends React.Component {
           <table>
             <tbody>
               <tr>
-                <th>Name</th>
                 <th>
-                  Import{" "}
                   <input
                     type="checkbox"
                     checked={selectAllChecked}
@@ -431,12 +459,12 @@ export default class RoiImportListDialog extends React.Component {
                     onChange={this.onChangeSelectAllCheckbox}
                   />
                 </th>
-                <th>Type</th>
+                <th>Name</th>
+                <th>Referenced Scan</th>
               </tr>
 
               {importList.map((roiCollection, index) => (
                 <tr key={`${roiCollection.name}_${roiCollection.index}`}>
-                  <td className="roi-import-left-cell">{roiCollection.name}</td>
                   <td>
                     <input
                       className="roi-import-list-item-check"
@@ -447,8 +475,9 @@ export default class RoiImportListDialog extends React.Component {
                       value={selectedCheckboxes[index]}
                     />
                   </td>
+                  <td className="roi-import-left-cell">{roiCollection.name}</td>
                   <td className="roi-import-left-cell">
-                    {roiCollection.collectionType}
+                    {roiCollection.referencedSeriesNumber}
                   </td>
                 </tr>
               ))}
@@ -467,7 +496,7 @@ export default class RoiImportListDialog extends React.Component {
     return (
       <div>
         <div className="roi-import-list-header">
-          <h3>Import ROI Collections</h3>
+          <h3>Import ROI Contour Collections</h3>
           {importing ? null : (
             <a
               className="roi-import-list-cancel btn btn-sm btn-secondary"

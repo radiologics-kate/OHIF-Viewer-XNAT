@@ -11,7 +11,9 @@ export default class XNATProject extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    const active = this.props.ID === sessionMap.get("session", "projectId");
+    console.log(`XNAT PROJECT: ${this.props.ID}, ${sessionMap.getProject()}`);
+
+    const active = this.props.ID === sessionMap.getProject();
 
     this.state = {
       subjects: [],

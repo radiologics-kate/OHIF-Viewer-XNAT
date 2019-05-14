@@ -10,14 +10,20 @@ export default class AIMExporter {
   constructor(aimWriter) {
     this._aimString = aimWriter.toString();
     this._seriesInstanceUID = aimWriter.seriesInfo.seriesInstanceUid;
-    this._projectID = sessionMap.get(
-      this._seriesInstanceUID,
-      "parentProjectId"
-    );
-    this._experimentID = sessionMap.get(
+
+    console.log(`AIM Exporter constructor:`);
+    console.log(aimWriter.seriesInfo);
+
+    this._projectID = sessionMap.getParentProject();
+
+    this._experimentID = sessionMap.getScan(
       this._seriesInstanceUID,
       "experimentId"
     );
+
+    console.log(this._projectID);
+    console.log(this._experimentID);
+
     this._label = aimWriter.label;
   }
 
@@ -37,6 +43,8 @@ export default class AIMExporter {
     }/sessions/${this._experimentID}/collections/${
       this._label
     }?type=AIM&overwrite=false&${csrfTokenParameter}`;
+
+    console.log(putUrl);
 
     await this._PUTAIM(putUrl).catch(error => {
       putFailed = true;

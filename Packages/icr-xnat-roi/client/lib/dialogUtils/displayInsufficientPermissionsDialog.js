@@ -15,8 +15,7 @@ export default function displayInsufficientPermissionsDialog(
   seriesInstanceUid,
   readOrWrite = "read"
 ) {
-  const projectId = sessionMap.get(seriesInstanceUid, "projectId");
-  const experimentLabel = sessionMap.get(seriesInstanceUid, "experimentLabel");
+  const { experimentLabel, projectId } = sessionMap.getScan(seriesInstanceUid);
 
   const title = "Insufficient Permissions";
   const body =

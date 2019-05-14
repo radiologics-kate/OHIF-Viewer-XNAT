@@ -126,12 +126,12 @@ export default class MaskImportListDialog extends React.Component {
 
     this._seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
     this._maskImporter = new MaskImporter(this._seriesInstanceUid);
-    this._experimentId = sessionMap.get(
-      this._seriesInstanceUid,
-      "experimentId"
-    );
-    this._subjectId = sessionMap.get(this._seriesInstanceUid, "subjectId");
-    this._projectId = sessionMap.get(this._seriesInstanceUid, "projectId");
+
+    const scan = sessionMap.getScan(this._seriesInstanceUid);
+
+    this._experimentId = scan.experimentId;
+    this._subjectId = scan.subjectId;
+    this._projectId = scan.projectId;
 
     const cancelablePromise = fetchJSON(
       `/data/archive/projects/${this._projectId}/subjects/${

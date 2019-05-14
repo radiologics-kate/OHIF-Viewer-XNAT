@@ -11,8 +11,7 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
  * @returns {null}
  */
 export function displayExportFailedDialog(seriesInstanceUid) {
-  const projectId = sessionMap.get(seriesInstanceUid, "projectId");
-  const experimentLabel = sessionMap.get(seriesInstanceUid, "experimentLabel");
+  const { experimentLabel, projectId } = sessionMap.getScan(seriesInstanceUid);
 
   const title = "Export Failed";
   const body =

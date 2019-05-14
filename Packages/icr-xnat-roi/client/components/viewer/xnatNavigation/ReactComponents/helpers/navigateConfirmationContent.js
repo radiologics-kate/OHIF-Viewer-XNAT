@@ -9,7 +9,7 @@ export default function(unsavedRegions) {
     body += "You have unsaved contours on:</br>";
 
     for (let i = 0; i < contours.length; i++) {
-      body += `${sessionMap.get(contours[i], "seriesDescription")}</br>`;
+      body += `${sessionMap.getScan(contours[i], "seriesDescription")}</br>`;
     }
   }
 
@@ -19,7 +19,7 @@ export default function(unsavedRegions) {
     body += "You have unsaved masks on:</br>";
 
     for (let i = 0; i < masks.length; i++) {
-      body += ` ${sessionMap.get(masks[i], "seriesDescription")}</br>`;
+      body += ` ${sessionMap.getScan(masks[i], "seriesDescription")}</br>`;
     }
   }
 

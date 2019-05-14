@@ -10,14 +10,13 @@ export default class DICOMSEGExporter {
   constructor(segBlob, seriesInstanceUid, label, name) {
     this._payload = segBlob;
     this._seriesInstanceUID = seriesInstanceUid;
-    this._projectID = sessionMap.get(
-      this._seriesInstanceUID,
-      "parentProjectId"
-    );
-    this._experimentID = sessionMap.get(
-      this._seriesInstanceUID,
+
+    this._projectID = sessionMap.getParentProject();
+    this._experimentID = sessionMap.getScan(
+      this._seriesInstanceUid,
       "experimentId"
     );
+
     this._label = label;
   }
 
