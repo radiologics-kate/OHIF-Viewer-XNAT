@@ -13,7 +13,7 @@ export default class DICOMSEGExporter {
 
     this._projectID = sessionMap.getParentProject();
     this._experimentID = sessionMap.getScan(
-      this._seriesInstanceUid,
+      this._seriesInstanceUID,
       "experimentId"
     );
 

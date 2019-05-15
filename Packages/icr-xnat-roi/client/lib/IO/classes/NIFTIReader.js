@@ -33,8 +33,8 @@ const THEO_NAMES = [
  * @class NIFTIReader - Reads a NIFTI file and returns a set of masks.
  */
 export default class NIFTIReader {
-  constructor(seriesInfo) {
-    this._seriesInfo = seriesInfo;
+  constructor(seriesInstanceUid) {
+    this._seriesInstanceUid = seriesInstanceUid;
     this._metadataProvider = OHIF.viewer.metadataProvider;
   }
 
@@ -42,11 +42,11 @@ export default class NIFTIReader {
    * read - Reads the given NIFTI file.
    *
    * @param  {ArrayBuffer} niftiArrayBuffer The NIFTI file as an array buffer.
-   * @param  {object} stackToolState  The toolstate for the image stack.
+   * @param  {string[]} imageIds A list of imageIds in the stack.
    * @param  {object} dimensions The dimensions of the NIFTI volume.
    * @returns {object[]}  An array of masks.
    */
-  read(niftiArrayBuffer, stackToolState, dimensions) {
+  read(niftiArrayBuffer, imageIds, dimensions) {
     this._niftiArrayBuffer = niftiArrayBuffer;
 
     console.log("_niftiArrayBuffer");
@@ -71,7 +71,6 @@ export default class NIFTIReader {
       } dimensional data`;
     }
 
-    const imageIds = stackToolState.data[0].imageIds;
     const metadataOfFirstImage = this._metadataProvider.getMetadata(
       imageIds[0]
     );
@@ -306,11 +305,7 @@ export default class NIFTIReader {
    * @returns {null}
    */
   _setSegMetadata(segIndex, metadata) {
-    modules.brush.setters.metadata(
-      this._seriesInfo.seriesInstanceUid,
-      segIndex,
-      metadata
-    );
+    modules.brush.setters.metadata(this._seriesInstanceUid, segIndex, metadata);
   }
 
   /**

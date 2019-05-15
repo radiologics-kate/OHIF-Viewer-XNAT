@@ -7,28 +7,28 @@ const dcmjs = require("dcmjs");
 const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 
+const stackSpecificStateManager = cornerstoneTools.stackSpecificStateManager;
+
 const brushModule = cornerstoneTools.store.modules.brush;
 
 export default class MaskImporter {
-  constructor() {
-    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-    const element = activeEnabledElement.element;
-    const stackToolState = cornerstoneTools.getToolState(element, "stack");
-    const imageIds = stackToolState.data[0].imageIds;
-    const image = cornerstone.getImage(element);
+  constructor(seriesInstanceUid) {
+    const imageIds = this._getImageIds(seriesInstanceUid);
+
+    const metaData = OHIF.viewer.metadataProvider.getMetadata(imageIds[0]);
 
     const dimensions = {
-      rows: image.rows,
-      columns: image.columns,
+      rows: metaData.instance.rows,
+      columns: metaData.instance.columns,
       slices: imageIds.length
     };
 
     dimensions.sliceLength = dimensions.rows * dimensions.columns;
     dimensions.cube = dimensions.sliceLength * dimensions.slices;
 
-    this._stackToolState = stackToolState;
+    this._seriesInstanceUid = seriesInstanceUid;
+    this._imageIds = imageIds;
     this._dimensions = dimensions;
-    this._seriesInfo = SeriesInfoProvider.getActiveSeriesInfo();
 
     const colorMapId = cornerstoneTools.store.modules.brush.state.colorMapId;
     const colormap = cornerstone.colors.getColormap(colorMapId);
@@ -37,42 +37,79 @@ export default class MaskImporter {
   }
 
   /**
+   * _getImageIds - Returns the imageIds for the stack.
+   *
+   * @param  {type} seriesInstanceUid description
+   * @returns {type}                   description
+   */
+  _getImageIds(seriesInstanceUid) {
+    const imageIds = [];
+    // Get the imageId of each sopInstance in the series
+    const studies = OHIF.viewer.StudyMetadataList.all();
+
+    for (let i = 0; i < studies.length; i++) {
+      const series = studies[i].getSeriesByUID(seriesInstanceUid);
+      if (series !== undefined) {
+        const instanceCount = series.getInstanceCount();
+
+        for (let j = 0; j < instanceCount; j++) {
+          const instance = series.getInstanceByIndex(j);
+          const imageId = instance.getImageId();
+
+          imageIds.push(imageId);
+        }
+      }
+    }
+
+    return imageIds;
+  }
+
+  /**
    * importDICOMSEG - Imports a DICOM SEG file to CornerstoneTools.
    *
    * @param  {ArrayBuffer} dicomSegArrayBuffer An arraybuffer of the DICOM SEG object.
-   * @param  {string} collectionName      The name of the ROICollection.
-   * @param  {string} collectionLabel     The label of the ROICollection.
    * @returns {null}                     description
    */
-  importDICOMSEG(dicomSegArrayBuffer, collectionName, collectionLabel) {
-    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-    const element = activeEnabledElement.element;
+  importDICOMSEG(dicomSegArrayBuffer) {
+    return new Promise(resolve => {
+      const imageIds = this._imageIds;
 
-    const stackToolState = cornerstoneTools.getToolState(element, "stack");
+      const imagePromises = [];
 
-    const imageIds = stackToolState.data[0].imageIds;
+      for (let i = 0; i < imageIds.length; i++) {
+        imagePromises.push(cornerstone.loadAndCacheImage(imageIds[i]));
+      }
 
-    const {
-      toolState,
-      segMetadata
-    } = dcmjs.adapters.Cornerstone.Segmentation.generateToolState(
-      imageIds,
-      dicomSegArrayBuffer,
-      cornerstone.metaData
-    );
+      Promise.all(imagePromises).then(() => {
+        const {
+          toolState,
+          segMetadata
+        } = dcmjs.adapters.Cornerstone.Segmentation.generateToolState(
+          imageIds,
+          dicomSegArrayBuffer,
+          cornerstone.metaData
+        );
 
-    this._clearMaskMetadata();
-    this._clearGlobalBrushToolState(
-      globalToolStateManager.saveToolState(),
-      imageIds
-    );
-    this._addBrushToolStateToGlobalToolState(toolState);
+        this._clearMaskMetadata();
+        this._clearGlobalBrushToolState(
+          globalToolStateManager.saveToolState(),
+          imageIds
+        );
+        this._addBrushToolStateToGlobalToolState(toolState);
 
-    const seriesInstanceUid = this._seriesInfo.seriesInstanceUid;
+        const seriesInstanceUid = this._seriesInstanceUid;
 
-    for (let i = 0; i < segMetadata.data.length; i++) {
-      brushModule.setters.metadata(seriesInstanceUid, i, segMetadata.data[i]);
-    }
+        for (let i = 0; i < segMetadata.data.length; i++) {
+          brushModule.setters.metadata(
+            seriesInstanceUid,
+            i,
+            segMetadata.data[i]
+          );
+        }
+
+        resolve();
+      });
+    });
   }
 
   /**
@@ -101,18 +138,16 @@ export default class MaskImporter {
    * importNIFTI - Imports a NIFTI file to CornerstoneTools.
    *
    * @param  {ArrayBuffer} niftyArrayBuffer An arraybuffer of the NIFTI object.
-   * @param  {string} collectionName      The name of the ROICollection.
-   * @param  {string} collectionLabel     The label of the ROICollection.
    * @returns {null}                     description
    */
-  importNIFTI(niftyArrayBuffer, collectionName, collectionLabel) {
+  importNIFTI(niftyArrayBuffer) {
     this._clearMaskMetadata();
 
-    const niftiReader = new NIFTIReader(this._seriesInfo, collectionName);
+    const niftiReader = new NIFTIReader(this._seriesInstanceUid);
 
     const masks = niftiReader.read(
       niftyArrayBuffer,
-      this._stackToolState,
+      this._imageIds,
       this._dimensions
     );
 
@@ -126,11 +161,7 @@ export default class MaskImporter {
    */
   _clearMaskMetadata() {
     for (let i = 0; i < this._numberOfColors; i++) {
-      brushModule.setters.metadata(
-        this._seriesInfo.seriesInstanceUid,
-        i,
-        undefined
-      );
+      brushModule.setters.metadata(this._seriesInstanceUid, i, undefined);
     }
   }
 
@@ -159,11 +190,10 @@ export default class MaskImporter {
    * @returns {null}
    */
   _addNIFTIMasksToCornerstone(masks) {
-    const stackToolState = this._stackToolState;
     const dimensions = this._dimensions;
     const sliceLength = dimensions.sliceLength;
 
-    const imageIds = stackToolState.data[0].imageIds;
+    const imageIds = this._imageIds;
     const toolState = globalToolStateManager.saveToolState();
 
     this._initialiseBrushStateNifti(toolState, imageIds);

@@ -11,9 +11,6 @@ export default class AIMExporter {
     this._aimString = aimWriter.toString();
     this._seriesInstanceUID = aimWriter.seriesInfo.seriesInstanceUid;
 
-    console.log(`AIM Exporter constructor:`);
-    console.log(aimWriter.seriesInfo);
-
     this._projectID = sessionMap.getParentProject();
 
     this._experimentID = sessionMap.getScan(

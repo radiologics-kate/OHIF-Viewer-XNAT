@@ -27,7 +27,7 @@ export default class RoiImportListDialog extends React.Component {
     };
 
     this._cancelablePromises = [];
-    this._validTypes = validTypes = ["AIM", "RTSTRUCT"];
+    this._validTypes = ["AIM", "RTSTRUCT"];
 
     this.onChangeCheckbox = this.onChangeCheckbox.bind(this);
     this.onChangeSelectAllCheckbox = this.onChangeSelectAllCheckbox.bind(this);
@@ -209,6 +209,7 @@ export default class RoiImportListDialog extends React.Component {
               collectionType: data_fields.collectionType,
               label: data_fields.label,
               experimentId: data_fields.imageSession_ID,
+              experimentLabel: referencedScan.experimentLabel,
               referencedSeriesInstanceUid: referencedScan.seriesInstanceUid,
               referencedSeriesNumber: referencedScan.seriesNumber,
               name: data_fields.name,
@@ -477,7 +478,9 @@ export default class RoiImportListDialog extends React.Component {
                   </td>
                   <td className="roi-import-left-cell">{roiCollection.name}</td>
                   <td className="roi-import-left-cell">
-                    {roiCollection.referencedSeriesNumber}
+                    {`${roiCollection.experimentLabel} - ${
+                      roiCollection.referencedSeriesNumber
+                    }`}
                   </td>
                 </tr>
               ))}
