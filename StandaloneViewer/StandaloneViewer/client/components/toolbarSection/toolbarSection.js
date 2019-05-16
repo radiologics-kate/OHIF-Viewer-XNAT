@@ -324,12 +324,6 @@ Template.toolbarSection.helpers({
             title: 'Settings',
             classes: 'imageViewerCommand',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-settings'
-          },
-          {
-            id: 'segManagement',
-            title: 'Seg Management',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-seg-management-menu'
           }
         ];
 

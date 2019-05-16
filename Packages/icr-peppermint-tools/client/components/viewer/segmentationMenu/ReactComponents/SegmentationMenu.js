@@ -1,5 +1,5 @@
 import React from "react";
-import BrushManagementListItem from "./BrushManagementListItem.js";
+import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
@@ -12,12 +12,11 @@ import getBrushSegmentColor from "../../../../lib/util/getBrushSegmentColor.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
-export default class BrushManagementDialog extends React.Component {
+export default class SegmentationMenu extends React.Component {
   constructor(props = {}) {
     super(props);
 
     this.onNewSegmentButtonClick = this.onNewSegmentButtonClick.bind(this);
-    this.onCancelButtonClick = this.onCancelButtonClick.bind(this);
     this.onSegmentChange = this.onSegmentChange.bind(this);
     this.onShowHideClick = this.onShowHideClick.bind(this);
     this.onEditClick = this.onEditClick.bind(this);
@@ -35,7 +34,8 @@ export default class BrushManagementDialog extends React.Component {
       segments: [],
       visibleSegments: [],
       deleteConfirmationOpen: false,
-      segmentToDelete: 0
+      segmentToDelete: 0,
+      activeSegmentIndex: 0
     };
 
     console.log(`TEST:`);
@@ -61,7 +61,8 @@ export default class BrushManagementDialog extends React.Component {
     this.setState({
       roiCollectionInfo,
       segments,
-      visibleSegments
+      visibleSegments,
+      activeSegmentIndex: brushModule.state.drawColorId
     });
   }
 
@@ -84,21 +85,16 @@ export default class BrushManagementDialog extends React.Component {
 
     for (let i = 0; i < numberOfColors; i++) {
       if (!segmentMetadata[i]) {
-        brushModule.state.drawColorId = i;
-        this._closeDialog();
         newSegmentInput(i);
         break;
       }
     }
   }
 
-  onCancelButtonClick() {
-    this._closeDialog();
-  }
-
   onSegmentChange(segmentIndex) {
     brushModule.state.drawColorId = segmentIndex;
-    this._closeDialog();
+
+    this.setState({ activeSegmentIndex: segmentIndex });
   }
 
   onShowHideClick(segmentIndex) {
@@ -121,7 +117,6 @@ export default class BrushManagementDialog extends React.Component {
   }
 
   onEditClick(segmentIndex, metadata) {
-    this._closeDialog();
     editSegmentInput(segmentIndex, metadata);
   }
 
@@ -155,12 +150,6 @@ export default class BrushManagementDialog extends React.Component {
     });
   }
 
-  _closeDialog() {
-    const dialog = document.getElementById("brushManagementDialog");
-
-    dialog.close();
-  }
-
   _roiCollectionInfo() {
     const importInfo = brushModule.state.import;
     const seriesInstanceUid = this._seriesInstanceUid;
@@ -176,7 +165,7 @@ export default class BrushManagementDialog extends React.Component {
     }
 
     return {
-      name: "New SEG ROI Collection",
+      name: "New Segmentation Collection",
       label: ""
     };
   }
@@ -243,14 +232,15 @@ export default class BrushManagementDialog extends React.Component {
       segments,
       visibleSegments,
       deleteConfirmationOpen,
-      segmentToDelete
+      segmentToDelete,
+      activeSegmentIndex
     } = this.state;
 
     console.log("BurshManagementDialog render:");
     console.log(segments);
 
     const segmentRows = segments.map(segment => (
-      <BrushManagementListItem
+      <SegmentationMenuListItem
         key={`${segment.metadata.SegmentLabel}_${segment.index}`}
         segmentIndex={segment.index}
         metadata={segment.metadata}
@@ -259,6 +249,7 @@ export default class BrushManagementDialog extends React.Component {
         onShowHideClick={this.onShowHideClick}
         onEditClick={this.onEditClick}
         onDeleteClick={this.onDeleteClick}
+        checked={segment.index === activeSegmentIndex}
       />
     ));
 
@@ -298,25 +289,16 @@ export default class BrushManagementDialog extends React.Component {
     }
 
     return (
-      <div>
-        {" "}
-        <div className="brush-management-header">
-          <h3>Segments</h3>
-          <a
-            className="brush-management-cancel btn btn-sm btn-secondary"
-            onClick={this.onCancelButtonClick}
-          >
-            <i className="fa fa-times-circle fa-2x" />
-          </a>
-        </div>
-        <div className="brush-management-list">
+      <div className="segmentation-menu-component">
+        <h3>Segments</h3>
+        <div className="segmentation-menu-list">
           <table className="peppermint-table">
             <tbody>
               <tr>
                 <th colSpan="3" className="left-aligned-cell">
                   {roiCollectionInfo.name}
                 </th>
-                <th colSpan="4" className="right-aligned-cell">
+                <th colSpan="2" className="right-aligned-cell">
                   {roiCollectionInfo.label}
                 </th>
               </tr>
@@ -325,34 +307,36 @@ export default class BrushManagementDialog extends React.Component {
                   <th colSpan="3" className="left-aligned-cell">
                     Type: {roiCollectionInfo.type}
                   </th>
-                  <th colSpan="4" className="right-aligned-cell">
+                  <th colSpan="2" className="right-aligned-cell">
                     Modified: {roiCollectionInfo.modified}
                   </th>
                 </tr>
               )}
 
-              <tr className="brush-management-list-bordered">
-                <th>Label</th>
-                <th>Category</th>
-                <th>Type</th>
+              <tr className="segmentation-menu-list-bordered">
                 <th>Paint</th>
-                <th>Hide</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>Label</th>
+                <th className="centered-cell">Type</th>
+                <th className="centered-cell">Hide</th>
+                <th className="centered-cell">Delete</th>
               </tr>
 
               {segmentRows}
+              <tr>
+                <th />
+                <th>
+                  <a
+                    className="segmentation-menu-new-button btn btn-sm btn-primary"
+                    onClick={this.onNewSegmentButtonClick}
+                  >
+                    <i className="fa fa-plus-circle" /> Segment
+                  </a>
+                </th>
+              </tr>
             </tbody>
           </table>
         </div>
-        <div>
-          <a
-            className="brush-management-new-button btn btn-sm btn-primary"
-            onClick={this.onNewSegmentButtonClick}
-          >
-            <i className="fa fa-plus-circle" /> Segment
-          </a>
-        </div>
+        <div />
       </div>
     );
   }

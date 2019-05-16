@@ -19,11 +19,11 @@ export default class WorkingRoiCollectionList extends React.Component {
       <>
         <tr className="roi-list-header">
           <th />
-          <th colSpan="4"> Working ROI Collection</th>
+          <th colSpan="4"> New ROI Contour Collection</th>
         </tr>
 
         <tr>
-          <th>Active</th>
+          <th>Draw</th>
           <th>Name</th>
           <th className="centered-cell">Contours</th>
         </tr>

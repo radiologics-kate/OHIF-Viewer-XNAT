@@ -5,7 +5,7 @@
               {{>studyBrowser (clone this)}}
             {{/if}}
             {{#if leftSidebarChangeSession}}
-              {{> xnatNavigation}}
+              {{>xnatNavigation}}
             {{/if}}
         </div>
         <div class="mainContent {{#if leftSidebarOpen}}sidebar-left-open{{/if}} {{#if rightSidebarOpen}}sidebar-right-open{{/if}}">
@@ -18,7 +18,7 @@
             {{>roiContourMenu}}
           {{/if}}
           {{#if rightSidebarSegmentationMenu}}
-            <div><p> SEGMENTATION MENU </p></div>
+            {{>segmentationMenu}}
           {{/if}}
         </div>
 

@@ -59,15 +59,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.html",
+    "client/components/viewer/segmentationMenu/segmentationMenu.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.js",
+    "client/components/viewer/segmentationMenu/segmentationMenu.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/brushManagementDialogs/brushManagementDialogs.styl",
+    "client/components/viewer/segmentationMenu/segmentationMenu.styl",
     "client"
   );
 

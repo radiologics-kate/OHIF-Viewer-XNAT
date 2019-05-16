@@ -1,28 +1,37 @@
 @import "{ohif:design}/app"
 @import "../peppermint-table.styl"
 
-.roi-contour-menu
+.segmentation-menu
   theme('color', '$textPrimaryColor')
   z-index: 1000
 
   text-align: center
   height: 100%
 
-  .roi-contour-menu-component
+  .segmentation-menu-component
     height: 100%
 
   h3
     font-weight: 400
     height: 20px
 
-  .roi-contour-menu-collection-list-body
-    height: calc(90% - 150px)
+  .segmentation-menu-list-bordered
+    border-width: 1px
+    border-top-style: solid
+    border-bottom-style: solid
+
+  .segmentation-menu-new-button
+    float: center
+    width: 100%
+
+  .segmentation-menu-list
+    height: calc(90% - 300px)
     padding-right: 18px
     padding-left: 18px
     overflow-y: auto
     overflow-x: hidden
-    theme('scrollbar-color', '$textSecondaryColor $uiGrayDarkest')
     word-wrap: break-word
+    theme('scrollbar-color', '$textSecondaryColor $uiGrayDarkest')
 
     &::-webkit-scrollbar
       them('background', '$uiGrayDarkest')
@@ -33,34 +42,8 @@
       border-radius: 10px
       theme('border-right', '2px solid $uiGrayDarkest')
 
-    .roi-contour-menu-name-link
+    .segmentation-menu-name-link
       theme('color', '$textPrimaryColor')
 
       &:hover
         theme('color', '$textSecondaryColor')
-
-  .roi-contour-menu-cancel
-    text-align: right
-    margin-top: 16px
-
-  .roi-contour-menu-new-button
-    float: center
-    width: 100%
-
-  .roi-list-header
-    border-width: 1px
-    border-top-style: solid
-    border-bottom-style: solid
-
-  .roi-contour-menu-option
-    display: -webkit-flex
-    display: -ms-flexbox
-    display: flex
-    flex-direction: column
-    align-items: center
-
-
-    svg
-      background-color: transparent
-      width: 50px
-      height: 50px

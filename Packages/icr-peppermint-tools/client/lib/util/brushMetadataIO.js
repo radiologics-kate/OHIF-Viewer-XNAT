@@ -2,8 +2,6 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import generateBrushMetadata from "../../lib/util/generateBrushMetadata.js";
 
-import segManagement from "./segManagement.js";
-
 const brushModule = cornerstoneTools.store.modules.brush;
 
 export function newSegmentInput(segIndex, metadata) {
@@ -11,17 +9,7 @@ export function newSegmentInput(segIndex, metadata) {
 }
 
 export function editSegmentInput(segIndex, metadata) {
-  brushMetdataInput(segIndex, metadata, editSegmentInputCallback);
-}
-
-function editSegmentInputCallback(data) {
-  segmentInputCallback(data);
-
-  console.log("EDIT");
-
-  segManagement();
-
-  // TODO -> Reopen seg managamenet dialogs.
+  brushMetdataInput(segIndex, metadata, segmentInputCallback);
 }
 
 function segmentInputCallback(data) {
@@ -40,6 +28,10 @@ function segmentInputCallback(data) {
   );
 
   brushModule.setters.metadata(seriesInstanceUid, segIndex, metadata);
+  brushModule.state.drawColorId = segIndex;
+
+  // JamesAPetts
+  Session.set("refreshSegmentationMenu", Math.random().toString());
 }
 
 /**

@@ -40,7 +40,8 @@ export default class BrushManagementListItem extends React.Component {
       onSegmentChange,
       onShowHideClick,
       onEditClick,
-      onDeleteClick
+      onDeleteClick,
+      checked
     } = this.props;
 
     const segmentLabel = metadata.SegmentLabel;
@@ -48,19 +49,12 @@ export default class BrushManagementListItem extends React.Component {
     const segmentCategory =
       metadata.SegmentedPropertyCategoryCodeSequence.CodeMeaning;
     const typeWithModifier = this._getTypeWithModifier();
-    const checked =
-      brushModule.state.drawColorId === segmentIndex ? "checked" : null;
     const showHideIcon = visible ? "fa fa-eye" : "fa fa-eye-slash";
 
     return (
       <tr>
-        <td className="left-aligned-cell">
-          <i className="fa fa-square" style={{ color: segmentColor }} />{" "}
-          {segmentLabel}
-        </td>
-        <td>{segmentCategory}</td>
-        <td>{typeWithModifier}</td>
         <td className="centered-cell">
+          <i className="fa fa-square" style={{ color: segmentColor }} />{" "}
           <input
             type="radio"
             checked={checked}
@@ -68,6 +62,28 @@ export default class BrushManagementListItem extends React.Component {
               onSegmentChange(segmentIndex);
             }}
           />
+        </td>
+        <td className="left-aligned-cell">
+          <a
+            className="segmentation-menu-name-link"
+            onClick={() => {
+              onEditClick(segmentIndex, metadata);
+            }}
+          >
+            {segmentLabel}
+          </a>
+        </td>
+        <td>
+          <a
+            className="segmentation-menu-name-link"
+            onClick={() => {
+              onEditClick(segmentIndex, metadata);
+            }}
+          >
+            {typeWithModifier}
+            {" - "}
+            {segmentCategory}
+          </a>
         </td>
         <td className="centered-cell">
           <a
@@ -77,16 +93,6 @@ export default class BrushManagementListItem extends React.Component {
             }}
           >
             <i className={showHideIcon} />
-          </a>
-        </td>
-        <td className="centered-cell">
-          <a
-            className="btn btn-sm btn-secondary"
-            onClick={() => {
-              onEditClick(segmentIndex, metadata);
-            }}
-          >
-            <i className="fa fa-wrench" />
           </a>
         </td>
         <td className="centered-cell">

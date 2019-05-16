@@ -32,10 +32,14 @@ Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
     case "[":
       brushTool.previousSegmentation();
       imageNeedsUpdate = true;
+      // JamesAPetts
+      Session.set("refreshSegmentationMenu", Math.random().toString);
       break;
     case "]":
       brushTool.nextSegmentation();
       imageNeedsUpdate = true;
+      // JamesAPetts
+      Session.set("refreshSegmentationMenu", Math.random().toString);
       break;
     case "-":
       brushTool.decreaseBrushSize();

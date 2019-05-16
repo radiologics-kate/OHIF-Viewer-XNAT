@@ -1,13 +1,13 @@
-import "./roiContourMenu.html";
-import RoiContourMenu from "./ReactComponents/RoiContourMenu.js";
+import "./segmentationMenu.html";
+import SegmentationMenu from "./ReactComponents/SegmentationMenu.js";
 
 let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
 
-Session.set("refreshRoiContourMenu", Math.random().toString);
+Session.set("refreshSegmentationMenu", Math.random().toString);
 
-Template.roiContourMenu.helpers({
-  RoiContourMenu() {
-    return RoiContourMenu;
+Template.segmentationMenu.helpers({
+  SegmentationMenu() {
+    return SegmentationMenu;
   },
   id() {
     const instance = Template.instance();
@@ -18,7 +18,7 @@ Template.roiContourMenu.helpers({
 
     cornerstoneNewImageActiveViewport = `CornerstoneNewImage${activeViewport}`;
 
-    Session.get("refreshRoiContourMenu");
+    Session.get("refreshSegmentationMenu");
 
     return Math.random().toString();
   }
