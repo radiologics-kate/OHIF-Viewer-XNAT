@@ -39,10 +39,6 @@
       &:hover
         theme('color', '$textSecondaryColor')
 
-  .roi-contour-menu-cancel
-    text-align: right
-    margin-top: 16px
-
   .roi-contour-menu-new-button
     float: center
     width: 100%
@@ -52,15 +48,21 @@
     border-top-style: solid
     border-bottom-style: solid
 
-  .roi-contour-menu-option
-    display: -webkit-flex
-    display: -ms-flexbox
-    display: flex
-    flex-direction: column
-    align-items: center
+  .roi-contour-menu-footer
+    margin: 10px
+    padding: 10px
+    theme('background', '$uiGrayDark')
+    theme('border', '1px solid $uiBorderColor')
+
+    .roi-contour-menu-option
+      display: -webkit-flex
+      display: -ms-flexbox
+      display: flex
+      flex-direction: column
+      align-items: center
 
 
-    svg
-      background-color: transparent
-      width: 50px
-      height: 50px
+      svg
+        background-color: transparent
+        width: 50px
+        height: 50px

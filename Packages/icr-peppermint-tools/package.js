@@ -72,19 +72,6 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/brushSettingsDialogs/brushSettingsDialogs.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/brushSettingsDialogs/brushSettingsDialogs.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/brushSettingsDialogs/brushSettingsDialogs.styl",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/roiContourMenu/roiContourMenu.html",
     "client"
   );

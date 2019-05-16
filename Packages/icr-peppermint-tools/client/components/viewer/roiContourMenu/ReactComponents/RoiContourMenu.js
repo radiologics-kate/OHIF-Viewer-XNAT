@@ -320,7 +320,6 @@ export default class roiContourMenu extends React.Component {
             </tbody>
           </table>
         </div>
-        <hr />
         <div className="roi-contour-menu-footer">
           <h3>Settings</h3>
           <a

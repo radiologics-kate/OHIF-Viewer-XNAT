@@ -318,18 +318,12 @@ Template.toolbarSection.helpers({
             title: 'Auto',
             classes: 'imageViewerTool',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-auto'
-          },
-          {
-            id: 'brushSettings',
-            title: 'Settings',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-brush-settings'
           }
         ];
 
         buttonData.push({
             id: 'Brush',
-            title: 'Brush',
+            title: 'Segment',
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-segmentation-menu',
             subTools: brushTools

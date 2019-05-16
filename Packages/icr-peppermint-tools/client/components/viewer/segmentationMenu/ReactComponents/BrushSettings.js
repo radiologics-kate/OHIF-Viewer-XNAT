@@ -10,10 +10,12 @@ export default class BrushSettings extends React.Component {
 
     const customGateRange = brushModule.getters.customGateRange();
 
+    console.log(brushState);
+
     this.state = {
       holeFill: brushState.holeFill,
       strayRemove: brushState.strayRemove,
-      activeGate: brushState.gate,
+      activeGate: brushState.activeGate,
       customGateRangeMin: customGateRange[0],
       customGateRangeMax: customGateRange[1]
     };
@@ -149,20 +151,15 @@ export default class BrushSettings extends React.Component {
       );
     }
 
+    console.log(`activeGate: ${activeGate}`);
+
     return (
-      <div>
-        <div className="brush-settings-horizontal-box">
-          <h3> Smart CT Gate Selection</h3>
-          <a
-            className="brush-settings-cancel btn btn-sm btn-secondary"
-            onClick={this.onCloseButtonClick}
-          >
-            <i className="fa fa-times-circle fa-2x" />
-          </a>
-        </div>
+      <div className="brush-settings-component">
+        <h3> Smart CT Gate Selection</h3>
         <select
           className="form-themed form-control"
           onChange={this.onGateChange}
+          value={activeGate}
         >
           {gates.map(gate => (
             <option key={gate.name} value={gate.name}>{`${gate.name} [${
@@ -176,7 +173,6 @@ export default class BrushSettings extends React.Component {
         <h3> Smart/Auto Gate Settings </h3>
         <label htmlFor="holeFill">{holeFillLabel}</label>
         <input
-          className="form-themed form-control"
           type="range"
           id="start"
           name="holeFill"
@@ -187,7 +183,6 @@ export default class BrushSettings extends React.Component {
         />
         <label htmlFor="strayRemove">{strayRemoveLabel}</label>
         <input
-          className="form-themed form-control"
           type="range"
           id="start"
           name="strayRemove"

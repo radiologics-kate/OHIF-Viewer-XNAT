@@ -25,7 +25,7 @@
     width: 100%
 
   .segmentation-menu-list
-    height: calc(90% - 300px)
+    height: calc(90% - 360px)
     padding-right: 18px
     padding-left: 18px
     overflow-y: auto
@@ -47,3 +47,18 @@
 
       &:hover
         theme('color', '$textSecondaryColor')
+
+  .brush-settings-component
+    margin: 10px
+    padding: 10px
+    theme('background', '$uiGrayDark')
+    theme('border', '1px solid $uiBorderColor')
+
+    select
+      width: 80%
+      text-align: center
+      margin: 0 auto
+
+    label
+      font-weight: 400
+      float: left

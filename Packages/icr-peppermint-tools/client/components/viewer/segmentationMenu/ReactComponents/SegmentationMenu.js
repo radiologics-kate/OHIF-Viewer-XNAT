@@ -1,5 +1,6 @@
 import React from "react";
 import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
+import BrushSettings from "./BrushSettings.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
@@ -336,7 +337,7 @@ export default class SegmentationMenu extends React.Component {
             </tbody>
           </table>
         </div>
-        <div />
+        <BrushSettings />
       </div>
     );
   }

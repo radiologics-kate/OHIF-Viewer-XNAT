@@ -24,7 +24,6 @@ export {
   setVolumeName
 } from "./client/lib/util/freehandNameIO.js";
 export { default as generateUID } from "./client/lib/util/generateUID.js";
-export { default as brushSettings } from "./client/lib/util/brushSettings.js";
 export {
   default as lockStructureSet
 } from "./client/lib/util/lockStructureSet.js";
