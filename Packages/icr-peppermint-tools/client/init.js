@@ -26,10 +26,10 @@ export default function initialise(configuration = {}) {
   const freehand3DStore = modules.freehand3D;
 
   icrXnatRoiSession.set("freehandInterpolate", config.interpolate);
-  freehand3DStore.setters.interpolate(config.interpolate);
+  freehand3DStore.state.interpolate = config.interpolate;
 
   icrXnatRoiSession.set("showFreehandStats", config.showFreehandStats);
-  freehand3DStore.setters.displayStats(config.showFreehandStats);
+  freehand3DStore.state.displayStats = config.showFreehandStats;
 
   brushModule.getters.activeGateRange = () => {
     const activeGate = brushState.activeGate;

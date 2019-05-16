@@ -12,11 +12,15 @@
             {{>standaloneViewerMain (clone this)}}
         </div>
 
-        <!--
+
         <div class="sidebarMenu sidebar-right {{#if rightSidebarOpen}}sidebar-open{{/if}}">
-            {{> xnatNavigation}}
+          {{#if rightSidebarRoiContourMenu}}
+            {{>roiContourMenu}}
+          {{/if}}
+          {{#if rightSidebarSegmentationMenu}}
+            <div><p> SEGMENTATION MENU </p></div>
+          {{/if}}
         </div>
-        -->
 
     </div>
 </template>

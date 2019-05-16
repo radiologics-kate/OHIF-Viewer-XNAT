@@ -172,7 +172,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     );
 
     if (activeROIContour === undefined || activeROIContour === null) {
-      createNewVolume(seriesInstanceUid);
+      createNewVolume();
 
       return true;
     }
@@ -291,7 +291,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
     }
 
     // Check to see if mouse in bounding box of textbox
-    if (freehand3DStore.getters.displayStats() && data.handles.textBox) {
+    if (freehand3DStore.state.displayStats && data.handles.textBox) {
       if (pointInsideBoundingBox(data.handles.textBox, coords)) {
         return data.handles.textBox;
       }
@@ -372,7 +372,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    if (handle.hasBoundingBox && freehand3DStore.getters.displayStats()) {
+    if (handle.hasBoundingBox && freehand3DStore.state.displayStats) {
       // Use default move handler - Can move textbox of locked ROIContours.
       moveHandleNearImagePoint(evt, this, data, handle, interactionType);
       return;
@@ -671,7 +671,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
         // Or config is set to show the textBox all the time
         if (
           data.polyBoundingBox &&
-          (freehand3DStore.getters.displayStats() || data.active)
+          (freehand3DStore.state.displayStats || data.active)
         ) {
           // If the textbox has not been moved by the user, it should be displayed on the right-most
           // Side of the tool.
@@ -821,7 +821,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       this._deactivateDraw(element);
     }
 
-    if (modules.freehand3D.getters.interpolate()) {
+    if (modules.freehand3D.state.interpolate) {
       interpolate(data);
     }
 

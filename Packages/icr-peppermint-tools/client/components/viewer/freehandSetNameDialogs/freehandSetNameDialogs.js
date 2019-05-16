@@ -39,8 +39,6 @@ Template.freehandSetNameDialogs.helpers({
   callback() {
     const instance = Template.instance();
 
-    console.log(instance.data.freehandSetNameDialogCallback.get());
-
     return instance.data.freehandSetNameDialogCallback.get();
   }
 });

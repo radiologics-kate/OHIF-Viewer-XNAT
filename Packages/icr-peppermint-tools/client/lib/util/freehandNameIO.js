@@ -17,6 +17,8 @@ function createNewVolumeCallback(name) {
     "DEFAULT",
     name
   );
+
+  Session.set("refreshRoiContourMenu", Math.random().toString());
 }
 
 /**
@@ -24,15 +26,20 @@ function createNewVolumeCallback(name) {
  * the response.
  *
  */
-export function createNewVolume() {
+export function createNewVolume(callback) {
   const freehandSetNameDialog = document.getElementById(
     "freehandSetNameDialog"
   );
   const dialogData = Blaze.getData(freehandSetNameDialog);
 
+  console.log(callback);
+  console.log(createNewVolumeCallback);
+
   dialogData.freehandSetNameDialogDefaultName.set("");
   dialogData.freehandSetNameDialogId.set(Math.random().toString());
-  dialogData.freehandSetNameDialogCallback.set(createNewVolumeCallback);
+  dialogData.freehandSetNameDialogCallback.set(
+    callback || createNewVolumeCallback
+  );
   freehandSetNameDialog.showModal();
 }
 

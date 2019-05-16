@@ -100,6 +100,7 @@ export default class RoiExportListDialog extends React.Component {
         //console.log('=====checking backup:=====');
         //localBackup.checkBackupOnExport();
         //console.log('=====checking backup DONE=====');
+        Session.set("refreshRoiContourMenu", Math.random().toString());
         this._closeDialog();
       })
       .catch(error => {

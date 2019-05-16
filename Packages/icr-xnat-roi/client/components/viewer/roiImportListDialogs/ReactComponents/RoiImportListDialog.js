@@ -336,6 +336,7 @@ export default class RoiImportListDialog extends React.Component {
     this._numCollectionsParsed++;
 
     if (this._numCollectionsParsed === this._numCollectionsToParse) {
+      Session.set("refreshRoiContourMenu", Math.random().toString());
       this._closeDialog();
     }
   }

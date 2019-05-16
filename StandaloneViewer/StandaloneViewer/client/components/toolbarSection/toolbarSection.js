@@ -38,17 +38,24 @@ Template.toolbarSection.helpers({
     rightSidebarToggleButtonData() {
         const instance = Template.instance();
         return {
-            toggleable: true,
-            key: 'rightSidebar',
-            value: instance.data.state,
-            options: [{
-                value: 'sessions',
-                svgLink: '',
-                svgWidth: 18,
-                svgHeight: 10,
-                bottomLabel: 'Change Session'
-            }]
-        };
+              toggleable: true,
+              key: 'rightSidebar',
+              value: instance.data.state,
+              options: [{
+                  value: 'roiContourMenu',
+                  svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-switch-volume',
+                  svgWidth: 15,
+                  svgHeight: 13,
+                  bottomLabel: 'Contours'
+              },
+              {
+                  value: 'segmentationMenu',
+                  svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-seg-management-menu',
+                  svgWidth: 15,
+                  svgHeight: 13,
+                  bottomLabel: 'Segments'
+              }]
+          };
     },
     toolbarButtons() {
         const extraTools = [];
@@ -255,9 +262,6 @@ Template.toolbarSection.helpers({
             subTools: annotationTools
         });
 
-        const showFreehandStats = icrXnatRoiSession.get('showFreehandStats');
-        const freehandInterpolate = icrXnatRoiSession.get('freehandInterpolate');
-
         const freehandTools = [
           {
               id: 'freehandMouse',
@@ -270,47 +274,8 @@ Template.toolbarSection.helpers({
               title: 'Sculpt (S)',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-sculpt'
-          },
-          {
-            id: 'volumeManagement',
-            title: 'ROI Management',
-            classes: 'imageViewerCommand',
-            svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-switch-volume'
           }
         ];
-
-        if (showFreehandStats) {
-          freehandTools.push(
-            {
-              id: 'toggleFreehandStats',
-              title: 'Stats',
-              classes: 'imageViewerCommand',
-              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-on'
-            }
-          );
-        } else {
-          freehandTools.push(
-            {
-              id: 'toggleFreehandStats',
-              title: 'Stats',
-              classes: 'imageViewerCommand',
-              svgLink: 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-off'
-            }
-          );
-        }
-
-
-
-        freehandTools.push(
-          {
-            id: 'toggleFreehandInterpolate',
-            title: freehandInterpolate ? 'Interpolation' : 'Interpolation',
-            classes: 'imageViewerCommand',
-            svgLink: freehandInterpolate
-            ? 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on'
-            : 'packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-off'
-          }
-        );
 
         const deleteTools = [
           {

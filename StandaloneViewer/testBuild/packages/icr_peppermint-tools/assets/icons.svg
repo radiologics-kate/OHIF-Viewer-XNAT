@@ -64,39 +64,37 @@
 
   <symbol id="icon-freehand-interpolate-off" viewBox="0 0 48 48">
     <title>Freehand Interpolate Off</title>
-    <g id="icon-freehand-interpolate-off-group" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-      <path id="freehand-interpolate-off-group-1" d="M36.14 2.72L43.25 6.04L45.01 9.35L42.71 14.16L35.13 17.74L22.88 18.22L11.65 16.32L6.37 13.68L5.56 9.69L12.53 4.07L22.88 2.72L36.14 2.72Z"></path>
-      <path id="freehand-interpolate-off-group-2" d="M24.51 34.18L33.17 35.6L37.29 40.27L33.17 44.6L27.08 46.16L18.76 45.48L12.73 42.57L12.13 37.97L17.34 35.33L24.51 34.18Z"></path>
+    <g id="icon-freehand-interpolate-on-group" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff">
+      <path d="M38.9 42.11C38.9 44.55 32.22 46.54 24 46.54C15.78 46.54 9.1 44.55 9.1 42.11C9.1 39.67 15.78 37.69 24 37.69C32.22 37.69 38.9 39.67 38.9 42.11Z" id="bNF26vkaV"></path>
+      <path d="M46.02 7.14C46.71 7.85 47.08 8.6 47.08 9.38C47.08 13.47 36.74 16.79 24 16.79C11.26 16.79 0.92 13.47 0.92 9.38C0.92 5.29 11.26 1.96 24 1.96C34.32 1.96 43.07 4.14 46.02 7.14Z" id="b5V5kkXTMV"></path>
     </g>
   </symbol>
 
   <symbol id="icon-freehand-interpolate-on" viewBox="0 0 48 48">
     <title>Freehand Interpolate On</title>
-    <g id="icon-freehand-interpolate-on-group" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke="#32cd32">
-      <path id="freehand-interpolate-on-group-1" d="M36.14 2.72L43.25 6.04L45.01 9.35L42.71 14.16L35.13 17.74L22.88 18.22L11.65 16.32L6.37 13.68L5.56 9.69L12.53 4.07L22.88 2.72L36.14 2.72Z"></path>
-      <path id="freehand-interpolate-on-group-2" d="M24.51 34.18L33.17 35.6L37.29 40.27L33.17 44.6L27.08 46.16L18.76 45.48L12.73 42.57L12.13 37.97L17.34 35.33L24.51 34.18Z"></path>
-    </g>
-
-    <g id="icon-freehand-interpolate-on-group2" fill="none"  stroke-dasharray="5,5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke="#32cd32">
-      <path d="M21.87 20.11L32.56 20.65L38.65 22.41L40.54 24.24L41.29 26.74L40.54 29.04L36.69 30.94L29.45 32.15L20.24 31.68L13.34 30.94L9.49 27.96L9.22 24.44L13.34 21.06L21.87 20.11Z" id="eN6kOHdJ"></path>
+    <g id="icon-freehand-interpolate-on-group" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#32cd32">
+      <path d="M38.9 42.11C38.9 44.55 32.22 46.54 24 46.54C15.78 46.54 9.1 44.55 9.1 42.11C9.1 39.67 15.78 37.69 24 37.69C32.22 37.69 38.9 39.67 38.9 42.11Z" id="bNF26vkaV"></path>
+      <path stroke-dasharray="5,5" d="M45 19.06C45 22.07 35.59 24.52 24 24.52C12.41 24.52 3 22.07 3 19.06C3 16.05 12.41 13.6 24 13.6C35.59 13.6 45 16.05 45 19.06Z" id="elwIAZroH"></path>
+      <path stroke-dasharray="5,5" d="M41.66 33.91C41.66 36.92 33.75 39.37 24 39.37C14.25 39.37 6.34 36.92 6.34 33.91C6.34 30.9 14.25 28.45 24 28.45C33.75 28.45 41.66 30.9 41.66 33.91Z" id="hYYgIuISI"></path>
+      <path stroke-dasharray="5,5" d="M43.8 26.9C43.8 29.92 34.93 32.36 24 32.36C13.07 32.36 4.2 29.92 4.2 26.9C4.2 23.89 13.07 21.45 24 21.45C34.93 21.45 43.8 23.89 43.8 26.9Z" id="c1KhlsDw7D"></path>
+      <path d="M46.02 7.14C46.71 7.85 47.08 8.6 47.08 9.38C47.08 13.47 36.74 16.79 24 16.79C11.26 16.79 0.92 13.47 0.92 9.38C0.92 5.29 11.26 1.96 24 1.96C34.32 1.96 43.07 4.14 46.02 7.14Z" id="b5V5kkXTMV"></path>
     </g>
   </symbol>
 
   <symbol id="icon-freehand-interpolate-on-no-highlight" viewBox="0 0 48 48">
     <title>Freehand Interpolate On No Highlight</title>
-    <g id="icon-freehand-interpolate-on-group" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-      <path id="freehand-interpolate-on-group-1" d="M36.14 2.72L43.25 6.04L45.01 9.35L42.71 14.16L35.13 17.74L22.88 18.22L11.65 16.32L6.37 13.68L5.56 9.69L12.53 4.07L22.88 2.72L36.14 2.72Z"></path>
-      <path id="freehand-interpolate-on-group-2" d="M24.51 34.18L33.17 35.6L37.29 40.27L33.17 44.6L27.08 46.16L18.76 45.48L12.73 42.57L12.13 37.97L17.34 35.33L24.51 34.18Z"></path>
-    </g>
-
-    <g id="icon-freehand-interpolate-on-group2" fill="none"  stroke-dasharray="5,5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21.87 20.11L32.56 20.65L38.65 22.41L40.54 24.24L41.29 26.74L40.54 29.04L36.69 30.94L29.45 32.15L20.24 31.68L13.34 30.94L9.49 27.96L9.22 24.44L13.34 21.06L21.87 20.11Z" id="eN6kOHdJ"></path>
+    <g id="icon-freehand-interpolate-on-group" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M38.9 42.11C38.9 44.55 32.22 46.54 24 46.54C15.78 46.54 9.1 44.55 9.1 42.11C9.1 39.67 15.78 37.69 24 37.69C32.22 37.69 38.9 39.67 38.9 42.11Z" id="bNF26vkaV"></path>
+      <path stroke-dasharray="5,5" d="M45 19.06C45 22.07 35.59 24.52 24 24.52C12.41 24.52 3 22.07 3 19.06C3 16.05 12.41 13.6 24 13.6C35.59 13.6 45 16.05 45 19.06Z" id="elwIAZroH"></path>
+      <path stroke-dasharray="5,5" d="M41.66 33.91C41.66 36.92 33.75 39.37 24 39.37C14.25 39.37 6.34 36.92 6.34 33.91C6.34 30.9 14.25 28.45 24 28.45C33.75 28.45 41.66 30.9 41.66 33.91Z" id="hYYgIuISI"></path>
+      <path stroke-dasharray="5,5" d="M43.8 26.9C43.8 29.92 34.93 32.36 24 32.36C13.07 32.36 4.2 29.92 4.2 26.9C4.2 23.89 13.07 21.45 24 21.45C34.93 21.45 43.8 23.89 43.8 26.9Z" id="c1KhlsDw7D"></path>
+      <path d="M46.02 7.14C46.71 7.85 47.08 8.6 47.08 9.38C47.08 13.47 36.74 16.79 24 16.79C11.26 16.79 0.92 13.47 0.92 9.38C0.92 5.29 11.26 1.96 24 1.96C34.32 1.96 43.07 4.14 46.02 7.14Z" id="b5V5kkXTMV"></path>
     </g>
   </symbol>
 
   <symbol id="icon-freehand-stats-off" viewBox="0 0 1792 1792">
     <title>Freehand Stats Off</title>
-    <g id="icon-freehand-stats-on-group" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <g id="icon-freehand-stats-on-group" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#ffffff">
       <path id="fa-comment-o" d="M896 384q-204 0-381.5 69.5t-282 187.5-104.5 255q0 112 71.5 213.5t201.5 175.5l87 50-27 96q-24 91-70 172 152-63 275-171l43-38 57 6q69 8 130 8 204 0 381.5-69.5t282-187.5 104.5-255-104.5-255-282-187.5-381.5-69.5zm896 512q0 174-120 321.5t-326 233-450 85.5q-70 0-145-8-198 175-460 242-49 14-114 22h-5q-15 0-27-10.5t-16-27.5v-1q-3-4-.5-12t2-10 4.5-9.5l6-9 7-8.5 8-9q7-8 31-34.5t34.5-38 31-39.5 32.5-51 27-59 26-76q-157-89-247.5-220t-90.5-281q0-174 120-321.5t326-233 450-85.5 450 85.5 326 233 120 321.5z"/>
     </g>
   </symbol>

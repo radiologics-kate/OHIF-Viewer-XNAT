@@ -231,8 +231,11 @@ function setROIContourAndSetIndexActive(
 
   const structureSet = getStructureSet(seriesInstanceUid, structureSetUid);
 
-  structureSet.activeROIContourIndex =
-    structureSet.ROIContourCollection.length - 1;
+  const index = structureSet.ROIContourCollection.length - 1;
+
+  structureSet.activeROIContourIndex = index;
+
+  return index;
 }
 
 function setDeleteROIFromStructureSet(
@@ -349,6 +352,9 @@ function incrementPolygonCount(
   );
 
   ROIContour.polygonCount++;
+
+  //JamesAPetts
+  Session.set("refreshRoiContourMenu", Math.random().toString());
 }
 
 function decrementPolygonCount(
@@ -363,6 +369,9 @@ function decrementPolygonCount(
   );
 
   ROIContour.polygonCount--;
+
+  //JamesAPetts
+  Session.set("refreshRoiContourMenu", Math.random().toString());
 }
 
 const getters = {
@@ -372,13 +381,7 @@ const getters = {
   ROIContourIndex: getROIContourIndex,
   activeStructureSetIndex: getActiveStructureSetIndex,
   activeROIContourIndex: getActiveROIContourIndex,
-  activeROIContour: getActiveROIContour,
-  interpolate: () => {
-    return state.interpolate;
-  },
-  displayStats: () => {
-    return state.displayStats;
-  }
+  activeROIContour: getActiveROIContour
 };
 
 const setters = {
@@ -395,11 +398,11 @@ const setters = {
   activeROIContour: setActiveROIContour,
   incrementPolygonCount,
   decrementPolygonCount,
-  interpolate: value => {
-    state.interpolate = value;
+  toggleInterpolate: () => {
+    state.interpolate = !state.interpolate;
   },
-  displayStats: value => {
-    state.displayStats = value;
+  toggleDisplayStats: () => {
+    state.displayStats = !state.displayStats;
   }
 };
 

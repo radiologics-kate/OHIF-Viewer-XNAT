@@ -17,15 +17,9 @@ Template.flexboxLayout.helpers({
   leftSidebarScanList() {
       const leftSidebarValue = Template.instance().data.state.get('leftSidebar');
 
-      console.log(leftSidebarValue);
-
       if (leftSidebarValue === "scanList") {
-
-        console.log(true);
         return true;
       }
-
-      console.log(false);
 
       return;
   },
@@ -37,9 +31,26 @@ Template.flexboxLayout.helpers({
     }
 
     return;
-    //return Template.instance().data.state.get('leftSidebarChangeSession');
   },
   rightSidebarOpen() {
-      return Template.instance().data.state.get('rightSidebar');
-  }
+      return Template.instance().data.state.get('rightSidebar') && true;
+  },
+  rightSidebarRoiContourMenu() {
+    const leftSidebarValue = Template.instance().data.state.get('rightSidebar');
+
+    if (leftSidebarValue === "roiContourMenu") {
+      return true;
+    }
+
+    return;
+  },
+  rightSidebarSegmentationMenu() {
+    const leftSidebarValue = Template.instance().data.state.get('rightSidebar');
+
+    if (leftSidebarValue === "segmentationMenu") {
+      return true;
+    }
+
+    return;
+  },
 });

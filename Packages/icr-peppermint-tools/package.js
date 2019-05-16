@@ -85,15 +85,15 @@ Package.onUse(function(api) {
   );
 
   api.addFiles(
-    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.html",
+    "client/components/viewer/roiContourMenu/roiContourMenu.html",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.js",
+    "client/components/viewer/roiContourMenu/roiContourMenu.js",
     "client"
   );
   api.addFiles(
-    "client/components/viewer/roiManagementDialogs/roiManagementDialogs.styl",
+    "client/components/viewer/roiContourMenu/roiContourMenu.styl",
     "client"
   );
 

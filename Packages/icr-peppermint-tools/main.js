@@ -24,15 +24,6 @@ export {
   setVolumeName
 } from "./client/lib/util/freehandNameIO.js";
 export { default as generateUID } from "./client/lib/util/generateUID.js";
-export {
-  default as toggleFreehandStats
-} from "./client/lib/util/toggleFreehandStats.js";
-export {
-  default as toggleFreehandInterpolate
-} from "./client/lib/util/toggleFreehandInterpolate.js";
-export {
-  default as volumeManagement
-} from "./client/lib/util/volumeManagement.js";
 export { default as segManagement } from "./client/lib/util/segManagement.js";
 export { default as brushSettings } from "./client/lib/util/brushSettings.js";
 export {
