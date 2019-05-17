@@ -36,3 +36,13 @@ export {
 export { Polygon } from "./client/lib/util/classes/Polygon.js";
 
 export { default as init } from "./client/init.js";
+
+import { default as RoiContourMenu } from "./client/components/viewer/roiContourMenu/RoiContourMenu.js";
+import { default as SegmentationMenu } from "./client/components/viewer/segmentationMenu/SegmentationMenu.js";
+
+const components = {
+  RoiContourMenu,
+  SegmentationMenu
+};
+
+export { components };

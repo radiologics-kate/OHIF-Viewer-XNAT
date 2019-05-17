@@ -1,4 +1,12 @@
 import { Template } from 'meteor/templating';
+import {components as peppermintComponents } from "meteor/icr:peppermint-tools";
+
+const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
+
+let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
+
+Session.set("refreshRoiContourMenu", Math.random().toString);
+Session.set("refreshSegmentationMenu", Math.random().toString);
 
 Template.flexboxLayout.events({
     'transitionend .sidebarMenu'(event, instance) {
@@ -53,4 +61,36 @@ Template.flexboxLayout.helpers({
 
     return;
   },
+  RoiContourMenu() {
+    return RoiContourMenu;
+  },
+  roiContourMenuId() {
+    const instance = Template.instance();
+
+    Session.get(cornertoneNewImageActiveViewport);
+
+    const activeViewport = Session.get("activeViewport");
+
+    cornerstoneNewImageActiveViewport = `CornerstoneNewImage${activeViewport}`;
+
+    Session.get("refreshRoiContourMenu");
+
+    return Math.random().toString();
+  },
+  SegmentationMenu() {
+    return SegmentationMenu;
+  },
+  segmentationMenuId() {
+    const instance = Template.instance();
+
+    Session.get(cornertoneNewImageActiveViewport);
+
+    const activeViewport = Session.get("activeViewport");
+
+    cornerstoneNewImageActiveViewport = `CornerstoneNewImage${activeViewport}`;
+
+    Session.get("refreshSegmentationMenu");
+
+    return Math.random().toString();
+  }
 });

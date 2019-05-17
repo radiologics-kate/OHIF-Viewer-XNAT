@@ -1,6 +1,8 @@
 import React from "react";
 import LockedCollectionsListItem from "./LockedCollectionsListItem.js";
 
+import "./roiContourMenu.styl";
+
 export default class LockedCollectionsList extends React.Component {
   constructor(props = {}) {
     super(props);

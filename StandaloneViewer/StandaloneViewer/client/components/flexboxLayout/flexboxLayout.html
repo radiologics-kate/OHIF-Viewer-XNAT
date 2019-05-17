@@ -15,10 +15,14 @@
 
         <div class="sidebarMenu sidebar-right {{#if rightSidebarOpen}}sidebar-open{{/if}}">
           {{#if rightSidebarRoiContourMenu}}
-            {{>roiContourMenu}}
+            <div id="roiContourMenu" class="roi-contour-menu">
+              {{> React component=RoiContourMenu key=roiContourMenuId}}
+            </div>
           {{/if}}
           {{#if rightSidebarSegmentationMenu}}
-            {{>segmentationMenu}}
+            <div id="segmentationMenu" class="segmentation-menu">
+              {{> React component=SegmentationMenu key=segmentationMenuId}}
+            </div>
           {{/if}}
         </div>
 

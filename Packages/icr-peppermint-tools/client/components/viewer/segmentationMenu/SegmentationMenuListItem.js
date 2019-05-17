@@ -5,8 +5,10 @@ import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import {
   newSegmentInput,
   editSegmentInput
-} from "../../../../lib/util/brushMetadataIO.js";
-import getBrushSegmentColor from "../../../../lib/util/getBrushSegmentColor.js";
+} from "../../../lib/util/brushMetadataIO.js";
+import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
+
+import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 

@@ -1,6 +1,8 @@
 import React from "react";
 import WorkingCollectionListItem from "./WorkingCollectionListItem.js";
 
+import "./roiContourMenu.styl";
+
 export default class WorkingRoiCollectionList extends React.Component {
   constructor(props = {}) {
     super(props);

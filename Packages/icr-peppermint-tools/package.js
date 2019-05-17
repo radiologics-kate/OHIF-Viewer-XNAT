@@ -58,31 +58,5 @@ Package.onUse(function(api) {
     "client"
   );
 
-  api.addFiles(
-    "client/components/viewer/segmentationMenu/segmentationMenu.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/segmentationMenu/segmentationMenu.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/segmentationMenu/segmentationMenu.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/roiContourMenu/roiContourMenu.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiContourMenu/roiContourMenu.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiContourMenu/roiContourMenu.styl",
-    "client"
-  );
-
   api.mainModule("main.js", "client");
 });

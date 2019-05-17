@@ -436,6 +436,8 @@ export default class RoiImportListDialog extends React.Component {
 
     let importBody;
 
+    console.log(importList);
+
     if (importListReady) {
       if (importing) {
         importBody = (

@@ -4,6 +4,8 @@ import { cornerstoneTools } from "meteor/ohif:cornerstone";
 const brushModule = cornerstoneTools.store.modules.brush;
 const brushState = brushModule.state;
 
+import "./segmentationMenu.styl";
+
 export default class BrushSettings extends React.Component {
   constructor(props = {}) {
     super(props);
