@@ -101,7 +101,7 @@ export default class LockedCollectionsListItem extends React.Component {
                 <td className="left-aligned-cell">
                   <i
                     className="fa fa-square"
-                    style={{ color: getBrushSegmentColor(roiContour.index) }}
+                    style={{ color: roiContour.metadata.color }}
                   />
                 </td>
                 <td className="left-aligned-cell">
