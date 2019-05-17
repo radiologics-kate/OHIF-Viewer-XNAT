@@ -13,7 +13,21 @@
 
   h3
     font-weight: 400
-    height: 20px
+
+  .roi-contour-menu-header
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
+    padding-right: 18px
+    padding-left: 18px
+    width: 100%
+
+    a
+      height: 30px
+      width: 80px
 
   .roi-contour-menu-collection-list-body
     height: calc(90% - 180px)
@@ -53,16 +67,6 @@
     padding: 10px
     theme('background', '$uiGrayDark')
     theme('border', '1px solid $uiBorderColor')
-
-    display: -webkit-flex
-    display: -ms-flexbox
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: flex-start
-
-    .roi-contour-menu-io-button
-      height: 50px
 
     .roi-contour-menu-option
       display: -webkit-flex

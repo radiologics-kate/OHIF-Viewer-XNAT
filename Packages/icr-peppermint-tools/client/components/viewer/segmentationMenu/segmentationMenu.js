@@ -239,7 +239,7 @@ export default class SegmentationMenu extends React.Component {
       activeSegmentIndex
     } = this.state;
 
-    const { importCallback, exportCallback, ioLabel } = this.props;
+    const { importCallback, exportCallback } = this.props;
 
     console.log("BurshManagementDialog render:");
     console.log(segments);
@@ -301,13 +301,12 @@ export default class SegmentationMenu extends React.Component {
     ) {
       ioMenu = (
         <div>
-          <h3>{ioLabel}</h3>
           {importCallback && (
             <a
               className="btn btn-sm btn-primary roi-contour-menu-io-button"
               onClick={importCallback}
             >
-              <h5>Import</h5>
+              Import
             </a>
           )}
           {exportCallback && (
@@ -315,7 +314,7 @@ export default class SegmentationMenu extends React.Component {
               className="btn btn-sm btn-primary roi-contour-menu-io-button"
               onClick={exportCallback}
             >
-              <h5>Export</h5>
+              Export
             </a>
           )}
         </div>
@@ -325,23 +324,38 @@ export default class SegmentationMenu extends React.Component {
     return (
       <div className="segmentation-menu-component">
         <div className="segmentation-menu-list">
-          <h3>Segments</h3>
+          <div className="segmentation-menu-header">
+            <h3>Segments</h3>
+            {ioMenu}
+          </div>
           <table className="peppermint-table">
             <tbody>
               <tr>
-                <th colSpan="3" className="left-aligned-cell">
+                <th
+                  colSpan="3"
+                  className="left-aligned-cell segmentation-menu-list-bordered"
+                >
                   {roiCollectionInfo.name}
                 </th>
-                <th colSpan="2" className="right-aligned-cell">
+                <th
+                  colSpan="2"
+                  className="right-aligned-cell segmentation-menu-list-bordered"
+                >
                   {roiCollectionInfo.label}
                 </th>
               </tr>
               {roiCollectionInfo.type && (
                 <tr>
-                  <th colSpan="3" className="left-aligned-cell">
+                  <th
+                    colSpan="3"
+                    className="left-aligned-cell segmentation-menu-list-bordered"
+                  >
                     Type: {roiCollectionInfo.type}
                   </th>
-                  <th colSpan="2" className="right-aligned-cell">
+                  <th
+                    colSpan="2"
+                    className="right-aligned-cell segmentation-menu-list-bordered"
+                  >
                     Modified: {roiCollectionInfo.modified}
                   </th>
                 </tr>
@@ -372,7 +386,6 @@ export default class SegmentationMenu extends React.Component {
         </div>
         <div className="segmentation-menu-footer">
           <BrushSettings />
-          {ioMenu}
         </div>
       </div>
     );

@@ -19,7 +19,19 @@
 
   h3
     font-weight: 400
-    height: 20px
+
+  .segmentation-menu-header
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
+    width: 100%
+
+    a
+      height: 30px
+      width: 80px
 
   .segmentation-menu-list-bordered
     border-width: 1px
@@ -35,6 +47,7 @@
     //height: calc(90% - 400px)
     padding-right: 18px
     padding-left: 18px
+    width: 100%
     overflow-y: scroll
     overflow-x: hidden
     word-wrap: break-word
@@ -60,13 +73,6 @@
     padding: 10px
     theme('background', '$uiGrayDark')
     theme('border', '1px solid $uiBorderColor')
-
-    display: -webkit-flex
-    display: -ms-flexbox
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: flex-start
 
     .brush-settings-component
       select
