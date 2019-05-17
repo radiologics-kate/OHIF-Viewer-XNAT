@@ -10,6 +10,12 @@
 
   .segmentation-menu-component
     height: 100%
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    align-items: center
 
   h3
     font-weight: 400
@@ -24,11 +30,12 @@
     float: center
     width: 100%
 
+
   .segmentation-menu-list
-    height: calc(90% - 360px)
+    //height: calc(90% - 400px)
     padding-right: 18px
     padding-left: 18px
-    overflow-y: auto
+    overflow-y: scroll
     overflow-x: hidden
     word-wrap: break-word
     theme('scrollbar-color', '$textSecondaryColor $uiGrayDarkest')
@@ -48,17 +55,25 @@
       &:hover
         theme('color', '$textSecondaryColor')
 
-  .brush-settings-component
+  .segmentation-menu-footer
     margin: 10px
     padding: 10px
     theme('background', '$uiGrayDark')
     theme('border', '1px solid $uiBorderColor')
 
-    select
-      width: 80%
-      text-align: center
-      margin: 0 auto
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: flex-start
 
-    label
-      font-weight: 400
-      float: left
+    .brush-settings-component
+      select
+        width: 80%
+        text-align: center
+        margin: 0 auto
+
+      label
+        font-weight: 400
+        float: left

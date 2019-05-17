@@ -16,12 +16,22 @@
         <div class="sidebarMenu sidebar-right {{#if rightSidebarOpen}}sidebar-open{{/if}}">
           {{#if rightSidebarRoiContourMenu}}
             <div id="roiContourMenu" class="roi-contour-menu">
-              {{> React component=RoiContourMenu key=roiContourMenuId}}
+              {{> React component=RoiContourMenu
+                key=roiContourMenuId
+                importCallback=roiContourMenuImportCallback
+                exportCallback=roiContourMenuExportCallback
+                ioLabel='XNAT'
+              }}
             </div>
           {{/if}}
           {{#if rightSidebarSegmentationMenu}}
             <div id="segmentationMenu" class="segmentation-menu">
-              {{> React component=SegmentationMenu key=segmentationMenuId}}
+              {{> React component=SegmentationMenu
+                key=segmentationMenuId
+                importCallback=segmentationMenuImportCallback
+                exportCallback=segmentationMenuExportCallback
+                ioLabel='XNAT'
+              }}
             </div>
           {{/if}}
         </div>

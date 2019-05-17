@@ -14,7 +14,7 @@ const brushModule = cornerstoneTools.store.modules.brush;
  *
  * @returns {null}
  */
-export default async function exportMask() {
+export default async function() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   if (icrXnatRoiSession.get("writePermissions") === true) {

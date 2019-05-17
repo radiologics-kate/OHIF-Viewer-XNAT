@@ -8,7 +8,7 @@ import displayInsufficientPermissionsDialog from "../dialogUtils/displayInsuffic
  *
  * @returns {null}
  */
-export default function importMask() {
+export default function() {
   const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
   if (icrXnatRoiSession.get("readPermissions") === false) {

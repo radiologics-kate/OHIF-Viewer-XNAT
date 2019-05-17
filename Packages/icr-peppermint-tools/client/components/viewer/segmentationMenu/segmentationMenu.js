@@ -239,6 +239,8 @@ export default class SegmentationMenu extends React.Component {
       activeSegmentIndex
     } = this.state;
 
+    const { importCallback, exportCallback, ioLabel } = this.props;
+
     console.log("BurshManagementDialog render:");
     console.log(segments);
 
@@ -265,7 +267,7 @@ export default class SegmentationMenu extends React.Component {
       ).metadata.SegmentLabel;
 
       return (
-        <>
+        <div>
           <div>
             <h5>Warning!</h5>
             <p>
@@ -287,14 +289,43 @@ export default class SegmentationMenu extends React.Component {
               <i className="fa fa fa-times-circle fa-2x" />
             </a>
           </div>
-        </>
+        </div>
+      );
+    }
+
+    let ioMenu;
+
+    if (
+      typeof importCallback === "function" ||
+      typeof exportCallback === "function"
+    ) {
+      ioMenu = (
+        <div>
+          <h3>{ioLabel}</h3>
+          {importCallback && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={importCallback}
+            >
+              <h5>Import</h5>
+            </a>
+          )}
+          {exportCallback && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={exportCallback}
+            >
+              <h5>Export</h5>
+            </a>
+          )}
+        </div>
       );
     }
 
     return (
       <div className="segmentation-menu-component">
-        <h3>Segments</h3>
         <div className="segmentation-menu-list">
+          <h3>Segments</h3>
           <table className="peppermint-table">
             <tbody>
               <tr>
@@ -339,7 +370,10 @@ export default class SegmentationMenu extends React.Component {
             </tbody>
           </table>
         </div>
-        <BrushSettings />
+        <div className="segmentation-menu-footer">
+          <BrushSettings />
+          {ioMenu}
+        </div>
       </div>
     );
   }

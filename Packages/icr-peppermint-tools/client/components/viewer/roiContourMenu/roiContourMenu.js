@@ -248,6 +248,10 @@ export default class roiContourMenu extends React.Component {
       displayStats
     } = this.state;
 
+    const { importCallback, exportCallback, ioLabel } = this.props;
+
+    console.log(this.props);
+
     const freehand3DStore = modules.freehand3D;
 
     if (unlockConfirmationOpen) {
@@ -311,6 +315,35 @@ export default class roiContourMenu extends React.Component {
       />
     ) : null;
 
+    let ioMenu;
+
+    if (
+      typeof importCallback === "function" ||
+      typeof exportCallback === "function"
+    ) {
+      ioMenu = (
+        <div>
+          <h3>{ioLabel}</h3>
+          {importCallback && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={importCallback}
+            >
+              <h5>Import</h5>
+            </a>
+          )}
+          {exportCallback && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={exportCallback}
+            >
+              <h5>Export</h5>
+            </a>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className="roi-contour-menu-component">
         <h3>ROI Contour Collections</h3>
@@ -323,41 +356,44 @@ export default class roiContourMenu extends React.Component {
           </table>
         </div>
         <div className="roi-contour-menu-footer">
-          <h3>Settings</h3>
-          <a
-            className="btn btn-sm btn-secondary"
-            onClick={this.onInterpolateToggleClick}
-          >
-            <div className="roi-contour-menu-option">
-              <svg>
-                <use
-                  xlinkHref={
-                    interpolate
-                      ? "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on"
-                      : "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-off"
-                  }
-                />
-              </svg>
-              <label>Interpolation</label>
-            </div>
-          </a>
-          <a
-            className="btn btn-sm btn-secondary"
-            onClick={this.onDisplayStatsToggleClick}
-          >
-            <div className="roi-contour-menu-option">
-              <svg>
-                <use
-                  xlinkHref={
-                    displayStats
-                      ? "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-on"
-                      : "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-off"
-                  }
-                />
-              </svg>
-              <label>Stats</label>
-            </div>
-          </a>
+          <div>
+            <h3>Settings</h3>
+            <a
+              className="btn btn-sm btn-secondary"
+              onClick={this.onInterpolateToggleClick}
+            >
+              <div className="roi-contour-menu-option">
+                <svg>
+                  <use
+                    xlinkHref={
+                      interpolate
+                        ? "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-on"
+                        : "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-interpolate-off"
+                    }
+                  />
+                </svg>
+                <label>Interpolation</label>
+              </div>
+            </a>
+            <a
+              className="btn btn-sm btn-secondary"
+              onClick={this.onDisplayStatsToggleClick}
+            >
+              <div className="roi-contour-menu-option">
+                <svg>
+                  <use
+                    xlinkHref={
+                      displayStats
+                        ? "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-on"
+                        : "packages/icr_peppermint-tools/assets/icons.svg#icon-freehand-stats-off"
+                    }
+                  />
+                </svg>
+                <label>Stats</label>
+              </div>
+            </a>
+          </div>
+          {ioMenu}
         </div>
       </div>
     );

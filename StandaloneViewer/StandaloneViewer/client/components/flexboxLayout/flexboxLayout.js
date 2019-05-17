@@ -1,6 +1,13 @@
 import { Template } from 'meteor/templating';
 import {components as peppermintComponents } from "meteor/icr:peppermint-tools";
 
+import {
+  importROIContours,
+  exportROIContours,
+  importSegmentations,
+  exportSegmentations
+} from "meteor/icr:xnat-roi";
+
 const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
 
 let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
@@ -77,6 +84,12 @@ Template.flexboxLayout.helpers({
 
     return Math.random().toString();
   },
+  roiContourMenuImportCallback() {
+    return importROIContours;
+  },
+  roiContourMenuExportCallback() {
+    return exportROIContours
+  },
   SegmentationMenu() {
     return SegmentationMenu;
   },
@@ -92,5 +105,11 @@ Template.flexboxLayout.helpers({
     Session.get("refreshSegmentationMenu");
 
     return Math.random().toString();
-  }
+  },
+  segmentationMenuImportCallback() {
+    return importSegmentations;
+  },
+  segmentationMenuExportCallback() {
+    return exportSegmentations;
+  },
 });

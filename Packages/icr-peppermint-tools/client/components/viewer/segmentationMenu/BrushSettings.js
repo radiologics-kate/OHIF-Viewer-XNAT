@@ -175,6 +175,7 @@ export default class BrushSettings extends React.Component {
         <h3> Smart/Auto Gate Settings </h3>
         <label htmlFor="holeFill">{holeFillLabel}</label>
         <input
+          className="form-themed form-control"
           type="range"
           id="start"
           name="holeFill"
@@ -185,6 +186,7 @@ export default class BrushSettings extends React.Component {
         />
         <label htmlFor="strayRemove">{strayRemoveLabel}</label>
         <input
+          className="form-themed form-control"
           type="range"
           id="start"
           name="strayRemove"

@@ -16,7 +16,7 @@
     height: 20px
 
   .roi-contour-menu-collection-list-body
-    height: calc(90% - 150px)
+    height: calc(90% - 180px)
     padding-right: 18px
     padding-left: 18px
     overflow-y: auto
@@ -54,13 +54,22 @@
     theme('background', '$uiGrayDark')
     theme('border', '1px solid $uiBorderColor')
 
+    display: -webkit-flex
+    display: -ms-flexbox
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: flex-start
+
+    .roi-contour-menu-io-button
+      height: 50px
+
     .roi-contour-menu-option
       display: -webkit-flex
       display: -ms-flexbox
       display: flex
       flex-direction: column
       align-items: center
-
 
       svg
         background-color: transparent
