@@ -26,8 +26,6 @@ Mousetrap.bind(
     const key = evt.key;
     let imageNeedsUpdate = false;
 
-    console.log("Key:" + key);
-
     switch (key) {
       case "n":
       case "N":

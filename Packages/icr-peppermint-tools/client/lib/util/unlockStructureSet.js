@@ -21,8 +21,6 @@ export default function(seriesInstanceUid, structureSetUid) {
     structureSetUid
   );
 
-  console.log(structureSet);
-
   const ROIContourCollection = structureSet.ROIContourCollection;
 
   const workingStructureSet = freehand3DStore.getters.structureSet(
@@ -49,7 +47,6 @@ export default function(seriesInstanceUid, structureSetUid) {
 
   Object.keys(toolStateManager).forEach(elementId => {
     // Only get polygons from this series
-    // TODO => There must be a better way to do this with the stack tool now.
     if (getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid) {
       // grab the freehand tool for this DICOM instance
 
@@ -70,15 +67,11 @@ export default function(seriesInstanceUid, structureSetUid) {
     }
   });
 
-  console.log("deleting old named structureSet");
-
   // Remove named structureSet.
   freehand3DStore.setters.deleteStructureSet(
     seriesInstanceUid,
     structureSetUid
   );
-
-  console.log(workingStructureSet.activeROIContourIndex);
 
   if (workingStructureSet.activeROIContourIndex === null) {
     workingStructureSet.activeROIContourIndex = 0;
@@ -99,18 +92,6 @@ function movePolygonsInInstance(
 ) {
   const freehand3DStore = modules.freehand3D;
 
-  /*
-  structureSetUid: "DEFAULT",
-  ROIContourUid: referencedROIContour.uid,
-  referencedROIContour,
-  referencedStructureSet,
-  */
-
-  //workingStructureSet
-  //
-
-  console.log("====moving polygons in instance..");
-
   for (let i = 0; i < toolData.length; i++) {
     const data = toolData[i];
 
@@ -128,7 +109,5 @@ function movePolygonsInInstance(
     data.structureSetUid = "DEFAULT";
     data.referencedROIContour = referencedROIContour;
     data.referencedStructureSet = referencedStructureSet;
-
-    console.log(data);
   }
 }

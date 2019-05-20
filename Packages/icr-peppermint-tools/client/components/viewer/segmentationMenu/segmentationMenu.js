@@ -41,9 +41,6 @@ export default class SegmentationMenu extends React.Component {
       segmentToDelete: 0,
       activeSegmentIndex: 0
     };
-
-    console.log(`TEST:`);
-    console.log(this.state);
   }
 
   componentDidMount() {
@@ -53,14 +50,9 @@ export default class SegmentationMenu extends React.Component {
       return;
     }
 
-    console.log(`BRUSH MANAGEMENT DIALOG COMPONENT DID MOUNT`);
-    console.log(this._seriesInstanceUid);
-
     const importMetadata = this._importMetadata();
     const segments = this._segments();
     const visibleSegments = this._visableSegmentsForElement();
-
-    console.log(segments);
 
     this.setState({
       importMetadata,
@@ -125,8 +117,6 @@ export default class SegmentationMenu extends React.Component {
   }
 
   onDeleteClick(segmentIndex) {
-    //TODO !
-    console.log("TODO: Delete");
     this.setState({
       deleteConfirmationOpen: true,
       segmentToDelete: segmentIndex
@@ -203,9 +193,6 @@ export default class SegmentationMenu extends React.Component {
   _segments() {
     const seriesInstanceUid = this._seriesInstanceUid;
 
-    console.log(`_segments seriesInstanceUid:`);
-    console.log(seriesInstanceUid);
-
     if (!seriesInstanceUid) {
       return;
     }
@@ -242,9 +229,6 @@ export default class SegmentationMenu extends React.Component {
     } = this.state;
 
     const { importCallback, exportCallback } = this.props;
-
-    console.log("BurshManagementDialog render:");
-    console.log(segments);
 
     const segmentRows = segments.map(segment => (
       <SegmentationMenuListItem

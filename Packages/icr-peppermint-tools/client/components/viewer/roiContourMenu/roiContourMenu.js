@@ -107,8 +107,6 @@ export default class roiContourMenu extends React.Component {
   }
 
   onRoiChange(roiContourIndex) {
-    console.log(`onRoiChange ${roiContourIndex}`);
-
     modules.freehand3D.setters.activeROIContourIndex(
       roiContourIndex,
       this._seriesInstanceUid
@@ -130,8 +128,6 @@ export default class roiContourMenu extends React.Component {
   }
 
   onUnlockClick(structureSetUid) {
-    console.log(structureSetUid);
-
     this.setState({
       unlockConfirmationOpen: true,
       roiCollectionToUnlock: structureSetUid
@@ -144,12 +140,6 @@ export default class roiContourMenu extends React.Component {
 
   onUnlockConfirmClick() {
     const { roiCollectionToUnlock } = this.state;
-
-    console.log(
-      `UNLOCK structureSet: ${
-        this._seriesInstanceUid
-      }, ${roiCollectionToUnlock}`
-    );
 
     unlockStructureSet(this._seriesInstanceUid, roiCollectionToUnlock);
 
@@ -248,9 +238,6 @@ export default class roiContourMenu extends React.Component {
     } = this.state;
 
     const { importCallback, exportCallback } = this.props;
-
-    console.log(this.props);
-
     const freehand3DStore = modules.freehand3D;
 
     if (unlockConfirmationOpen) {
@@ -287,10 +274,6 @@ export default class roiContourMenu extends React.Component {
         </div>
       );
     }
-
-    console.log("WORKING COLLECTION");
-    console.log(workingCollection);
-    console.log(lockedCollections);
 
     let workingCollectionList;
 

@@ -78,7 +78,6 @@ export default function extendBrushModule(brushModule, config) {
     importMetadata.modified = true;
 
     // JamesAPetts
-    console.log(`MODIFYING SEGMENTATION`);
     Session.set("refreshSegmentationMenu", Math.random().toString());
   };
 }

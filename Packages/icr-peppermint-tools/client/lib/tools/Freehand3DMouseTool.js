@@ -151,7 +151,6 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       })
       .catch(error => {
         console.log(error);
-        console.log("failure");
         preventPropagation(evt);
       });
   }

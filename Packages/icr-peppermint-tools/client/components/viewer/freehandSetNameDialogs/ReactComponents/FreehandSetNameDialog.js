@@ -14,20 +14,14 @@ export default class FreehandSetNameDialog extends React.Component {
   }
 
   onTextInputChange(evt) {
-    console.log(evt.target.value);
-
     this._roiContourName = evt.target.value;
   }
 
   onCancelButtonClick() {
-    console.log(`onCancelButtonClick`);
-
     this._closeDialog();
   }
 
   onConfirmButtonClick() {
-    console.log(`onConfirmButtonClick`);
-
     const name = this._roiContourName;
 
     if (name) {

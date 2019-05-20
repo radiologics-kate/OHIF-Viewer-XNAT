@@ -76,7 +76,6 @@ export default function(
 
   Object.keys(toolStateManager).forEach(elementId => {
     // Only get polygons from this series
-    // TODO => There must be a better way to do this with the stack tool now.
     if (getSeriesInstanceUidFromImageId(elementId) === seriesInstanceUid) {
       // grab the freehand tool for this DICOM instance
 
@@ -120,7 +119,6 @@ export default function(
     activeROIContourUid !== null &&
     activeROIContourUid !== undefined
   ) {
-    console.log(`didnt export active contour..`);
     // Make sure we are pointing to the right contour now.
     freehand3DStore.setters.activeROIContour(
       seriesInstanceUid,
@@ -140,7 +138,6 @@ export default function(
 function moveExportedPolygonsInInstance(exportData) {
   const freehand3DStore = modules.freehand3D;
 
-  console.log("====moving exported polygons in instance..");
   const {
     toolData,
     elementId,

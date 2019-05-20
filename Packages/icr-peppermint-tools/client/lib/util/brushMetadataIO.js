@@ -42,8 +42,6 @@ function brushMetdataInput(segIndex, metadata, callback) {
   const brushMetadataDialog = document.getElementById("brushMetadataDialog");
   const dialogData = Blaze.getData(brushMetadataDialog);
 
-  console.log(`BrushMetadataIO:: segIndex: ${segIndex}`);
-
   dialogData.brushMetadataDialogSegIndex.set(segIndex);
   dialogData.brushMetadataDialogMetadata.set(metadata);
   dialogData.brushMetadataDialogCallback.set(callback);

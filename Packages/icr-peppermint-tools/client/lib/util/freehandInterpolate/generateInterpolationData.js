@@ -213,8 +213,6 @@ function _getBoundingPair(sliceIndex, extent, ROIContourData) {
     if (ROIContourData[i].contours) {
       const contours = ROIContourData[i].contours;
 
-      //console.log(contours);
-
       if (contours[0].interpolated) {
         // This contour is interpolated. We need to
         // Find a solid contour to interpolate from.

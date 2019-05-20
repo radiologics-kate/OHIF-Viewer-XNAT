@@ -270,8 +270,6 @@ function setDeleteStructureSet(seriesInstanceUid, structureSetUid) {
     return structureSet.uid === structureSetUid;
   });
 
-  console.log(structureSetIndex);
-
   structureSetCollection.splice(structureSetIndex, 1);
 }
 

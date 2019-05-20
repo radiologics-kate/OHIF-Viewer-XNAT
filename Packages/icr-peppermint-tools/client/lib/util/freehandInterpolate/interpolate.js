@@ -627,7 +627,6 @@ function _reverseIfAntiClockwise(contour) {
   }
 
   if (checkSum > 0) {
-    console.log("anti-clockwise!");
     contour.x.reverse();
     contour.y.reverse();
   }

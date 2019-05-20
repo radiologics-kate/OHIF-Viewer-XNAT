@@ -16,9 +16,6 @@ export default class BrushMetadataDialog extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    console.log(`=== BrushMetadataDialog constructor ===`);
-    console.log(this.props.metadata);
-
     let categoryUID = "T-D0050";
     let typeUID = "T-D0050";
     let modifierUID = null;
@@ -43,8 +40,6 @@ export default class BrushMetadataDialog extends React.Component {
       this._maskName = "";
     }
 
-    // TODO -> populate the state if metadat is passed in through props.
-
     this.state = {
       validName: false,
       validType: false,
@@ -65,16 +60,11 @@ export default class BrushMetadataDialog extends React.Component {
     this._confirmButtonClasses = this._confirmButtonClasses.bind(this);
     this._segmentColor = this._segmentColor.bind(this);
     this._closeDialog = this._closeDialog.bind(this);
-
-    console.log(`========================================`);
   }
 
   onTextInputChange(evt) {
     const { validName } = this.state;
-
     const name = evt.target.value;
-
-    console.log(evt.target.value);
 
     this._maskName = name;
 
@@ -86,8 +76,6 @@ export default class BrushMetadataDialog extends React.Component {
   }
 
   onCategoryChange(evt) {
-    console.log(evt.target.value);
-
     const categoryUID = evt.target.value;
 
     const category = categories.find(
@@ -103,15 +91,11 @@ export default class BrushMetadataDialog extends React.Component {
       modifierUID = firstType.Modifier[0].CodeValue;
     }
 
-    console.log(categoryUID, typeUID, modifierUID);
-
     this.setState({ categoryUID, typeUID, modifierUID });
   }
 
   onTypeChange(evt) {
     const { categoryUID } = this.state;
-    console.log(evt.target.value);
-
     const typeUID = evt.target.value;
 
     const category = categories.find(
@@ -127,33 +111,23 @@ export default class BrushMetadataDialog extends React.Component {
       modifierUID = type.Modifier[0].CodeValue;
     }
 
-    console.log(typeUID, modifierUID);
-
     this.setState({ typeUID, modifierUID });
   }
 
   onModifierChange(evt) {
-    console.log(evt.target.value);
-
     const modifierUID = evt.target.value;
 
     this.setState({ modifierUID });
   }
 
   onCancelButtonClick() {
-    console.log(`onCancelButtonClick`);
-
     this.props.callback(null);
-
     this._closeDialog();
   }
 
   onConfirmButtonClick() {
     const { categoryUID, typeUID, modifierUID } = this.state;
     const { segIndex } = this.props;
-
-    console.log(`onConfirmButtonClick`);
-
     const data = {
       label: this._maskName,
       categoryUID,
@@ -220,7 +194,7 @@ export default class BrushMetadataDialog extends React.Component {
     const { categoryUID, typeUID, modifierUID } = this.state;
     const defaultName = this._maskName;
 
-    const segmentIndexText = `Segment ${segIndex}`; // TODO write segIndex + 1 once working.
+    const segmentIndexText = `Segment ${segIndex + 1}`;
 
     const validLabelIndicator = this._validLabelIndicator();
 
@@ -241,16 +215,10 @@ export default class BrushMetadataDialog extends React.Component {
       </>
     );
 
-    console.log(`categories:`);
-    console.log(categories);
-
     const category = categories.find(
       categoriesI => categoriesI.CodeValue === categoryUID
     );
     const types = category.Type;
-
-    console.log("types:");
-    console.log(types);
 
     const typeSelect = (
       <>
@@ -269,12 +237,7 @@ export default class BrushMetadataDialog extends React.Component {
       </>
     );
 
-    // TODO -> Type not changing on select.
-
     const type = types.find(typesI => typesI.CodeValue === typeUID);
-
-    console.log(`type`);
-    console.log(type);
 
     let modifierSelect;
 

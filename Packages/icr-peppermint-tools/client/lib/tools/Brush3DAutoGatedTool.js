@@ -87,9 +87,6 @@ export default class Brush3DAutoGatedTool extends Brush3DHUGatedTool {
     const { rows, columns } = image;
     const imagePixelData = image.getPixelData();
     const gateValues = this.gate;
-
-    console.log(gateValues);
-
     const rescaleSlope = image.slope || 1;
     const rescaleIntercept = image.intercept || 0;
 

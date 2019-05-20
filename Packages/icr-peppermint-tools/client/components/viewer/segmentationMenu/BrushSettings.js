@@ -12,8 +12,6 @@ export default class BrushSettings extends React.Component {
 
     const customGateRange = brushModule.getters.customGateRange();
 
-    console.log(brushState);
-
     this.state = {
       holeFill: brushState.holeFill,
       strayRemove: brushState.strayRemove,
@@ -36,8 +34,6 @@ export default class BrushSettings extends React.Component {
   }
 
   onGateChange(evt) {
-    console.log(evt.target.value);
-
     const val = evt.target.value;
 
     this.setState({ activeGate: val });
@@ -73,8 +69,6 @@ export default class BrushSettings extends React.Component {
   }
 
   onHoleFillChange(evt) {
-    console.log(evt.target.value);
-
     const val = Number(evt.target.value);
 
     this.setState({ holeFill: val });
@@ -82,8 +76,6 @@ export default class BrushSettings extends React.Component {
   }
 
   onStrayRemoveChange(evt) {
-    console.log(evt.target.value);
-
     const val = Number(evt.target.value);
 
     this.setState({ strayRemove: val });
@@ -101,8 +93,6 @@ export default class BrushSettings extends React.Component {
       customGateRangeMin,
       customGateRangeMax
     } = this.state;
-
-    console.log("BrushSettings render");
 
     const gates = brushState.gates;
 
@@ -152,8 +142,6 @@ export default class BrushSettings extends React.Component {
         </div>
       );
     }
-
-    console.log(`activeGate: ${activeGate}`);
 
     return (
       <div className="brush-settings-component">
