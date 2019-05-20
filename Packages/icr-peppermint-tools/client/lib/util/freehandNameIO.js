@@ -1,11 +1,11 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveSeriesInstanceUid from "./getActiveSeriesInstanceUid.js";
 
 const modules = cornerstoneTools.store.modules;
 
 function createNewVolumeCallback(name) {
   // Create and activate new ROIContour
-  const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+  const activeSeriesInstanceUid = getActiveSeriesInstanceUid();
 
   //Check if default structureSet exists for this series.
   if (!modules.freehand3D.getters.series(activeSeriesInstanceUid)) {

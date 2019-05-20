@@ -3,18 +3,15 @@ import WorkingCollectionList from "./WorkingCollectionList.js";
 import LockedCollectionsList from "./LockedCollectionsList.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveSeriesInstanceUid from "../../../lib/util/getActiveSeriesInstanceUid.js";
 import {
   createNewVolume,
   setVolumeName
 } from "../../../lib/util/freehandNameIO.js";
 import unlockStructureSet from "../../../lib/util/unlockStructureSet.js";
-
 import "./roiContourMenu.styl";
 
 const modules = cornerstoneTools.store.modules;
-
-//
 
 export default class roiContourMenu extends React.Component {
   constructor(props = {}) {
@@ -57,7 +54,7 @@ export default class roiContourMenu extends React.Component {
   }
 
   componentDidMount() {
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
     if (!seriesInstanceUid) {
       return;

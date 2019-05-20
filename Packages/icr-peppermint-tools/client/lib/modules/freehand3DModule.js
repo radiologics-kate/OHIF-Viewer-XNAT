@@ -1,7 +1,7 @@
 import { cornerstone } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
 import generateUID from "../util/generateUID.js";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getSeriesInstanceUidFromEnabledElement from "../util/getSeriesInstanceUidFromEnabledElement.js";
 
 /**
  * @typedef {series[]} seriesCollection
@@ -419,7 +419,7 @@ function enabledElementCallback(element) {
     return;
   }
 
-  const seriesInstanceUid = SeriesInfoProvider.getSeriesInstanceUid(
+  const seriesInstanceUid = getSeriesInstanceUidFromEnabledElement(
     enabledElement
   );
 

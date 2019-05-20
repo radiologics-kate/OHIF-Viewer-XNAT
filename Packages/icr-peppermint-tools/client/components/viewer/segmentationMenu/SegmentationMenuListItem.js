@@ -1,7 +1,6 @@
 import React from "react";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
 import {
   newSegmentInput,
   editSegmentInput

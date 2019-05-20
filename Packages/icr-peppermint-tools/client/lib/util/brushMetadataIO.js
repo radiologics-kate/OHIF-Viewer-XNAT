@@ -1,5 +1,5 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveSeriesInstanceUid from "./getActiveSeriesInstanceUid.js";
 import generateBrushMetadata from "../../lib/util/generateBrushMetadata.js";
 
 const brushModule = cornerstoneTools.store.modules.brush;
@@ -19,7 +19,7 @@ function segmentInputCallback(data) {
 
   const { label, categoryUID, typeUID, modifierUID, segIndex } = data;
 
-  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+  const seriesInstanceUid = getActiveSeriesInstanceUid();
   const metadata = generateBrushMetadata(
     label,
     categoryUID,

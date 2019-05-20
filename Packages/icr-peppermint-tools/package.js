@@ -10,15 +10,7 @@ Package.onUse(function(api) {
   api.use(["ecmascript", "standard-app-packages", "http", "jquery", "stylus"]);
 
   // OHIF dependencies
-  api.use([
-    "ohif:design",
-    "ohif:cornerstone",
-    "ohif:core",
-    "ohif:hotkeys",
-    "ohif:log",
-    "icr:series-info-provider",
-    "icr:xnat-roi-namespace"
-  ]);
+  api.use(["ohif:design", "ohif:cornerstone", "ohif:core"]);
 
   // ===== Assets =====
   api.addAssets("assets/icons.svg", "client");

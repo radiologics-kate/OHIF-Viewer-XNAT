@@ -1,7 +1,7 @@
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import isDialogOpen from "../util/isDialogOpen.js";
+import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
 import getActiveBrushToolsForElement from "../util/getActiveBrushToolsForElement.js";
 import { newSegmentInput } from "../util/brushMetadataIO.js";
 
@@ -12,7 +12,7 @@ const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 const brushModule = cornerstoneTools.store.modules.brush;
 
 Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
-  if (isModalOpen()) {
+  if (isDialogOpen()) {
     return;
   }
 
@@ -62,7 +62,7 @@ Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
 });
 
 function newSegmentation() {
-  const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+  const seriesInstanceUid = getActiveSeriesInstanceUid();
 
   let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
 

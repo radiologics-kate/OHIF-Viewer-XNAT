@@ -1,7 +1,6 @@
-import { cornerstoneTools, cornerstoneMath } from "meteor/ohif:cornerstone";
-import { OHIF } from "meteor/ohif:core";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
+import isDialogOpen from "../util/isDialogOpen.js";
 
 import { newSegmentInput } from "../util/brushMetadataIO.js";
 
@@ -37,7 +36,7 @@ export default class Brush3DTool extends BrushTool {
     const eventData = evt.detail;
     const element = eventData.element;
     const segIndex = brushModule.state.drawColorId;
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
     // Check if metadata exists,
     const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
@@ -49,7 +48,7 @@ export default class Brush3DTool extends BrushTool {
       this._drawing = true;
       this._startListeningForMouseUp(element);
       this._lastImageCoords = eventData.currentPoints.image;
-    } else if (!isModalOpen()) {
+    } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
       newSegmentInput(brushModule.state.drawColorId);
     }
@@ -66,7 +65,7 @@ export default class Brush3DTool extends BrushTool {
     const eventData = evt.detail;
     const element = eventData.element;
     const segIndex = brushModule.state.drawColorId;
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
     // Check if metadata exists,
     const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
@@ -75,7 +74,7 @@ export default class Brush3DTool extends BrushTool {
       // Metadata assigned, start drawing.
       this._setActiveStrategy(seriesInstanceUid);
       this._paint(evt);
-    } else if (!isModalOpen()) {
+    } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
       newSegmentInput(brushModule.state.drawColorId);
     }
@@ -99,12 +98,12 @@ export default class Brush3DTool extends BrushTool {
   }
 
   static checkIfAnyMetadataOnSeries() {
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
     const metaData = brushModule.getters.metadata(seriesInstanceUid);
 
     // If metadata doesn't exist, or all elements undefined (i.e. deleted), open UI.
     if (!metaData || !metaData.find(element => element)) {
-      if (!isModalOpen()) {
+      if (!isDialogOpen()) {
         brushModule.state.drawColorId = 0;
         newSegmentInput(brushModule.state.drawColorId);
       }

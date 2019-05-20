@@ -1,16 +1,18 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { createNewVolume } from "../util/freehandNameIO.js";
 import { OHIF } from "meteor/ohif:core";
-import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
+import isDialogOpen from "../util/isDialogOpen.js";
 
 const getKeyFromKeyCode = cornerstoneTools.import("util/getKeyFromKeyCode");
 const Mousetrap = require("mousetrap");
 const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
 
+// TODO -> Move all this to OHIF viewer keybindings if thats possible through a plugin?
+
 Mousetrap.bind(
   ["n", "N", "ctrl", "del"],
   function(evt) {
-    if (isModalOpen()) {
+    if (isDialogOpen()) {
       return;
     }
 
@@ -54,7 +56,7 @@ Mousetrap.bind(
 Mousetrap.bind(
   ["ctrl"],
   function(evt) {
-    if (isModalOpen()) {
+    if (isDialogOpen()) {
       return;
     }
 

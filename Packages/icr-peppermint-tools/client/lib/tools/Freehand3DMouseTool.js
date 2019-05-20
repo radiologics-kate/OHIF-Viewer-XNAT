@@ -4,11 +4,10 @@ import {
   cornerstoneMath
 } from "meteor/ohif:cornerstone";
 import generateUID from "../util/generateUID.js";
-import { OHIF } from "meteor/ohif:core";
 import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
 import interpolate from "../util/freehandInterpolate/interpolate.js";
 
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
 
 // Cornerstone 3rd party dev kit imports
 const {
@@ -79,7 +78,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
     const referencedStructureSet = freehand3DStore.getters.structureSet(
       seriesInstanceUid,
       "DEFAULT"
@@ -140,7 +139,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
       return;
     }
 
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
     this._checkVolumeName(seriesInstanceUid)
       .then(() => {
@@ -158,7 +157,7 @@ export default class Freehand3DMouseTool extends FreehandMouseTool {
   }
 
   static checkIfFirstVolumeOnSeries() {
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
     const freehand3DStore = modules.freehand3D;
     let series = freehand3DStore.getters.series(seriesInstanceUid);
 

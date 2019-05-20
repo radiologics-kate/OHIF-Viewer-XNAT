@@ -1,12 +1,5 @@
-import {
-  cornerstoneTools,
-  cornerstone,
-  cornerstoneMath
-} from "meteor/ohif:cornerstone";
-import { OHIF } from "meteor/ohif:core";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { cornerstoneTools, cornerstone } from "meteor/ohif:cornerstone";
 import Brush3DTool from "./Brush3DTool.js";
-import { icrXnatRoiSession, isModalOpen } from "meteor/icr:xnat-roi-namespace";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 const getToolState = cornerstoneTools.getToolState;

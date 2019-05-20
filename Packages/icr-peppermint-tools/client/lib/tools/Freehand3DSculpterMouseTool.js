@@ -1,8 +1,4 @@
-import { cornerstoneTools, cornerstoneMath } from "meteor/ohif:cornerstone";
-import generateUID from "../util/generateUID.js";
-import { OHIF } from "meteor/ohif:core";
-import { createNewVolume, setVolumeName } from "../util/freehandNameIO.js";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import interpolate from "../util/freehandInterpolate/interpolate.js";
 
 const FreehandSculpterMouseTool = cornerstoneTools.FreehandSculpterMouseTool;

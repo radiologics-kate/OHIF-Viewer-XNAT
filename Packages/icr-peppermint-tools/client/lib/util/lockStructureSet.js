@@ -1,5 +1,6 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
+import getSeriesInstanceUidFromImageId from "./getSeriesInstanceUidFromImageId.js";
 
 const modules = cornerstoneTools.store.modules;
 const globalToolStateManager =
@@ -127,17 +128,6 @@ export default function(
       activeROIContourUid
     );
   }
-}
-
-/**
- * Extracts the seriesInstanceUid from an image, given the imageId.
- * TODO -> Move this to SeriesInfoProvider.
- *
- * @param {String} imageId The ID of the image being queried.
- */
-function getSeriesInstanceUidFromImageId(imageId) {
-  const metaData = OHIF.viewer.metadataProvider.getMetadata(imageId);
-  return metaData.series.seriesInstanceUid;
 }
 
 /**

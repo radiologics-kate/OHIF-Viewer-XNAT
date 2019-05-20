@@ -3,14 +3,13 @@ import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
 import BrushSettings from "./BrushSettings.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
-import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
+import getActiveSeriesInstanceUid from "../../../lib/util/getActiveSeriesInstanceUid.js";
 import {
   newSegmentInput,
   editSegmentInput
 } from "../../../lib/util/brushMetadataIO.js";
 import deleteSegment from "../../../lib/util/deleteSegment.js";
 import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
-
 import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
@@ -48,7 +47,7 @@ export default class SegmentationMenu extends React.Component {
   }
 
   componentDidMount() {
-    this._seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    this._seriesInstanceUid = getActiveSeriesInstanceUid();
 
     if (!this._seriesInstanceUid) {
       return;
@@ -72,7 +71,7 @@ export default class SegmentationMenu extends React.Component {
   }
 
   onNewSegmentButtonClick() {
-    const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
+    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
     let segmentMetadata =
       brushModule.state.segmentationMetadata[seriesInstanceUid];

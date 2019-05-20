@@ -1,106 +1,20 @@
-import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import freehand3DModule from "./lib/modules/freehand3DModule.js";
+import extendBrushModule from "./lib/modules/extendBrushModule.js";
 
 const modules = cornerstoneTools.store.modules;
 
 export default function initialise(configuration = {}) {
   const brushModule = cornerstoneTools.store.modules.brush;
-  const brushState = brushModule.state;
 
   const config = Object.assign({}, defaultConfig, configuration);
 
-  brushState.holeFill = config.holeFill;
-  brushState.holeFillRange = config.holeFillRange;
-  brushState.strayRemove = config.strayRemove;
-  brushState.strayRemoveRange = config.strayRemoveRange;
-  brushState.gates = config.gates;
-  brushState.gates.push({
-    name: "custom",
-    range: [0, 100]
-  });
-  brushState.activeGate = brushState.gates[0].name;
-  brushState.maxRadius = config.maxRadius;
+  extendBrushModule(brushModule, config);
+
   cornerstoneTools.register("module", "freehand3D", freehand3DModule);
-
   const freehand3DStore = modules.freehand3D;
-
-  icrXnatRoiSession.set("freehandInterpolate", config.interpolate);
   freehand3DStore.state.interpolate = config.interpolate;
-
-  icrXnatRoiSession.set("showFreehandStats", config.showFreehandStats);
   freehand3DStore.state.displayStats = config.showFreehandStats;
-
-  brushModule.getters.activeGateRange = () => {
-    const activeGate = brushState.activeGate;
-    const gates = brushState.gates;
-
-    const gateIndex = gates.findIndex(element => {
-      return element.name === activeGate;
-    });
-
-    return brushState.gates[gateIndex].range;
-  };
-
-  brushModule.getters.customGateRange = () => {
-    const gates = brushState.gates;
-
-    const gateIndex = gates.findIndex(element => {
-      return element.name === "custom";
-    });
-
-    return brushState.gates[gateIndex].range;
-  };
-
-  brushModule.setters.customGateRange = (min, max) => {
-    const gates = brushState.gates;
-
-    const gateIndex = gates.findIndex(element => {
-      return element.name === "custom";
-    });
-
-    const customGateRange = brushState.gates[gateIndex].range;
-
-    if (min !== null) {
-      customGateRange[0] = min;
-    }
-
-    if (max !== null) {
-      customGateRange[1] = max;
-    }
-  };
-
-  brushModule.getters.importMetadata = seriesInstanceUid => {
-    if (
-      brushModule.state.import &&
-      brushModule.state.import[seriesInstanceUid]
-    ) {
-      return brushModule.state.import[seriesInstanceUid];
-    }
-  };
-
-  brushModule.setters.importMetadata = (seriesInstanceUid, metadata) => {
-    // Store that we've imported a collection for this series.
-    if (!brushModule.state.import) {
-      brushModule.state.import = {};
-    }
-
-    brushModule.state.import[seriesInstanceUid] = metadata;
-  };
-
-  brushModule.setters.importModified = seriesInstanceUid => {
-    const importMetadata = brushModule.state.import[seriesInstanceUid];
-
-    if (importMetadata.modified) {
-      return;
-    }
-
-    importMetadata.modified = true;
-
-    // JamesAPetts
-    console.log(`MODIFYING SEGMENTATION`);
-    Session.set("refreshSegmentationMenu", Math.random().toString());
-  };
 }
 
 const defaultConfig = {
@@ -125,6 +39,10 @@ const defaultConfig = {
     {
       name: "bone",
       range: [150, 2000]
+    },
+    {
+      name: "custom",
+      range: [0, 100]
     }
   ]
 };
