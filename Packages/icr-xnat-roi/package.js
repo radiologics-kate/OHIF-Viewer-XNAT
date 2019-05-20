@@ -48,44 +48,6 @@ Package.onUse(function(api) {
     "client"
   );
 
-  api.addFiles(
-    "client/components/viewer/maskImportListDialogs/maskImportListDialogs.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/maskImportListDialogs/maskImportListDialogs.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/maskImportListDialogs/maskImportListDialogs.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiExportListDialogs/roiExportListDialogs.styl",
-    "client"
-  );
-
-  api.addFiles(
-    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/maskExportListDialogs/maskExportListDialogs.styl",
-    "client"
-  );
   // Help Menu
   api.addFiles(
     "client/components/viewer/helpDialogs/helpDialogs.html",

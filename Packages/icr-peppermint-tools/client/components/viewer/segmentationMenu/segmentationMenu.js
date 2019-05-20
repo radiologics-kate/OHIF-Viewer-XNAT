@@ -27,6 +27,10 @@ export default class SegmentationMenu extends React.Component {
     this.onDeleteClick = this.onDeleteClick.bind(this);
     this.onDeleteCancelClick = this.onDeleteCancelClick.bind(this);
     this.onDeleteConfirmClick = this.onDeleteConfirmClick.bind(this);
+    this.onImportButtonClick = this.onImportButtonClick.bind(this);
+    this.onExportButtonClick = this.onExportButtonClick.bind(this);
+    this.onIOComplete = this.onIOComplete.bind(this);
+    this.onIOCancel = this.onIOCancel.bind(this);
     this._importMetadata = this._importMetadata.bind(this);
     this._visableSegmentsForElement = this._visableSegmentsForElement.bind(
       this
@@ -39,7 +43,9 @@ export default class SegmentationMenu extends React.Component {
       visibleSegments: [],
       deleteConfirmationOpen: false,
       segmentToDelete: 0,
-      activeSegmentIndex: 0
+      activeSegmentIndex: 0,
+      importing: false,
+      exporting: false
     };
   }
 
@@ -60,6 +66,48 @@ export default class SegmentationMenu extends React.Component {
       visibleSegments,
       activeSegmentIndex: brushModule.state.drawColorId
     });
+  }
+
+  onIOComplete() {
+    const importMetadata = this._importMetadata();
+    const segments = this._segments();
+    const visibleSegments = this._visableSegmentsForElement();
+
+    this.setState({
+      importMetadata,
+      segments,
+      visibleSegments,
+      activeSegmentIndex: brushModule.state.drawColorId,
+      importing: false,
+      exporting: false
+    });
+  }
+
+  onIOCancel() {
+    this.setState({
+      importing: false,
+      exporting: false
+    });
+  }
+
+  onImportButtonClick() {
+    const { ImportCallbackOrComponent } = this.props;
+
+    if (ImportCallbackOrComponent.prototype.isReactComponent) {
+      this.setState({ importing: true });
+    } else {
+      ImportCallbackOrComponent();
+    }
+  }
+
+  onExportButtonClick() {
+    const { ExportCallbackOrComponent } = this.props;
+
+    if (ExportCallbackOrComponent.prototype.isReactComponent) {
+      this.setState({ exporting: true });
+    } else {
+      ExportCallbackOrComponent();
+    }
   }
 
   onNewSegmentButtonClick() {
@@ -225,10 +273,12 @@ export default class SegmentationMenu extends React.Component {
       visibleSegments,
       deleteConfirmationOpen,
       segmentToDelete,
-      activeSegmentIndex
+      activeSegmentIndex,
+      importing,
+      exporting
     } = this.state;
 
-    const { importCallback, exportCallback } = this.props;
+    const { ImportCallbackOrComponent, ExportCallbackOrComponent } = this.props;
 
     const segmentRows = segments.map(segment => (
       <SegmentationMenuListItem
@@ -241,6 +291,8 @@ export default class SegmentationMenu extends React.Component {
         onEditClick={this.onEditClick}
         onDeleteClick={this.onDeleteClick}
         checked={segment.index === activeSegmentIndex}
+        ImportCallbackOrComponent
+        ExportCallbackOrComponent
       />
     ));
 
@@ -279,26 +331,41 @@ export default class SegmentationMenu extends React.Component {
       );
     }
 
+    if (importing) {
+      return (
+        <ImportCallbackOrComponent
+          onImportComplete={this.onIOComplete}
+          onImportCancel={this.onIOCancel}
+        />
+      );
+    }
+
+    if (exporting) {
+      return (
+        <ExportCallbackOrComponent
+          onExportComplete={this.onIOComplete}
+          onExportCancel={this.onIOCancel}
+        />
+      );
+    }
+
     let ioMenu;
 
-    if (
-      typeof importCallback === "function" ||
-      typeof exportCallback === "function"
-    ) {
+    if (ImportCallbackOrComponent || ExportCallbackOrComponent) {
       ioMenu = (
         <div>
-          {importCallback && (
+          {ImportCallbackOrComponent && (
             <a
               className="btn btn-sm btn-primary roi-contour-menu-io-button"
-              onClick={importCallback}
+              onClick={this.onImportButtonClick}
             >
               Import
             </a>
           )}
-          {exportCallback && (
+          {ExportCallbackOrComponent && (
             <a
               className="btn btn-sm btn-primary roi-contour-menu-io-button"
-              onClick={exportCallback}
+              onClick={this.onExportButtonClick}
             >
               Export
             </a>

@@ -1,13 +1,15 @@
 import React from "react";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import DICOMSEGWriter from "../../../../lib/IO/classes/DICOMSEGWriter.js";
-import DICOMSEGExporter from "../../../../lib/IO/classes/DICOMSEGExporter.js";
+import DICOMSEGWriter from "../../../lib/IO/classes/DICOMSEGWriter.js";
+import DICOMSEGExporter from "../../../lib/IO/classes/DICOMSEGExporter.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import { displayExportFailedDialog } from "../../../../lib/dialogUtils/displayExportDialogs.js";
-import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
-import generateDateTimeAndLabel from "../../../../lib/util/generateDateTimeAndLabel.js";
+import { displayExportFailedDialog } from "../../../lib/dialogUtils/displayExportDialogs.js";
+import awaitConfirmationDialog from "../../../lib/dialogUtils/awaitConfirmationDialog.js";
+import generateDateTimeAndLabel from "../../../lib/util/generateDateTimeAndLabel.js";
 import MaskExportListItem from "./MaskExportListItem.js";
+
+import "./maskExportListDialogs.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -100,7 +102,7 @@ export default class MaskExportListDialog extends React.Component {
 
           // JamesAPetts
           Session.set("refreshSegmentationMenu", Math.random().toString);
-          this._closeDialog();
+          this.props.onExportComplete();
 
           // TODO -> Work on backup mechanism, disabled for now.
           //console.log('=====checking backup:=====');
@@ -112,13 +114,13 @@ export default class MaskExportListDialog extends React.Component {
           // TODO -> Work on backup mechanism, disabled for now.
           //localBackup.saveBackUpForActiveSeries();
           displayExportFailedDialog(seriesInstanceUid);
-          this._closeDialog();
+          this.props.onExportCancel();
         });
     });
   }
 
   onCloseButtonClick() {
-    this._closeDialog();
+    this.props.onExportCancel();
   }
 
   /**
@@ -178,11 +180,6 @@ export default class MaskExportListDialog extends React.Component {
     this.setState({ segList });
   }
 
-  _closeDialog() {
-    const dialog = document.getElementById("maskExportListDialog");
-    dialog.close();
-  }
-
   render() {
     const { label, segList, exporting, importMetadata } = this.state;
 
@@ -233,7 +230,7 @@ export default class MaskExportListDialog extends React.Component {
     }
 
     return (
-      <div>
+      <div className="mask-export-list-dialog">
         <div className="mask-export-list-header">
           <h3>Export Segmentations</h3>
           {!exporting && (

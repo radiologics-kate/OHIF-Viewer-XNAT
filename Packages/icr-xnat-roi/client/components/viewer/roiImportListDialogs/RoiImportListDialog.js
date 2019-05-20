@@ -1,30 +1,27 @@
 import React from "react";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import MaskImporter from "../../../../lib/IO/classes/MaskImporter.js";
+import RoiImporter from "../../../../lib/IO/classes/RoiImporter.js";
 import fetchJSON from "../../../../lib/IO/fetchJSON.js";
 import fetchXML from "../../../../lib/IO/fetchXML.js";
 import fetchArrayBuffer from "../../../../lib/IO/fetchArrayBuffer.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
 
-const brushModule = cornerstoneTools.store.modules.brush;
+import "./roiImportListDialogs.styl";
 
-const overwriteConfirmationContent = {
-  title: `Warning`,
-  body: `
-    Loading in another Segmentation will overwrite existing segmentation data. Are you sure
-    you want to do this?
-  `
-};
+const modules = cornerstoneTools.store.modules;
 
-export default class MaskImportListDialog extends React.Component {
+export default class RoiImportListDialog extends React.Component {
   constructor(props = {}) {
     super(props);
 
+    selectedCheckboxes = [];
+
+    console.log("RoiImportListDialog");
+
     this.state = {
-      scanSelected: 0,
-      segmentationSelected: 0,
+      selectAllChecked: true,
+      selectedCheckboxes,
       importListReady: false,
       importList: [],
       importing: false,
@@ -32,86 +29,71 @@ export default class MaskImportListDialog extends React.Component {
     };
 
     this._cancelablePromises = [];
-    this._validTypes = ["SEG", "NIFTI"];
+    this._validTypes = ["AIM", "RTSTRUCT"];
+
+    this.onChangeCheckbox = this.onChangeCheckbox.bind(this);
+    this.onChangeSelectAllCheckbox = this.onChangeSelectAllCheckbox.bind(this);
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onCloseButtonClick = this.onCloseButtonClick.bind(this);
+    this._getVolumeManagementLabels = this._getVolumeManagementLabels.bind(
+      this
+    );
     this._collectionEligibleForImport = this._collectionEligibleForImport.bind(
       this
     );
-    this.onSelectedScanChange = this.onSelectedScanChange.bind(this);
-    this.onChangeRadio = this.onChangeRadio.bind(this);
-
-    this._hasExistingMaskData = this._hasExistingMaskData.bind(this);
     this._updateImportingText = this._updateImportingText.bind(this);
     this._closeDialog = this._closeDialog.bind(this);
-  }
-
-  onSelectedScanChange(evt) {
-    console.log(evt.target.value);
-
-    const val = evt.target.value;
-
-    this.setState({ scanSelected: val });
+    this._incrementNumCollectionsParsed = this._incrementNumCollectionsParsed.bind(
+      this
+    );
   }
 
   onCloseButtonClick() {
     this._closeDialog();
   }
 
-  onChangeRadio(evt, index) {
-    this.setState({ segmentationSelected: index });
+  onChangeCheckbox(evt, index) {
+    const selectedCheckboxes = this.state.selectedCheckboxes;
+
+    selectedCheckboxes[index] = evt.target.checked;
+    this.setState({ selectedCheckboxes });
   }
 
-  async onExportButtonClick() {
-    const { importList, scanSelected, segmentationSelected } = this.state;
+  onChangeSelectAllCheckbox(evt) {
+    const selectedCheckboxes = this.state.selectedCheckboxes;
+    const checked = evt.target.checked;
 
-    console.log(`onExportButtonClick:`);
+    for (let i = 0; i < selectedCheckboxes.length; i++) {
+      selectedCheckboxes[i] = checked;
+    }
 
-    const scan = importList[scanSelected];
+    this.setState({ selectAllChecked: evt.target.checked, selectedCheckboxes });
+  }
 
-    console.log(`scan:`);
-    console.log(scan);
+  onExportButtonClick() {
+    const { importList, selectedCheckboxes } = this.state;
 
-    if (this._hasExistingMaskData(scan.referencedSeriesInstanceUid)) {
-      confirmed = await awaitConfirmationDialog(overwriteConfirmationContent);
+    this._numCollectionsParsed = 0;
+    this._numCollectionsToParse = 0;
 
-      if (!confirmed) {
-        return;
+    for (let i = 0; i < importList.length; i++) {
+      if (selectedCheckboxes[i]) {
+        this._numCollectionsToParse++;
       }
+    }
+
+    if (this._numCollectionsToParse === 0) {
+      return;
     }
 
     this._updateImportingText("");
     this.setState({ importing: true });
 
-    console.log(`segmentationSelected:`);
-    console.log(segmentationSelected);
-
-    console.log(`segmentation:`);
-    console.log(scan.segmentations[segmentationSelected]);
-
-    this._importRoiCollection(scan.segmentations[segmentationSelected], scan);
-  }
-
-  /**
-   * _hasExistingMaskData - Check if we either have an import
-   *                        (quicker to check), or we have some data.
-   *
-   * @returns {boolean}  Whether mask data exists.
-   */
-  _hasExistingMaskData(seriesInstanceUid) {
-    let hasData = false;
-    if (brushModule.getters.importMetadata(seriesInstanceUid)) {
-      hasData = true;
-    } else {
-      const metadata =
-        brushModule.state.segmentationMetadata[seriesInstanceUid];
-
-      if (metadata) {
-        hasData = metadata.some(data => data !== undefined);
+    for (let i = 0; i < importList.length; i++) {
+      if (selectedCheckboxes[i]) {
+        this._importRoiCollection(importList[i]);
       }
     }
-
-    return hasData;
   }
 
   /**
@@ -131,7 +113,7 @@ export default class MaskImportListDialog extends React.Component {
   }
 
   /**
-   * componentDidMount - On mounting, fetch a list of available projects from XNAT.
+   * componentDidMount - On mounting, fetch a list of available ROICollections from XNAT.
    *
    * @returns {type}  description
    */
@@ -144,7 +126,7 @@ export default class MaskImportListDialog extends React.Component {
 
     const sessions = sessionMap.getSession();
 
-    console.log(`sessions`);
+    console.log(`sessions:`);
     console.log(sessions);
 
     this._subjectId = sessionMap.getSubject();
@@ -163,6 +145,8 @@ export default class MaskImportListDialog extends React.Component {
       promises.push(cancelablePromise.promise);
       this._cancelablePromises.push(cancelablePromise);
     }
+
+    this._volumeManagementLabels = this._getVolumeManagementLabels();
 
     Promise.all(promises).then(sessionAssessorLists => {
       const roiCollectionPromises = [];
@@ -223,29 +207,13 @@ export default class MaskImportListDialog extends React.Component {
             referencedScan &&
             this._collectionEligibleForImport(roiCollectionInfo)
           ) {
-            let referencedSeriesNumberList = importList.find(
-              element =>
-                element.referencedSeriesNumber ===
-                  referencedScan.seriesNumber &&
-                element.experimentLabel === referencedScan.experimentLabel
-            );
-
-            if (!referencedSeriesNumberList) {
-              importList.push({
-                index: importList.length,
-                referencedSeriesNumber: referencedScan.seriesNumber,
-                referencedSeriesInstanceUid: referencedScan.seriesInstanceUid,
-                experimentLabel: referencedScan.experimentLabel,
-                experimentId: referencedScan.experimentId,
-                segmentations: []
-              });
-
-              referencedSeriesNumberList = importList[importList.length - 1];
-            }
-
-            referencedSeriesNumberList.segmentations.push({
+            importList.push({
               collectionType: data_fields.collectionType,
               label: data_fields.label,
+              experimentId: data_fields.imageSession_ID,
+              experimentLabel: referencedScan.experimentLabel,
+              referencedSeriesInstanceUid: referencedScan.seriesInstanceUid,
+              referencedSeriesNumber: referencedScan.seriesNumber,
               name: data_fields.name,
               getFilesUri: `/data/archive/experiments/${
                 data_fields.imageSession_ID
@@ -254,42 +222,43 @@ export default class MaskImportListDialog extends React.Component {
           }
         });
 
+        const selectedCheckboxes = [];
+
+        for (let i = 0; i < importList.length; i++) {
+          selectedCheckboxes.push(true);
+        }
+
         console.log(importList);
-
-        const activeSeriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
-
-        const scanSelected = importList.findIndex(
-          scan => scan.referencedSeriesInstanceUid === activeSeriesInstanceUid
-        );
 
         this.setState({
           importList,
           importListReady: true,
-          scanSelected: scanSelected !== -1 ? scanSelected : 0,
-          segmentationSelected: 0
+          selectedCheckboxes
         });
       });
     });
   }
 
   _closeDialog() {
-    const dialog = document.getElementById("maskImportListDialog");
+    const dialog = document.getElementById("roiImportListDialog");
     dialog.close();
   }
 
   _updateImportingText(roiCollectionLabel) {
     this.setState({
-      progressText: roiCollectionLabel
+      progressText: `${roiCollectionLabel} ${this._numCollectionsParsed}/${
+        this._numCollectionsToParse
+      }`
     });
   }
 
-  async _importRoiCollection(segmentation, scan) {
-    const roiList = await fetchJSON(segmentation.getFilesUri).promise;
+  async _importRoiCollection(roiCollectionInfo) {
+    const roiList = await fetchJSON(roiCollectionInfo.getFilesUri).promise;
     const result = roiList.ResultSet.Result;
 
     // Reduce count if no associated file is found (nothing to import, badly deleted roiCollection).
     if (result.length === 0) {
-      this._closeDialog();
+      this._incrementNumCollectionsParsed(roiCollectionInfo.name);
 
       return;
     }
@@ -298,8 +267,8 @@ export default class MaskImportListDialog extends React.Component {
     // In an ideal world this should always be 1, and any other resources -- if any -- are differently formated representations of the same data, but things happen.
     for (let i = 0; i < result.length; i++) {
       const fileType = result[i].collection;
-      if (fileType === segmentation.collectionType) {
-        this._getAndImportFile(result[i].URI, segmentation, scan);
+      if (fileType === roiCollectionInfo.collectionType) {
+        this._getAndImportFile(result[i].URI, roiCollectionInfo);
       }
     }
   }
@@ -309,60 +278,69 @@ export default class MaskImportListDialog extends React.Component {
    *                     cornerstoneTools toolData.
    *
    * @param  {string} uri             The REST URI of the file.
-   * @param  {object} segmentation    An object describing the roiCollection to
+   * @param  {object} collectionInfo  An object describing the roiCollection to
    *                                  import.
-   * @param  {object} scan            The scan to import onto.
    * @returns {null}
    */
-  async _getAndImportFile(uri, segmentation, scan) {
-    const seriesInstanceUid = scan.referencedSeriesInstanceUid;
-    const maskImporter = new MaskImporter(seriesInstanceUid);
+  async _getAndImportFile(uri, roiCollectionInfo) {
+    const roiImporter = new RoiImporter(
+      roiCollectionInfo.referencedSeriesInstanceUid
+    );
 
-    console.log(`_getAndImportFile, seriesInstanceUid:`);
-    console.log(seriesInstanceUid);
+    switch (roiCollectionInfo.collectionType) {
+      case "AIM":
+        this._updateImportingText(roiCollectionInfo.name);
+        const aimFile = await fetchXML(uri).promise;
 
-    switch (segmentation.collectionType) {
-      case "SEG":
-        this._updateImportingText(segmentation.name);
+        if (!aimFile) {
+          break;
+        }
 
-        // Store that we've imported a collection for this series.
-        brushModule.setters.importMetadata(seriesInstanceUid, {
-          label: segmentation.label,
-          type: "SEG",
-          name: segmentation.name,
-          modified: false
-        });
-
-        const segArrayBuffer = await fetchArrayBuffer(uri).promise;
-
-        await maskImporter.importDICOMSEG(segArrayBuffer);
+        roiImporter.importAIMfile(
+          aimFile,
+          roiCollectionInfo.name,
+          roiCollectionInfo.label
+        );
         break;
+      case "RTSTRUCT":
+        this._updateImportingText(roiCollectionInfo.name);
+        const rtStructFile = await fetchArrayBuffer(uri).promise;
 
-      case "NIFTI":
-        this._updateImportingText(segmentation.name);
+        if (!rtStructFile) {
+          break;
+        }
 
-        // Store that we've imported a collection for this series.
-        brushModule.setters.importMetadata(seriesInstanceUid, {
-          label: segmentation.label,
-          type: "NIFTI",
-          name: segmentation.name,
-          modified: false
-        });
-
-        const niftiArrayBuffer = await fetchArrayBuffer(uri).promise;
-
-        maskImporter.importNIFTI(niftiArrayBuffer);
+        roiImporter.importRTStruct(
+          rtStructFile,
+          roiCollectionInfo.name,
+          roiCollectionInfo.label
+        );
         break;
-
       default:
         console.error(
-          `MaskImportListDialog._getAndImportFile not configured for filetype: ${fileType}.`
+          `RoiImportListDialog._getAndImportFile not configured for filetype: ${fileType}.`
         );
     }
 
-    // JamesAPetts
-    Session.set("refreshSegmentationMenu", Math.random().toString());
-    this._closeDialog();
+    this._incrementNumCollectionsParsed(roiCollectionInfo.name);
+  }
+
+  /** @private
+   * _incrementNumCollectionsParsed - Increases the number of collections
+   * parsed, and closes the progress dialog if the collections have all been
+   * imported.
+   *
+   * @returns {null}
+   */
+  _incrementNumCollectionsParsed(roiCollectionName) {
+    this._updateImportingText(roiCollectionName);
+
+    this._numCollectionsParsed++;
+
+    if (this._numCollectionsParsed === this._numCollectionsToParse) {
+      Session.set("refreshRoiContourMenu", Math.random().toString());
+      this._closeDialog();
+    }
   }
 
   /** @private
@@ -381,6 +359,17 @@ export default class MaskImportListDialog extends React.Component {
     const collectionType = item.data_fields.collectionType;
 
     if (!this._validTypes.some(type => type === collectionType)) {
+      return false;
+    }
+
+    // Check collection isn't already imported.
+    const roiCollectionLabel = item.data_fields.label;
+
+    const collectionAlreadyImported = this._volumeManagementLabels.some(
+      label => label === roiCollectionLabel
+    );
+
+    if (collectionAlreadyImported) {
       return false;
     }
 
@@ -410,10 +399,37 @@ export default class MaskImportListDialog extends React.Component {
     }
   }
 
+  /** @private
+   * _getVolumeManagementLabels - Construct a list of roiCollections
+   *                               already imported.
+   *
+   * @returns {string[]} An array of the labels of roiCollections already imported.
+   */
+  _getVolumeManagementLabels() {
+    const freehand3DStore = modules.freehand3D;
+    const structureSetUids = [];
+
+    const seriesCollection = freehand3DStore.state.seriesCollection;
+
+    seriesCollection.forEach(series => {
+      const structureSetCollection = series.structureSetCollection;
+
+      for (let i = 0; i < structureSetCollection.length; i++) {
+        const label = structureSetCollection[i].uid;
+
+        if (label !== "DEFAULT") {
+          structureSetUids.push(label);
+        }
+      }
+    });
+
+    return structureSetUids;
+  }
+
   render() {
     const {
-      scanSelected,
-      segmentationSelected,
+      selectAllChecked,
+      selectedCheckboxes,
       importList,
       importListReady,
       importing,
@@ -421,6 +437,8 @@ export default class MaskImportListDialog extends React.Component {
     } = this.state;
 
     let importBody;
+
+    console.log(importList);
 
     if (importListReady) {
       if (importing) {
@@ -436,55 +454,43 @@ export default class MaskImportListDialog extends React.Component {
         importBody = <p>No data to import.</p>;
       } else {
         importBody = (
-          <>
-            <select
-              className="form-themed form-control"
-              onChange={this.onSelectedScanChange}
-              value={scanSelected}
-            >
-              {importList.map(scan => (
-                <option
-                  key={scan.referencedSeriesInstanceUid}
-                  value={scan.index}
-                >{`${scan.experimentLabel} - ${
-                  scan.referencedSeriesNumber
-                }`}</option>
-              ))}
-            </select>
+          <table>
+            <tbody>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={selectAllChecked}
+                    value={selectAllChecked}
+                    onChange={this.onChangeSelectAllCheckbox}
+                  />
+                </th>
+                <th>Name</th>
+                <th>Referenced Scan</th>
+              </tr>
 
-            <hr />
-
-            <table>
-              <tbody>
-                <tr>
-                  <th />
-                  <th>Name</th>
+              {importList.map((roiCollection, index) => (
+                <tr key={`${roiCollection.name}_${roiCollection.index}`}>
+                  <td>
+                    <input
+                      className="roi-import-list-item-check"
+                      type="checkbox"
+                      name="sync"
+                      onChange={evt => this.onChangeCheckbox(evt, index)}
+                      checked={selectedCheckboxes[index]}
+                      value={selectedCheckboxes[index]}
+                    />
+                  </td>
+                  <td className="roi-import-left-cell">{roiCollection.name}</td>
+                  <td className="roi-import-left-cell">
+                    {`${roiCollection.experimentLabel} - ${
+                      roiCollection.referencedSeriesNumber
+                    }`}
+                  </td>
                 </tr>
-
-                {importList[scanSelected].segmentations.map(
-                  (roiCollection, index) => (
-                    <tr key={roiCollection.label}>
-                      <td>
-                        <input
-                          className="mask-import-list-item-check"
-                          type="radio"
-                          name="sync"
-                          onChange={evt => this.onChangeRadio(evt, index)}
-                          checked={
-                            segmentationSelected === index ? true : false
-                          }
-                          value={segmentationSelected === index ? true : false}
-                        />
-                      </td>
-                      <td className="mask-import-left-cell">
-                        {roiCollection.name}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </>
+              ))}
+            </tbody>
+          </table>
         );
       }
     } else {
@@ -496,12 +502,12 @@ export default class MaskImportListDialog extends React.Component {
     }
 
     return (
-      <div>
-        <div className="mask-import-list-header">
-          <h3>Import Segmentation Collections</h3>
+      <div className="roi-import-list-dialog">
+        <div className="roi-import-list-header">
+          <h3>Import ROI Contour Collections</h3>
           {importing ? null : (
             <a
-              className="mask-import-list-cancel btn btn-sm btn-secondary"
+              className="roi-import-list-cancel btn btn-sm btn-secondary"
               onClick={this.onCloseButtonClick}
             >
               <i className="fa fa-times-circle fa-2x" />
@@ -509,12 +515,12 @@ export default class MaskImportListDialog extends React.Component {
           )}
         </div>
         <hr />
-        <div className="mask-import-list-body">{importBody}</div>
+        <div className="roi-import-list-body">{importBody}</div>
         <hr />
-        <div className="mask-import-list-footer">
+        <div className="roi-import-list-footer">
           {importing ? null : (
             <a
-              className="mask-import-list-confirm btn btn-sm btn-primary"
+              className="roi-import-list-confirm btn btn-sm btn-primary"
               onClick={this.onExportButtonClick}
             >
               <svg stroke="#fff">

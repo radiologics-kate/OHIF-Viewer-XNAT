@@ -2,15 +2,8 @@ import { Template } from 'meteor/templating';
 import { components as peppermintComponents } from "meteor/icr:peppermint-tools";
 import { components as icrXnatRoiComponents } from 'meteor/icr:xnat-roi';
 
-import {
-  importROIContours,
-  exportROIContours,
-  importSegmentations,
-  exportSegmentations
-} from "meteor/icr:xnat-roi";
-
 const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
-const { XNATNavigation } = icrXnatRoiComponents;
+const { XNATNavigation, MaskImportList, MaskExportList, RoiImportList, RoiExportList } = icrXnatRoiComponents;
 
 let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
 
@@ -86,11 +79,11 @@ Template.flexboxLayout.helpers({
 
     return Math.random().toString();
   },
-  roiContourMenuImportCallback() {
-    return importROIContours;
+  roiContourMenuImportComponent() {
+    return RoiImportList;
   },
-  roiContourMenuExportCallback() {
-    return exportROIContours
+  roiContourMenuExportComponent() {
+    return RoiExportList;
   },
   SegmentationMenu() {
     return SegmentationMenu;
@@ -108,11 +101,11 @@ Template.flexboxLayout.helpers({
 
     return Math.random().toString();
   },
-  segmentationMenuImportCallback() {
-    return importSegmentations;
+  segmentationMenuImportComponent() {
+    return MaskImportList;
   },
-  segmentationMenuExportCallback() {
-    return exportSegmentations;
+  segmentationMenuExportComponent() {
+    return MaskExportList;
   },
   XNATNavigation() {
     return XNATNavigation;

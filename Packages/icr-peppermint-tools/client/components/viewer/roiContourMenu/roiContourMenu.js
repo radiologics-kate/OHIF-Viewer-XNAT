@@ -13,6 +13,8 @@ import "./roiContourMenu.styl";
 
 const modules = cornerstoneTools.store.modules;
 
+//
+
 export default class roiContourMenu extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -298,6 +300,18 @@ export default class roiContourMenu extends React.Component {
     ) : null;
 
     let ioMenu;
+
+    // TODO ->
+    //
+    // Similar component insertion to the segmentation menu.
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
 
     if (
       typeof importCallback === "function" ||

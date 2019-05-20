@@ -9,6 +9,8 @@ import { lockStructureSet } from "meteor/icr:peppermint-tools";
 import { displayExportFailedDialog } from "../../../../lib/dialogUtils/displayExportDialogs.js";
 import generateDateTimeAndLabel from "../../../../lib/util/generateDateTimeAndLabel.js";
 
+import "./roiExportListDialogs.styl";
+
 const modules = cornerstoneTools.store.modules;
 
 export default class RoiExportListDialog extends React.Component {
@@ -277,7 +279,7 @@ export default class RoiExportListDialog extends React.Component {
     }
 
     return (
-      <div>
+      <div className="roi-export-list-dialog">
         <div className="roi-export-list-header">
           <h3>Export Contours</h3>
           {!exporting && (
