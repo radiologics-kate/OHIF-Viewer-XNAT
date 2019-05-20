@@ -38,7 +38,7 @@ export default class MaskExportListDialog extends React.Component {
   }
 
   async onExportButtonClick() {
-    const { roiCollectionInfo, segList, label, dateTime } = this.state;
+    const { importMetadata, segList, label, dateTime } = this.state;
     const roiCollectionName = this._roiCollectionName;
     const seriesInstanceUid = this._seriesInstanceUid;
 
@@ -47,8 +47,8 @@ export default class MaskExportListDialog extends React.Component {
       return;
     }
 
-    if (roiCollectionInfo) {
-      // roiCollectionInfo exists, therefore this is an edit.
+    if (importMetadata) {
+      // importMetadata exists, therefore this is an edit.
       // Confirm user wants to make a new ROI Collection.
       const content = {
         title: `Warning`,
@@ -90,16 +90,13 @@ export default class MaskExportListDialog extends React.Component {
           // Store that we've 'imported' a collection for this series.
           // (For all intents and purposes exporting it ends with an imported state,
           // i.e. not a fresh Mask collection.)
-          if (!brushModule.state.import) {
-            brushModule.state.import = {};
-          }
 
-          brushModule.state.import[seriesInstanceUid] = {
+          brushModule.setters.importMetadata(seriesInstanceUid, {
             label: label,
             name: roiCollectionName,
             type: "SEG",
             modified: false
-          };
+          });
 
           // JamesAPetts
           Session.set("refreshSegmentationMenu", Math.random().toString);
@@ -152,16 +149,11 @@ export default class MaskExportListDialog extends React.Component {
 
     const seriesInstanceUid = SeriesInfoProvider.getActiveSeriesInstanceUid();
 
-    let roiCollectionInfo;
+    const importMetadata = brushModule.setters.importMetadata(
+      seriesInstanceUid
+    );
 
-    if (
-      brushModule.state.import &&
-      brushModule.state.import[seriesInstanceUid]
-    ) {
-      roiCollectionInfo = brushModule.state.import[seriesInstanceUid];
-    }
-
-    this.setState({ roiCollectionInfo });
+    this.setState({ importMetadata });
 
     this._seriesInstanceUid = seriesInstanceUid;
 
@@ -192,7 +184,7 @@ export default class MaskExportListDialog extends React.Component {
   }
 
   render() {
-    const { label, segList, exporting, roiCollectionInfo } = this.state;
+    const { label, segList, exporting, importMetadata } = this.state;
 
     let segExportListBody;
 
@@ -209,11 +201,11 @@ export default class MaskExportListDialog extends React.Component {
       segExportListBody = (
         <table className="peppermint-table">
           <tbody>
-            {roiCollectionInfo ? (
+            {importMetadata ? (
               <tr className="mask-export-list-collection-info">
-                <th className="left-aligned-cell">{roiCollectionInfo.name}</th>
-                <th className="centered-cell">{roiCollectionInfo.label}</th>
-                <th className="right-aligned-cell">{roiCollectionInfo.type}</th>
+                <th className="left-aligned-cell">{importMetadata.name}</th>
+                <th className="centered-cell">{importMetadata.label}</th>
+                <th className="right-aligned-cell">{importMetadata.type}</th>
               </tr>
             ) : (
               <tr className="mask-export-list-collection-info">

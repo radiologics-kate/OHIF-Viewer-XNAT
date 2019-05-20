@@ -15,6 +15,8 @@ import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
+//
+
 export default class SegmentationMenu extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -26,14 +28,14 @@ export default class SegmentationMenu extends React.Component {
     this.onDeleteClick = this.onDeleteClick.bind(this);
     this.onDeleteCancelClick = this.onDeleteCancelClick.bind(this);
     this.onDeleteConfirmClick = this.onDeleteConfirmClick.bind(this);
-    this._roiCollectionInfo = this._roiCollectionInfo.bind(this);
+    this._importMetadata = this._importMetadata.bind(this);
     this._visableSegmentsForElement = this._visableSegmentsForElement.bind(
       this
     );
     this._segments = this._segments.bind(this);
 
     this.state = {
-      roiCollectionInfo: { name: "", label: "" },
+      importMetadata: { name: "", label: "" },
       segments: [],
       visibleSegments: [],
       deleteConfirmationOpen: false,
@@ -55,14 +57,14 @@ export default class SegmentationMenu extends React.Component {
     console.log(`BRUSH MANAGEMENT DIALOG COMPONENT DID MOUNT`);
     console.log(this._seriesInstanceUid);
 
-    const roiCollectionInfo = this._roiCollectionInfo();
+    const importMetadata = this._importMetadata();
     const segments = this._segments();
     const visibleSegments = this._visableSegmentsForElement();
 
     console.log(segments);
 
     this.setState({
-      roiCollectionInfo,
+      importMetadata,
       segments,
       visibleSegments,
       activeSegmentIndex: brushModule.state.drawColorId
@@ -153,17 +155,18 @@ export default class SegmentationMenu extends React.Component {
     });
   }
 
-  _roiCollectionInfo() {
-    const importInfo = brushModule.state.import;
+  _importMetadata() {
     const seriesInstanceUid = this._seriesInstanceUid;
+    const importMetadata = brushModule.getters.importMetadata(
+      seriesInstanceUid
+    );
 
-    if (importInfo && importInfo[seriesInstanceUid]) {
-      const roiCollection = importInfo[seriesInstanceUid];
+    if (importMetadata) {
       return {
-        label: roiCollection.label,
-        type: roiCollection.type,
-        name: roiCollection.name,
-        modified: roiCollection.modified ? "true" : " false"
+        label: importMetadata.label,
+        type: importMetadata.type,
+        name: importMetadata.name,
+        modified: importMetadata.modified ? "true" : " false"
       };
     }
 
@@ -231,7 +234,7 @@ export default class SegmentationMenu extends React.Component {
 
   render() {
     const {
-      roiCollectionInfo,
+      importMetadata,
       segments,
       visibleSegments,
       deleteConfirmationOpen,
@@ -335,28 +338,28 @@ export default class SegmentationMenu extends React.Component {
                   colSpan="3"
                   className="left-aligned-cell segmentation-menu-list-bordered"
                 >
-                  {roiCollectionInfo.name}
+                  {importMetadata.name}
                 </th>
                 <th
                   colSpan="2"
                   className="right-aligned-cell segmentation-menu-list-bordered"
                 >
-                  {roiCollectionInfo.label}
+                  {importMetadata.label}
                 </th>
               </tr>
-              {roiCollectionInfo.type && (
+              {importMetadata.type && (
                 <tr>
                   <th
                     colSpan="3"
                     className="left-aligned-cell segmentation-menu-list-bordered"
                   >
-                    Type: {roiCollectionInfo.type}
+                    Type: {importMetadata.type}
                   </th>
                   <th
                     colSpan="2"
                     className="right-aligned-cell segmentation-menu-list-bordered"
                   >
-                    Modified: {roiCollectionInfo.modified}
+                    Modified: {importMetadata.modified}
                   </th>
                 </tr>
               )}

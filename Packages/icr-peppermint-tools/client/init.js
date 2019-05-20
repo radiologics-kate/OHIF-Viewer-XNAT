@@ -69,6 +69,38 @@ export default function initialise(configuration = {}) {
       customGateRange[1] = max;
     }
   };
+
+  brushModule.getters.importMetadata = seriesInstanceUid => {
+    if (
+      brushModule.state.import &&
+      brushModule.state.import[seriesInstanceUid]
+    ) {
+      return brushModule.state.import[seriesInstanceUid];
+    }
+  };
+
+  brushModule.setters.importMetadata = (seriesInstanceUid, metadata) => {
+    // Store that we've imported a collection for this series.
+    if (!brushModule.state.import) {
+      brushModule.state.import = {};
+    }
+
+    brushModule.state.import[seriesInstanceUid] = metadata;
+  };
+
+  brushModule.setters.importModified = seriesInstanceUid => {
+    const importMetadata = brushModule.state.import[seriesInstanceUid];
+
+    if (importMetadata.modified) {
+      return;
+    }
+
+    importMetadata.modified = true;
+
+    // JamesAPetts
+    console.log(`MODIFYING SEGMENTATION`);
+    Session.set("refreshSegmentationMenu", Math.random().toString());
+  };
 }
 
 const defaultConfig = {

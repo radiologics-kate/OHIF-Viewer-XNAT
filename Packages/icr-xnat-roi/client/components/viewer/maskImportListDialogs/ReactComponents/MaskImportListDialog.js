@@ -100,11 +100,7 @@ export default class MaskImportListDialog extends React.Component {
    */
   _hasExistingMaskData(seriesInstanceUid) {
     let hasData = false;
-    if (
-      brushModule.state.import &&
-      brushModule.state.import[seriesInstanceUid] &&
-      brushModule.state.import[seriesInstanceUid].label
-    ) {
+    if (brushModule.getters.importMetadata(seriesInstanceUid)) {
       hasData = true;
     } else {
       const metadata =
@@ -330,16 +326,12 @@ export default class MaskImportListDialog extends React.Component {
         this._updateImportingText(segmentation.name);
 
         // Store that we've imported a collection for this series.
-        if (!brushModule.state.import) {
-          brushModule.state.import = {};
-        }
-
-        brushModule.state.import[seriesInstanceUid] = {
+        brushModule.setters.importMetadata(seriesInstanceUid, {
           label: segmentation.label,
           type: "SEG",
           name: segmentation.name,
           modified: false
-        };
+        });
 
         const segArrayBuffer = await fetchArrayBuffer(uri).promise;
 
@@ -350,16 +342,12 @@ export default class MaskImportListDialog extends React.Component {
         this._updateImportingText(segmentation.name);
 
         // Store that we've imported a collection for this series.
-        if (!brushModule.state.import) {
-          brushModule.state.import = {};
-        }
-
-        brushModule.state.import[seriesInstanceUid] = {
+        brushModule.setters.importMetadata(seriesInstanceUid, {
           label: segmentation.label,
           type: "NIFTI",
           name: segmentation.name,
           modified: false
-        };
+        });
 
         const niftiArrayBuffer = await fetchArrayBuffer(uri).promise;
 
@@ -373,7 +361,7 @@ export default class MaskImportListDialog extends React.Component {
     }
 
     // JamesAPetts
-    Session.set("refreshSegmentationMenu", Math.random().toString);
+    Session.set("refreshSegmentationMenu", Math.random().toString());
     this._closeDialog();
   }
 

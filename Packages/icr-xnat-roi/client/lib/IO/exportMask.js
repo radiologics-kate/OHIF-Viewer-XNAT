@@ -31,17 +31,11 @@ export default async function() {
 }
 
 function beginExportIfNewOrModifiedMask(seriesInstanceUid) {
-  let roiCollectionInfo;
+  const importMetadata = brushModule.getters.importMetadata(seriesInstanceUid);
 
   // If imported mask, check its been modified.
-  if (
-    brushModule.state.import &&
-    brushModule.state.import[seriesInstanceUid] &&
-    !brushModule.state.import[seriesInstanceUid].modified
-  ) {
-    displayMaskNotModifiedDialog(
-      brushModule.state.import[seriesInstanceUid].name
-    );
+  if (importMetadata && !importMetadata.modified) {
+    displayMaskNotModifiedDialog(importMetadata.name);
   } else {
     const maskExportListDialog = document.getElementById(
       "maskExportListDialog"

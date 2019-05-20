@@ -14,6 +14,8 @@ import "./roiContourMenu.styl";
 
 const modules = cornerstoneTools.store.modules;
 
+//
+
 export default class roiContourMenu extends React.Component {
   constructor(props = {}) {
     super(props);

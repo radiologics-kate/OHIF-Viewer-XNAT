@@ -84,14 +84,15 @@ export default class Brush3DTool extends BrushTool {
   _setActiveStrategy(seriesInstanceUid) {
     this.activeStrategy = MODES.OVERLAPPING;
 
-    if (
-      brushModule.state.import &&
-      brushModule.state.import[seriesInstanceUid]
-    ) {
-      // Modified an imported mask.
-      brushModule.state.import[seriesInstanceUid].modified = true;
+    const importMetadata = brushModule.getters.importMetadata(
+      seriesInstanceUid
+    );
 
-      if (brushModule.state.import[seriesInstanceUid].type === "NIFTI") {
+    if (importMetadata) {
+      // Modified an imported mask.
+      brushModule.setters.importModified(seriesInstanceUid);
+
+      if (importMetadata.type === "NIFTI") {
         this.activeStrategy = MODES.NON_OVERLAPPING;
       }
     }

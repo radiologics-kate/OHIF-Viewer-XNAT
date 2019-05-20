@@ -42,23 +42,19 @@ function _getUnsavedContours() {
 
 function _getUnsavedMasks() {
   const brushModule = modules.brush;
-
-  const importedSegmentations = brushModule.state.import;
   const segmentationMetadata = brushModule.state.segmentationMetadata;
-
-  //console.log(importedSegmentations);
 
   const unsavedMasks = [];
 
   Object.keys(segmentationMetadata).forEach(seriesInstanceUid => {
     console.log(seriesInstanceUid);
 
+    const importMetadata = brushModule.getters.importMetadata(
+      seriesInstanceUid
+    );
+
     // If the segmentation is "imported" and not "modified", its saved.
-    if (
-      importedSegmentations &&
-      importedSegmentations[seriesInstanceUid] &&
-      !importedSegmentations[seriesInstanceUid].modified
-    ) {
+    if (importMetadata && !importMetadata.modified) {
       return;
     }
 
