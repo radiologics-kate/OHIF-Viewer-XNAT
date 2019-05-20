@@ -1,5 +1,6 @@
 import { Template } from 'meteor/templating';
-import {components as peppermintComponents } from "meteor/icr:peppermint-tools";
+import { components as peppermintComponents } from "meteor/icr:peppermint-tools";
+import { components as icrXnatRoiComponents } from 'meteor/icr:xnat-roi';
 
 import {
   importROIContours,
@@ -9,6 +10,7 @@ import {
 } from "meteor/icr:xnat-roi";
 
 const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
+const { XNATNavigation } = icrXnatRoiComponents;
 
 let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
 
@@ -112,4 +114,7 @@ Template.flexboxLayout.helpers({
   segmentationMenuExportCallback() {
     return exportSegmentations;
   },
+  XNATNavigation() {
+    return XNATNavigation;
+  }
 });

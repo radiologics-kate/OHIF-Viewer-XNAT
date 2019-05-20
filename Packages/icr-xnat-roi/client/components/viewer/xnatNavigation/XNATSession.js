@@ -1,11 +1,13 @@
 import React from "react";
 import XNATSessionLabel from "./XNATSessionLabel.js";
-import fetchJSON from "../../../../lib/IO/fetchJSON.js";
+import fetchJSON from "../../../lib/IO/fetchJSON.js";
 import SessionRouter from "./helpers/SessionRouter.js";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
 import { sessionMap } from "meteor/icr:series-info-provider";
-import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
+import awaitConfirmationDialog from "../../../lib/dialogUtils/awaitConfirmationDialog.js";
+
+import "./xnatNavigation.styl";
 
 export default class XNATSession extends React.Component {
   constructor(props) {

@@ -1,6 +1,8 @@
 import React from "react";
 import XNATSession from "./XNATSession.js";
 
+import "./xnatNavigation.styl";
+
 export default class XNATSessionList extends React.Component {
   constructor(props) {
     super(props);

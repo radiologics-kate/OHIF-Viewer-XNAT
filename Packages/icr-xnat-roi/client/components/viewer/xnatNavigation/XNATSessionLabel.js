@@ -1,5 +1,7 @@
 import React from "react";
 
+import "./xnatNavigation.styl";
+
 export default class XNATSessionLabel extends React.Component {
   constructor(props) {
     super(props);

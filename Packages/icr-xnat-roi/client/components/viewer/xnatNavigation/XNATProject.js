@@ -1,11 +1,13 @@
 import React from "react";
 import XNATProjectLabel from "./XNATProjectLabel.js";
 import XNATSubjectList from "./XNATSubjectList.js";
-import fetchJSON from "../../../../lib/IO/fetchJSON.js";
+import fetchJSON from "../../../lib/IO/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { sessionMap } from "meteor/icr:series-info-provider";
+
+import "./xnatNavigation.styl";
 
 export default class XNATProject extends React.Component {
   constructor(props = {}) {

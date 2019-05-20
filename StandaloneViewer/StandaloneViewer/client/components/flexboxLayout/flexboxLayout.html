@@ -5,7 +5,9 @@
               {{>studyBrowser (clone this)}}
             {{/if}}
             {{#if leftSidebarChangeSession}}
-              {{>xnatNavigation}}
+            <div>
+              {{>React component=XNATNavigation}}
+            </div>
             {{/if}}
         </div>
         <div class="mainContent {{#if leftSidebarOpen}}sidebar-left-open{{/if}} {{#if rightSidebarOpen}}sidebar-right-open{{/if}}">

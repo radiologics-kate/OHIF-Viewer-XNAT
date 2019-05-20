@@ -2,15 +2,17 @@ import React from "react";
 import XNATSubjectLabel from "./XNATSubjectLabel.js";
 import XNATSessionList from "./XNATSessionList.js";
 import SubjectRouter from "./helpers/SubjectRouter.js";
-import fetchJSON from "../../../../lib/IO/fetchJSON.js";
+import fetchJSON from "../../../lib/IO/fetchJSON.js";
 import onExpandIconClick from "./helpers/onExpandIconClick.js";
 import getExpandIcon from "./helpers/getExpandIcon.js";
 import compareOnProperty from "./helpers/compareOnProperty.js";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import navigateConfirmationContent from "./helpers/navigateConfirmationContent.js";
 import { getUnsavedRegions } from "meteor/icr:peppermint-tools";
-import awaitConfirmationDialog from "../../../../lib/dialogUtils/awaitConfirmationDialog.js";
-import progressDialog from "../../../../lib/dialogUtils/progressDialog.js";
+import awaitConfirmationDialog from "../../../lib/dialogUtils/awaitConfirmationDialog.js";
+import progressDialog from "../../../lib/dialogUtils/progressDialog.js";
+
+import "./xnatNavigation.styl";
 
 export default class XNATSubject extends React.Component {
   constructor(props) {

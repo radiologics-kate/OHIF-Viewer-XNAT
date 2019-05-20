@@ -36,19 +36,6 @@ Package.onUse(function(api) {
   api.addFiles("client/components/viewer/ioDialogs/ioDialogs.styl", "client");
 
   api.addFiles(
-    "client/components/viewer/xnatNavigation/xnatNavigation.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/xnatNavigation/xnatNavigation.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/xnatNavigation/xnatNavigation.styl",
-    "client"
-  );
-
-  api.addFiles(
     "client/components/viewer/roiImportListDialogs/roiImportListDialogs.html",
     "client"
   );

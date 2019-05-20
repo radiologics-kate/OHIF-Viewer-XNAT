@@ -1,6 +1,8 @@
 import React from "react";
 import XNATProject from "./XNATProject.js";
 
+import "./xnatNavigation.styl";
+
 export default class XNATProjectList extends React.Component {
   constructor(props = {}) {
     super(props);

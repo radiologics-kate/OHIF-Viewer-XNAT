@@ -1,5 +1,5 @@
 import { icrXnatRoiSession } from "meteor/icr:xnat-roi-namespace";
-import makeCancelable from "../../../../../lib/util/makeCancelable.js";
+import makeCancelable from "../../../../lib/util/makeCancelable.js";
 
 export default function(projectId, subjectId, experimentId) {
   return new Promise((resolve, reject) => {

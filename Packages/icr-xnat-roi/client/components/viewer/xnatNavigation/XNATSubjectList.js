@@ -1,6 +1,8 @@
 import React from "react";
 import XNATSubject from "./XNATSubject.js";
 
+import "./xnatNavigation.styl";
+
 export default class XNATSubjectList extends React.Component {
   constructor(props = {}) {
     super(props);

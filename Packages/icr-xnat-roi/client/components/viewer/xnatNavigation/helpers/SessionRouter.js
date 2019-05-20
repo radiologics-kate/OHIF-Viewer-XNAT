@@ -1,6 +1,6 @@
 import checkSessionJSONExists from "./checkSessionJSONExists.js";
-import fetchJSON from "../../../../../lib/IO/fetchJSON.js";
-import progressDialog from "../../../../../lib/dialogUtils/progressDialog.js";
+import fetchJSON from "../../../../lib/IO/fetchJSON.js";
+import progressDialog from "../../../../lib/dialogUtils/progressDialog.js";
 
 export default class SessionRouter {
   constructor(
