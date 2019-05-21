@@ -1,13 +1,13 @@
 import React from "react";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import AIMWriter from "../../../../lib/IO/classes/AIMWriter.js";
-import AIMExporter from "../../../../lib/IO/classes/AIMExporter.js";
-import RoiExtractor from "../../../../lib/IO/classes/RoiExtractor.js";
+import AIMWriter from "../../../lib/IO/classes/AIMWriter.js";
+import AIMExporter from "../../../lib/IO/classes/AIMExporter.js";
+import RoiExtractor from "../../../lib/IO/classes/RoiExtractor.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { sessionMap } from "meteor/icr:series-info-provider";
 import { lockStructureSet } from "meteor/icr:peppermint-tools";
-import { displayExportFailedDialog } from "../../../../lib/dialogUtils/displayExportDialogs.js";
-import generateDateTimeAndLabel from "../../../../lib/util/generateDateTimeAndLabel.js";
+import { displayExportFailedDialog } from "../../../lib/dialogUtils/displayExportDialogs.js";
+import generateDateTimeAndLabel from "../../../lib/util/generateDateTimeAndLabel.js";
 
 import "./roiExportListDialogs.styl";
 
@@ -35,7 +35,6 @@ export default class RoiExportListDialog extends React.Component {
     this.onCloseButtonClick = this.onCloseButtonClick.bind(this);
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onTextInputChange = this.onTextInputChange.bind(this);
-    this._closeDialog = this._closeDialog.bind(this);
 
     this._roiCollectionName = label;
   }
@@ -103,19 +102,19 @@ export default class RoiExportListDialog extends React.Component {
         //localBackup.checkBackupOnExport();
         //console.log('=====checking backup DONE=====');
         Session.set("refreshRoiContourMenu", Math.random().toString());
-        this._closeDialog();
+        this.props.onExportComplete();
       })
       .catch(error => {
         console.log(error);
         // TODO -> Work on backup mechanism, disabled for now.
         //localBackup.saveBackUpForActiveSeries();
-        this._closeDialog();
+        this.props.onExportCancel();
         displayExportFailedDialog(seriesInfo.seriesInstanceUid);
       });
   }
 
   onCloseButtonClick() {
-    this._closeDialog();
+    this.props.onExportCancel();
   }
 
   onChangeSelectAllCheckbox(evt) {

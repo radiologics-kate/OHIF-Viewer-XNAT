@@ -28,7 +28,9 @@ export default class roiContourMenu extends React.Component {
       roiCollectionToUnlock: "",
       activeROIContourIndex: 0,
       interpolate,
-      displayStats
+      displayStats,
+      importing: false,
+      exporting: false
     };
 
     this.onNewRoiButtonClick = this.onNewRoiButtonClick.bind(this);
@@ -37,10 +39,66 @@ export default class roiContourMenu extends React.Component {
     this.onUnlockClick = this.onUnlockClick.bind(this);
     this.onUnlockCancelClick = this.onUnlockCancelClick.bind(this);
     this.onUnlockConfirmClick = this.onUnlockConfirmClick.bind(this);
+    this.onIOComplete = this.onIOComplete.bind(this);
+    this.onIOCancel = this.onIOCancel.bind(this);
+    this.onImportButtonClick = this.onImportButtonClick.bind(this);
+    this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onDisplayStatsToggleClick = this.onDisplayStatsToggleClick.bind(this);
     this.onInterpolateToggleClick = this.onInterpolateToggleClick.bind(this);
     this._workingCollection = this._workingCollection.bind(this);
     this._lockedCollections = this._lockedCollections.bind(this);
+  }
+
+  onIOComplete() {
+    const freehand3DStore = modules.freehand3D;
+
+    let activeROIContourIndex = 0;
+
+    const seriesInstanceUid = this._seriesInstanceUid;
+
+    if (modules.freehand3D.getters.series(seriesInstanceUid)) {
+      activeROIContourIndex = freehand3DStore.getters.activeROIContourIndex(
+        seriesInstanceUid
+      );
+    }
+
+    const workingCollection = this._workingCollection();
+    const lockedCollections = this._lockedCollections();
+
+    this.setState({
+      workingCollection,
+      lockedCollections,
+      activeROIContourIndex,
+      importing: false,
+      exporting: false
+    });
+  }
+
+  onIOCancel() {
+    this.setState({
+      importing: false,
+      exporting: false
+    });
+  }
+
+  onImportButtonClick() {
+    const { ImportCallbackOrComponent } = this.props;
+
+    if (ImportCallbackOrComponent.prototype.isReactComponent) {
+      this.setState({ importing: true });
+    } else {
+      ImportCallbackOrComponent();
+    }
+  }
+
+  onExportButtonClick() {
+    const { ExportCallbackOrComponent } = this.props;
+
+    if (ExportCallbackOrComponent.prototype.isReactComponent) {
+      this.setState({ exporting: true });
+    } else {
+      ExportCallbackOrComponent();
+    }
   }
 
   onDisplayStatsToggleClick() {
@@ -236,10 +294,12 @@ export default class roiContourMenu extends React.Component {
       roiCollectionToUnlock,
       activeROIContourIndex,
       interpolate,
-      displayStats
+      displayStats,
+      importing,
+      exporting
     } = this.state;
 
-    const { importCallback, exportCallback } = this.props;
+    const { ImportCallbackOrComponent, ExportCallbackOrComponent } = this.props;
     const freehand3DStore = modules.freehand3D;
 
     if (unlockConfirmationOpen) {
@@ -277,6 +337,49 @@ export default class roiContourMenu extends React.Component {
       );
     }
 
+    if (importing) {
+      return (
+        <ImportCallbackOrComponent
+          onImportComplete={this.onIOComplete}
+          onImportCancel={this.onIOCancel}
+        />
+      );
+    }
+
+    if (exporting) {
+      return (
+        <ExportCallbackOrComponent
+          onExportComplete={this.onIOComplete}
+          onExportCancel={this.onIOCancel}
+        />
+      );
+    }
+
+    let ioMenu;
+
+    if (ImportCallbackOrComponent || ExportCallbackOrComponent) {
+      ioMenu = (
+        <div>
+          {ImportCallbackOrComponent && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={this.onImportButtonClick}
+            >
+              Import
+            </a>
+          )}
+          {ExportCallbackOrComponent && (
+            <a
+              className="btn btn-sm btn-primary roi-contour-menu-io-button"
+              onClick={this.onExportButtonClick}
+            >
+              Export
+            </a>
+          )}
+        </div>
+      );
+    }
+
     let workingCollectionList;
 
     if (this._seriesInstanceUid) {
@@ -298,40 +401,6 @@ export default class roiContourMenu extends React.Component {
         seriesInstanceUid={this._seriesInstanceUid}
       />
     ) : null;
-
-    let ioMenu;
-
-    // TODO ->
-    //
-    // Similar component insertion to the segmentation menu.
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-
-    if (
-      typeof importCallback === "function" ||
-      typeof exportCallback === "function"
-    ) {
-      ioMenu = (
-        <div>
-          {importCallback && (
-            <a className="btn btn-sm btn-primary" onClick={importCallback}>
-              Import
-            </a>
-          )}
-          {exportCallback && (
-            <a className="btn btn-sm btn-primary" onClick={exportCallback}>
-              Export
-            </a>
-          )}
-        </div>
-      );
-    }
 
     return (
       <div className="roi-contour-menu-component">

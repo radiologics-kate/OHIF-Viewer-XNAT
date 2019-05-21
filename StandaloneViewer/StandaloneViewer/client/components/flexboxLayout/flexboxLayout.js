@@ -80,6 +80,9 @@ Template.flexboxLayout.helpers({
     return Math.random().toString();
   },
   roiContourMenuImportComponent() {
+    console.log(`roiContourMenuImportComponent:`);
+    console.log(RoiImportList);
+
     return RoiImportList;
   },
   roiContourMenuExportComponent() {

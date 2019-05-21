@@ -1,9 +1,9 @@
 import React from "react";
 import { SeriesInfoProvider } from "meteor/icr:series-info-provider";
-import RoiImporter from "../../../../lib/IO/classes/RoiImporter.js";
-import fetchJSON from "../../../../lib/IO/fetchJSON.js";
-import fetchXML from "../../../../lib/IO/fetchXML.js";
-import fetchArrayBuffer from "../../../../lib/IO/fetchArrayBuffer.js";
+import RoiImporter from "../../../lib/IO/classes/RoiImporter.js";
+import fetchJSON from "../../../lib/IO/fetchJSON.js";
+import fetchXML from "../../../lib/IO/fetchXML.js";
+import fetchArrayBuffer from "../../../lib/IO/fetchArrayBuffer.js";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import { sessionMap } from "meteor/icr:series-info-provider";
 
@@ -42,14 +42,13 @@ export default class RoiImportListDialog extends React.Component {
       this
     );
     this._updateImportingText = this._updateImportingText.bind(this);
-    this._closeDialog = this._closeDialog.bind(this);
     this._incrementNumCollectionsParsed = this._incrementNumCollectionsParsed.bind(
       this
     );
   }
 
   onCloseButtonClick() {
-    this._closeDialog();
+    this.props.onImportCancel();
   }
 
   onChangeCheckbox(evt, index) {
@@ -339,7 +338,7 @@ export default class RoiImportListDialog extends React.Component {
 
     if (this._numCollectionsParsed === this._numCollectionsToParse) {
       Session.set("refreshRoiContourMenu", Math.random().toString());
-      this._closeDialog();
+      this.props.onImportComplete();
     }
   }
 

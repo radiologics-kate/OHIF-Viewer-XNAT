@@ -35,19 +35,6 @@ Package.onUse(function(api) {
   api.addFiles("client/components/viewer/ioDialogs/ioDialogs.js", "client");
   api.addFiles("client/components/viewer/ioDialogs/ioDialogs.styl", "client");
 
-  api.addFiles(
-    "client/components/viewer/roiImportListDialogs/roiImportListDialogs.html",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiImportListDialogs/roiImportListDialogs.js",
-    "client"
-  );
-  api.addFiles(
-    "client/components/viewer/roiImportListDialogs/roiImportListDialogs.styl",
-    "client"
-  );
-
   // Help Menu
   api.addFiles(
     "client/components/viewer/helpDialogs/helpDialogs.html",
