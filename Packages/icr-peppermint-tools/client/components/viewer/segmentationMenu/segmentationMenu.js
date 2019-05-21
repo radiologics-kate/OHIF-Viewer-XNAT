@@ -1,5 +1,6 @@
 import React from "react";
 import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
+import SegmentationMenuListHeader from "./SegmentationMenuListHeader.js";
 import BrushSettings from "./BrushSettings.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
 import { OHIF } from "meteor/ohif:core";
@@ -254,22 +255,6 @@ export default class SegmentationMenu extends React.Component {
 
     const { ImportCallbackOrComponent, ExportCallbackOrComponent } = this.props;
 
-    const segmentRows = segments.map(segment => (
-      <SegmentationMenuListItem
-        key={`${segment.metadata.SegmentLabel}_${segment.index}`}
-        segmentIndex={segment.index}
-        metadata={segment.metadata}
-        visible={visibleSegments[segment.index]}
-        onSegmentChange={this.onSegmentChange}
-        onShowHideClick={this.onShowHideClick}
-        onEditClick={this.onEditClick}
-        onDeleteClick={this.onDeleteClick}
-        checked={segment.index === activeSegmentIndex}
-        ImportCallbackOrComponent
-        ExportCallbackOrComponent
-      />
-    ));
-
     let brushManagementDialogBody;
 
     if (deleteConfirmationOpen) {
@@ -348,6 +333,22 @@ export default class SegmentationMenu extends React.Component {
       );
     }
 
+    const segmentRows = segments.map(segment => (
+      <SegmentationMenuListItem
+        key={`${segment.metadata.SegmentLabel}_${segment.index}`}
+        segmentIndex={segment.index}
+        metadata={segment.metadata}
+        visible={visibleSegments[segment.index]}
+        onSegmentChange={this.onSegmentChange}
+        onShowHideClick={this.onShowHideClick}
+        onEditClick={this.onEditClick}
+        onDeleteClick={this.onDeleteClick}
+        checked={segment.index === activeSegmentIndex}
+        ImportCallbackOrComponent
+        ExportCallbackOrComponent
+      />
+    ));
+
     return (
       <div className="segmentation-menu-component">
         <div className="segmentation-menu-list">
@@ -357,36 +358,7 @@ export default class SegmentationMenu extends React.Component {
           </div>
           <table className="peppermint-table">
             <tbody>
-              <tr>
-                <th
-                  colSpan="3"
-                  className="left-aligned-cell segmentation-menu-list-bordered"
-                >
-                  {importMetadata.name}
-                </th>
-                <th
-                  colSpan="2"
-                  className="right-aligned-cell segmentation-menu-list-bordered"
-                >
-                  {importMetadata.label}
-                </th>
-              </tr>
-              {importMetadata.type && (
-                <tr>
-                  <th
-                    colSpan="3"
-                    className="left-aligned-cell segmentation-menu-list-bordered"
-                  >
-                    Type: {importMetadata.type}
-                  </th>
-                  <th
-                    colSpan="2"
-                    className="right-aligned-cell segmentation-menu-list-bordered"
-                  >
-                    Modified: {importMetadata.modified}
-                  </th>
-                </tr>
-              )}
+              <SegmentationMenuListHeader importMetadata={importMetadata} />
 
               <tr className="segmentation-menu-list-bordered">
                 <th>Paint</th>

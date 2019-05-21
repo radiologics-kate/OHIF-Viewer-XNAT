@@ -11,7 +11,7 @@ import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
-export default class BrushManagementListItem extends React.Component {
+export default class SegmentationMenuListItem extends React.Component {
   constructor(props = {}) {
     super(props);
   }
