@@ -9,11 +9,12 @@ import {
   setVolumeName
 } from "../../../lib/util/freehandNameIO.js";
 import unlockStructureSet from "../../../lib/util/unlockStructureSet.js";
+import onIOCancel from "../helpers/onIOCancel.js";
+import onImportButtonClick from "../helpers/onImportButtonClick.js";
+import onExportButtonClick from "../helpers/onExportButtonClick.js";
 import "./roiContourMenu.styl";
 
 const modules = cornerstoneTools.store.modules;
-
-//
 
 export default class roiContourMenu extends React.Component {
   constructor(props = {}) {
@@ -40,9 +41,9 @@ export default class roiContourMenu extends React.Component {
     this.onUnlockCancelClick = this.onUnlockCancelClick.bind(this);
     this.onUnlockConfirmClick = this.onUnlockConfirmClick.bind(this);
     this.onIOComplete = this.onIOComplete.bind(this);
-    this.onIOCancel = this.onIOCancel.bind(this);
-    this.onImportButtonClick = this.onImportButtonClick.bind(this);
-    this.onExportButtonClick = this.onExportButtonClick.bind(this);
+    this.onIOCancel = onIOCancel.bind(this);
+    this.onImportButtonClick = onImportButtonClick.bind(this);
+    this.onExportButtonClick = onExportButtonClick.bind(this);
     this.onDisplayStatsToggleClick = this.onDisplayStatsToggleClick.bind(this);
     this.onInterpolateToggleClick = this.onInterpolateToggleClick.bind(this);
     this._workingCollection = this._workingCollection.bind(this);
@@ -72,33 +73,6 @@ export default class roiContourMenu extends React.Component {
       importing: false,
       exporting: false
     });
-  }
-
-  onIOCancel() {
-    this.setState({
-      importing: false,
-      exporting: false
-    });
-  }
-
-  onImportButtonClick() {
-    const { ImportCallbackOrComponent } = this.props;
-
-    if (ImportCallbackOrComponent.prototype.isReactComponent) {
-      this.setState({ importing: true });
-    } else {
-      ImportCallbackOrComponent();
-    }
-  }
-
-  onExportButtonClick() {
-    const { ExportCallbackOrComponent } = this.props;
-
-    if (ExportCallbackOrComponent.prototype.isReactComponent) {
-      this.setState({ exporting: true });
-    } else {
-      ExportCallbackOrComponent();
-    }
   }
 
   onDisplayStatsToggleClick() {

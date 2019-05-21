@@ -9,12 +9,13 @@ import {
   editSegmentInput
 } from "../../../lib/util/brushMetadataIO.js";
 import deleteSegment from "../../../lib/util/deleteSegment.js";
+import onIOCancel from "../helpers/onIOCancel.js";
+import onImportButtonClick from "../helpers/onImportButtonClick.js";
+import onExportButtonClick from "../helpers/onExportButtonClick.js";
 import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
 import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
-
-//
 
 export default class SegmentationMenu extends React.Component {
   constructor(props = {}) {
@@ -27,10 +28,10 @@ export default class SegmentationMenu extends React.Component {
     this.onDeleteClick = this.onDeleteClick.bind(this);
     this.onDeleteCancelClick = this.onDeleteCancelClick.bind(this);
     this.onDeleteConfirmClick = this.onDeleteConfirmClick.bind(this);
-    this.onImportButtonClick = this.onImportButtonClick.bind(this);
-    this.onExportButtonClick = this.onExportButtonClick.bind(this);
+    this.onImportButtonClick = onImportButtonClick.bind(this);
+    this.onExportButtonClick = onExportButtonClick.bind(this);
     this.onIOComplete = this.onIOComplete.bind(this);
-    this.onIOCancel = this.onIOCancel.bind(this);
+    this.onIOCancel = onIOCancel.bind(this);
     this._importMetadata = this._importMetadata.bind(this);
     this._visableSegmentsForElement = this._visableSegmentsForElement.bind(
       this
@@ -81,33 +82,6 @@ export default class SegmentationMenu extends React.Component {
       importing: false,
       exporting: false
     });
-  }
-
-  onIOCancel() {
-    this.setState({
-      importing: false,
-      exporting: false
-    });
-  }
-
-  onImportButtonClick() {
-    const { ImportCallbackOrComponent } = this.props;
-
-    if (ImportCallbackOrComponent.prototype.isReactComponent) {
-      this.setState({ importing: true });
-    } else {
-      ImportCallbackOrComponent();
-    }
-  }
-
-  onExportButtonClick() {
-    const { ExportCallbackOrComponent } = this.props;
-
-    if (ExportCallbackOrComponent.prototype.isReactComponent) {
-      this.setState({ exporting: true });
-    } else {
-      ExportCallbackOrComponent();
-    }
   }
 
   onNewSegmentButtonClick() {
