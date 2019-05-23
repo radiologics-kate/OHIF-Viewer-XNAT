@@ -6,6 +6,12 @@ const brushState = brushModule.state;
 
 import "./segmentationMenu.styl";
 
+const minGateSeperation = 10;
+
+/**
+ * @class BrushSettings - A component that allows the user to change
+ * configuration of the Brush tools.
+ */
 export default class BrushSettings extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -25,14 +31,14 @@ export default class BrushSettings extends React.Component {
     this.onCustomGateMaxChange = this.onCustomGateMaxChange.bind(this);
     this.onHoleFillChange = this.onHoleFillChange.bind(this);
     this.onStrayRemoveChange = this.onStrayRemoveChange.bind(this);
-    this.onCloseButtonClick = this.onCloseButtonClick.bind(this);
   }
 
-  onCloseButtonClick(evt) {
-    const dialog = document.getElementById("brushSettingsDialog");
-    dialog.close();
-  }
-
+  /**
+   * onGateChange - Callback that changes the active gate of the Smart CT Brush.
+   *
+   * @param  {type} evt description
+   * @returns {type}     description
+   */
   onGateChange(evt) {
     const val = evt.target.value;
 
@@ -40,13 +46,20 @@ export default class BrushSettings extends React.Component {
     brushState.activeGate = val;
   }
 
+  /**
+   * onCustomGateMinChange - Changes the minimum value of a
+   * custom Smart CT Gate.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onCustomGateMinChange(evt) {
     let val = Number(evt.target.value);
 
     const customRangeMax = this.state.customGateRangeMax;
 
-    if (val > customRangeMax - 10) {
-      val = customRangeMax - 10;
+    if (val > customRangeMax - minGateSeperation) {
+      val = customRangeMax - minGateSeperation;
       evt.target.value = val;
     }
 
@@ -54,13 +67,20 @@ export default class BrushSettings extends React.Component {
     brushModule.setters.customGateRange(val, null);
   }
 
+  /**
+   * onCustomGateMaxChange - Changes the maximum value of a
+   * custom Smart CT Gate.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onCustomGateMaxChange(evt) {
     let val = Number(evt.target.value);
 
     const customRangeMin = this.state.customGateRangeMin;
 
-    if (val < customRangeMin + 10) {
-      val = customRangeMin + 10;
+    if (val < customRangeMin + minGateSeperation) {
+      val = customRangeMin + minGateSeperation;
       evt.target.value = val;
     }
 
@@ -68,6 +88,13 @@ export default class BrushSettings extends React.Component {
     brushModule.setters.customGateRange(null, val);
   }
 
+  /**
+   * onHoleFillChange - Changes the value of the hole fill parameter for the
+   * Smart CT and Auto brushes.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onHoleFillChange(evt) {
     const val = Number(evt.target.value);
 
@@ -75,6 +102,13 @@ export default class BrushSettings extends React.Component {
     brushState.holeFill = val;
   }
 
+  /**
+   * onStrayRemoveChange - Changes the balue of the stray remove parameter for
+   * the Smart CT and Auto brushes.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onStrayRemoveChange(evt) {
     const val = Number(evt.target.value);
 
@@ -144,7 +178,7 @@ export default class BrushSettings extends React.Component {
     }
 
     return (
-      <div className="brush-settings-component">
+      <div className="segmentation-menu-footer">
         <h3> Smart CT Gate Selection</h3>
         <select
           className="form-themed form-control"

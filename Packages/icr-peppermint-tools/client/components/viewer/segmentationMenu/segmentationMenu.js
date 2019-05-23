@@ -1,5 +1,8 @@
 import React from "react";
+import MenuIOButtons from "../common/MenuIOButtons.js";
+import SegmentationMenuDeleteConfirmation from "./SegmentationMenuDeleteConfirmation.js";
 import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
+import SegmentationMenuListBody from "./SegmentationMenuListBody.js";
 import SegmentationMenuListHeader from "./SegmentationMenuListHeader.js";
 import BrushSettings from "./BrushSettings.js";
 import { cornerstone, cornerstoneTools } from "meteor/ohif:cornerstone";
@@ -10,14 +13,18 @@ import {
   editSegmentInput
 } from "../../../lib/util/brushMetadataIO.js";
 import deleteSegment from "../../../lib/util/deleteSegment.js";
-import onIOCancel from "../helpers/onIOCancel.js";
-import onImportButtonClick from "../helpers/onImportButtonClick.js";
-import onExportButtonClick from "../helpers/onExportButtonClick.js";
-import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
+import onIOCancel from "../common/helpers/onIOCancel.js";
+import onImportButtonClick from "../common/helpers/onImportButtonClick.js";
+import onExportButtonClick from "../common/helpers/onExportButtonClick.js";
 import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
+/**
+ * @class SegmentationMenu - Renders a menu for importing, exporting, creating
+ * and renaming Segments. As well as setting configuration settings for
+ * the Brush tools.
+ */
 export default class SegmentationMenu extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -26,7 +33,9 @@ export default class SegmentationMenu extends React.Component {
     this.onSegmentChange = this.onSegmentChange.bind(this);
     this.onShowHideClick = this.onShowHideClick.bind(this);
     this.onEditClick = this.onEditClick.bind(this);
-    this.onDeleteClick = this.onDeleteClick.bind(this);
+    this.confirmDeleteOnDeleteClick = this.confirmDeleteOnDeleteClick.bind(
+      this
+    );
     this.onDeleteCancelClick = this.onDeleteCancelClick.bind(this);
     this.onDeleteConfirmClick = this.onDeleteConfirmClick.bind(this);
     this.onImportButtonClick = onImportButtonClick.bind(this);
@@ -51,6 +60,12 @@ export default class SegmentationMenu extends React.Component {
     };
   }
 
+  /**
+   * componentDidMount - Grabs the segments from the brushStore and
+   * populates state.
+   *
+   * @returns {null}
+   */
   componentDidMount() {
     this._seriesInstanceUid = getActiveSeriesInstanceUid();
 
@@ -70,6 +85,12 @@ export default class SegmentationMenu extends React.Component {
     });
   }
 
+  /**
+   * onIOComplete - A callback executed on succesful completion of an
+   * IO opperation. Recalculates the Segmentation state.
+   *
+   * @returns {type}  description
+   */
   onIOComplete() {
     const importMetadata = this._importMetadata();
     const segments = this._segments();
@@ -85,6 +106,12 @@ export default class SegmentationMenu extends React.Component {
     });
   }
 
+  /**
+   * onNewSegmentButtonClick - Callback that adds a new segment to the
+   * active series.
+   *
+   * @returns {null}
+   */
   onNewSegmentButtonClick() {
     const seriesInstanceUid = getActiveSeriesInstanceUid();
 
@@ -110,12 +137,24 @@ export default class SegmentationMenu extends React.Component {
     }
   }
 
+  /**
+   * onSegmentChange - Callback that changes the active segment being drawn.
+   *
+   * @param  {Number} segmentIndex The index of the segment to set active.
+   * @returns {null}
+   */
   onSegmentChange(segmentIndex) {
     brushModule.state.drawColorId = segmentIndex;
 
     this.setState({ activeSegmentIndex: segmentIndex });
   }
 
+  /**
+   * onShowHideClick - Callback that toggles visibility of a segment.
+   *
+   * @param  {Number} segmentIndex The index of the segemnt to toggle.
+   * @returns {null}
+   */
   onShowHideClick(segmentIndex) {
     const { visibleSegments } = this.state;
 
@@ -135,17 +174,35 @@ export default class SegmentationMenu extends React.Component {
     this.setState({ visibleSegments });
   }
 
+  /**
+   * onEditClick - A callback that triggers metadata input for a segment.
+   *
+   * @param  {Number} segmentIndex The index of the segment metadata to edit.
+   * @param  {object}   metadata     The current metadata of the segment.
+   * @returns {null}
+   */
   onEditClick(segmentIndex, metadata) {
     editSegmentInput(segmentIndex, metadata);
   }
 
-  onDeleteClick(segmentIndex) {
+  /**
+   * confirmDeleteOnDeleteClick - A callback that triggers confirmation of segment deletion.
+   *
+   * @param  {Number} segmentIndex The index of the segment being deleted.
+   * @returns {null}
+   */
+  confirmDeleteOnDeleteClick(segmentIndex) {
     this.setState({
       deleteConfirmationOpen: true,
       segmentToDelete: segmentIndex
     });
   }
 
+  /**
+   * onDeleteConfirmClick - A callback that deletes a segment form the series.
+   *
+   * @returns {null}
+   */
   onDeleteConfirmClick() {
     const { segmentToDelete } = this.state;
 
@@ -161,12 +218,23 @@ export default class SegmentationMenu extends React.Component {
     });
   }
 
+  /**
+   * onDeleteCancelClick - A callback that closes the delete confirmation window
+   * and aborts deletion.
+   *
+   * @returns {null}
+   */
   onDeleteCancelClick() {
     this.setState({
       deleteConfirmationOpen: false
     });
   }
 
+  /**
+   * _importMetadata - Returns the import metadata for the active series.
+   *
+   * @returns {object} The importMetadata.
+   */
   _importMetadata() {
     const seriesInstanceUid = this._seriesInstanceUid;
     const importMetadata = brushModule.getters.importMetadata(
@@ -188,6 +256,12 @@ export default class SegmentationMenu extends React.Component {
     };
   }
 
+  /**
+   * _visableSegmentsForElement - Returns an array of visible segments for the
+   * active series.
+   *
+   * @returns {Boolean[]} An array of visible segments.
+   */
   _visableSegmentsForElement() {
     const seriesInstanceUid = this._seriesInstanceUid;
 
@@ -213,6 +287,11 @@ export default class SegmentationMenu extends React.Component {
     return visableSegmentsForElement;
   }
 
+  /**
+   * _segments - Returns an array of segment metadata for the active series.
+   *
+   * @returns {object[]} An array of segment metadata.
+   */
   _segments() {
     const seriesInstanceUid = this._seriesInstanceUid;
 
@@ -255,138 +334,68 @@ export default class SegmentationMenu extends React.Component {
 
     const { ImportCallbackOrComponent, ExportCallbackOrComponent } = this.props;
 
-    let brushManagementDialogBody;
-
-    if (deleteConfirmationOpen) {
-      const segmentColor = getBrushSegmentColor(segmentToDelete);
-      const segmentLabel = segments.find(
-        segment => segment.index === segmentToDelete
-      ).metadata.SegmentLabel;
-
-      return (
-        <div>
-          <div>
-            <h5>Warning!</h5>
-            <p>
-              Are you sure you want to delete {segmentLabel}? This cannot be
-              undone.
-            </p>
-          </div>
-          <div className="seg-delete-horizontal-box">
-            <a
-              className="btn btn-sm btn-primary"
-              onClick={this.onDeleteConfirmClick}
-            >
-              <i className="fa fa fa-check-circle fa-2x" />
-            </a>
-            <a
-              className="btn btn-sm btn-primary"
-              onClick={this.onDeleteCancelClick}
-            >
-              <i className="fa fa fa-times-circle fa-2x" />
-            </a>
-          </div>
-        </div>
-      );
-    }
+    let component;
 
     if (importing) {
-      return (
+      component = (
         <ImportCallbackOrComponent
           onImportComplete={this.onIOComplete}
           onImportCancel={this.onIOCancel}
         />
       );
-    }
-
-    if (exporting) {
-      return (
+    } else if (exporting) {
+      component = (
         <ExportCallbackOrComponent
           onExportComplete={this.onIOComplete}
           onExportCancel={this.onIOCancel}
         />
       );
-    }
+    } else if (deleteConfirmationOpen) {
+      const segmentLabel = segments.find(
+        segment => segment.index === segmentToDelete
+      ).metadata.SegmentLabel;
 
-    let ioMenu;
-
-    if (ImportCallbackOrComponent || ExportCallbackOrComponent) {
-      ioMenu = (
-        <div>
-          {ImportCallbackOrComponent && (
-            <a
-              className="btn btn-sm btn-primary roi-contour-menu-io-button"
-              onClick={this.onImportButtonClick}
-            >
-              Import
-            </a>
-          )}
-          {ExportCallbackOrComponent && (
-            <a
-              className="btn btn-sm btn-primary roi-contour-menu-io-button"
-              onClick={this.onExportButtonClick}
-            >
-              Export
-            </a>
-          )}
+      component = (
+        <SegmentationMenuDeleteConfirmation
+          segmentLabel={segmentLabel}
+          onDeleteConfirmClick={onDeleteConfirmClick}
+          onDeleteCancelClick={onDeleteCancelClick}
+        />
+      );
+    } else {
+      component = (
+        <div className="segmentation-menu-component">
+          <div className="segmentation-menu-list">
+            <div className="segmentation-menu-header">
+              <h3>Segments</h3>
+              <MenuIOButtons
+                ImportCallbackOrComponent={ImportCallbackOrComponent}
+                ExportCallbackOrComponent={ExportCallbackOrComponent}
+                onImportButtonClick={onImportButtonClick}
+                onExportButtonClick={onExportButtonClick}
+              />
+            </div>
+            <table className="peppermint-table">
+              <tbody>
+                <SegmentationMenuListHeader importMetadata={importMetadata} />
+                <SegmentationMenuListBody
+                  segments={segments}
+                  visibleSegments={visibleSegments}
+                  activeSegmentIndex={activeSegmentIndex}
+                  onNewSegmentButtonClick={this.onNewSegmentButtonClick}
+                  onSegmentChange={this.onSegmentChange}
+                  onShowHideClick={this.onShowHideClick}
+                  onEditClick={this.onEditClick}
+                  onDeleteClick={this.confirmDeleteOnDeleteClick}
+                />
+              </tbody>
+            </table>
+          </div>
+          <BrushSettings />
         </div>
       );
     }
 
-    const segmentRows = segments.map(segment => (
-      <SegmentationMenuListItem
-        key={`${segment.metadata.SegmentLabel}_${segment.index}`}
-        segmentIndex={segment.index}
-        metadata={segment.metadata}
-        visible={visibleSegments[segment.index]}
-        onSegmentChange={this.onSegmentChange}
-        onShowHideClick={this.onShowHideClick}
-        onEditClick={this.onEditClick}
-        onDeleteClick={this.onDeleteClick}
-        checked={segment.index === activeSegmentIndex}
-        ImportCallbackOrComponent
-        ExportCallbackOrComponent
-      />
-    ));
-
-    return (
-      <div className="segmentation-menu-component">
-        <div className="segmentation-menu-list">
-          <div className="segmentation-menu-header">
-            <h3>Segments</h3>
-            {ioMenu}
-          </div>
-          <table className="peppermint-table">
-            <tbody>
-              <SegmentationMenuListHeader importMetadata={importMetadata} />
-
-              <tr className="segmentation-menu-list-bordered">
-                <th>Paint</th>
-                <th>Label</th>
-                <th className="centered-cell">Type</th>
-                <th className="centered-cell">Hide</th>
-                <th className="centered-cell">Delete</th>
-              </tr>
-
-              {segmentRows}
-              <tr>
-                <th />
-                <th>
-                  <a
-                    className="segmentation-menu-new-button btn btn-sm btn-primary"
-                    onClick={this.onNewSegmentButtonClick}
-                  >
-                    <i className="fa fa-plus-circle" /> Segment
-                  </a>
-                </th>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="segmentation-menu-footer">
-          <BrushSettings />
-        </div>
-      </div>
-    );
+    return <>{component}</>;
   }
 }

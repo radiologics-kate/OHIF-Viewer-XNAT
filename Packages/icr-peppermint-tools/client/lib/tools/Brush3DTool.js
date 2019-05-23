@@ -23,6 +23,9 @@ export default class Brush3DTool extends BrushTool {
 
     this.initialConfiguration = initialConfiguration;
     this.touchDragCallback = this._startPaintingTouch.bind(this);
+
+    console.log(`Brush3DTool constructor:`);
+    console.log(this);
   }
 
   /**

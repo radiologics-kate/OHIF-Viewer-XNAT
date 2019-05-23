@@ -3,6 +3,11 @@ import WorkingCollectionListItem from "./WorkingCollectionListItem.js";
 
 import "./roiContourMenu.styl";
 
+/**
+ * @class WorkingRoiCollectionList - Renders a list of
+ * WorkingCollectionListItem, displaying metadata of the working ROIContour
+ * Collection.
+ */
 export default class WorkingRoiCollectionList extends React.Component {
   constructor(props = {}) {
     super(props);

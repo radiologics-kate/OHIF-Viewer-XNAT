@@ -7,6 +7,10 @@ import "./roiContourMenu.styl";
 
 const modules = cornerstoneTools.store.modules;
 
+/**
+ * @class LockedCollectionsListItem - Renders metadata for an individual locked
+ * ROIContour Collection.
+ */
 export default class LockedCollectionsListItem extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -22,12 +26,23 @@ export default class LockedCollectionsListItem extends React.Component {
     this.onShowHideClick = this.onShowHideClick.bind(this);
   }
 
+  /**
+   * onToggleVisibilityClick - Callback that toggles the expands/collapses the
+   * list of collection metadata.
+   *
+   * @returns {null}
+   */
   onToggleVisibilityClick() {
     const { expanded } = this.state;
 
     this.setState({ expanded: !expanded });
   }
 
+  /**
+   * onShowHideClick - Toggles the visibility of the collections ROI Contours.
+   *
+   * @returns {null}
+   */
   onShowHideClick() {
     const { collection, seriesInstanceUid } = this.props;
     const { visible } = this.state;

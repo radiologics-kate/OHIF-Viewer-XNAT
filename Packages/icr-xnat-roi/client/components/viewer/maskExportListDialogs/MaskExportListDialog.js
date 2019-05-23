@@ -100,8 +100,6 @@ export default class MaskExportListDialog extends React.Component {
             modified: false
           });
 
-          // JamesAPetts
-          Session.set("refreshSegmentationMenu", Math.random().toString);
           this.props.onExportComplete();
 
           // TODO -> Work on backup mechanism, disabled for now.

@@ -2,6 +2,10 @@ import React from "react";
 
 import "./roiContourMenu.styl";
 
+/**
+ * @class WorkingCollectionListItem - Renders metadata for the working
+ * ROIContour Collection.
+ */
 export default class WorkingCollectionListItem extends React.Component {
   constructor(props = {}) {
     super(props);

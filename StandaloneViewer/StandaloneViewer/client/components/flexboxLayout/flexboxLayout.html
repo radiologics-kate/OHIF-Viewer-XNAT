@@ -14,10 +14,9 @@
             {{>standaloneViewerMain (clone this)}}
         </div>
 
-
         <div class="sidebarMenu sidebar-right {{#if rightSidebarOpen}}sidebar-open{{/if}}">
           {{#if rightSidebarRoiContourMenu}}
-            <div id="roiContourMenu" class="roi-contour-menu">
+            <div class="roi-contour-menu">
               {{> React component=RoiContourMenu
                 key=roiContourMenuId
                 ImportCallbackOrComponent=roiContourMenuImportComponent
@@ -26,7 +25,7 @@
             </div>
           {{/if}}
           {{#if rightSidebarSegmentationMenu}}
-            <div id="segmentationMenu" class="segmentation-menu">
+            <div class="segmentation-menu">
               {{> React component=SegmentationMenu
                 key=segmentationMenuId
                 ImportCallbackOrComponent=segmentationMenuImportComponent

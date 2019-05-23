@@ -11,11 +11,19 @@ import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
+/**
+ * @class SegmentationMenuListItem - Renders metadata for a single segment.
+ */
 export default class SegmentationMenuListItem extends React.Component {
   constructor(props = {}) {
     super(props);
   }
 
+  /**
+   * _getTypeWithModifier - Returns the segment type with its modifier as a string.
+   *
+   * @returns {string}
+   */
   _getTypeWithModifier() {
     const { metadata } = this.props;
 

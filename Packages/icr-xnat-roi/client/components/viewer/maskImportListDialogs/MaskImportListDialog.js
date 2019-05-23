@@ -356,8 +356,6 @@ export default class MaskImportListDialog extends React.Component {
         );
     }
 
-    // JamesAPetts
-    Session.set("refreshSegmentationMenu", Math.random().toString());
     this.props.onImportComplete();
   }
 

@@ -12,6 +12,10 @@ const invalidIcon = "fa fa-times fa-2x";
 const validColor = "limegreen";
 const invalidColor = "firebrick";
 
+/**
+ * @class BrushMetadataDialog - A component that allows the user to input
+ * metadata for a segmentation.
+ */
 export default class BrushMetadataDialog extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -62,6 +66,13 @@ export default class BrushMetadataDialog extends React.Component {
     this._closeDialog = this._closeDialog.bind(this);
   }
 
+  /**
+   * onTextInputChange - A callback that checks the validity of the input
+   * segment label.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onTextInputChange(evt) {
     const { validName } = this.state;
     const name = evt.target.value;
@@ -75,6 +86,12 @@ export default class BrushMetadataDialog extends React.Component {
     }
   }
 
+  /**
+   * onCategoryChange - A callback that updates the category state on select.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onCategoryChange(evt) {
     const categoryUID = evt.target.value;
 
@@ -94,6 +111,12 @@ export default class BrushMetadataDialog extends React.Component {
     this.setState({ categoryUID, typeUID, modifierUID });
   }
 
+  /**
+   * onTypeChange - A callback that changes the type state on select.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onTypeChange(evt) {
     const { categoryUID } = this.state;
     const typeUID = evt.target.value;
@@ -114,17 +137,34 @@ export default class BrushMetadataDialog extends React.Component {
     this.setState({ typeUID, modifierUID });
   }
 
+  /**
+   * onModifierChange - A callback that changes the modifier state on select.
+   *
+   * @param  {object} evt The event.
+   * @returns {null}
+   */
   onModifierChange(evt) {
     const modifierUID = evt.target.value;
 
     this.setState({ modifierUID });
   }
 
+  /**
+   * onCancelButtonClick - A callback that closes the dialog.
+   *
+   * @returns {null}
+   */
   onCancelButtonClick() {
     this.props.callback(null);
     this._closeDialog();
   }
 
+  /**
+   * onConfirmButtonClick - A callback that sets the segment metadat and closes
+   * the dialog.
+   *
+   * @returns {null}
+   */
   onConfirmButtonClick() {
     const { categoryUID, typeUID, modifierUID } = this.state;
     const { segIndex } = this.props;
@@ -140,12 +180,23 @@ export default class BrushMetadataDialog extends React.Component {
     this._closeDialog();
   }
 
+  /**
+   * _closeDialog - Closes the dialog.
+   *
+   * @returns {null}
+   */
   _closeDialog() {
     const dialog = document.getElementById("brushMetadataDialog");
 
     dialog.close();
   }
 
+  /**
+   * _validLabelIndicator - If the label input is valid, returns a Font Awesome
+   * green checkmark, otherwise returns a Font Awesome red cross.
+   *
+   * @returns {object} The Font Awesome class info.
+   */
   _validLabelIndicator() {
     if (this._isValidInput()) {
       return {
@@ -160,10 +211,21 @@ export default class BrushMetadataDialog extends React.Component {
     };
   }
 
+  /**
+   * _isValidInput - Returns true if the input label is valid.
+   *
+   * @returns {Boolean} True if the label input is valid.
+   */
   _isValidInput() {
     return this._maskName.length > 0;
   }
 
+  /**
+   * _confirmButtonClasses - Returns a string of classes for the confirm button
+   * depending on current state.
+   *
+   * @returns {String} The classes for the confirm button.
+   */
   _confirmButtonClasses() {
     if (this._isValidInput()) {
       return "brush-metadata-new-button btn btn-sm btn-primary";
@@ -172,6 +234,11 @@ export default class BrushMetadataDialog extends React.Component {
     return "brush-metadata-new-button-invalid btn btn-sm btn-primary";
   }
 
+  /**
+   * _segmentColor - Returns the segment's color.
+   *
+   * @returns {String} The color.
+   */
   _segmentColor() {
     const { segIndex } = this.props;
 
@@ -301,7 +368,7 @@ export default class BrushMetadataDialog extends React.Component {
           <div>
             {categorySelect}
             {typeSelect}
-            {type.Modifier && modiferSelect}
+            {modiferSelect}
           </div>
         </div>
 

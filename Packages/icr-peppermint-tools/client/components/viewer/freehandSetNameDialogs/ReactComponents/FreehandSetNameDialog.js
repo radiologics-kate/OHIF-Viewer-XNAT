@@ -1,5 +1,9 @@
 import React from "react";
 
+/**
+ * @class FreehandSetNameDialog - A component that allows the user to input
+ * metadata for a ROIContour.
+ */
 export default class FreehandSetNameDialog extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -13,14 +17,31 @@ export default class FreehandSetNameDialog extends React.Component {
     this._roiContourName = this.props.defaultName;
   }
 
+  /**
+   * onTextInputChange - A callback that stores the text input on the component.
+   *
+   * @param  {object} evt The text input event.
+   * @returns {null}
+   */
   onTextInputChange(evt) {
     this._roiContourName = evt.target.value;
   }
 
+  /**
+   * onCancelButtonClick - A callback that closes the dialog.
+   *
+   * @returns {type}  description
+   */
   onCancelButtonClick() {
     this._closeDialog();
   }
 
+  /**
+   * onConfirmButtonClick - A callback that renames the ROI Contour and closes
+   * the dialog.
+   *
+   * @returns {null}
+   */
   onConfirmButtonClick() {
     const name = this._roiContourName;
 
@@ -30,6 +51,11 @@ export default class FreehandSetNameDialog extends React.Component {
     }
   }
 
+  /**
+   * _closeDialog - Closes the dialog.
+   *
+   * @returns {null}
+   */
   _closeDialog() {
     const dialog = document.getElementById("freehandSetNameDialog");
 

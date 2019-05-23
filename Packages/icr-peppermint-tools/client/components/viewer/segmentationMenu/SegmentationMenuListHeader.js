@@ -1,8 +1,10 @@
 import React from "react";
 import "./segmentationMenu.styl";
 
-const brushModule = cornerstoneTools.store.modules.brush;
-
+/**
+ * @class SegmentationMenuListHeader - Renders the header for the
+ * SegmentationMenuList table.
+ */
 export default class SegmentationMenuListHeader extends React.Component {
   constructor(props = {}) {
     super(props);
@@ -43,6 +45,13 @@ export default class SegmentationMenuListHeader extends React.Component {
             </th>
           </tr>
         )}
+        <tr className="segmentation-menu-list-bordered">
+          <th>Paint</th>
+          <th>Label</th>
+          <th className="centered-cell">Type</th>
+          <th className="centered-cell">Hide</th>
+          <th className="centered-cell">Delete</th>
+        </tr>
       </>
     );
   }
