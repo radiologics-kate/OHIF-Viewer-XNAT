@@ -6,6 +6,8 @@
  * @returns {null}
  */
 export default function onImportButtonClick() {
+  console.log(this);
+
   const { ImportCallbackOrComponent } = this.props;
 
   if (ImportCallbackOrComponent.prototype.isReactComponent) {

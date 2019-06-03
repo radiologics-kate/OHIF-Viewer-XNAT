@@ -375,6 +375,8 @@ export default class RoiContourMenu extends React.Component {
         </div>
       );
     } else {
+      console.log(lockedCollections.length);
+
       component = (
         <div className="roi-contour-menu-component">
           <div className="roi-contour-menu-header">
@@ -382,8 +384,8 @@ export default class RoiContourMenu extends React.Component {
             <MenuIOButtons
               ImportCallbackOrComponent={ImportCallbackOrComponent}
               ExportCallbackOrComponent={ExportCallbackOrComponent}
-              onImportButtonClick={onImportButtonClick}
-              onExportButtonClick={onExportButtonClick}
+              onImportButtonClick={this.onImportButtonClick}
+              onExportButtonClick={this.onExportButtonClick}
             />
           </div>
           <div className="roi-contour-menu-collection-list-body">
@@ -398,7 +400,7 @@ export default class RoiContourMenu extends React.Component {
                     onNewRoiButtonClick={this.onNewRoiButtonClick}
                   />
                 )}
-                {lockedCollections.length && (
+                {lockedCollections.length !== 0 && (
                   <LockedCollectionsList
                     lockedCollections={lockedCollections}
                     onUnlockClick={this.confirmUnlockOnUnlockClick}

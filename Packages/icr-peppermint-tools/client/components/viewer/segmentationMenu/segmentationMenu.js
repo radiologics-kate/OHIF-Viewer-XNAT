@@ -371,8 +371,8 @@ export default class SegmentationMenu extends React.Component {
               <MenuIOButtons
                 ImportCallbackOrComponent={ImportCallbackOrComponent}
                 ExportCallbackOrComponent={ExportCallbackOrComponent}
-                onImportButtonClick={onImportButtonClick}
-                onExportButtonClick={onExportButtonClick}
+                onImportButtonClick={this.onImportButtonClick}
+                onExportButtonClick={this.onExportButtonClick}
               />
             </div>
             <table className="peppermint-table">
