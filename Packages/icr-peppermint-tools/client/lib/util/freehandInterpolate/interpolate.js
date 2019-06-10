@@ -202,14 +202,14 @@ function _addInterpolatedContour(
 
   const imageToolState = toolStateManager[imageId];
 
-  if (!imageToolState.freehandMouse) {
-    imageToolState.freehandMouse = {};
-    imageToolState.freehandMouse.data = [];
-  } else if (!imageToolState.freehandMouse.data) {
-    imageToolState.freehandMouse.data = [];
+  if (!imageToolState.freehandRoi) {
+    imageToolState.freehandRoi = {};
+    imageToolState.freehandRoi.data = [];
+  } else if (!imageToolState.freehandRoi.data) {
+    imageToolState.freehandRoi.data = [];
   }
 
-  imageToolState.freehandMouse.data.push(polygon.getFreehandToolData(false));
+  imageToolState.freehandRoi.data.push(polygon.getFreehandToolData(false));
 
   modules.freehand3D.setters.incrementPolygonCount(
     referencedToolData.seriesInstanceUid,
@@ -246,9 +246,9 @@ function _editInterpolatedContour(
   // The ROIContour.
   let toolDataIndex;
 
-  for (let i = 0; i < imageToolState.freehandMouse.data.length; i++) {
+  for (let i = 0; i < imageToolState.freehandRoi.data.length; i++) {
     if (
-      imageToolState.freehandMouse.data[i].ROIContourUid ===
+      imageToolState.freehandRoi.data[i].ROIContourUid ===
       referencedToolData.ROIContourUid
     ) {
       toolDataIndex = i;
@@ -256,7 +256,7 @@ function _editInterpolatedContour(
     }
   }
 
-  const oldPolygon = imageToolState.freehandMouse.data[toolDataIndex];
+  const oldPolygon = imageToolState.freehandRoi.data[toolDataIndex];
   const points = [];
 
   for (let i = 0; i < interpolated2DContour.x.length; i++) {
@@ -277,7 +277,7 @@ function _editInterpolatedContour(
     true
   );
 
-  imageToolState.freehandMouse.data[
+  imageToolState.freehandRoi.data[
     toolDataIndex
   ] = updatedPolygon.getFreehandToolData(false);
 }

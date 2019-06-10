@@ -10,7 +10,8 @@ import { viewportUtils } from "./viewportUtils";
 import { panelNavigation } from "./panelNavigation";
 import { WLPresets } from "./WLPresets";
 import {
-  Freehand3DMouseTool,
+  FreehandRoi3DSculpterTool,
+  FreehandRoi3DTool,
   Brush3DTool,
   Brush3DHUGatedTool,
   Brush3DAutoGatedTool
@@ -48,8 +49,8 @@ Meteor.startup(function() {
     dragProbe: "",
     ellipticalRoi: "",
     rectangleRoi: "",
-    freehandMouse: "D",
-    freehandSculpterMouse: "S",
+    freehandRoi: "D",
+    freehandRoiSculptor: "S",
     eraser: "E",
     brush: "B",
 
@@ -143,17 +144,17 @@ Meteor.startup(function() {
     wwwcRegion: "W/L by Region",
     crosshairs: "Crosshairs",
     referenceLines: "Reference Lines",
-    freehandSculpterMouse: "Freehand Sculpter Mouse",
+    freehandRoiSculptor: "Freehand Roi Sculptor",
     eraser: "Eraser"
   });
 
   // JamesAPetts Hooks on tool activation.
-  OHIF.commands.register(contextName, "freehandMouse", {
-    name: "Freehand Mouse",
+  OHIF.commands.register(contextName, "freehandRoi", {
+    name: "Freehand Roi",
     action: toolManager.setActiveToolWithHook,
     params: {
-      toolName: "freehandMouse",
-      hook: Freehand3DMouseTool.checkIfFirstVolumeOnSeries
+      toolName: "freehandRoi",
+      hook: FreehandRoi3DTool.checkIfFirstVolumeOnSeries
     }
   });
 

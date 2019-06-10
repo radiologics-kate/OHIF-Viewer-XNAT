@@ -193,7 +193,7 @@ const clearTools = () => {
 
   const freehandTool = cornerstoneTools.getToolForElement(
     element,
-    "freehandMouse"
+    "freehandRoi"
   );
 
   // Close the freehandTool
@@ -203,13 +203,13 @@ const clearTools = () => {
 
   // Delete all toolData apart from freehand toolData from the element
   Object.keys(toolState).forEach(function(key) {
-    if (key !== "freehandMouse") {
+    if (key !== "freehandRoi") {
       delete toolState[key];
     }
   });
 
-  if (toolState.freehandMouse && toolState.freehandMouse.data) {
-    const freehandData = toolState.freehandMouse.data;
+  if (toolState.freehandRoi && toolState.freehandRoi.data) {
+    const freehandData = toolState.freehandRoi.data;
     const freehand3DStore = cornerstoneTools.store.modules.freehand3D;
 
     // Delete any non-locked polygons (NOTE: Traverse the array in reverse order to reduce the complexity of the algorithm).
@@ -229,7 +229,7 @@ const clearTools = () => {
 
     // If freehandData is now empty as a result of the deletion, delete it.
     if (freehandData.length === 0) {
-      delete toolState.freehandMouse;
+      delete toolState.freehandRoi;
     }
   }
 

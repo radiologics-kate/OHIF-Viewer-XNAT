@@ -16,20 +16,30 @@ const {
   calculateFreehandStatistics,
   freehandIntersect,
   FreehandHandleData
-} = cornerstoneTools.import("util/freehandUtils");
-const draw = cornerstoneTools.import("drawing/draw");
-const drawJoinedLines = cornerstoneTools.import("drawing/drawJoinedLines");
-const drawHandles = cornerstoneTools.import("drawing/drawHandles");
-const drawLinkedTextBox = cornerstoneTools.import("drawing/drawLinkedTextBox");
-const moveHandleNearImagePoint = cornerstoneTools.import(
+} = cornerstoneTools.importInternalModule("util/freehandUtils");
+const draw = cornerstoneTools.importInternalModule("drawing/draw");
+const drawJoinedLines = cornerstoneTools.importInternalModule(
+  "drawing/drawJoinedLines"
+);
+const drawHandles = cornerstoneTools.importInternalModule(
+  "drawing/drawHandles"
+);
+const drawLinkedTextBox = cornerstoneTools.importInternalModule(
+  "drawing/drawLinkedTextBox"
+);
+const moveHandleNearImagePoint = cornerstoneTools.importInternalModule(
   "manipulators/moveHandleNearImagePoint"
 );
-const getNewContext = cornerstoneTools.import("drawing/getNewContext");
-const FreehandMouseTool = cornerstoneTools.FreehandMouseTool;
+const getNewContext = cornerstoneTools.importInternalModule(
+  "drawing/getNewContext"
+);
+const FreehandRoiTool = cornerstoneTools.FreehandRoiTool;
 const modules = cornerstoneTools.store.modules;
 const toolColors = cornerstoneTools.toolColors;
-const numbersWithCommas = cornerstoneTools.import("util/numbersWithCommas");
-const pointInsideBoundingBox = cornerstoneTools.import(
+const numbersWithCommas = cornerstoneTools.importInternalModule(
+  "util/numbersWithCommas"
+);
+const pointInsideBoundingBox = cornerstoneTools.importInternalModule(
   "util/pointInsideBoundingBox"
 );
 const getToolState = cornerstoneTools.getToolState;
@@ -38,10 +48,10 @@ const getElementToolStateManager = cornerstoneTools.getElementToolStateManager;
 const state = cornerstoneTools.store.state;
 const EVENTS = cornerstoneTools.EVENTS;
 
-export default class Freehand3DMouseTool extends FreehandMouseTool {
+export default class FreehandRoi3DTool extends FreehandRoiTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: "FreehandMouse",
+      name: "FreehandRoi",
       configuration: defaultFreehandConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);

@@ -17,7 +17,7 @@ export default class SegmentationMenuListHeader extends React.Component {
       <>
         <tr>
           <th
-            colSpan="3"
+            colSpan="2"
             className="left-aligned-cell segmentation-menu-list-bordered"
           >
             {importMetadata.name}
@@ -32,7 +32,7 @@ export default class SegmentationMenuListHeader extends React.Component {
         {importMetadata.type && (
           <tr>
             <th
-              colSpan="3"
+              colSpan="2"
               className="left-aligned-cell segmentation-menu-list-bordered"
             >
               Type: {importMetadata.type}
@@ -49,7 +49,6 @@ export default class SegmentationMenuListHeader extends React.Component {
           <th>Paint</th>
           <th>Label</th>
           <th className="centered-cell">Type</th>
-          <th className="centered-cell">Hide</th>
           <th className="centered-cell">Delete</th>
         </tr>
       </>

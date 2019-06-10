@@ -45,9 +45,7 @@ export default class SegmentationMenuListItem extends React.Component {
     const {
       metadata,
       segmentIndex,
-      visible,
       onSegmentChange,
-      onShowHideClick,
       onEditClick,
       onDeleteClick,
       checked
@@ -58,7 +56,6 @@ export default class SegmentationMenuListItem extends React.Component {
     const segmentCategory =
       metadata.SegmentedPropertyCategoryCodeSequence.CodeMeaning;
     const typeWithModifier = this._getTypeWithModifier();
-    const showHideIcon = visible ? "fa fa-eye" : "fa fa-eye-slash";
 
     return (
       <tr>
@@ -92,16 +89,6 @@ export default class SegmentationMenuListItem extends React.Component {
             {typeWithModifier}
             {" - "}
             {segmentCategory}
-          </a>
-        </td>
-        <td className="centered-cell">
-          <a
-            className="btn btn-sm btn-secondary"
-            onClick={() => {
-              onShowHideClick(segmentIndex);
-            }}
-          >
-            <i className={showHideIcon} />
           </a>
         </td>
         <td className="centered-cell">

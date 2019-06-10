@@ -3,9 +3,10 @@ import { createNewVolume } from "../util/freehandNameIO.js";
 import { OHIF } from "meteor/ohif:core";
 import isDialogOpen from "../util/isDialogOpen.js";
 
-const getKeyFromKeyCode = cornerstoneTools.import("util/getKeyFromKeyCode");
 const Mousetrap = require("mousetrap");
-const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
+const BaseBrushTool = cornerstoneTools.importInternalModule(
+  "base/BaseBrushTool"
+);
 
 // TODO -> Move all this to OHIF viewer keybindings if thats possible through a plugin?
 
@@ -20,7 +21,7 @@ Mousetrap.bind(
     const element = activeEnabledElement.element;
     const freehandTool = cornerstoneTools.getToolForElement(
       element,
-      "freehandMouse"
+      "freehandRoi"
     );
 
     const key = evt.key;
@@ -62,7 +63,7 @@ Mousetrap.bind(
     const element = activeEnabledElement.element;
     const freehandTool = cornerstoneTools.getToolForElement(
       element,
-      "freehandMouse"
+      "freehandRoi"
     );
 
     freehandTool.configuration.alwaysShowHandles = true;

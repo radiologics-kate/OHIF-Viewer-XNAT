@@ -55,7 +55,7 @@ export default class RoiExtractor {
         this._seriesInstanceUid
       ) {
         // grab the freehand tool for this DICOM instance
-        const freehandToolState = toolStateManager[imageId].freehandMouse;
+        const freehandToolState = toolStateManager[imageId].freehandRoi;
 
         if (freehandToolState) {
           // Append new ROIs to polygon list

@@ -1,10 +1,10 @@
 // Tools
 export {
-  default as Freehand3DMouseTool
-} from "./client/lib/tools/Freehand3DMouseTool.js";
+  default as FreehandRoi3DTool
+} from "./client/lib/tools/FreehandRoi3DTool.js";
 export {
-  default as Freehand3DSculpterMouseTool
-} from "./client/lib/tools/Freehand3DSculpterMouseTool.js";
+  default as FreehandRoi3DSculptorTool
+} from "./client/lib/tools/FreehandRoi3DSculptorTool.js";
 export { default as Brush3DTool } from "./client/lib/tools/Brush3DTool.js";
 export {
   default as Brush3DHUGatedTool

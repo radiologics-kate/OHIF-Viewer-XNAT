@@ -127,8 +127,8 @@ export const toolManager = {
     };
 
     pluginTools = {
-      freehandMouse: peppermintTools.Freehand3DMouseTool,
-      freehandSculpterMouse: peppermintTools.Freehand3DSculpterMouseTool,
+      freehandRoi: peppermintTools.FreehandRoi3DTool,
+      freehandRoiSculptor: peppermintTools.FreehandRoi3DSculptorTool,
       brush: peppermintTools.Brush3DTool,
       brushHUGated: peppermintTools.Brush3DHUGatedTool,
       brushAutoGated: peppermintTools.Brush3DAutoGatedTool
@@ -339,9 +339,9 @@ export const toolManager = {
     });
 
     // JamesAPetts - Peppermint tools
-    const freehandTool = pluginTools["freehandMouse"];
+    const freehandTool = pluginTools["freehandRoi"];
     cornerstoneTools.addToolForElement(element, freehandTool, {
-      name: "freehandMouse"
+      name: "freehandRoi"
     });
 
     const brushTool = pluginTools["brush"];
@@ -357,10 +357,10 @@ export const toolManager = {
       name: "brushAutoGated"
     });
 
-    const freehandSculpterMouseTool = pluginTools["freehandSculpterMouse"];
+    const freehandSculpterMouseTool = pluginTools["freehandRoiSculptor"];
     cornerstoneTools.addToolForElement(element, freehandSculpterMouseTool, {
-      name: "freehandSculpterMouse",
-      referencedToolName: "freehandMouse"
+      name: "freehandRoiSculptor",
+      referencedToolName: "freehandRoi"
     });
 
     // Activate pinch zoom
@@ -386,7 +386,7 @@ export const toolManager = {
       isTouchActive: true
     });
 
-    cornerstoneTools.setToolPassive("freehandMouse", {
+    cornerstoneTools.setToolPassive("freehandRoi", {
       mouseButtonMask: 1
     });
 

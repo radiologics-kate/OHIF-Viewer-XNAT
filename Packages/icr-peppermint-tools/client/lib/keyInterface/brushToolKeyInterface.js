@@ -5,9 +5,10 @@ import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
 import getActiveBrushToolsForElement from "../util/getActiveBrushToolsForElement.js";
 import { newSegmentInput } from "../util/brushMetadataIO.js";
 
-const getKeyFromKeyCode = cornerstoneTools.import("util/getKeyFromKeyCode");
 const Mousetrap = require("mousetrap");
-const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
+const BaseBrushTool = cornerstoneTools.importInternalModule(
+  "base/BaseBrushTool"
+);
 
 const brushModule = cornerstoneTools.store.modules.brush;
 

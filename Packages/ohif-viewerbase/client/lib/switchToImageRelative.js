@@ -1,7 +1,7 @@
-import { viewportUtils } from './viewportUtils';
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { viewportUtils } from "./viewportUtils";
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
-const scroll = cornerstoneTools.import('util/scroll');
+const scroll = cornerstoneTools.importInternalModule("util/scroll");
 
 /**
  * This function switches to an image given an element and
@@ -13,6 +13,6 @@ const scroll = cornerstoneTools.import('util/scroll');
  * @param {number} [distanceFromCurrentIndex] The image index in the stack to switch to.
  */
 export function switchToImageRelative(distanceFromCurrentIndex) {
-    var element = viewportUtils.getActiveViewportElement();
-    scroll(element, distanceFromCurrentIndex);
+  var element = viewportUtils.getActiveViewportElement();
+  scroll(element, distanceFromCurrentIndex);
 }

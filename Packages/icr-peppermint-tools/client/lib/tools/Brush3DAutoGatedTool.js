@@ -1,7 +1,7 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import Brush3DHUGatedTool from "./Brush3DHUGatedTool.js";
 
-const { getCircle } = cornerstoneTools.import("util/brushUtils");
+const { getCircle } = cornerstoneTools.importInternalModule("util/brushUtils");
 
 const brushModule = cornerstoneTools.store.modules.brush;
 

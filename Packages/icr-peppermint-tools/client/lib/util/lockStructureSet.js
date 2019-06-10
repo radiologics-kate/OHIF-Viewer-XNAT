@@ -82,9 +82,9 @@ export default function(
       if (
         toolStateManager &&
         toolStateManager[elementId] &&
-        toolStateManager[elementId].freehandMouse
+        toolStateManager[elementId].freehandRoi
       ) {
-        const toolState = toolStateManager[elementId].freehandMouse;
+        const toolState = toolStateManager[elementId].freehandRoi;
         const toolData = toolState.data;
         // Append new ROIs to polygon list
         const exportData = {

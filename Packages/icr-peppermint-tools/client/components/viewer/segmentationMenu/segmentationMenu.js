@@ -31,7 +31,6 @@ export default class SegmentationMenu extends React.Component {
 
     this.onNewSegmentButtonClick = this.onNewSegmentButtonClick.bind(this);
     this.onSegmentChange = this.onSegmentChange.bind(this);
-    this.onShowHideClick = this.onShowHideClick.bind(this);
     this.onEditClick = this.onEditClick.bind(this);
     this.confirmDeleteOnDeleteClick = this.confirmDeleteOnDeleteClick.bind(
       this
@@ -43,15 +42,11 @@ export default class SegmentationMenu extends React.Component {
     this.onIOComplete = this.onIOComplete.bind(this);
     this.onIOCancel = onIOCancel.bind(this);
     this._importMetadata = this._importMetadata.bind(this);
-    this._visableSegmentsForElement = this._visableSegmentsForElement.bind(
-      this
-    );
     this._segments = this._segments.bind(this);
 
     this.state = {
       importMetadata: { name: "", label: "" },
       segments: [],
-      visibleSegments: [],
       deleteConfirmationOpen: false,
       segmentToDelete: 0,
       activeSegmentIndex: 0,
@@ -75,12 +70,10 @@ export default class SegmentationMenu extends React.Component {
 
     const importMetadata = this._importMetadata();
     const segments = this._segments();
-    const visibleSegments = this._visableSegmentsForElement();
 
     this.setState({
       importMetadata,
       segments,
-      visibleSegments,
       activeSegmentIndex: brushModule.state.drawColorId
     });
   }
@@ -94,12 +87,10 @@ export default class SegmentationMenu extends React.Component {
   onIOComplete() {
     const importMetadata = this._importMetadata();
     const segments = this._segments();
-    const visibleSegments = this._visableSegmentsForElement();
 
     this.setState({
       importMetadata,
       segments,
-      visibleSegments,
       activeSegmentIndex: brushModule.state.drawColorId,
       importing: false,
       exporting: false
@@ -150,31 +141,6 @@ export default class SegmentationMenu extends React.Component {
   }
 
   /**
-   * onShowHideClick - Callback that toggles visibility of a segment.
-   *
-   * @param  {Number} segmentIndex The index of the segemnt to toggle.
-   * @returns {null}
-   */
-  onShowHideClick(segmentIndex) {
-    const { visibleSegments } = this.state;
-
-    visibleSegments[segmentIndex] = !visibleSegments[segmentIndex];
-
-    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-    const enabledElementUID = activeEnabledElement.uuid;
-
-    brushModule.setters.brushVisibilityForElement(
-      enabledElementUID,
-      segmentIndex,
-      visibleSegments[segmentIndex]
-    );
-
-    cornerstone.updateImage(activeEnabledElement.element);
-
-    this.setState({ visibleSegments });
-  }
-
-  /**
    * onEditClick - A callback that triggers metadata input for a segment.
    *
    * @param  {Number} segmentIndex The index of the segment metadata to edit.
@@ -209,12 +175,10 @@ export default class SegmentationMenu extends React.Component {
     deleteSegment(this._seriesInstanceUid, segmentToDelete);
 
     const segments = this._segments();
-    const visibleSegments = this._visableSegmentsForElement();
 
     this.setState({
       deleteConfirmationOpen: false,
-      segments,
-      visibleSegments
+      segments
     });
   }
 
@@ -257,37 +221,6 @@ export default class SegmentationMenu extends React.Component {
   }
 
   /**
-   * _visableSegmentsForElement - Returns an array of visible segments for the
-   * active series.
-   *
-   * @returns {Boolean[]} An array of visible segments.
-   */
-  _visableSegmentsForElement() {
-    const seriesInstanceUid = this._seriesInstanceUid;
-
-    if (!seriesInstanceUid) {
-      return;
-    }
-
-    const segmentMetadata =
-      brushModule.state.segmentationMetadata[seriesInstanceUid];
-
-    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-    const enabledElementUID = activeEnabledElement.uuid;
-    const visible = brushModule.getters.visibleSegmentationsForElement(
-      enabledElementUID
-    );
-
-    const visableSegmentsForElement = [];
-
-    for (let i = 0; i < visible.length; i++) {
-      visableSegmentsForElement.push(visible[i]);
-    }
-
-    return visableSegmentsForElement;
-  }
-
-  /**
    * _segments - Returns an array of segment metadata for the active series.
    *
    * @returns {object[]} An array of segment metadata.
@@ -324,7 +257,6 @@ export default class SegmentationMenu extends React.Component {
     const {
       importMetadata,
       segments,
-      visibleSegments,
       deleteConfirmationOpen,
       segmentToDelete,
       activeSegmentIndex,
@@ -380,11 +312,9 @@ export default class SegmentationMenu extends React.Component {
                 <SegmentationMenuListHeader importMetadata={importMetadata} />
                 <SegmentationMenuListBody
                   segments={segments}
-                  visibleSegments={visibleSegments}
                   activeSegmentIndex={activeSegmentIndex}
                   onNewSegmentButtonClick={this.onNewSegmentButtonClick}
                   onSegmentChange={this.onSegmentChange}
-                  onShowHideClick={this.onShowHideClick}
                   onEditClick={this.onEditClick}
                   onDeleteClick={this.confirmDeleteOnDeleteClick}
                 />

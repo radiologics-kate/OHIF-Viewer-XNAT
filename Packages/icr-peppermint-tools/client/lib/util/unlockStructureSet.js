@@ -53,9 +53,9 @@ export default function(seriesInstanceUid, structureSetUid) {
       if (
         toolStateManager &&
         toolStateManager[elementId] &&
-        toolStateManager[elementId].freehandMouse
+        toolStateManager[elementId].freehandRoi
       ) {
-        const toolState = toolStateManager[elementId].freehandMouse;
+        const toolState = toolStateManager[elementId].freehandRoi;
         const toolData = toolState.data;
 
         movePolygonsInInstance(

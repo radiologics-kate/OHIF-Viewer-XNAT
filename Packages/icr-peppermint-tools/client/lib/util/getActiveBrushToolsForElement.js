@@ -1,17 +1,15 @@
-import { cornerstoneTools } from 'meteor/ohif:cornerstone';
+import { cornerstoneTools } from "meteor/ohif:cornerstone";
 
-const BaseBrushTool = cornerstoneTools.import('base/BaseBrushTool');
+const BaseBrushTool = cornerstoneTools.importInternalModule(
+  "base/BaseBrushTool"
+);
 
-export default function (element) {
+export default function(element) {
   tools = cornerstoneTools.store.state.tools;
 
   tools = tools.filter(
-    (tool) =>
-      tool.element === element &&
-      tool.mode === 'active'
+    tool => tool.element === element && tool.mode === "active"
   );
 
-  return tools.filter(
-    (tool) => tool instanceof BaseBrushTool
-  );
+  return tools.filter(tool => tool instanceof BaseBrushTool);
 }

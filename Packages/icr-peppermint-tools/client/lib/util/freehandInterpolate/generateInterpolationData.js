@@ -96,12 +96,12 @@ function _getROIContourData(imageIds, ROIContourUid) {
     const imageId = imageIds[i];
     const imageToolState = toolStateManager[imageId];
 
-    if (!imageToolState || !imageToolState.freehandMouse) {
+    if (!imageToolState || !imageToolState.freehandRoi) {
       ROIContourData.push({
         imageId
       });
     } else {
-      const contours = imageToolState.freehandMouse.data.filter(contour => {
+      const contours = imageToolState.freehandRoi.data.filter(contour => {
         return contour.ROIContourUid === ROIContourUid;
       });
 

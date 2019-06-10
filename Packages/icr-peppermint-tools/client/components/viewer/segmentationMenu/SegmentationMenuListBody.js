@@ -15,11 +15,9 @@ export default class SegmentationMenuListBody extends React.Component {
   render() {
     const {
       segments,
-      visibleSegments,
       activeSegmentIndex,
       onNewSegmentButtonClick,
       onSegmentChange,
-      onShowHideClick,
       onEditClick,
       onDeleteClick
     } = this.props;
@@ -31,9 +29,7 @@ export default class SegmentationMenuListBody extends React.Component {
             key={`${segment.metadata.SegmentLabel}_${segment.index}`}
             segmentIndex={segment.index}
             metadata={segment.metadata}
-            visible={visibleSegments[segment.index]}
             onSegmentChange={onSegmentChange}
-            onShowHideClick={onShowHideClick}
             onEditClick={onEditClick}
             onDeleteClick={onDeleteClick}
             checked={segment.index === activeSegmentIndex}

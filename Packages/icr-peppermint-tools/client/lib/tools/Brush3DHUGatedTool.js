@@ -4,13 +4,15 @@ import Brush3DTool from "./Brush3DTool.js";
 const brushModule = cornerstoneTools.store.modules.brush;
 const getToolState = cornerstoneTools.getToolState;
 const addToolState = cornerstoneTools.addToolState;
-const { getCircle, drawBrushPixels } = cornerstoneTools.import(
+const { getCircle, drawBrushPixels } = cornerstoneTools.importInternalModule(
   "util/brushUtils"
 );
 
 const floodFill = require("n-dimensional-flood-fill");
 
-const BaseBrushTool = cornerstoneTools.import("base/BaseBrushTool");
+const BaseBrushTool = cornerstoneTools.importInternalModule(
+  "base/BaseBrushTool"
+);
 
 export default class Brush3DHUGatedTool extends Brush3DTool {
   constructor(configuration = {}) {

@@ -19,12 +19,12 @@ export function rescaleImportedPolygons(imageId, imagePlane) {
 
   if (
     imageIdToolState === undefined ||
-    imageIdToolState.freehandMouse === undefined
+    imageIdToolState.freehandRoi === undefined
   ) {
     return;
   }
 
-  const toolData = imageIdToolState.freehandMouse.data;
+  const toolData = imageIdToolState.freehandRoi.data;
 
   let rescaledPolygons = false;
 

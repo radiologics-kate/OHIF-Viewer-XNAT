@@ -1,17 +1,17 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import interpolate from "../util/freehandInterpolate/interpolate.js";
 
-const FreehandSculpterMouseTool = cornerstoneTools.FreehandSculpterMouseTool;
+const FreehandRoiSculptorTool = cornerstoneTools.FreehandRoiSculptorTool;
 const toolColors = cornerstoneTools.toolColors;
 const modules = cornerstoneTools.store.modules;
 const state = cornerstoneTools.store.state;
 const getToolState = cornerstoneTools.getToolState;
 
-export default class Freehand3DSculpterMouseTool extends FreehandSculpterMouseTool {
+export default class FreehandRoi3DSculptorTool extends FreehandRoiSculptorTool {
   constructor(configuration = {}) {
     const defaultConfig = {
-      name: "FreehandSculpterMouse",
-      referencedToolName: "FreehandMouse",
+      name: "FreehandRoiSculptor",
+      referencedToolName: "FreehandRoi",
       configuration: getDefaultFreehandSculpterMouseToolConfiguration()
     };
     const initialConfiguration = Object.assign(defaultConfig, configuration);

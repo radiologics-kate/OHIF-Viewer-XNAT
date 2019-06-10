@@ -65,8 +65,8 @@ function _loadDataIfDisplaySetHasBackup(displaySet) {
 
       const data = JSON.parse(request.result.dataDump);
 
-      if (data.freehandMouse) {
-        loadFreehandMouseData(data.freehandMouse, seriesInstanceUid, images);
+      if (data.freehandRoi) {
+        loadfreehandRoiData(data.freehandRoi, seriesInstanceUid, images);
       }
 
       if (data.brush) {
@@ -172,11 +172,11 @@ async function _awaitOverwriteConfirmationUI(seriesDescription) {
   });
 }
 
-function loadFreehandMouseData(freehandMouseData, seriesInstanceUid, images) {
-  const { metadata, toolState } = freehandMouseData;
+function loadfreehandRoiData(freehandRoiData, seriesInstanceUid, images) {
+  const { metadata, toolState } = freehandRoiData;
 
-  loadFreehandMouseMetadata(metadata, seriesInstanceUid);
-  loadFreehandMouseToolState(toolState, seriesInstanceUid, images);
+  loadfreehandRoiMetadata(metadata, seriesInstanceUid);
+  loadfreehandRoiToolState(toolState, seriesInstanceUid, images);
 }
 
 function loadBrushData(brushData, seriesInstanceUid, images) {
@@ -186,7 +186,7 @@ function loadBrushData(brushData, seriesInstanceUid, images) {
   loadBrushToolState(toolState, seriesInstanceUid, images);
 }
 
-function loadFreehandMouseMetadata(metadata, seriesInstanceUid) {
+function loadfreehandRoiMetadata(metadata, seriesInstanceUid) {
   modules.freehand3D.setters.structureSet(seriesInstanceUid, metadata.name, {
     uid: metadata.uid,
     activeROIContourIndex: 0
@@ -210,7 +210,7 @@ function loadFreehandMouseMetadata(metadata, seriesInstanceUid) {
   }
 }
 
-function loadFreehandMouseToolState(toolState, seriesInstanceUid, images) {
+function loadfreehandRoiToolState(toolState, seriesInstanceUid, images) {
   const toolStateManager = globalToolStateManager.saveToolState();
 
   for (let i = 0; i < images.length; i++) {
@@ -221,10 +221,10 @@ function loadFreehandMouseToolState(toolState, seriesInstanceUid, images) {
     const imageId = images[i].getImageId();
     const sopInstanceUid = images[i]._sopInstanceUID;
 
-    prepareToolStateManager(toolStateManager, imageId, "freehandMouse");
+    prepareToolStateManager(toolStateManager, imageId, "freehandRoi");
 
     const toolStateManagerFreehandData =
-      toolStateManager[imageId].freehandMouse.data;
+      toolStateManager[imageId].freehandRoi.data;
 
     // Add each polygon.
     const freehandToolData = toolState[i];
@@ -390,35 +390,35 @@ function saveBackUpForActiveSeries() {
   }
 
   // Get DEFAULT (i.e. working) structureSet.
-  const freehandMouseMetadata = modules.freehand3D.getters.structureSet(
+  const freehandRoiMetadata = modules.freehand3D.getters.structureSet(
     seriesInstanceUid,
     "DEFAULT"
   );
 
   const freehandDefaultStructureSetHasContours = doesFreehandDefaultStructureSetHaveContours(
-    freehandMouseMetadata
+    freehandRoiMetadata
   );
 
-  if (freehandMouseMetadata && freehandDefaultStructureSetHasContours) {
-    dataDump.freehandMouse = {};
-    dataDump.freehandMouse.metadata = freehandMouseMetadata;
+  if (freehandRoiMetadata && freehandDefaultStructureSetHasContours) {
+    dataDump.freehandRoi = {};
+    dataDump.freehandRoi.metadata = freehandRoiMetadata;
 
-    const freehandMouseToolState = {};
+    const freehandRoiToolState = {};
 
     for (let i = 0; i < imageIds.length; i++) {
       const imageToolState = toolStateManager[imageIds[i]];
 
-      if (imageToolState && imageToolState.freehandMouse) {
-        freehandMouseToolState[i] = createFreehandMouseObjectForFrame(
-          imageToolState.freehandMouse
+      if (imageToolState && imageToolState.freehandRoi) {
+        freehandRoiToolState[i] = createfreehandRoiObjectForFrame(
+          imageToolState.freehandRoi
         );
       }
     }
 
-    dataDump.freehandMouse.toolState = freehandMouseToolState;
+    dataDump.freehandRoi.toolState = freehandRoiToolState;
   }
 
-  if (dataDump.brush || dataDump.freehandMouse) {
+  if (dataDump.brush || dataDump.freehandRoi) {
     console.log("saving backup...");
 
     // Save data
@@ -454,22 +454,20 @@ function saveBackUpForActiveSeries() {
   return false;
 }
 
-function doesFreehandDefaultStructureSetHaveContours(freehandMouseMetadata) {
+function doesFreehandDefaultStructureSetHaveContours(freehandRoiMetadata) {
   let result = false;
 
-  if (freehandMouseMetadata && freehandMouseMetadata.ROIContourCollection) {
-    result = freehandMouseMetadata.ROIContourCollection.some(
-      element => element
-    );
+  if (freehandRoiMetadata && freehandRoiMetadata.ROIContourCollection) {
+    result = freehandRoiMetadata.ROIContourCollection.some(element => element);
   }
 
   return result;
 }
 
-function createFreehandMouseObjectForFrame(freehandMouseToolStateI) {
-  const data = freehandMouseToolStateI.data;
+function createfreehandRoiObjectForFrame(freehandRoiToolStateI) {
+  const data = freehandRoiToolStateI.data;
 
-  const freehandMouseObjectForFrame = [];
+  const freehandRoiObjectForFrame = [];
 
   for (let i = 0; i < data.length; i++) {
     const points = [];
@@ -489,7 +487,7 @@ function createFreehandMouseObjectForFrame(freehandMouseToolStateI) {
       });
     }
 
-    freehandMouseObjectForFrame.push({
+    freehandRoiObjectForFrame.push({
       uid: dataI.uid,
       points,
       // Deliberately don't store the seriesInstanceUid.
@@ -498,7 +496,7 @@ function createFreehandMouseObjectForFrame(freehandMouseToolStateI) {
     });
   }
 
-  return freehandMouseObjectForFrame;
+  return freehandRoiObjectForFrame;
 }
 
 function createBrushObjectForFrame(brushMouseToolStateI) {

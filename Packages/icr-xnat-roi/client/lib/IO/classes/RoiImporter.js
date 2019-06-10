@@ -7,7 +7,7 @@ import RTStructReader from "./RTStructReader.js";
 const globalToolStateManager =
   cornerstoneTools.globalImageIdSpecificToolStateManager;
 const modules = cornerstoneTools.store.modules;
-const freehandToolDataType = "freehandMouse";
+const freehandToolDataType = "freehandRoi";
 
 /**
  * @class RoiImporter - Imports contour-based ROI formats to

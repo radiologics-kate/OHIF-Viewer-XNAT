@@ -250,13 +250,13 @@ Template.toolbarSection.helpers({
 
         const freehandTools = [
           {
-              id: 'freehandMouse',
+              id: 'freehandRoi',
               title: 'Draw (D)',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-draw'
           },
           {
-              id: 'freehandSculpterMouse',
+              id: 'freehandRoiSculptor',
               title: 'Sculpt (S)',
               classes: 'imageViewerTool',
               svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-freehand-sculpt'
