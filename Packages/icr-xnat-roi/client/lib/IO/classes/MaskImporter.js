@@ -30,8 +30,16 @@ export default class MaskImporter {
     this._imageIds = imageIds;
     this._dimensions = dimensions;
 
-    const colorMapId = cornerstoneTools.store.modules.brush.state.colorMapId;
-    const colormap = cornerstone.colors.getColormap(colorMapId);
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+
+    if (!activeEnabledElement) {
+      return [];
+    }
+    const activeElement = activeEnabledElement.element;
+
+    const colormap = brushModule.getters.activeCornerstoneColorMap(
+      activeElement
+    );
 
     this._numberOfColors = colormap.getNumberOfColors();
   }

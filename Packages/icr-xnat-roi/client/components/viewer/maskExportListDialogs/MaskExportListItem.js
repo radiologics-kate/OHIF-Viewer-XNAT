@@ -1,5 +1,6 @@
 import React from "react";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
+import { OHIF } from "meteor/ohif:core";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
@@ -7,8 +8,15 @@ export default class MaskExportListItem extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    this._colormap = cornerstone.colors.getColormap(
-      brushModule.state.colorMapId
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+
+    if (!activeEnabledElement) {
+      return [];
+    }
+    const activeElement = activeEnabledElement.element;
+
+    this._colormap = brushModule.getters.activeCornerstoneColorMap(
+      activeElement
     );
 
     this._getColor = this._getColor.bind(this);

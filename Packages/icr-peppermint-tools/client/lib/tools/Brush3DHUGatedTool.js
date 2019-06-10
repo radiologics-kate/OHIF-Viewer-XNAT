@@ -8,6 +8,8 @@ const { getCircle, drawBrushPixels } = cornerstoneTools.importInternalModule(
   "util/brushUtils"
 );
 
+const EVENTS = cornerstoneTools.EVENTS;
+
 const floodFill = require("n-dimensional-flood-fill");
 
 const BaseBrushTool = cornerstoneTools.importInternalModule(
@@ -24,12 +26,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     super(initialConfiguration);
 
     this.initialConfiguration = initialConfiguration;
-
-    // Bind the strategies so that we can use `this`.
-    this.strategies = {
-      overlapping: this._overlappingStrategy.bind(this),
-      nonOverlapping: this._nonOverlappingStrategy.bind(this)
-    };
 
     this.touchDragCallback = this._startPaintingTouch.bind(this);
   }
@@ -49,84 +45,53 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     return true;
   }
 
-  _overlappingStrategy(evt) {
-    const eventData = evt.detail;
-    const { element, image } = eventData;
-    const { rows, columns } = image;
-    const { x, y } = eventData.currentPoints.image;
-
-    if (x < 0 || x > columns || y < 0 || y > rows) {
-      return;
-    }
-
-    const radius = brushModule.state.radius;
-    const pointerArray = this._gateCircle(
-      image,
-      getCircle(radius, rows, columns, x, y)
-    );
-
-    const toolData = this._getToolData(element);
-
-    this._drawMainColor(eventData, toolData, pointerArray);
-  }
-
-  _nonOverlappingStrategy(evt) {
-    const eventData = evt.detail;
-    const { element, image } = eventData;
-    const { rows, columns } = image;
-    const { x, y } = eventData.currentPoints.image;
-    const segIndex = brushModule.state.drawColorId;
-
-    if (x < 0 || x > columns || y < 0 || y > rows) {
-      return;
-    }
-
-    const radius = brushModule.state.radius;
-    const pointerArray = this._gateCircle(
-      image,
-      getCircle(radius, rows, columns, x, y)
-    );
-
-    const toolData = this._getToolData(element);
-    const numberOfColors = BaseBrushTool.getNumberOfColors();
-
-    // If there is brush data in this region for other colors, delete it.
-    for (let i = 0; i < numberOfColors; i++) {
-      if (i === segIndex) {
-        continue;
-      }
-
-      if (toolData[i] && toolData[i].pixelData) {
-        drawBrushPixels(pointerArray, toolData[i], columns, true);
-        toolData[i].invalidated = true;
-      }
-    }
-
-    this._drawMainColor(eventData, toolData, pointerArray);
-  }
-
   /**
-   * _getToolData - Get the brush toolData for the element, and create it if
-   * it doesn't exist.
+   * Paints the data to the canvas.
    *
-   * @param  {object} element The cornerstone enabled element.
-   * @returns {object}         The brush toolData.
+   * @protected
+   * @param  {Object} evt The data object associated with the event.
+   * @returns {void}
    */
-  _getToolData(element) {
-    let toolState = getToolState(
-      element,
-      BaseBrushTool.getReferencedToolDataName()
-    );
+  _paint(evt) {
+    const eventData = evt.detail;
+    const { element, image } = eventData;
+    const { rows, columns } = image;
+    const { x, y } = eventData.currentPoints.image;
 
-    if (!toolState) {
-      addToolState(element, BaseBrushTool.getReferencedToolDataName(), {});
-      toolState = getToolState(
-        element,
-        BaseBrushTool.getReferencedToolDataName()
-      );
+    if (x < 0 || x > columns || y < 0 || y > rows) {
+      return;
     }
 
-    return toolState.data;
+    const {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex
+    } = brushModule.getters.getAndCacheLabelmap2D(element);
+
+    const radius = brushModule.state.radius;
+    const pointerArray = this._gateCircle(
+      image,
+      getCircle(radius, rows, columns, x, y)
+    );
+    const shouldErase =
+      this._isCtrlDown(eventData) || this.configuration.alwaysEraseOnClick;
+    const segmentIndex = labelmap3D.activeDrawColorId;
+
+    // Draw / Erase the active color.
+    drawBrushPixels(
+      pointerArray,
+      labelmap3D,
+      currentImageIdIndex,
+      segmentIndex,
+      columns,
+      shouldErase
+    );
+
+    cornerstone.triggerEvent(element, EVENTS.LABELMAP_MODIFIED, {
+      activeLabelmapIndex
+    });
+
+    cornerstone.updateImage(evt.detail.element);
   }
 
   /**

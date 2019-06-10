@@ -1,6 +1,5 @@
 import React from "react";
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
-import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
 import { OHIF } from "meteor/ohif:core";
 
 import "./roiContourMenu.styl";

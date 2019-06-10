@@ -1,5 +1,6 @@
 import React from "react";
 import SegmentationMenuListItem from "./SegmentationMenuListItem.js";
+import { newSegment } from "../../../lib/util/brushMetadataIO.js";
 
 import "./segmentationMenu.styl";
 
@@ -16,7 +17,6 @@ export default class SegmentationMenuListBody extends React.Component {
     const {
       segments,
       activeSegmentIndex,
-      onNewSegmentButtonClick,
       onSegmentChange,
       onEditClick,
       onDeleteClick
@@ -40,7 +40,7 @@ export default class SegmentationMenuListBody extends React.Component {
           <th>
             <a
               className="segmentation-menu-new-button btn btn-sm btn-primary"
-              onClick={onNewSegmentButtonClick}
+              onClick={newSegment}
             >
               <i className="fa fa-plus-circle" /> Segment
             </a>

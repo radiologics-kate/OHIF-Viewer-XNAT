@@ -3,7 +3,7 @@ import { OHIF } from "meteor/ohif:core";
 import isDialogOpen from "../util/isDialogOpen.js";
 import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
 import getActiveBrushToolsForElement from "../util/getActiveBrushToolsForElement.js";
-import { newSegmentInput } from "../util/brushMetadataIO.js";
+import { newSegment } from "../util/brushMetadataIO.js";
 
 const Mousetrap = require("mousetrap");
 const BaseBrushTool = cornerstoneTools.importInternalModule(
@@ -31,13 +31,13 @@ Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
 
   switch (key) {
     case "[":
-      brushTool.previousSegmentation();
+      brushTool.previousSegment();
       imageNeedsUpdate = true;
       // JamesAPetts
       Session.set("refreshSegmentationMenu", Math.random().toString);
       break;
     case "]":
-      brushTool.nextSegmentation();
+      brushTool.nextSegment();
       imageNeedsUpdate = true;
       // JamesAPetts
       Session.set("refreshSegmentationMenu", Math.random().toString);
@@ -53,7 +53,7 @@ Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
       break;
     case "n":
     case "N":
-      newSegmentation();
+      newSegment();
       break;
   }
 
@@ -61,25 +61,3 @@ Mousetrap.bind(["[", "]", "-", "=", "+", "n", "N"], function(evt) {
     cornerstone.updateImage(element);
   }
 });
-
-function newSegmentation() {
-  const seriesInstanceUid = getActiveSeriesInstanceUid();
-
-  let segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
-
-  if (!segMetadata) {
-    brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
-    segMetadata = brushModule.state.segmentationMetadata[seriesInstanceUid];
-  }
-
-  const colormap = cornerstone.colors.getColormap(brushModule.state.colorMapId);
-  const numberOfColors = colormap.getNumberOfColors();
-
-  for (let i = 0; i < numberOfColors; i++) {
-    if (!segMetadata[i]) {
-      brushModule.state.drawColorId = i;
-      newSegmentInput(i);
-      break;
-    }
-  }
-}

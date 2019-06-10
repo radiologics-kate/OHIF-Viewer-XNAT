@@ -1,6 +1,7 @@
 import { cornerstoneTools } from "meteor/ohif:cornerstone";
 import getActiveSeriesInstanceUid from "../util/getActiveSeriesInstanceUid.js";
 import isDialogOpen from "../util/isDialogOpen.js";
+import { OHIF } from "meteor/ohif:core";
 
 import { newSegmentInput } from "../util/brushMetadataIO.js";
 
@@ -23,9 +24,6 @@ export default class Brush3DTool extends BrushTool {
 
     this.initialConfiguration = initialConfiguration;
     this.touchDragCallback = this._startPaintingTouch.bind(this);
-
-    console.log(`Brush3DTool constructor:`);
-    console.log(this);
   }
 
   /**
@@ -38,22 +36,32 @@ export default class Brush3DTool extends BrushTool {
   _startPainting(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
-    const segIndex = brushModule.state.drawColorId;
-    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
-    // Check if metadata exists,
-    const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
+    const {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex
+    } = brushModule.getters.getAndCacheLabelmap2D(element);
 
-    if (metaData && metaData.SegmentLabel) {
+    const segmentIndex = labelmap3D.activeDrawColorId;
+    const metadata = labelmap3D.metadata[segmentIndex];
+
+    if (metadata) {
       // Metadata assigned, start drawing.
-      this._setActiveStrategy(seriesInstanceUid);
       this._paint(evt);
       this._drawing = true;
       this._startListeningForMouseUp(element);
       this._lastImageCoords = eventData.currentPoints.image;
     } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
-      newSegmentInput(brushModule.state.drawColorId);
+      const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+      const activeElement = activeEnabledElement.element;
+
+      const activeSegmentIndex = brushModule.getters.activeSegmentIndex(
+        activeElement
+      );
+
+      newSegmentInput(activeSegmentIndex);
     }
   }
 
@@ -67,47 +75,48 @@ export default class Brush3DTool extends BrushTool {
   _startPaintingTouch(evt) {
     const eventData = evt.detail;
     const element = eventData.element;
-    const segIndex = brushModule.state.drawColorId;
-    const seriesInstanceUid = getActiveSeriesInstanceUid();
 
-    // Check if metadata exists,
-    const metaData = brushModule.getters.metadata(seriesInstanceUid, segIndex);
+    const {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex
+    } = brushModule.getters.getAndCacheLabelmap2D(element);
 
-    if (metaData && metaData.SegmentLabel) {
+    const segmentIndex = labelmap3D.activeDrawColorId;
+    const metadata = labelmap3D.metadata[segmentIndex];
+
+    if (metaData) {
       // Metadata assigned, start drawing.
-      this._setActiveStrategy(seriesInstanceUid);
       this._paint(evt);
     } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
-      newSegmentInput(brushModule.state.drawColorId);
+      const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+      const activeElement = activeEnabledElement.element;
+
+      const activeSegmentIndex = brushModule.getters.activeSegmentIndex(
+        activeElement
+      );
+
+      newSegmentInput(activeSegmentIndex);
     }
   }
 
-  _setActiveStrategy(seriesInstanceUid) {
-    this.activeStrategy = MODES.OVERLAPPING;
+  static checkIfAnyMetadataOnActiveElement() {
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const activeElement = activeEnabledElement.element;
 
-    const importMetadata = brushModule.getters.importMetadata(
-      seriesInstanceUid
-    );
+    const {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex
+    } = brushModule.getters.getAndCacheLabelmap2D(activeElement);
 
-    if (importMetadata) {
-      // Modified an imported mask.
-      brushModule.setters.importModified(seriesInstanceUid);
-
-      if (importMetadata.type === "NIFTI") {
-        this.activeStrategy = MODES.NON_OVERLAPPING;
-      }
-    }
-  }
-
-  static checkIfAnyMetadataOnSeries() {
-    const seriesInstanceUid = getActiveSeriesInstanceUid();
-    const metaData = brushModule.getters.metadata(seriesInstanceUid);
+    const metadata = labelmap3D.metadata;
 
     // If metadata doesn't exist, or all elements undefined (i.e. deleted), open UI.
-    if (!metaData || !metaData.find(element => element)) {
+    if (!metadata || !metadata.find(element => element)) {
       if (!isDialogOpen()) {
-        brushModule.state.drawColorId = 0;
+        brushModule.state.drawColorId = 1;
         newSegmentInput(brushModule.state.drawColorId);
       }
     }

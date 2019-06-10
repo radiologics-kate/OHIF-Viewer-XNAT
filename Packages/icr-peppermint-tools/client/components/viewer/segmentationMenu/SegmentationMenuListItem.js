@@ -5,7 +5,6 @@ import {
   newSegmentInput,
   editSegmentInput
 } from "../../../lib/util/brushMetadataIO.js";
-import getBrushSegmentColor from "../../../lib/util/getBrushSegmentColor.js";
 
 import "./segmentationMenu.styl";
 
@@ -52,7 +51,23 @@ export default class SegmentationMenuListItem extends React.Component {
     } = this.props;
 
     const segmentLabel = metadata.SegmentLabel;
-    const segmentColor = getBrushSegmentColor(segmentIndex);
+
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+    const activeElement = activeEnabledElement.element;
+
+    const colormap = brushModule.getters.activeCornerstoneColorMap(
+      activeElement
+    );
+
+    const color = colormap.getColor(segmentIndex);
+
+    console.log(segmentIndex);
+
+    console.log(colormap);
+    console.log(color);
+
+    const segmentColor = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1.0 )`;
+
     const segmentCategory =
       metadata.SegmentedPropertyCategoryCodeSequence.CodeMeaning;
     const typeWithModifier = this._getTypeWithModifier();

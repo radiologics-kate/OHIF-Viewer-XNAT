@@ -163,7 +163,7 @@ Meteor.startup(function() {
     action: toolManager.setActiveToolWithHook,
     params: {
       toolName: "brush",
-      hook: Brush3DTool.checkIfAnyMetadataOnSeries
+      hook: Brush3DTool.checkIfAnyMetadataOnActiveElement
     }
   });
 
@@ -172,7 +172,7 @@ Meteor.startup(function() {
     action: toolManager.setActiveToolWithHook,
     params: {
       toolName: "brushHUGated",
-      hook: Brush3DHUGatedTool.checkIfAnyMetadataOnSeries
+      hook: Brush3DHUGatedTool.checkIfAnyMetadataOnActiveElement
     }
   });
 
@@ -181,7 +181,7 @@ Meteor.startup(function() {
     action: toolManager.setActiveToolWithHook,
     params: {
       toolName: "brushAutoGated",
-      hook: Brush3DAutoGatedTool.checkIfAnyMetadataOnSeries
+      hook: Brush3DAutoGatedTool.checkIfAnyMetadataOnActiveElement
     }
   });
 

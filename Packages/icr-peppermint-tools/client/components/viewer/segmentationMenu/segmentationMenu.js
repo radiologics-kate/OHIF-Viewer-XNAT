@@ -29,7 +29,6 @@ export default class SegmentationMenu extends React.Component {
   constructor(props = {}) {
     super(props);
 
-    this.onNewSegmentButtonClick = this.onNewSegmentButtonClick.bind(this);
     this.onSegmentChange = this.onSegmentChange.bind(this);
     this.onEditClick = this.onEditClick.bind(this);
     this.confirmDeleteOnDeleteClick = this.confirmDeleteOnDeleteClick.bind(
@@ -48,8 +47,8 @@ export default class SegmentationMenu extends React.Component {
       importMetadata: { name: "", label: "" },
       segments: [],
       deleteConfirmationOpen: false,
-      segmentToDelete: 0,
-      activeSegmentIndex: 0,
+      segmentToDelete: 1,
+      activeSegmentIndex: 1,
       importing: false,
       exporting: false
     };
@@ -62,19 +61,25 @@ export default class SegmentationMenu extends React.Component {
    * @returns {null}
    */
   componentDidMount() {
-    this._seriesInstanceUid = getActiveSeriesInstanceUid();
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
 
-    if (!this._seriesInstanceUid) {
-      return;
+    if (!activeEnabledElement) {
+      return [];
     }
+
+    this._element = activeEnabledElement.element;
 
     const importMetadata = this._importMetadata();
     const segments = this._segments();
 
+    const activeSegmentIndex = brushModule.getters.activeSegmentIndex(
+      this._element
+    );
+
     this.setState({
       importMetadata,
       segments,
-      activeSegmentIndex: brushModule.state.drawColorId
+      activeSegmentIndex
     });
   }
 
@@ -88,44 +93,17 @@ export default class SegmentationMenu extends React.Component {
     const importMetadata = this._importMetadata();
     const segments = this._segments();
 
+    const activeSegmentIndex = brushModule.getters.activeSegmentIndex(
+      this._element
+    );
+
     this.setState({
       importMetadata,
       segments,
-      activeSegmentIndex: brushModule.state.drawColorId,
+      activeSegmentIndex,
       importing: false,
       exporting: false
     });
-  }
-
-  /**
-   * onNewSegmentButtonClick - Callback that adds a new segment to the
-   * active series.
-   *
-   * @returns {null}
-   */
-  onNewSegmentButtonClick() {
-    const seriesInstanceUid = getActiveSeriesInstanceUid();
-
-    let segmentMetadata =
-      brushModule.state.segmentationMetadata[seriesInstanceUid];
-
-    if (!segmentMetadata) {
-      brushModule.state.segmentationMetadata[seriesInstanceUid] = [];
-      segmentMetadata =
-        brushModule.state.segmentationMetadata[seriesInstanceUid];
-    }
-
-    const colormap = cornerstone.colors.getColormap(
-      brushModule.state.colorMapId
-    );
-    const numberOfColors = colormap.getNumberOfColors();
-
-    for (let i = 0; i < numberOfColors; i++) {
-      if (!segmentMetadata[i]) {
-        newSegmentInput(i);
-        break;
-      }
-    }
   }
 
   /**
@@ -135,7 +113,7 @@ export default class SegmentationMenu extends React.Component {
    * @returns {null}
    */
   onSegmentChange(segmentIndex) {
-    brushModule.state.drawColorId = segmentIndex;
+    brushModule.setters.brushColor(this._element, segmentIndex);
 
     this.setState({ activeSegmentIndex: segmentIndex });
   }
@@ -226,20 +204,14 @@ export default class SegmentationMenu extends React.Component {
    * @returns {object[]} An array of segment metadata.
    */
   _segments() {
-    const seriesInstanceUid = this._seriesInstanceUid;
-
-    if (!seriesInstanceUid) {
-      return;
-    }
-
-    const segmentMetadata =
-      brushModule.state.segmentationMetadata[seriesInstanceUid];
-
-    const segments = [];
+    // TODO -> support for multiple labelmaps.
+    const segmentMetadata = brushModule.getters.metadata(this._element);
 
     if (!segmentMetadata) {
-      return segments;
+      return [];
     }
+
+    const segments = [];
 
     for (let i = 0; i < segmentMetadata.length; i++) {
       if (segmentMetadata[i]) {
@@ -313,7 +285,6 @@ export default class SegmentationMenu extends React.Component {
                 <SegmentationMenuListBody
                   segments={segments}
                   activeSegmentIndex={activeSegmentIndex}
-                  onNewSegmentButtonClick={this.onNewSegmentButtonClick}
                   onSegmentChange={this.onSegmentChange}
                   onEditClick={this.onEditClick}
                   onDeleteClick={this.confirmDeleteOnDeleteClick}

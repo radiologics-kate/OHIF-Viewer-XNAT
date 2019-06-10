@@ -242,8 +242,15 @@ export default class BrushMetadataDialog extends React.Component {
   _segmentColor() {
     const { segIndex } = this.props;
 
-    const colormap = cornerstone.colors.getColormap(
-      brushModule.state.colorMapId
+    const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
+
+    if (!activeEnabledElement) {
+      return [];
+    }
+    const activeElement = activeEnabledElement.element;
+
+    const colormap = brushModule.getters.activeCornerstoneColorMap(
+      activeElement
     );
 
     if (!colormap) {
@@ -261,7 +268,7 @@ export default class BrushMetadataDialog extends React.Component {
     const { categoryUID, typeUID, modifierUID } = this.state;
     const defaultName = this._maskName;
 
-    const segmentIndexText = `Segment ${segIndex + 1}`;
+    const segmentIndexText = `Segment ${segIndex}`;
 
     const validLabelIndicator = this._validLabelIndicator();
 
