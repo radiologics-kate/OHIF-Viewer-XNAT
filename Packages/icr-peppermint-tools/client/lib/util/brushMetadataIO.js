@@ -62,7 +62,7 @@ function segmentInputCallback(data) {
 
   // TODO -> support for multiple labelmaps.
   brushModule.setters.metadata(activeElement, 0, segIndex, metadata);
-  brushModule.setters.brushColor(activeElement, segIndex);
+  brushModule.setters.activeSegmentIndex(activeElement, segIndex);
 
   // JamesAPetts
   Session.set("refreshSegmentationMenu", Math.random().toString());

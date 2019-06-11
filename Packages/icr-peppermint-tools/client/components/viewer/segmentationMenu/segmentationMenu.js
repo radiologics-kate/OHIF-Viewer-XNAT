@@ -113,7 +113,7 @@ export default class SegmentationMenu extends React.Component {
    * @returns {null}
    */
   onSegmentChange(segmentIndex) {
-    brushModule.setters.brushColor(this._element, segmentIndex);
+    brushModule.setters.activeSegmentIndex(this._element, segmentIndex);
 
     this.setState({ activeSegmentIndex: segmentIndex });
   }

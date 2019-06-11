@@ -52,7 +52,7 @@ export default class Brush3DTool extends BrushTool {
       shouldErase
     };
 
-    const segmentIndex = labelmap3D.activeDrawColorId;
+    const segmentIndex = labelmap3D.activeSegmentIndex;
     const metadata = labelmap3D.metadata[segmentIndex];
 
     if (metadata) {

@@ -78,7 +78,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       pointerArray,
       labelmap3D,
       currentImageIdIndex,
-      labelmap3D.activeDrawColorId,
       columns,
       shouldErase
     );
