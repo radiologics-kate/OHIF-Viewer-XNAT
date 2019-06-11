@@ -150,7 +150,7 @@ export default class SegmentationMenu extends React.Component {
   onDeleteConfirmClick() {
     const { segmentToDelete } = this.state;
 
-    deleteSegment(this._seriesInstanceUid, segmentToDelete);
+    brushModule.setters.deleteSegment(this._element, segmentToDelete);
 
     const segments = this._segments();
 
@@ -262,8 +262,8 @@ export default class SegmentationMenu extends React.Component {
       component = (
         <SegmentationMenuDeleteConfirmation
           segmentLabel={segmentLabel}
-          onDeleteConfirmClick={onDeleteConfirmClick}
-          onDeleteCancelClick={onDeleteCancelClick}
+          onDeleteConfirmClick={this.onDeleteConfirmClick}
+          onDeleteCancelClick={this.onDeleteCancelClick}
         />
       );
     } else {

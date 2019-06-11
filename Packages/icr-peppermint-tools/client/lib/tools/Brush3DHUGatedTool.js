@@ -26,8 +26,6 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     super(initialConfiguration);
 
     this.initialConfiguration = initialConfiguration;
-
-    this.touchDragCallback = this._startPaintingTouch.bind(this);
   }
 
   /**
@@ -62,27 +60,25 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
       return;
     }
 
-    const {
-      labelmap3D,
-      currentImageIdIndex,
-      activeLabelmapIndex
-    } = brushModule.getters.getAndCacheLabelmap2D(element);
-
     const radius = brushModule.state.radius;
     const pointerArray = this._gateCircle(
       image,
       getCircle(radius, rows, columns, x, y)
     );
-    const shouldErase =
-      this._isCtrlDown(eventData) || this.configuration.alwaysEraseOnClick;
-    const segmentIndex = labelmap3D.activeDrawColorId;
+
+    const {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex,
+      shouldErase
+    } = this.paintEventData;
 
     // Draw / Erase the active color.
     drawBrushPixels(
       pointerArray,
       labelmap3D,
       currentImageIdIndex,
-      segmentIndex,
+      labelmap3D.activeDrawColorId,
       columns,
       shouldErase
     );
@@ -422,68 +418,5 @@ export default class Brush3DHUGatedTool extends Brush3DTool {
     }
 
     return largestRegionArea;
-  }
-
-  _drawMainColor(eventData, toolData, pointerArray) {
-    const shouldErase = this._isCtrlDown(eventData);
-    const columns = eventData.image.columns;
-    const segIndex = brushModule.state.drawColorId;
-
-    if (shouldErase && !toolData[segIndex]) {
-      // Erase command, yet no data yet, just return.
-      return;
-    }
-
-    if (!toolData[segIndex]) {
-      toolData[segIndex] = {};
-    }
-
-    if (!toolData[segIndex].pixelData) {
-      const enabledElement = cornerstone.getEnabledElement(eventData.element);
-      const enabledElementUID = enabledElement.uuid;
-
-      // Clear cache for this color to avoid flickering.
-      const imageBitmapCacheForElement = brushModule.getters.imageBitmapCacheForElement(
-        enabledElementUID
-      );
-
-      if (imageBitmapCacheForElement) {
-        imageBitmapCacheForElement[segIndex] = null;
-      }
-
-      // Add a new pixelData array.
-      toolData[segIndex].pixelData = new Uint8ClampedArray(
-        eventData.image.width * eventData.image.height
-      );
-    }
-
-    const toolDataI = toolData[segIndex];
-
-    // Draw / Erase the active color.
-    drawBrushPixels(pointerArray, toolDataI, columns, shouldErase);
-
-    toolDataI.invalidated = true;
-  }
-
-  _isCtrlDown(eventData) {
-    return (eventData.event && eventData.event.ctrlKey) || eventData.ctrlKey;
-  }
-
-  // TEMP
-  _tempPrintData(data) {
-    for (let j = 0; j < data[0].length; j++) {
-      const line = [];
-
-      for (let i = 0; i < data.length; i++) {
-        line.push(data[i][j]);
-      }
-
-      console.log(
-        line
-          .join(" ")
-          .replace(/-1/g, "_")
-          .replace(/2/g, "F") + `   ${j}`
-      );
-    }
   }
 }

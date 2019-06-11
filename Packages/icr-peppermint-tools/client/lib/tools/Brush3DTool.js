@@ -23,7 +23,6 @@ export default class Brush3DTool extends BrushTool {
     super(initialConfiguration);
 
     this.initialConfiguration = initialConfiguration;
-    this.touchDragCallback = this._startPaintingTouch.bind(this);
   }
 
   /**
@@ -43,6 +42,16 @@ export default class Brush3DTool extends BrushTool {
       activeLabelmapIndex
     } = brushModule.getters.getAndCacheLabelmap2D(element);
 
+    const shouldErase =
+      this._isCtrlDown(eventData) || this.configuration.alwaysEraseOnClick;
+
+    this.paintEventData = {
+      labelmap3D,
+      currentImageIdIndex,
+      activeLabelmapIndex,
+      shouldErase
+    };
+
     const segmentIndex = labelmap3D.activeDrawColorId;
     const metadata = labelmap3D.metadata[segmentIndex];
 
@@ -52,42 +61,6 @@ export default class Brush3DTool extends BrushTool {
       this._drawing = true;
       this._startListeningForMouseUp(element);
       this._lastImageCoords = eventData.currentPoints.image;
-    } else if (!isDialogOpen()) {
-      // Open the UI and let the user input data!
-      const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
-      const activeElement = activeEnabledElement.element;
-
-      const activeSegmentIndex = brushModule.getters.activeSegmentIndex(
-        activeElement
-      );
-
-      newSegmentInput(activeSegmentIndex);
-    }
-  }
-
-  /**
-   * Initialise painting with baseBrushTool
-   *
-   * @override @protected
-   * @event
-   * @param {Object} evt - The event.
-   */
-  _startPaintingTouch(evt) {
-    const eventData = evt.detail;
-    const element = eventData.element;
-
-    const {
-      labelmap3D,
-      currentImageIdIndex,
-      activeLabelmapIndex
-    } = brushModule.getters.getAndCacheLabelmap2D(element);
-
-    const segmentIndex = labelmap3D.activeDrawColorId;
-    const metadata = labelmap3D.metadata[segmentIndex];
-
-    if (metaData) {
-      // Metadata assigned, start drawing.
-      this._paint(evt);
     } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
       const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
