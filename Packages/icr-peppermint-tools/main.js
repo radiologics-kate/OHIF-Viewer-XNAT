@@ -31,6 +31,7 @@ export { getNextColor } from "./client/lib/modules/freehand3DModule.js";
 export {
   default as getUnsavedRegions
 } from "./client/lib/util/getUnsavedRegions.js";
+export { default as isDialogOpen } from "./client/lib/util/isDialogOpen.js";
 
 // Classes
 export { Polygon } from "./client/lib/util/classes/Polygon.js";

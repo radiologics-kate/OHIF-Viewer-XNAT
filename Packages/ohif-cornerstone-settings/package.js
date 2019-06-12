@@ -1,16 +1,15 @@
 Package.describe({
-    name: 'ohif:cornerstone-settings',
-    summary: 'Cornerstone Settings package',
-    version: '0.0.1'
+  name: "ohif:cornerstone-settings",
+  summary: "Cornerstone Settings package",
+  version: "0.0.1"
 });
 
 Package.onUse(function(api) {
-    api.versionsFrom('1.7');
+  api.versionsFrom("1.7");
 
-    api.use('ecmascript');
-    api.use('ohif:cornerstone');
-    api.use('ohif:core');
-    api.use('icr:xnat-roi-scaling');
+  api.use("ecmascript");
+  api.use("ohif:cornerstone");
+  api.use("ohif:core");
 
-    api.mainModule('client/main.js', 'client');
+  api.mainModule("client/main.js", "client");
 });

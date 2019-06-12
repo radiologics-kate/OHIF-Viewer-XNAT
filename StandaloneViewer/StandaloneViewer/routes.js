@@ -1,9 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Router } from 'meteor/clinical:router';
 import { OHIF } from 'meteor/ohif:core';
-import { checkAndSetPermissions } from "meteor/icr:xnat-roi";
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
-import { sessionMap } from 'meteor/icr:series-info-provider';
 
 console.log(Meteor.isDevelopment);
 
@@ -13,31 +10,16 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
   OHIF.log.info('Disconnecting from the Meteor server');
   Meteor.disconnect();
 
-  const url = window.location.href;
-
-  const origin = window.location.origin;
-  const urlExtention = url.replace(origin, '').split('VIEWER')[0].replace(/\//g, '');
-
-  console.log(urlExtention);
-
-  let viewerRoot;
-  let rootUrl;
-
-  if (urlExtention) {
-    viewerRoot = `/${urlExtention}/VIEWER`;
-    rootUrl = `${origin}/${urlExtention}`;
-  } else {
-    viewerRoot = `/VIEWER`;
-    rootUrl = origin;
-  }
-
-  Session.set('rootUrl', rootUrl);
-  Session.set('viewerRoot', viewerRoot);
-
-  console.log(`origin: ${origin}`);
-  console.log(`urlExtention ${urlExtention}`);
-  console.log(`rootUrl: ${rootUrl}`);
-  console.log(`viewerRoot" ${viewerRoot}`);
+  // TODO -> A) Fetch the json from a URL?
+  // B) Or JSON provided on the window,
+  // (i.e. viewer and JSON as one returned service.)
+  //
+  //  If A) URL has form e.g. https://www.cancerimagingarchive.net/OHIFViewer?url=https://www.cancerimagingarchive.net/API_TO_FETCH_JSON
+  //  If B) URL doesn't really matter, so we just "route the current route",
+  //        and we grab the JSON from window.
+  //
+  // TODO: RTSTRUCT and SEG -> Filter based on SOPClassUid, then add the entries
+  // to an import list that will be importable by peppermint-tools?
 
   Router.configure({
       loadingTemplate: 'loading'
@@ -45,204 +27,65 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
 
   Router.onBeforeAction('loading');
 
-  // JPETTS -- route based on XNAT root
-  Router.route(`${viewerRoot}`, {
-      onRun: function() {
-          console.log('onRun');
-
-          const next = this.next;
-
-          console.log(this.params);
-
-          // Query params:
-          //
-          // Single Session:
-          //   projectId, subjectId, experimentId, experimentLabel
-          //
-          // Single Session in shared project:
-          //   projectId, subjectId, experimentId, experimentLabel, parentProjectId
-          //
-          // Subject:
-          //   projectId, subjectId
-          //
-          // Subject in shared project:
-          //  projectId, subjectId, parentProjectId
-
-          let subjectId;
-          let projectId;
-          let experimentId;
-          let experimentLabel;
-          let parentProjectId;
-
-          if (this.params.query) {
+  Router.route('/:id?', {
+        onRun: function() {
+            console.warn('onRun');
+            // Retrieve the query from the URL the user has entered
             const query = this.params.query;
+            const id = this.params.id;
 
-            experimentId = query.experimentId;
-            experimentLabel = query.experimentLabel;
-            subjectId = query.subjectId;
-            projectId = query.projectId;
-            parentProjectId = query.parentProjectId ? query.parentProjectId : projectId;
-          } else {
-            console.error('insufficient query parameters.');
-          }
+            if (!id && !query.url) {
+                console.log('No URL was specified. Use ?url=${yourURL}');
+                return;
+            }
 
-          if (parentProjectId) {
-            console.log(`This experiment is shared view of ${experimentId} from ${parentProjectId}`);
-          }
+            const next = this.next;
+            const idUrl = `/api/${id}`;
+            const url = query.url || idUrl;
 
-          sessionMap.setProject(projectId);
-          sessionMap.setParentProject(parentProjectId);
-          sessionMap.setSubject(subjectId);
+            // Define a request to the server to retrieve the study data
+            // as JSON, given a URL that was in the Route
+            const oReq = new XMLHttpRequest();
 
-
-          if (experimentId) {
-            // Single Session
-            checkAndSetPermissions(projectId, parentProjectId);
-
-            sessionMap.setSession({
-              projectId,
-              subjectId,
-              experimentId,
-              experimentLabel
+            // Add event listeners for request failure
+            oReq.addEventListener('error', () => {
+                OHIF.log.warn('An error occurred while retrieving the JSON data');
+                next();
             });
 
-            sessionMap.setExperiment(experimentId);
-
-            // Build JSON GET url.
-            const jsonRequestUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentId}`;
-
-            getJson(jsonRequestUrl).then(json => {
-              // Parse the response content
-              // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText
-              if (!json) {
-                  OHIF.log.warn('Response was undefined');
-                  return;
-              }
-
-              sessionMap.setScan(json, {
-                experimentId,
-                experimentLabel,
-                subjectId,
-                projectId,
-                parentProjectId
-              });
-
-              let jsonString = JSON.stringify(json);
-
-              if (parentProjectId) {
-                console.log(`replacing ${parentProjectId} with ${projectId}`);
-                jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
-              }
-
-              this.data = JSON.parse(jsonString);
-
-              next();
-            }).catch(error => {
-              console.log(error);
-              OHIF.log.warn('An error occurred while retrieving the JSON data');
-              next();
-            });
-          } else {
-            // Whole Subject.
-            //
-
-            const subjectExperimentListUrl = `${Session.get('rootUrl')}/data/archive/projects/${projectId}/subjects/${subjectId}/experiments?format=json`;
-
-            checkAndSetPermissions(projectId, parentProjectId);
-
-            getJson(subjectExperimentListUrl).then(json => {
-              // TODO -> Fetch each json.
-              // Promise.all and combine JSON.
-              // Load up viewer.
-              console.log(json);
-
-              const experimentList = json.ResultSet.Result;
-              const results = [];
-
-              for (let i = 0; i < experimentList.length; i++) {
-                const experimentIdI = experimentList[i].ID;
-                const experimentLabelI = experimentList[i].label;
-
-                sessionMap.setSession({
-                  projectId,
-                  subjectId,
-                  experimentId: experimentIdI,
-                  experimentLabel: experimentLabelI
-                });
-
-                const experimentJSONFetchUrl = `${Session.get('rootUrl')}/xapi/viewer/projects/${projectId}/experiments/${experimentIdI}`;
-
-                results[i] = getJson(experimentJSONFetchUrl);
-              }
-
-              Promise.all(results).then((jsonFiles) => {
-                console.log(jsonFiles);
-
-                let studyList = {
-                  transactionId: subjectId,
-                  studies: []
-                };
-
-                for (let i = 0; i < jsonFiles.length; i++) {
-                  const experimentJsonI = jsonFiles[i];
-                  const studiesI = experimentJsonI.studies;
-
-                  sessionMap.setScan(experimentJsonI, {
-                    experimentId: experimentList[i].ID,
-                    experimentLabel: experimentList[i].label,
-                    subjectId,
-                    projectId,
-                    parentProjectId
-                  });
-
-                  console.log('Session Map:')
-                  console.log(sessionMap);
-
-                  // TODO -> clean this
-                  studiesI[0].studyDescription = experimentList[i].label || experimentList[i].ID;
-
-                  console.log(`Studies[${i}]`);
-
-                  console.log(studiesI);
-
-                  studyList.studies = [...studyList.studies, ...studiesI];
+            // When the JSON has been returned, parse it into a JavaScript Object
+            // and render the OHIF Viewer with this data
+            oReq.addEventListener('load', () => {
+                // Parse the response content
+                // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText
+                if (!oReq.responseText) {
+                    OHIF.log.warn('Response was undefined');
+                    return;
                 }
 
-                console.log(studyList);
-
-
-                if (parentProjectId) {
-                  console.log(`replacing ${parentProjectId} with ${projectId}`);
-
-                  let jsonString = JSON.stringify(studyList);
-
-                  jsonString = jsonString.replace( new RegExp( parentProjectId, 'g' ), projectId );
-
-                  studyList = JSON.parse(jsonString);
-                }
-
-                console.log(studyList);
-
-                this.data = studyList;
-
-                console.log(this);
-                console.log(this.data);
+                OHIF.log.info(JSON.stringify(oReq.responseText, null, 2));
+                this.data = JSON.parse(oReq.responseText);
 
                 next();
-              });
-
             });
 
-          }
-      },
-      action() {
-        console.log('Loading up viewer with json!');
-          // Render the Viewer with this data
-          this.render('standaloneViewer', {
-              data: () => this.data
-          });
-      }
-  });
+            // Open the Request to the server for the JSON data
+            // In this case we have a server-side route called /api/
+            // which responds to GET requests with the study data
+            OHIF.log.info(`Sending Request to: ${url}`);
+            oReq.open('GET', url);
+            oReq.setRequestHeader('Accept', 'application/json')
+
+            // Fire the request to the server
+            oReq.send();
+        },
+        action() {
+            // Render the Viewer with this data
+            this.render('standaloneViewer', {
+                data: () => this.data
+            });
+        }
+    });
 } else {
     // Local dev mode.
     if (Meteor.isClient) {
@@ -253,10 +96,6 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
       Router.configure({
           loadingTemplate: 'loading'
       });
-
-      icrXnatRoiSession.set("writePermissions", true);
-      icrXnatRoiSession.set("readPermissions", true);
-      icrXnatRoiSession.set("editPermissions", true);
 
       Router.onBeforeAction('loading');
 
@@ -297,30 +136,7 @@ if (Meteor.isClient && !Meteor.isDevelopment) {
                   }
 
                   OHIF.log.info(JSON.stringify(oReq.responseText, null, 2));
-
-                  const parsedJSON = JSON.parse(oReq.responseText);
-
-                  sessionMap.setScan(parsedJSON, {
-                    experimentId: 'XNAT_JPETTS_E00014',
-                    experimentLabel: 'Patient2',
-                    subjectId: 'XNAT_JPETTS_S00011',
-                    projectId: 'ITCRdemo',
-                    parentProjectId: 'ITCRdemo'
-                  });
-
-                  sessionMap.setSession({
-                    projectId: 'ITCRdemo',
-                    subjectId: 'XNAT_JPETTS_S00011',
-                    experimentId: 'XNAT_JPETTS_E00014',
-                    experimentLabel: 'Patient2'
-                  });
-
-                  sessionMap.setProject('ITCRdemo');
-                  sessionMap.setParentProject('ITCRdemo');
-                  sessionMap.setSubject('XNAT_JPETTS_S00011');
-                  sessionMap.setExperiment('XNAT_JPETTS_E00014')
-
-                  this.data = parsedJSON
+                  this.data = JSON.parse(oReq.responseText);
 
                   next();
               });

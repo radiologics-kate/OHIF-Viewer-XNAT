@@ -1,9 +1,7 @@
 import { Template } from 'meteor/templating';
 import { components as peppermintComponents } from "meteor/icr:peppermint-tools";
-import { components as icrXnatRoiComponents } from 'meteor/icr:xnat-roi';
 
 const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
-const { XNATNavigation, MaskImportList, MaskExportList, RoiImportList, RoiExportList } = icrXnatRoiComponents;
 
 let cornertoneNewImageActiveViewport = "CornerstoneNewImage0";
 
@@ -23,24 +21,6 @@ Template.flexboxLayout.events({
 Template.flexboxLayout.helpers({
   leftSidebarOpen() {
     return Template.instance().data.state.get('leftSidebar') && true;
-  },
-  leftSidebarScanList() {
-      const leftSidebarValue = Template.instance().data.state.get('leftSidebar');
-
-      if (leftSidebarValue === "scanList") {
-        return true;
-      }
-
-      return;
-  },
-  leftSidebarChangeSession() {
-    const leftSidebarValue = Template.instance().data.state.get('leftSidebar');
-
-    if (leftSidebarValue === "changeSession") {
-      return true;
-    }
-
-    return;
   },
   rightSidebarOpen() {
       return Template.instance().data.state.get('rightSidebar') && true;
@@ -79,15 +59,6 @@ Template.flexboxLayout.helpers({
 
     return Math.random().toString();
   },
-  roiContourMenuImportComponent() {
-    console.log(`roiContourMenuImportComponent:`);
-    console.log(RoiImportList);
-
-    return RoiImportList;
-  },
-  roiContourMenuExportComponent() {
-    return RoiExportList;
-  },
   SegmentationMenu() {
     return SegmentationMenu;
   },
@@ -103,14 +74,5 @@ Template.flexboxLayout.helpers({
     Session.get("refreshSegmentationMenu");
 
     return Math.random().toString();
-  },
-  segmentationMenuImportComponent() {
-    return MaskImportList;
-  },
-  segmentationMenuExportComponent() {
-    return MaskExportList;
-  },
-  XNATNavigation() {
-    return XNATNavigation;
   }
 });

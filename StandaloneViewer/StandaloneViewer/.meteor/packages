@@ -40,10 +40,6 @@ fortawesome:fontawesome
 mrt:moment
 random@1.1.0
 underscore
-icr:xnat-roi-namespace
-icr:series-info-provider
-icr:xnat-roi-scaling
-icr:xnat-roi
-icr:peppermint-tools
 react-template-helper
 jboulhous:dev
+icr:peppermint-tools

@@ -1,14 +1,7 @@
 <template name="flexboxLayout">
     <div class="viewerSection">
         <div class="sidebarMenu sidebar-left {{#if leftSidebarOpen}}sidebar-open{{/if}}">
-            {{#if leftSidebarScanList}}
-              {{>studyBrowser (clone this)}}
-            {{/if}}
-            {{#if leftSidebarChangeSession}}
-            <div>
-              {{>React component=XNATNavigation}}
-            </div>
-            {{/if}}
+            {{>studyBrowser (clone this)}}
         </div>
         <div class="mainContent {{#if leftSidebarOpen}}sidebar-left-open{{/if}} {{#if rightSidebarOpen}}sidebar-right-open{{/if}}">
             {{>standaloneViewerMain (clone this)}}
@@ -19,8 +12,6 @@
             <div class="roi-contour-menu">
               {{> React component=RoiContourMenu
                 key=roiContourMenuId
-                ImportCallbackOrComponent=roiContourMenuImportComponent
-                ExportCallbackOrComponent=roiContourMenuExportComponent
               }}
             </div>
           {{/if}}
@@ -28,8 +19,6 @@
             <div class="segmentation-menu">
               {{> React component=SegmentationMenu
                 key=segmentationMenuId
-                ImportCallbackOrComponent=segmentationMenuImportComponent
-                ExportCallbackOrComponent=segmentationMenuExportComponent
               }}
             </div>
           {{/if}}

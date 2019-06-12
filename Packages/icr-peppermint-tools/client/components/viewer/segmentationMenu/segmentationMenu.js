@@ -20,6 +20,8 @@ import "./segmentationMenu.styl";
 
 const brushModule = cornerstoneTools.store.modules.brush;
 
+//
+
 /**
  * @class SegmentationMenu - Renders a menu for importing, exporting, creating
  * and renaming Segments. As well as setting configuration settings for
@@ -358,8 +360,8 @@ export default class SegmentationMenu extends React.Component {
       component = (
         <SegmentationMenuDeleteConfirmation
           segmentLabel={segmentLabel}
-          onDeleteConfirmClick={onDeleteConfirmClick}
-          onDeleteCancelClick={onDeleteCancelClick}
+          onDeleteConfirmClick={this.onDeleteConfirmClick}
+          onDeleteCancelClick={this.onDeleteCancelClick}
         />
       );
     } else {

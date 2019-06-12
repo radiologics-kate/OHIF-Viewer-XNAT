@@ -1,39 +1,30 @@
 import { Template } from 'meteor/templating';
 import { OHIF } from 'meteor/ohif:core';
 import 'meteor/ohif:viewerbase';
-import { icrXnatRoiSession } from 'meteor/icr:xnat-roi-namespace';
 
 Template.toolbarSection.onCreated(() => {
     const instance = Template.instance();
 
     if (OHIF.uiSettings.leftSidebarOpen) {
-        instance.data.state.set('leftSidebar', 'scanList');
+        instance.data.state.set('leftSidebar', 'studies');
     }
 });
 
 Template.toolbarSection.helpers({
     leftSidebarToggleButtonData() {
         const instance = Template.instance();
-        // JamesAPetts - Return two things
         return {
-              toggleable: true,
-              key: 'leftSidebar',
-              value: instance.data.state,
-              options: [{
-                  value: 'scanList',
-                  svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-studies',
-                  svgWidth: 15,
-                  svgHeight: 13,
-                  bottomLabel: 'Scans'
-              },
-              {
-                  value: 'changeSession',
-                  svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-measurements-lesions',
-                  svgWidth: 15,
-                  svgHeight: 13,
-                  bottomLabel: 'XNAT Nav'
-              }]
-          };
+            toggleable: true,
+            key: 'leftSidebar',
+            value: instance.data.state,
+            options: [{
+                value: 'studies',
+                svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-studies',
+                svgWidth: 15,
+                svgHeight: 13,
+                bottomLabel: 'Series'
+            }]
+        };
     },
     rightSidebarToggleButtonData() {
         const instance = Template.instance();
@@ -201,51 +192,40 @@ Template.toolbarSection.helpers({
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-pan'
         });
 
-        const annotationTools = [
-          {
-            id: 'length',
-            title: 'Length',
-            classes: 'imageViewerTool toolbarSectionButton',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-temp'
-          },
-          {
-            id: 'annotate',
-            title: 'Annotate',
-            classes: 'imageViewerTool',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-non-target'
-          },
-          {
-            id: 'angle',
-            title: 'Angle',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-angle-left'
-          },/*
-          {
-            id: 'bidirectional',
-            title: 'Bidirectional',
-            classes: 'imageViewerTool',
-            svgLink: 'packages/ohif_viewerbase/assets/icons.svg#bidirectional-tool'
-          },*/
-          {
-            id: 'ellipticalRoi',
-            title: 'Ellipse',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-circle-o'
-          },
-          {
-            id: 'rectangleRoi',
-            title: 'Rectangle',
-            classes: 'imageViewerTool',
-            iconClasses: 'fa fa-square-o'
-          }
-        ];
 
         buttonData.push({
-            id: 'Annotations',
-            title: 'Annotations',
-            classes: 'rp-x-1 rm-l-3',
-            svgLink: 'packages/icr_xnat-roi/assets/icons.svg#annotations-menu',
-            subTools: annotationTools
+          id: 'length',
+          title: 'Length',
+          classes: 'imageViewerTool toolbarSectionButton',
+          svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-temp'
+        });
+
+        buttonData.push({
+          id: 'annotate',
+          title: 'Annotate',
+          classes: 'imageViewerTool',
+          svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-measure-non-target'
+        });
+
+        buttonData.push({
+          id: 'angle',
+          title: 'Angle',
+          classes: 'imageViewerTool',
+          iconClasses: 'fa fa-angle-left'
+        });
+
+        buttonData.push({
+          id: 'ellipticalRoi',
+          title: 'Ellipse',
+          classes: 'imageViewerTool',
+          iconClasses: 'fa fa-circle-o'
+        });
+
+        buttonData.push({
+          id: 'rectangleRoi',
+          title: 'Rectangle',
+          classes: 'imageViewerTool',
+          iconClasses: 'fa fa-square-o'
         });
 
         const freehandTools = [
@@ -329,13 +309,6 @@ Template.toolbarSection.helpers({
             classes: 'rp-x-1 rm-l-3',
             svgLink: 'packages/ohif_viewerbase/assets/icons.svg#icon-tools-more',
             subTools: extraTools
-        });
-
-        buttonData.push({
-          id: 'showHelp',
-          title: 'Help',
-          classes: 'imageViewerCommand',
-          iconClasses: 'fa fa-question'
         });
 
         return buttonData;
