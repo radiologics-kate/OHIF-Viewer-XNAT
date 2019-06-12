@@ -22,8 +22,6 @@ export default class XNATNavigation extends React.Component {
    * @returns {type}  description
    */
   componentDidMount() {
-    console.log(`XNAT Navigation componentDidMount`);
-
     fetchJSON("/data/archive/projects/?format=json")
       .promise.then(result => {
         if (!result) {

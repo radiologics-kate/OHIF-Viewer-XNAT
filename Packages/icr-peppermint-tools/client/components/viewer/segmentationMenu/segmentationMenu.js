@@ -360,8 +360,8 @@ export default class SegmentationMenu extends React.Component {
       component = (
         <SegmentationMenuDeleteConfirmation
           segmentLabel={segmentLabel}
-          onDeleteConfirmClick={onDeleteConfirmClick}
-          onDeleteCancelClick={onDeleteCancelClick}
+          onDeleteConfirmClick={this.onDeleteConfirmClick}
+          onDeleteCancelClick={this.onDeleteCancelClick}
         />
       );
     } else {
