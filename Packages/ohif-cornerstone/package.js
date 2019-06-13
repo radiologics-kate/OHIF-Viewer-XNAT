@@ -7,8 +7,8 @@ Package.describe({
 Npm.depends({
     hammerjs: '2.0.8',
     'cornerstone-core': '2.2.7',
-    //'cornerstone-tools': '4.0.0',
-    'cornerstone-tools': "file:///Users/jpetts/cornerstone-tools-JamesAPetts/cornerstoneTools",
+    //'cornerstone-tools': '4.0.0-rc2',
+    'cornerstone-tools': 'file:///Users/jpetts/cornerstone-tools-JamesAPetts/cornerstoneTools',
     'cornerstone-math': '0.1.6',
     'dicom-parser': '1.8.0',
     'cornerstone-wado-image-loader': '2.1.4',

@@ -150,7 +150,11 @@ export default class SegmentationMenu extends React.Component {
   onDeleteConfirmClick() {
     const { segmentToDelete } = this.state;
 
+    const t0 = performance.now();
+
     brushModule.setters.deleteSegment(this._element, segmentToDelete);
+
+    const t1 = performance.now();
 
     const segments = this._segments();
 

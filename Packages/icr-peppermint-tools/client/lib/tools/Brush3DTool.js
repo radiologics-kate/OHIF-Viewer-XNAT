@@ -57,10 +57,11 @@ export default class Brush3DTool extends BrushTool {
 
     if (metadata) {
       // Metadata assigned, start drawing.
-      this._paint(evt);
+      if (eventData.currentPoints) {
+        this._paint(evt);
+      }
       this._drawing = true;
       this._startListeningForMouseUp(element);
-      this._lastImageCoords = eventData.currentPoints.image;
     } else if (!isDialogOpen()) {
       // Open the UI and let the user input data!
       const activeEnabledElement = OHIF.viewerbase.viewportUtils.getEnabledElementForActiveElement();
@@ -89,8 +90,7 @@ export default class Brush3DTool extends BrushTool {
     // If metadata doesn't exist, or all elements undefined (i.e. deleted), open UI.
     if (!metadata || !metadata.find(element => element)) {
       if (!isDialogOpen()) {
-        brushModule.state.drawColorId = 1;
-        newSegmentInput(brushModule.state.drawColorId);
+        newSegmentInput(1);
       }
     }
   }
