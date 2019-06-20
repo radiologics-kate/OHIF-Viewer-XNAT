@@ -1,5 +1,6 @@
 import { Template } from 'meteor/templating';
 import { components as peppermintComponents } from "meteor/icr:peppermint-tools";
+import papiRoiLoader from './lib/papiRoiLoader.js';
 
 const { RoiContourMenu, SegmentationMenu } = peppermintComponents;
 
@@ -58,6 +59,9 @@ Template.flexboxLayout.helpers({
     Session.get("refreshRoiContourMenu");
 
     return Math.random().toString();
+  },
+  roiContourMenuImportComponent() {
+    return papiRoiLoader;
   },
   SegmentationMenu() {
     return SegmentationMenu;

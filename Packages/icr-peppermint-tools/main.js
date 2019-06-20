@@ -46,4 +46,12 @@ const components = {
   SegmentationMenu
 };
 
+export {
+  default as getSeriesInstanceUidFromEnabledElement
+} from "./client/lib/util/getSeriesInstanceUidFromEnabledElement";
+
+export {
+  default as getSeriesInstanceUidFromImageId
+} from "./client/lib/util/getSeriesInstanceUidFromImageId.js";
+
 export { components };

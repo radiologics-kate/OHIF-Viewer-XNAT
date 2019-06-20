@@ -4,22 +4,235 @@
     "studyInstanceUid": "23.23.21.3.32",
     "patientName": "Patient Name",
     "seriesList": [{
-      "seriesInstanceUid": "1.23.2.32.1.2.1.3.2",
-      "seriesDescription": "T-1",
+      "seriesInstanceUid": "1.3.6.1.4.1.14519.5.2.1.5168.2407.870862828034960601000068282140",
+      "seriesDescription": "TEST",
       "instances": [
-             {
-               "sopInstanceUid": "1.2.3.2.32.18.8",
-               "rows": 256,
-               "columns": 256,
-               "url": "dicomweb://172.31.83.205/papi/v1/files/405/data"
-             },
-             {
-                "sopInstanceUid": "1.2.3.2.32.18.9",
-                "rows": 256,
-                "columns": 256,
-                "url": "dicomweb://172.31.83.205/papi/v1/files/406/data"
-             }
-         ]
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/348/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/350/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/346/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/317/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/202/data"
+        },
+
+
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/352/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/264/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/318/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/418/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/302/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/284/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/330/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/273/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/209/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/289/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/251/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/272/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/262/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/287/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/288/data"
+        }
+
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/419/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/416/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/260/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/296/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/387/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/367/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/244/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/415/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/221/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/364/data"
+        },
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/334/data"
+        }
+
+
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/204/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/339/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/222/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/201/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/240/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/324/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/345/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/293/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/408/data"
+        }
+        ,
+        {
+          "rows": 512,
+          "columns": 512,
+          "url": "dicomweb://172.31.83.205/papi/v1/files/341/data"
+        }
+        ]
      }]
   }]
 }
