@@ -15,7 +15,8 @@ const testDataFiles = [
     'MGStudy.json',
     'MRStudy.json',
     'PTCTStudy.json',
-    'RFStudy.json'
+    'RFStudy.json',
+    'papi_demo.json'
 ];
 
 testDataFiles.forEach(file => {

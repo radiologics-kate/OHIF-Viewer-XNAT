@@ -9,12 +9,15 @@
       "instances": [
              {
                "sopInstanceUid": "1.2.3.2.32.18.8",
-               "rows": 1,
-               "url": "dicomweb://rawgit.com/chafey/byozfwv/master/sampleData/1.2.840.113619.2.5.1762583153.215519.978957063.80.dcm"
-             }, {
-          "sopInstanceUid": "1.2.3.2.32.18.9",
-          "rows": 1,
-          "url": "dicomweb://rawgit.com/chafey/byozfwv/master/sampleData/1.2.840.113619.2.5.1762583153.215519.978957063.81.dcm"
+               "rows": 256,
+               "columns": 256,
+               "url": "dicomweb://172.31.83.205/papi/v1/files/405/data"
+             },
+             {
+                "sopInstanceUid": "1.2.3.2.32.18.9",
+                "rows": 256,
+                "columns": 256,
+                "url": "dicomweb://172.31.83.205/papi/v1/files/406/data"
              }
          ]
      }]
