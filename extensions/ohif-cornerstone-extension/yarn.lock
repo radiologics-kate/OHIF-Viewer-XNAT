@@ -3259,6 +3259,7 @@ lodash.clonedeep@^4.5.0:
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
 lodash.memoize@^4.1.2:
   version "4.1.2"
@@ -3503,6 +3504,7 @@ mkpath@^1.0.0:
 moment@^2.23.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 ms@2.0.0:
   version "2.0.0"
@@ -4421,7 +4423,7 @@ randomfill@^1.0.3:
     randombytes "^2.0.5"
     safe-buffer "^5.1.0"
 
-react-cornerstone-viewport@0.1.30:
+react-cornerstone-viewport@^0.1.30:
   version "0.1.30"
   resolved "https://registry.yarnpkg.com/react-cornerstone-viewport/-/react-cornerstone-viewport-0.1.30.tgz#3546a5164feef5f1f3b45ade10fd9a66f82fd101"
   integrity sha512-DGxdpS7FJvWi57NhpKhKMdaW3go/Fs/zfWJFtaEzGVHq2zQnEEV5G1pamC4ttRhKMfzy7T7y4h14xUVzE7IqPA==

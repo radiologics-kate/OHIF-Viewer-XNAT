@@ -1453,15 +1453,13 @@
     universal-user-agent "^2.0.0"
     url-template "^2.0.8"
 
-"@ohif/extension-cornerstone@0.0.37":
-  version "0.0.37"
-  resolved "https://registry.yarnpkg.com/@ohif/extension-cornerstone/-/extension-cornerstone-0.0.37.tgz#d9d31409ffbc773dde17767daa02b87f461cf11a"
-  integrity sha512-090WPGXOYIxZjQe0mIM7SipgR3ggUZpbtWpwg7huWC0PQObIM3Juy4L8mtss23OKaKsmrmVxUaFc5NRQhs+Z+w==
+"@ohif/extension-cornerstone@file:.yalc/@ohif/extension-cornerstone":
+  version "0.0.37-5abbc013"
   dependencies:
     "@babel/runtime" "^7.2.0"
     classnames "^2.2.6"
     lodash.throttle "^4.1.1"
-    react-cornerstone-viewport "0.1.30"
+    react-cornerstone-viewport "^0.1.30"
 
 "@ohif/extension-dicom-html@0.0.3":
   version "0.0.3"
@@ -4089,10 +4087,10 @@ cornerstone-math@^0.1.8:
   resolved "https://registry.yarnpkg.com/cornerstone-math/-/cornerstone-math-0.1.8.tgz#68ab1f9e4fdcd7c5cb23a0d2eb4263f9f894f1c5"
   integrity sha512-x7NEQHBtVG7j1yeyj/aRoKTpXv1Vh2/H9zNLMyqYJDtJkNng8C4Q8M3CgZ1qer0Yr7eVq2x+Ynmj6kfOm5jXKw==
 
-cornerstone-tools@^3.13.0:
-  version "3.13.0"
-  resolved "https://registry.yarnpkg.com/cornerstone-tools/-/cornerstone-tools-3.13.0.tgz#c198f7d1a500e76db5fb5b0bd2ddeaf1a9a09160"
-  integrity sha512-7MUL1D0eSsYFw+K9YDcPZVKVovFqMYl84Vpix+1fb3N2EN/UOMpjzrYhdajvMR8qfoBUAMpyMkMnzM11Hb9Z+A==
+cornerstone-tools@vNext:
+  version "4.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/cornerstone-tools/-/cornerstone-tools-4.0.0-rc4.tgz#44cfbbf262e49cb86c53e9f7def6da4b0a3a4555"
+  integrity sha512-fr1vweA4Koss9wHHKLSgloHt5BsDeWaq1iPwxjOuItqLPZLVC0DA7W90FySeK5C5037oymOHnp72nRHt+H/5eQ==
   dependencies:
     "@babel/runtime" "7.1.2"
     cornerstone-math "0.1.7"
@@ -10630,10 +10628,10 @@ octokit-pagination-methods@^1.1.0:
   resolved "https://registry.yarnpkg.com/octokit-pagination-methods/-/octokit-pagination-methods-1.1.0.tgz#cf472edc9d551055f9ef73f6e42b4dbb4c80bea4"
   integrity sha512-fZ4qZdQ2nxJvtcasX7Ghl+WlWS/d9IgnBIwFZXVNNZUmzpno91SX5bc5vuxiuKoCtK78XxGGNuSCrDC7xYB3OQ==
 
-ohif-core@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/ohif-core/-/ohif-core-0.6.0.tgz#9fea32d8d10da84b9030d2e4f76b30e431e14ac2"
-  integrity sha512-2Z/HTRZ21i7w056MifH1k0y4brhrZSUsmeqbMcPLSh1cztRGnLQBamBZ08SzWvktcNxLDuwJI9zNDkJ8Gw4Idw==
+ohif-core@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/ohif-core/-/ohif-core-0.9.0.tgz#18d28cd50056703417169bc3a467cacffa07ddc6"
+  integrity sha512-UYVLAEuQowM78r0N94EVnYby9L+W1NwpdDFDZl3rVDwleHnZs0GpGTJKEjx8YnAieq1zboWP6mswTp1vFXaV9g==
   dependencies:
     "@babel/runtime" "^7.2.0"
     ajv "^6.10.0"
@@ -12523,7 +12521,7 @@ react-bootstrap-modal@4.2.0:
     react-overlays "^0.8.0"
     react-transition-group "^2.0.0"
 
-react-cornerstone-viewport@0.1.30:
+react-cornerstone-viewport@^0.1.30:
   version "0.1.30"
   resolved "https://registry.yarnpkg.com/react-cornerstone-viewport/-/react-cornerstone-viewport-0.1.30.tgz#3546a5164feef5f1f3b45ade10fd9a66f82fd101"
   integrity sha512-DGxdpS7FJvWi57NhpKhKMdaW3go/Fs/zfWJFtaEzGVHq2zQnEEV5G1pamC4ttRhKMfzy7T7y4h14xUVzE7IqPA==

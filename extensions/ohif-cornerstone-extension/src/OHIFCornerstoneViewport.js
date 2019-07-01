@@ -32,7 +32,30 @@ class OHIFCornerstoneViewport extends Component {
   };
 
   static defaultProps = {
-    customProps: {},
+    customProps: {
+      availableTools: [
+        { name: 'Pan', mouseButtonMasks: [1, 4] },
+        {
+          name: 'Zoom',
+          props: {
+            minScale: 0.3,
+            maxScale: 25,
+            preventZoomOutsideImage: true,
+          },
+          mouseButtonMasks: [1, 2],
+        },
+        { name: 'Wwwc', mouseButtonMasks: [1] },
+        { name: 'Bidirectional', mouseButtonMasks: [1] },
+        { name: 'Length', mouseButtonMasks: [1] },
+        { name: 'Angle', mouseButtonMasks: [1] },
+        { name: 'StackScroll', mouseButtonMasks: [1] },
+        { name: 'Brush', mouseButtonMasks: [1] },
+        { name: 'PanMultiTouch' },
+        { name: 'ZoomTouchPinch' },
+        { name: 'StackScrollMouseWheel' },
+        { name: 'StackScrollMultiTouch' },
+      ],
+    },
   };
 
   static propTypes = {
@@ -254,6 +277,10 @@ class OHIFCornerstoneViewport extends Component {
         });
       });
     }
+
+    console.log(`TEST YALC: OHIF-Cornerstone Viewport.`);
+
+    console.log(this.props);
 
     return (
       <>

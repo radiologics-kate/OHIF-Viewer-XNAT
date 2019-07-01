@@ -23,7 +23,9 @@ import OHIFDicomMicroscopyExtension from '@ohif/extension-dicom-microscopy';
 import OHIFDicomPDFExtension from '@ohif/extension-dicom-pdf';
 import OHIFStandaloneViewer from './OHIFStandaloneViewer';
 import OHIFVTKExtension from '@ohif/extension-vtk';
-import OHIFSegmentationPlugin from 'ohif-segmentation-plugin';
+//import OHIFSegmentationPlugin from 'ohif-segmentation-plugin';
+import OHIFSegmentationPlugin from './ohif-segmentation-extension-local';
+
 // ~~ EXTENSIONS
 import { OidcProvider } from 'redux-oidc';
 import PropTypes from 'prop-types';

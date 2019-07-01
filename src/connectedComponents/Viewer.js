@@ -258,7 +258,9 @@ class Viewer extends Component {
                 viewports={
                   window.store.getState().viewports.viewportSpecificData
                 }
-                activeIndex={window.store.getState().activeViewportIndex}
+                activeIndex={
+                  window.store.getState().viewports.activeViewportIndex
+                }
               />
             )}
           </SidePanel>
