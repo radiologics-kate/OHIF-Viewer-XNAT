@@ -103,17 +103,19 @@ export default {
           icon: 'th-list',
           label: 'Segments',
           target: 'segment-panel',
+          from: 'left',
         },
         {
           icon: 'th',
           label: 'Contours',
           target: 'contour-panel',
+          from: 'right',
         },
       ],
       components: [
         {
           id: 'segment-panel',
-          from: 'right',
+          from: 'left',
           width: '500px',
           component: SegmentationMenu,
         },
