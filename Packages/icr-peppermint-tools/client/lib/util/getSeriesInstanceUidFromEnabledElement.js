@@ -1,7 +1,7 @@
 import { OHIF } from "meteor/ohif:core";
 
 export default function getSeriesInstanceUidFromEnabledElement(enabledElement) {
-  if (!enabledElement) {
+  if (!enabledElement || !enabledElement.image) {
     return;
   }
 
