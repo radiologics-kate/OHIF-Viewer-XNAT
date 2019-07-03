@@ -362,17 +362,15 @@ export class MetadataProvider {
 
     let PerFrameFunctionalGroupsSequenceI;
 
+    // If the PerFrameFunctionalGroupsSequence entry exists for this frame, use
+    // It to get IPP. Otherwise use what is in the SharedFunctionalGroupsSequence/
     if (dataSet.elements["x52009230"]) {
       PerFrameFunctionalGroupsSequenceI =
         dataSet.elements["x52009230"].items[frame].dataSet;
-    }
 
-    let imagePosition;
+      const perFramePlanePositionSequence =
+        PerFrameFunctionalGroupsSequenceI.elements["x00209113"];
 
-    const perFramePlanePositionSequence =
-      PerFrameFunctionalGroupsSequenceI.elements["x00209113"];
-
-    if (perFramePlanePositionSequence) {
       instance.imagePositionPatient = perFramePlanePositionSequence.items[0].dataSet.string(
         "x00200032"
       );
@@ -382,10 +380,11 @@ export class MetadataProvider {
       ].items[0].dataSet.string("x00200032");
     }
 
-    imagePosition = instance.imagePositionPatient.split("\\");
+    const imagePosition = instance.imagePositionPatient.split("\\");
 
-    const perFramePlaneOrientationSequence =
-      PerFrameFunctionalGroupsSequenceI.elements["x00209116"];
+    const perFramePlaneOrientationSequence = PerFrameFunctionalGroupsSequenceI
+      ? PerFrameFunctionalGroupsSequenceI.elements["x00209116"]
+      : null;
 
     if (perFramePlaneOrientationSequence) {
       instance.imageOrientationPatient = perFramePlaneOrientationSequence.items[0].dataSet.string(
@@ -399,8 +398,9 @@ export class MetadataProvider {
 
     const imageOrientation = instance.imageOrientationPatient.split("\\");
 
-    const perFramePixelMeasuresSequence =
-      PerFrameFunctionalGroupsSequenceI.elements["x00289110"];
+    const perFramePixelMeasuresSequence = PerFrameFunctionalGroupsSequenceI
+      ? PerFrameFunctionalGroupsSequenceI.elements["x00289110"]
+      : null;
 
     if (perFramePixelMeasuresSequence) {
       instance.pixelSpacing = perFramePixelMeasuresSequence.items[0].dataSet.string(
