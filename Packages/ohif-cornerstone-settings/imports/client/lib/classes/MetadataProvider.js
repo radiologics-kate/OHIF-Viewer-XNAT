@@ -374,42 +374,47 @@ export class MetadataProvider {
       instance.imagePositionPatient = perFramePlanePositionSequence.items[0].dataSet.string(
         "x00200032"
       );
-    } else {
+    } else if (SharedFunctionalGroupsSequenceDataSet.elements["x00209113"]) {
       instance.imagePositionPatient = SharedFunctionalGroupsSequenceDataSet.elements[
         "x00209113"
       ].items[0].dataSet.string("x00200032");
+    } else {
+      instance.imagePositionPatient = "NaN\\NaN\\NaN";
     }
 
     const imagePosition = instance.imagePositionPatient.split("\\");
 
-    const perFramePlaneOrientationSequence = PerFrameFunctionalGroupsSequenceI
+    let planeOrientationSequence = PerFrameFunctionalGroupsSequenceI
       ? PerFrameFunctionalGroupsSequenceI.elements["x00209116"]
       : null;
 
-    if (perFramePlaneOrientationSequence) {
-      instance.imageOrientationPatient = perFramePlaneOrientationSequence.items[0].dataSet.string(
+    // IF null, use the shared group, if it exists.
+    planeOrientationSequence =
+      planeOrientationSequence ||
+      SharedFunctionalGroupsSequenceDataSet.elements["x00209116"];
+
+    if (planeOrientationSequence) {
+      instance.imageOrientationPatient = planeOrientationSequence.items[0].dataSet.string(
         "x00200037"
       );
     } else {
-      instance.imagePositionPatient = SharedFunctionalGroupsSequenceDataSet.elements[
-        "x00209116"
-      ].items[0].dataSet.string("x00200037");
+      instance.imageOrientationPatient = "NaN\\NaN\\NaN";
     }
 
     const imageOrientation = instance.imageOrientationPatient.split("\\");
 
-    const perFramePixelMeasuresSequence = PerFrameFunctionalGroupsSequenceI
+    let pixelMeasuresSequence = PerFrameFunctionalGroupsSequenceI
       ? PerFrameFunctionalGroupsSequenceI.elements["x00289110"]
       : null;
+
+    pixelMeasuresSequence =
+      pixelMeasuresSequence ||
+      SharedFunctionalGroupsSequenceDataSet.elements["x00289110"];
 
     if (perFramePixelMeasuresSequence) {
       instance.pixelSpacing = perFramePixelMeasuresSequence.items[0].dataSet.string(
         "x00280030"
       );
-    } else {
-      instance.pixelSpacing = SharedFunctionalGroupsSequenceDataSet.elements[
-        "x00289110"
-      ].items[0].dataSet.string("x00280030");
     }
 
     let columnPixelSpacing = 1.0;
